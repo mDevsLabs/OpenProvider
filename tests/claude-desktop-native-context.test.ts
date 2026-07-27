@@ -25,8 +25,8 @@ const config = {
 
 test("buildClaudeDesktopState gives native rows their real context window", async () => {
   const home = tempHome();
-  const prev = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = home;
+  const prev = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+  process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = home;
   try {
     const state = await buildClaudeDesktopState(config);
     const sol = state.models.find(m => m.route === "native/gpt-5.6-sol");
@@ -41,8 +41,8 @@ test("buildClaudeDesktopState gives native rows their real context window", asyn
       if (expected !== undefined) expect(row?.contextWindow).toBe(expected);
     }
   } finally {
-    if (prev === undefined) delete process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-    else process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = prev;
+    if (prev === undefined) delete process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+    else process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = prev;
     rmSync(home, { recursive: true, force: true });
   }
 });

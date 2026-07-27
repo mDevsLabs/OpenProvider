@@ -5,10 +5,10 @@ import { join } from "node:path";
 import { isRealBunBinary, bundledBunPath, durableBunPath, durableBunRuntime, overrideBunPath } from "../src/lib/bun-runtime";
 
 const tmp = mkdtempSync(join(tmpdir(), "opr-bun-runtime-"));
-const previousOverride = process.env.OPENCODEX_BUN_PATH;
+const previousOverride = process.env.OPENPROVIDER_BUN_PATH;
 afterAll(() => {
-  if (previousOverride === undefined) delete process.env.OPENCODEX_BUN_PATH;
-  else process.env.OPENCODEX_BUN_PATH = previousOverride;
+  if (previousOverride === undefined) delete process.env.OPENPROVIDER_BUN_PATH;
+  else process.env.OPENPROVIDER_BUN_PATH = previousOverride;
   rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -38,26 +38,26 @@ describe("isRealBunBinary (size gate vs placeholder stub)", () => {
 });
 
 describe("bundledBunPath / durableBunPath", () => {
-  it("uses OPENCODEX_BUN_PATH only when it points to a real Bun binary", () => {
+  it("uses OPENPROVIDER_BUN_PATH only when it points to a real Bun binary", () => {
     const real = join(tmp, "override-bun.exe");
     const stub = join(tmp, "override-stub.exe");
     writeFileSync(real, Buffer.alloc(1_000_000));
     writeFileSync(stub, "stub");
 
-    process.env.OPENCODEX_BUN_PATH = stub;
+    process.env.OPENPROVIDER_BUN_PATH = stub;
     expect(overrideBunPath()).toBeNull();
     expect(durableBunRuntime().source).not.toBe("override");
 
-    process.env.OPENCODEX_BUN_PATH = real;
+    process.env.OPENPROVIDER_BUN_PATH = real;
     expect(overrideBunPath()).toBe(real);
     expect(durableBunRuntime()).toEqual({
       path: real,
       source: "override",
-      overrideEnv: "OPENCODEX_BUN_PATH",
+      overrideEnv: "OPENPROVIDER_BUN_PATH",
     });
     expect(durableBunPath()).toBe(real);
-    if (previousOverride === undefined) delete process.env.OPENCODEX_BUN_PATH;
-    else process.env.OPENCODEX_BUN_PATH = previousOverride;
+    if (previousOverride === undefined) delete process.env.OPENPROVIDER_BUN_PATH;
+    else process.env.OPENPROVIDER_BUN_PATH = previousOverride;
   });
 
   it("resolves the installed bundled bun binary (dev has the bun dep)", () => {

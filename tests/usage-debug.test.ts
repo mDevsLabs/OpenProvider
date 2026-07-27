@@ -18,15 +18,15 @@ let previousHome: string | undefined;
 let previousDebug: string | undefined;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   previousDebug = process.env[USAGE_DEBUG_ENV];
   testDir = mkdtempSync(join(tmpdir(), "opr-usage-debug-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   if (previousDebug === undefined) delete process.env[USAGE_DEBUG_ENV];
   else process.env[USAGE_DEBUG_ENV] = previousDebug;
   if (testDir) rmSync(testDir, { recursive: true, force: true });

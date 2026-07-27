@@ -218,7 +218,7 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
       openai_base_url: "sentinel",
       CODEX_HOME: "sentinel",
       codex_api_key: "sentinel",
-      OPENCODEX_HOME: "sentinel",
+      OPENPROVIDER_HOME: "sentinel",
       openprovider_base_url: "sentinel",
       HTTP_PROXY: "sentinel",
       https_proxy: "sentinel",
@@ -235,7 +235,7 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
     expect(env.https_proxy).toBeUndefined();
     expect(env.ALL_PROXY).toBeUndefined();
     expect(env.all_proxy).toBeUndefined();
-    expect(env.OPENCODEX_HOME).toBe("/tmp/opr");
+    expect(env.OPENPROVIDER_HOME).toBe("/tmp/opr");
     expect(env.CODEX_HOME).toBe("/tmp/codex");
     expect(env.NO_PROXY).toBe("127.0.0.1,localhost,::1");
     expect(env.no_proxy).toBe("127.0.0.1,localhost,::1");
@@ -250,7 +250,7 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
     const realCodex = join(root, "codex-real");
     const shim = join(root, "codex");
     writeFileSync(tokenFile, "real-state-sentinel\n", { mode: 0o600 });
-    writeFileSync(realCodex, "#!/bin/sh\nprintf '%s\\n' \"$OPENCODEX_API_AUTH_TOKEN\"\n", { mode: 0o700 });
+    writeFileSync(realCodex, "#!/bin/sh\nprintf '%s\\n' \"$OPENPROVIDER_API_AUTH_TOKEN\"\n", { mode: 0o700 });
     writeFileSync(shim, buildUnixCodexShim(realCodex, process.execPath, "/fixture/cli.ts", tokenFile), { mode: 0o700 });
     chmodSync(realCodex, 0o700);
     chmodSync(shim, 0o700);

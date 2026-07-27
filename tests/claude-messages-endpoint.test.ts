@@ -22,16 +22,16 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-claude-endpoint-");
   testDir = mkdtempSync(join(tmpdir(), "opr-claude-endpoint-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   globalThis.fetch = originalFetch;
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   globalThis.fetch = originalFetch;
@@ -556,7 +556,7 @@ test("routed Claude requests give OpenAI sidecars main auth without leaking it t
   const mainAccessToken = "main-chatgpt-access";
   const mainAccountId = "main-chatgpt-account";
   const imageBytes = "aGVsbG8taW1hZ2UtYnl0ZXM=";
-  const visionCaption = "A red OPENCODEX logo on a white background.";
+  const visionCaption = "A red OPENPROVIDER logo on a white background.";
   const sidecarCalls: Array<{ headers: Headers; body: Record<string, any>; kind: "vision" | "web-search" }> = [];
   const routedCalls: Array<{ authorization: string | null; body: Record<string, any> }> = [];
 

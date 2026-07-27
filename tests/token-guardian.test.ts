@@ -9,7 +9,7 @@ import { __resetGuardianState, guardianSweep } from "../src/oauth/token-guardian
 import type { OcxConfig, OcxProviderConfig } from "../src/types";
 
 const origHome = process.env.HOME;
-const origOcxHome = process.env.OPENCODEX_HOME;
+const origOcxHome = process.env.OPENPROVIDER_HOME;
 const origCodexHome = process.env.CODEX_HOME;
 const origFetch = globalThis.fetch;
 const WARMUP_INPUT = [{ type: "message", role: "user", content: [{ type: "input_text", text: "hi" }] }];
@@ -32,7 +32,7 @@ beforeEach(() => {
   tmp = join(tmpdir(), `token-guardian-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(tmp, { recursive: true });
   process.env.HOME = tmp;
-  process.env.OPENCODEX_HOME = join(tmp, "opr");
+  process.env.OPENPROVIDER_HOME = join(tmp, "opr");
   process.env.CODEX_HOME = join(tmp, "codex");
   mkdirSync(join(tmp, "opr"), { recursive: true });
   mkdirSync(join(tmp, "codex"), { recursive: true });
@@ -41,7 +41,7 @@ beforeEach(() => {
 
 afterEach(() => {
   if (origHome === undefined) delete process.env.HOME; else process.env.HOME = origHome;
-  if (origOcxHome === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = origOcxHome;
+  if (origOcxHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = origOcxHome;
   if (origCodexHome === undefined) delete process.env.CODEX_HOME; else process.env.CODEX_HOME = origCodexHome;
   globalThis.fetch = origFetch;
   rmSync(tmp, { recursive: true, force: true });

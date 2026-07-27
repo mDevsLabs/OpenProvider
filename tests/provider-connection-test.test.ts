@@ -7,19 +7,19 @@ import { saveConfig } from "../src/config";
 import type { OcxConfig } from "../src/types";
 
 const TEST_DIR = join(tmpdir(), "opr-conn-test");
-const previousHome = process.env.OPENCODEX_HOME;
+const previousHome = process.env.OPENPROVIDER_HOME;
 const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_DIR, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
 });
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   rmSync(TEST_DIR, { recursive: true, force: true });
 });
 

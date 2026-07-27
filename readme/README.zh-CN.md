@@ -3,7 +3,7 @@
 两条命令，Codex 和 Claude Code 就能用任何 LLM 跑起来。</p>
 
 <p align="center">
-  <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="在 X 上关注 @claudeebum"></a>
+  <a href="https://x.com/mDevsLabs"><img src="https://img.shields.io/badge/%40mDevsLabs-000000?logo=x&logoColor=white" alt="在 X 上关注 @mDevsLabs"></a>
   <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="npm version"></a>
   <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="license"></a>
   <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="node version">
@@ -296,7 +296,7 @@ openprovider 提供两种自动启动代理的方式：
 shim。仍在变化的启动器不会被改动，而会在后续命令中重试。修复失败只会警告，不会让请求的命令
 失败；手动备用命令为 `opr codex-shim install`。若要关闭自动恢复，请将
 `codexShimAutoRestore` 设为 `false`，或为进程设置
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`。
+`OPENPROVIDER_CODEX_SHIM_AUTO_RESTORE=0`。
 如果配置的代理端口已被占用，`opr start` 会自动选择另一个空闲本地端口并更新 Codex 使用它。
 
 ### 卸载
@@ -377,7 +377,7 @@ WebSocket 传输默认关闭。只有当你希望 Codex 使用 Responses WebSock
 API（`/api/*`）和数据平面（`/v1/responses`、`/v1/images/generations`、`/v1/images/edits`）：
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+export OPENPROVIDER_API_AUTH_TOKEN="your-secret-token"
 opr start
 ```
 

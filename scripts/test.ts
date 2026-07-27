@@ -23,7 +23,7 @@ export function createIsolatedTestEnvironment(
       ...baseEnv,
       HOME: root,
       USERPROFILE: root,
-      OPENCODEX_HOME: openproviderHome,
+      OPENPROVIDER_HOME: openproviderHome,
       CODEX_HOME: codexHome,
     },
     cleanup() {

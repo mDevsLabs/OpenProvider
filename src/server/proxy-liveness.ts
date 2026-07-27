@@ -56,7 +56,7 @@ export function probeHostname(hostname: string | undefined): string {
  * still-running pre-identity proxy (e.g. right after `opr update`) is not mistaken for a
  * foreign server and shadow-started over.
  */
-export function isOpencodexHealthz(body: HealthzIdentity | null): boolean {
+export function isOpenproviderHealthz(body: HealthzIdentity | null): boolean {
   if (!body) return false;
   if (body.service === "openprovider") return true;
   if (body.service !== undefined) return false;
@@ -76,7 +76,7 @@ export async function proxyIdentityAt(
     });
     if (!res.ok) return null;
     const body = (await res.json().catch(() => null)) as HealthzIdentity | null;
-    if (!isOpencodexHealthz(body)) return null;
+    if (!isOpenproviderHealthz(body)) return null;
     const pid = typeof body?.pid === "number" ? body.pid : null;
     if (opts.expectedPid !== undefined && pid !== null && pid !== opts.expectedPid) return null;
     return { pid };

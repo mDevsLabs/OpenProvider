@@ -312,9 +312,9 @@ describe("management API logical v1/v2 switching", () => {
   test("mode-only switches preserve the logical limit in both directions", async () => {
     const path = fixtureConfig("[agents]\nmax_threads = 100\nmax_depth = 2\n");
     const oldCodexHome = process.env.CODEX_HOME;
-    const oldOcxHome = process.env.OPENCODEX_HOME;
+    const oldOcxHome = process.env.OPENPROVIDER_HOME;
     process.env.CODEX_HOME = dirname(path);
-    process.env.OPENCODEX_HOME = mkdtempSync(join(tmpdir(), "opr-api-config-"));
+    process.env.OPENPROVIDER_HOME = mkdtempSync(join(tmpdir(), "opr-api-config-"));
     const config = { providers: [] } as never;
     const toggle = (enabled: boolean) => {
       const content = readFileSync(path, "utf8");
@@ -368,7 +368,7 @@ describe("management API logical v1/v2 switching", () => {
       expect(await getResponse?.json()).toMatchObject({ enabled: false, maxConcurrentThreadsPerSession: 77 });
     } finally {
       if (oldCodexHome === undefined) delete process.env.CODEX_HOME; else process.env.CODEX_HOME = oldCodexHome;
-      if (oldOcxHome === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = oldOcxHome;
+      if (oldOcxHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = oldOcxHome;
     }
   });
 
@@ -443,9 +443,9 @@ describe("cli surface", () => {
   test("mode v2/v1 preserves the same logical limit", async () => {
     const path = fixtureConfig("[agents]\nmax_threads = 100\n");
     const oldCodexHome = process.env.CODEX_HOME;
-    const oldOcxHome = process.env.OPENCODEX_HOME;
+    const oldOcxHome = process.env.OPENPROVIDER_HOME;
     process.env.CODEX_HOME = dirname(path);
-    process.env.OPENCODEX_HOME = mkdtempSync(join(tmpdir(), "opr-cli-config-"));
+    process.env.OPENPROVIDER_HOME = mkdtempSync(join(tmpdir(), "opr-cli-config-"));
     const logs: string[] = [];
     const deps = {
       execFile: (_file: string, args: string[]) => {
@@ -475,7 +475,7 @@ describe("cli surface", () => {
       expect(getLogicalMaxThreads(path)).toBe(77);
     } finally {
       if (oldCodexHome === undefined) delete process.env.CODEX_HOME; else process.env.CODEX_HOME = oldCodexHome;
-      if (oldOcxHome === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = oldOcxHome;
+      if (oldOcxHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = oldOcxHome;
     }
   }, 15_000);
 });

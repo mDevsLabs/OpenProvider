@@ -82,7 +82,7 @@ describe.skipIf(!runnable)("opr launcher graceful shutdown", () => {
 
         const child = spawn("node", [BIN_OCX, "start", "--port", String(port)], {
           stdio: "ignore",
-          env: { ...process.env, OPENCODEX_HOME: home, CODEX_HOME: home },
+          env: { ...process.env, OPENPROVIDER_HOME: home, CODEX_HOME: home },
         });
         spawned.push(child);
 

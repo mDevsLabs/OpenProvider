@@ -11,17 +11,17 @@ import {
   type VersionCache,
 } from "../src/update/notify";
 
-const prevHome = process.env.OPENCODEX_HOME;
+const prevHome = process.env.OPENPROVIDER_HOME;
 let dir: string;
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), "opr-version-"));
-  process.env.OPENCODEX_HOME = dir;
+  process.env.OPENPROVIDER_HOME = dir;
 });
 
 afterEach(() => {
-  if (prevHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = prevHome;
+  if (prevHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = prevHome;
   try { rmSync(dir, { recursive: true, force: true }); } catch { /* ignore */ }
 });
 

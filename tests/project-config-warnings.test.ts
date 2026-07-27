@@ -6,7 +6,7 @@ import {
   analyzeProjectCodexConfig,
   collectProjectCodexConfigWarnings,
   getCachedProjectConfigDiagnostics,
-  isGlobalOpencodexRoutingActive,
+  isGlobalOpenproviderRoutingActive,
   invalidateProjectConfigDiagnosticsCache,
   parseTrustedProjectPathsFromCodexConfig,
   relPath,
@@ -69,11 +69,11 @@ let previousHome: string | undefined;
 let previousCodexHome: string | undefined;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   previousCodexHome = process.env.CODEX_HOME;
   testDir = join(tmpdir(), `opr-proj-warn-${Date.now()}`);
   mkdirSync(testDir, { recursive: true });
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   // Isolate from the real user config — resolveCodexConfigPath reads CODEX_HOME.
   process.env.CODEX_HOME = join(testDir, "codex-home");
   mkdirSync(process.env.CODEX_HOME, { recursive: true });
@@ -81,8 +81,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
   invalidateProjectConfigDiagnosticsCache();
@@ -98,14 +98,14 @@ ${extra}
 `);
 }
 
-describe("isGlobalOpencodexRoutingActive", () => {
+describe("isGlobalOpenproviderRoutingActive", () => {
   test("detects injected openai_base_url marker", () => {
     const text = `
 # Auto-injected by openprovider
 openai_base_url = "http://127.0.0.1:10100/v1"
 model_provider = "openprovider"
 `;
-    expect(isGlobalOpencodexRoutingActive("unused", text)).toBe(true);
+    expect(isGlobalOpenproviderRoutingActive("unused", text)).toBe(true);
   });
 
   test("does not treat dormant model_providers.openprovider table as active routing", () => {
@@ -114,7 +114,7 @@ model_provider = "openprovider"
 name = "openprovider"
 base_url = "http://127.0.0.1:10100/v1"
 `;
-    expect(isGlobalOpencodexRoutingActive("unused", text)).toBe(false);
+    expect(isGlobalOpenproviderRoutingActive("unused", text)).toBe(false);
   });
 });
 

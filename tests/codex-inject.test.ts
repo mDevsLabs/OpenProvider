@@ -8,7 +8,7 @@ import {
   dominantEol,
   setRootOpenaiBaseUrl,
   stripInjectedOpenaiBaseUrl,
-  stripOpencodexConfig,
+  stripOpenproviderConfig,
   stripRootContextWindowOverrides,
 } from "../src/codex/inject";
 
@@ -37,7 +37,7 @@ describe("Codex config injection", () => {
   test("can inject Codex provider API auth header from environment for non-loopback proxy mode", () => {
     const block = buildProviderTableBlock(10100, false, true);
 
-    expect(block).toContain('env_http_headers = { "x-openprovider-api-key" = "OPENCODEX_API_AUTH_TOKEN" }');
+    expect(block).toContain('env_http_headers = { "x-openprovider-api-key" = "OPENPROVIDER_API_AUTH_TOKEN" }');
   });
 
   test("injected base_url matches the actual bind: literal 127.0.0.1 for loopback/wildcard (Windows resolves localhost to ::1 first)", () => {
@@ -75,7 +75,7 @@ describe("Codex config injection", () => {
   });
 
   test("preserves user root context-window overrides when restoring native Codex", () => {
-    const stripped = stripOpencodexConfig([
+    const stripped = stripOpenproviderConfig([
       'model = "gpt-5.5"',
       'model_context_window = 1000000',
       'model_auto_compact_token_limit = 900000',
@@ -95,7 +95,7 @@ describe("Codex config injection", () => {
   });
 
   test("removes root routed model names when restoring native Codex", () => {
-    const stripped = stripOpencodexConfig([
+    const stripped = stripOpenproviderConfig([
       'model_provider = "openprovider"',
       'model = "opencode-go/minimax-m3"',
       'model_verbosity = "high"',
@@ -110,7 +110,7 @@ describe("Codex config injection", () => {
   });
 
   test("preserves non-openprovider routed model names during fallback restore", () => {
-    const stripped = stripOpencodexConfig([
+    const stripped = stripOpenproviderConfig([
       'model_provider = "proxy"',
       'model = "openrouter/foo"',
       "",
@@ -150,7 +150,7 @@ describe("Codex config injection", () => {
 
     expect(profile).toContain('model_catalog_json = "/tmp/openprovider-catalog.json"');
     expect(profile).toContain("supports_websockets = true");
-    expect(profile).toContain('env_http_headers = { "x-openprovider-api-key" = "OPENCODEX_API_AUTH_TOKEN" }');
+    expect(profile).toContain('env_http_headers = { "x-openprovider-api-key" = "OPENPROVIDER_API_AUTH_TOKEN" }');
   });
 
   test("honors an explicit unavailable catalog decision", () => {
@@ -160,7 +160,7 @@ describe("Codex config injection", () => {
   });
 
   test("strips injected TOML sections without swallowing later indented tables", () => {
-    const stripped = stripOpencodexConfig([
+    const stripped = stripOpenproviderConfig([
       'model_provider = "openprovider"',
       "",
       "# Auto-injected by openprovider",
@@ -245,7 +245,7 @@ describe("Design B openai_base_url injection", () => {
     expect(stripInjectedOpenaiBaseUrl(userOwned)).toBe(userOwned);
   });
 
-  test("stripOpencodexConfig removes the Design B form including routed root models", () => {
+  test("stripOpenproviderConfig removes the Design B form including routed root models", () => {
     const injected = setRootOpenaiBaseUrl([
       'model = "opencode-go/minimax-m3"',
       'model_verbosity = "high"',
@@ -255,7 +255,7 @@ describe("Design B openai_base_url injection", () => {
       "fast_mode = true",
       "",
     ].join("\n"), 10100).content;
-    const stripped = stripOpencodexConfig(injected);
+    const stripped = stripOpenproviderConfig(injected);
 
     expect(stripped).not.toContain("openai_base_url");
     expect(stripped).not.toContain('model = "opencode-go/minimax-m3"'); // routed id useless without proxy
@@ -277,7 +277,7 @@ describe("Design B openai_base_url injection", () => {
       'base_url = "http://127.0.0.1:10100/v1"',
       "",
     ].join("\n");
-    const stripped = stripOpencodexConfig(legacy);
+    const stripped = stripOpenproviderConfig(legacy);
 
     expect(stripped).not.toContain("openprovider");
     expect(stripped).not.toContain("openai_base_url");
@@ -298,7 +298,7 @@ describe("Design B openai_base_url injection", () => {
       'wire_api = "responses"',
       "",
     ].join("\n");
-    const stripped = stripOpencodexConfig(legacyOnly);
+    const stripped = stripOpenproviderConfig(legacyOnly);
 
     expect(stripped).not.toContain("openprovider");
     expect(stripped).not.toContain("[model_providers.openprovider]");

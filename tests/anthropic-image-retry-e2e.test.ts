@@ -16,10 +16,10 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 let upstream: ReturnType<typeof Bun.serve> | null = null;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-imgretry-e2e-codex-");
   testDir = mkdtempSync(join(tmpdir(), "opr-imgretry-e2e-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   clearKeyCooldowns();
   resetNormalizeStateForTests();
 });
@@ -27,8 +27,8 @@ beforeEach(() => {
 afterEach(() => {
   upstream?.stop(true);
   upstream = null;
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (testDir) rmSync(testDir, { recursive: true, force: true });

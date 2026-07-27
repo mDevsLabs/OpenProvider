@@ -8,7 +8,7 @@ import { saveCodexAccountCredential } from "../src/codex/account-store";
 import type { OcxConfig } from "../src/types";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-session-affinity-test");
-let previousOpencodexHome: string | undefined;
+let previousOpenproviderHome: string | undefined;
 let previousCodexHome: string | undefined;
 
 function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
@@ -40,10 +40,10 @@ function makeActivePoolConfig(active: string, ids: string[] = [active]): OcxConf
 
 describe("resolveCodexAccountForThread", () => {
   beforeEach(() => {
-    previousOpencodexHome = process.env.OPENCODEX_HOME;
+    previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     // Isolate the main-account credential source: TEST_DIR has no auth.json, so the
     // main account is deterministically absent and cannot become a rotation target.
     previousCodexHome = process.env.CODEX_HOME;
@@ -55,8 +55,8 @@ describe("resolveCodexAccountForThread", () => {
   afterEach(() => {
     clearAccountQuota();
     clearThreadAccountMap();
-    if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = previousOpencodexHome;
+    if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+    else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
     if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
     else process.env.CODEX_HOME = previousCodexHome;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });

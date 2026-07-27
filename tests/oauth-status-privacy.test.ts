@@ -5,19 +5,19 @@ import { getLoginStatus, getValidAccessToken, UnsupportedOAuthProviderError } fr
 import { saveCredential } from "../src/oauth/store";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-oauth-status-privacy-test");
-let previousOpencodexHome: string | undefined;
+let previousOpenproviderHome: string | undefined;
 
 describe("OAuth status privacy", () => {
   beforeEach(() => {
-    previousOpencodexHome = process.env.OPENCODEX_HOME;
+    previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
   });
 
   afterEach(() => {
-    if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = previousOpencodexHome;
+    if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+    else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   });
 

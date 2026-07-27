@@ -91,7 +91,7 @@ export function buildWinswXml(entry: WinswEntry, env: NodeJS.ProcessEnv = proces
     `  <env name="OCX_API_TOKEN_FILE" value="${xmlEscape(serviceApiTokenFilePath())}"/>`,
     `  <env name="PATH" value="${xmlEscape(env.PATH ?? "")}"/>`,
     env.CODEX_HOME?.trim() ? `  <env name="CODEX_HOME" value="${xmlEscape(currentCodexHomeAbsolute())}"/>` : null,
-    env.OPENCODEX_HOME?.trim() ? `  <env name="OPENCODEX_HOME" value="${xmlEscape(getConfigDir())}"/>` : null,
+    env.OPENPROVIDER_HOME?.trim() ? `  <env name="OPENPROVIDER_HOME" value="${xmlEscape(getConfigDir())}"/>` : null,
   ].filter((line): line is string => Boolean(line));
   return `<?xml version="1.0" encoding="UTF-8"?>
 <service>

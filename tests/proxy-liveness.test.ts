@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { findLiveProxy, isOpencodexHealthz, probeHostname, proxyIdentityAt } from "../src/server/proxy-liveness";
+import { findLiveProxy, isOpenproviderHealthz, probeHostname, proxyIdentityAt } from "../src/server/proxy-liveness";
 
 function healthz(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status });
@@ -7,20 +7,20 @@ function healthz(body: unknown, status = 200): Response {
 
 const OURS = { status: "ok", service: "openprovider", version: "2.6.17", uptime: 12, pid: 4242, port: 10100 };
 
-describe("isOpencodexHealthz", () => {
+describe("isOpenproviderHealthz", () => {
   test("accepts the explicit service marker", () => {
-    expect(isOpencodexHealthz(OURS)).toBe(true);
+    expect(isOpenproviderHealthz(OURS)).toBe(true);
   });
 
   test("accepts the legacy pre-identity body (still-running old proxy after update)", () => {
-    expect(isOpencodexHealthz({ status: "ok", version: "2.6.16", uptime: 5 })).toBe(true);
+    expect(isOpenproviderHealthz({ status: "ok", version: "2.6.16", uptime: 5 })).toBe(true);
   });
 
   test("rejects foreign bodies", () => {
-    expect(isOpencodexHealthz(null)).toBe(false);
-    expect(isOpencodexHealthz({ status: "ok" })).toBe(false);
-    expect(isOpencodexHealthz({ service: "something-else", status: "ok", version: "1", uptime: 1 })).toBe(false);
-    expect(isOpencodexHealthz({ healthy: true } as never)).toBe(false);
+    expect(isOpenproviderHealthz(null)).toBe(false);
+    expect(isOpenproviderHealthz({ status: "ok" })).toBe(false);
+    expect(isOpenproviderHealthz({ service: "something-else", status: "ok", version: "1", uptime: 1 })).toBe(false);
+    expect(isOpenproviderHealthz({ healthy: true } as never)).toBe(false);
   });
 });
 

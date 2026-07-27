@@ -44,7 +44,7 @@ export interface CursorAdapterDeps {
 function safeCursorTransportError(err: unknown): string {
   if (err instanceof CursorTransportDisabledError) return CURSOR_TRANSPORT_DISABLED_MESSAGE;
   if (err instanceof CursorMissingCredentialError) {
-    return "Cursor live transport is enabled, but no Cursor access token is configured. Set provider.apiKey or OPENCODEX_CURSOR_TEST_TOKEN.";
+    return "Cursor live transport is enabled, but no Cursor access token is configured. Set provider.apiKey or OPENPROVIDER_CURSOR_TEST_TOKEN.";
   }
   const message = err instanceof Error ? err.message : typeof err === "string" ? err : undefined;
   if (message) return safeCursorErrorMessage(message);

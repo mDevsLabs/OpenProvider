@@ -94,7 +94,7 @@ work cannot delay health/provider/settings state or run every five seconds.
 - 장점, 단점 및 영향: Unchanged queries are cheap and memory stays bounded; a changed large log still consumes rebuild CPU, but cooperatively and at most once per observed revision/query.
 
 For diagnosing upstream-shape / usage-extraction issues run `opr debug usage on` (or set
-`OPENCODEX_USAGE_DEBUG=1` before start). The proxy then writes a rolling debug record per finalized
+`OPENPROVIDER_USAGE_DEBUG=1` before start). The proxy then writes a rolling debug record per finalized
 request to `~/.openprovider/usage-debug.jsonl` (mode `0o600`, auto-trimmed to the most-recent 100 lines
 once it exceeds 200) with the upstream content-type, body kind (`sse / json / other / none`), a 2KB
 body sample, and the extracted usage. Off by default; the hot path is guarded so production stays

@@ -18,7 +18,7 @@ function backupPathForTestCatalog(codexHome: string, openproviderHome: string, c
 function runScript(codexHome: string, openproviderHome: string, script: string): { stdout: string; status: number } {
   const result = spawnSync(process.execPath, ["--eval", script], {
     cwd: repoRoot,
-    env: { ...process.env, CODEX_HOME: codexHome, OPENCODEX_HOME: openproviderHome },
+    env: { ...process.env, CODEX_HOME: codexHome, OPENPROVIDER_HOME: openproviderHome },
     encoding: "utf8",
   });
   return { stdout: result.stdout?.trim() ?? "", status: result.status ?? 1 };

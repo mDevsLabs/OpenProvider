@@ -1,7 +1,7 @@
 import { durableBunRuntime } from "../lib/bun-runtime";
 import { codexAutoStartEnabled, getConfigPath, getPidPath, readConfigDiagnostics, readPid, readRuntimePort, type RuntimePortState } from "../config";
 import { diagnoseCodexBundledPlugins, type CodexPluginsDiagnostic } from "../codex/plugins-doctor";
-import { isOpencodexHealthz, probeHostname } from "../server/proxy-liveness";
+import { isOpenproviderHealthz, probeHostname } from "../server/proxy-liveness";
 import type { OcxConfig } from "../types";
 import { diagnoseService } from "../service";
 import { collectStartupHealth, type StartupHealth } from "../codex/autostart-health";
@@ -112,7 +112,7 @@ async function checkProxyHealth(target: ListenTarget): Promise<HealthCheck> {
       return { ok: false, url, message, label: `${url} ${message}` };
     }
     const body = await response.json().catch(() => null) as { service?: unknown; status?: unknown; version?: unknown; uptime?: unknown } | null;
-    if (!isOpencodexHealthz(body)) {
+    if (!isOpenproviderHealthz(body)) {
       const message = "responded, but not an openprovider proxy";
       return { ok: false, url, message, label: `${url} ${message}` };
     }

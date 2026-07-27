@@ -4,6 +4,6 @@ contact_links:
     url: https://github.com/mDevsLabs/OpenProvider/blob/main/SECURITY.md
     about: Read the supported-version and reporting guidance before sharing security-sensitive details.
   - name: Contributing guide
-    url: https://opencodex.me/contributing/
+    url: https://openprovider.me/contributing/
     about: Review setup, build, and verification guidance for contributors.
 

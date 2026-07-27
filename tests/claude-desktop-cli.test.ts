@@ -11,11 +11,11 @@ let previousHome: string | undefined;
 let previousDesktopDir: string | undefined;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
-  previousDesktopDir = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
+  previousHome = process.env.OPENPROVIDER_HOME;
+  previousDesktopDir = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
   dir = mkdtempSync(join(tmpdir(), "opr-desktop-cli-"));
-  process.env.OPENCODEX_HOME = join(dir, "opr");
-  process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = join(dir, "desktop");
+  process.env.OPENPROVIDER_HOME = join(dir, "opr");
+  process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = join(dir, "desktop");
   saveConfig({
     port: 10100,
     defaultProvider: "mock",
@@ -26,10 +26,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
-  if (previousDesktopDir === undefined) delete process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  else process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = previousDesktopDir;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
+  if (previousDesktopDir === undefined) delete process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+  else process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = previousDesktopDir;
   rmSync(dir, { recursive: true, force: true });
 });
 
@@ -76,7 +76,7 @@ test("no-arg and legacy mode flags apply Desktop config", async () => {
   try {
     expect(await handleClaudeDesktopCommand([])).toBe(0);
     expect(await handleClaudeDesktopCommand(["--static"])).toBe(0);
-    expect(readFileSync(join(process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR!, "_meta.json"), "utf8")).toContain("openprovider");
+    expect(readFileSync(join(process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR!, "_meta.json"), "utf8")).toContain("openprovider");
     expect(error).not.toHaveBeenCalled();
   } finally {
     log.mockRestore();

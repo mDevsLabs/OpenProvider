@@ -54,9 +54,9 @@ describe("Azure OpenAI adapter hardening", () => {
   });
 
   test("reports unresolved placeholders as non-fatal config diagnostics", () => {
-    const previousHome = process.env.OPENCODEX_HOME;
+    const previousHome = process.env.OPENPROVIDER_HOME;
     const testDir = mkdtempSync(join(tmpdir(), "opr-azure-diagnostics-"));
-    process.env.OPENCODEX_HOME = testDir;
+    process.env.OPENPROVIDER_HOME = testDir;
 
     try {
       writeFileSync(getConfigPath(), JSON.stringify({
@@ -77,8 +77,8 @@ describe("Azure OpenAI adapter hardening", () => {
       expect(loadConfig().providers["azure-openai"].baseUrl).toBe("https://{resource}.openai.azure.com/openai");
       expect(readdirSync(testDir).filter(name => name.startsWith("config.json.invalid-"))).toHaveLength(0);
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previousHome;
+      if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+      else process.env.OPENPROVIDER_HOME = previousHome;
       if (existsSync(testDir)) rmSync(testDir, { recursive: true, force: true });
     }
   });

@@ -37,8 +37,8 @@ import * as destinationPolicy from "../src/lib/destination-policy";
 // default 5s per-test budget (same flake class as 810fa115 / claude-management-api).
 setDefaultTimeout(60_000);
 
-const previousApiToken = process.env.OPENCODEX_API_AUTH_TOKEN;
-const previousOpencodexHome = process.env.OPENCODEX_HOME;
+const previousApiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN;
+const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
 const originalGlobalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-server-auth-test");
 let isolatedCodexHome: IsolatedCodexHome | null = null;
@@ -104,10 +104,10 @@ beforeEach(() => {
 
 afterEach(() => {
   globalThis.fetch = originalGlobalFetch;
-  if (previousApiToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  else process.env.OPENCODEX_API_AUTH_TOKEN = previousApiToken;
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousApiToken === undefined) delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
+  else process.env.OPENPROVIDER_API_AUTH_TOKEN = previousApiToken;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   clearCodexUpstreamHealth();
@@ -158,7 +158,7 @@ describe("provider management validation", () => {
   test("provider management rejects externally supplied forward auth providers", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -187,7 +187,7 @@ describe("provider management validation", () => {
   test("provider management rejects runtime metadata and accepts only canonical OpenAI option seeds", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig({
       port: 0,
       defaultProvider: "openai",
@@ -368,7 +368,7 @@ describe("provider management validation", () => {
   test("provider management does not persist registry-only static auth headers for opencode-free", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -399,7 +399,7 @@ describe("provider management validation", () => {
   test("management selections preserve an OpenAI API Pro selected id without wire rewriting", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const selected = "openai-apikey/gpt-5.6-sol-pro";
     saveConfig({
       port: 0,
@@ -454,7 +454,7 @@ describe("provider management validation", () => {
   test("provider management rejects namespace-breaking or reserved provider names", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -484,7 +484,7 @@ describe("provider management validation", () => {
   test("provider management rejects base URLs with embedded credentials", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -512,7 +512,7 @@ describe("provider management validation", () => {
   test("provider management rejects invalid or non-http base URLs", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -542,7 +542,7 @@ describe("provider management validation", () => {
   test("provider management rejects private-network destinations without explicit opt-in", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -571,7 +571,7 @@ describe("provider management validation", () => {
   test("provider management allows private-network destinations only with explicit opt-in", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
     stubModelDiscoveryFor("http://127.0.0.1:11434");
 
@@ -603,7 +603,7 @@ describe("provider management validation", () => {
   test("provider management always rejects metadata endpoints", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -633,7 +633,7 @@ describe("provider management validation", () => {
   test("provider PATCH can enable allowPrivateNetwork and then change baseUrl to localhost", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
     stubModelDiscoveryFor("https://api.example.com", "http://127.0.0.1:11434");
 
@@ -680,7 +680,7 @@ describe("provider management validation", () => {
   test("provider PATCH rejects disabling allowPrivateNetwork while baseUrl is private", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
     stubModelDiscoveryFor("http://127.0.0.1:8080");
 
@@ -714,7 +714,7 @@ describe("provider management validation", () => {
   test("provider PATCH persists liveModels and provider metadata exposes the normalized state", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -772,7 +772,7 @@ describe("provider management validation", () => {
  test("provider management rejects sensitive or injectable provider headers", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -807,7 +807,7 @@ describe("provider management validation", () => {
   test("provider deletion does not treat inherited object keys as configured providers", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -824,7 +824,7 @@ describe("provider management validation", () => {
   test("provider deletion removes stale provider context caps", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig({
       port: 0,
       defaultProvider: "test-openai",
@@ -860,7 +860,7 @@ describe("provider management validation", () => {
   test("provider management can disable and re-enable non-default providers", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig({
       port: 10100,
       hostname: "127.0.0.1",
@@ -915,7 +915,7 @@ describe("provider management validation", () => {
   test("provider management rejects disabling the default provider", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -937,7 +937,7 @@ describe("provider management validation", () => {
   test("provider management accepts canonical OpenAI modes and rejects legacy Multi", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig({
       port: 0,
       defaultProvider: "test-openai",
@@ -998,7 +998,7 @@ describe("provider management validation", () => {
   test("canonical OpenAI POST passes allowBenchmarkAddresses into destination resolution", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       defaultProvider: "test-openai",
@@ -1054,7 +1054,7 @@ describe("provider management validation", () => {
   test("canonical OpenAI POST still rejects non-benchmark private destination answers", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       defaultProvider: "test-openai",
@@ -1096,7 +1096,7 @@ describe("provider management validation", () => {
   test("disabled-only PATCH cannot re-enable a noncanonical openai row unchanged", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       hostname: "127.0.0.1",
@@ -1147,7 +1147,7 @@ describe("provider management validation", () => {
   test("disabled-only PATCH re-enables canonical openai and fills missing pool mode", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig({
       port: 0,
       hostname: "127.0.0.1",
@@ -1195,7 +1195,7 @@ describe("provider management validation", () => {
   test("disabled OpenAI recovery accepts pure Clash fake-IP via destination check", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       hostname: "127.0.0.1",
@@ -1244,7 +1244,7 @@ describe("provider management validation", () => {
   test("disabled OpenAI recovery rejects loopback, RFC1918, and metadata and stays disabled", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const disabledCanonical = {
       adapter: "openai-responses",
       baseUrl: "https://chatgpt.com/backend-api/codex",
@@ -1308,7 +1308,7 @@ describe("provider management validation", () => {
   test("disabled OpenAI recovery ignores persisted allowPrivateNetwork for DNS guard", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       hostname: "127.0.0.1",
@@ -1365,7 +1365,7 @@ describe("provider management validation", () => {
   test("disabled OpenAI recovery strips allowPrivateNetwork after successful re-enable", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       hostname: "127.0.0.1",
@@ -1421,7 +1421,7 @@ describe("provider management validation", () => {
     test(`disabled-only PATCH normalizes ${label} before save-and-reload`, async () => {
       if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
       mkdirSync(TEST_DIR, { recursive: true });
-      process.env.OPENCODEX_HOME = TEST_DIR;
+      process.env.OPENPROVIDER_HOME = TEST_DIR;
       saveConfig({
         port: 0,
         hostname: "127.0.0.1",
@@ -1474,7 +1474,7 @@ describe("provider management validation", () => {
   test("provider mode PATCH is strict, persists live state, clears caches and affinity, and primes Pool only", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       hostname: "127.0.0.1",
@@ -1548,7 +1548,7 @@ describe("provider management validation", () => {
   test("provider PATCH field-mask edits non-reserved providers and rejects unsafe fields (WP040)", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     const liveConfig: OcxConfig = {
       port: 0,
       hostname: "127.0.0.1",
@@ -1621,7 +1621,7 @@ describe("provider management validation", () => {
   test("provider context-cap API persists toggles and annotates model rows", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig({
       port: 0,
       defaultProvider: "test-openai",
@@ -1690,7 +1690,7 @@ describe("provider management validation", () => {
   test("provider context-cap API supports global value and set-all toggles", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig({
       port: 0,
       defaultProvider: "test-openai",

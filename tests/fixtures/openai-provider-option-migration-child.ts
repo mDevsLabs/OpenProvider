@@ -14,7 +14,7 @@ if (!openproviderHome || !codexHome) {
 }
 mkdirSync(openproviderHome, { recursive: true, mode: 0o700 });
 mkdirSync(codexHome, { recursive: true, mode: 0o700 });
-process.env.OPENCODEX_HOME = openproviderHome;
+process.env.OPENPROVIDER_HOME = openproviderHome;
 process.env.CODEX_HOME = codexHome;
 
 const forward = {

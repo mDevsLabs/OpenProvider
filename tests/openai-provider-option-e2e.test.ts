@@ -114,7 +114,7 @@ describe("OpenAI provider-option integration spine", () => {
     const realClaudeDir = join(homedir(), ".claude");
     const realClaudeHashBefore = hashTree(realClaudeDir);
     const previousEnv = {
-      OPENCODEX_HOME: process.env.OPENCODEX_HOME,
+      OPENPROVIDER_HOME: process.env.OPENPROVIDER_HOME,
       CODEX_HOME: process.env.CODEX_HOME,
       CLAUDE_CONFIG_DIR: process.env.CLAUDE_CONFIG_DIR,
     };
@@ -150,7 +150,7 @@ describe("OpenAI provider-option integration spine", () => {
       for (const dir of [openproviderHome, codexHome, claudeConfigDir]) {
         mkdirSync(dir, { recursive: true, mode: 0o700 });
       }
-      process.env.OPENCODEX_HOME = openproviderHome;
+      process.env.OPENPROVIDER_HOME = openproviderHome;
       process.env.CODEX_HOME = codexHome;
       process.env.CLAUDE_CONFIG_DIR = claudeConfigDir;
       const authPath = join(codexHome, "auth.json");
@@ -577,7 +577,7 @@ describe("OpenAI provider-option integration spine", () => {
       } finally {
         globalThis.fetch = savedFetch;
         for (const reset of resets) reset();
-        restoreEnv("OPENCODEX_HOME", previousEnv.OPENCODEX_HOME);
+        restoreEnv("OPENPROVIDER_HOME", previousEnv.OPENPROVIDER_HOME);
         restoreEnv("CODEX_HOME", previousEnv.CODEX_HOME);
         restoreEnv("CLAUDE_CONFIG_DIR", previousEnv.CLAUDE_CONFIG_DIR);
         rmSync(root, { recursive: true, force: true });

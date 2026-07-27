@@ -190,7 +190,7 @@ function maybeElideSkillText(text: string, names: readonly string[]): string {
   const firstLineEnd = text.indexOf("\n");
   const dir = text.slice(SKILL_TEXT_MARKER.length, firstLineEnd === -1 ? text.length : firstLineEnd).trim();
   // Windows clients send `C:\Users\...\claude-api`; normalize separators before
-  // basenaming (repo precedent: src/codex/inject.ts isOpencodexCatalogPath).
+  // basenaming (repo precedent: src/codex/inject.ts isOpenproviderCatalogPath).
   const base = dir.replace(/\\/g, "/").split("/").filter(Boolean).pop()?.toLowerCase() ?? "";
   if (!names.includes(base)) return text;
   return `[openprovider] '${base}' skill document bundle (${text.length} chars) elided for routed models `

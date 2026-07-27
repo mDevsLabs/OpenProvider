@@ -64,7 +64,7 @@ function jsonResponse(data: unknown, status = 200): Response {
 }
 
 const ACCOUNT_ID_RE = /^[a-zA-Z0-9._-]{1,64}$/;
-const MANUAL_IMPORT_ENV = "OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT";
+const MANUAL_IMPORT_ENV = "OPENPROVIDER_ENABLE_UNVERIFIED_CODEX_IMPORT";
 
 const codexAuthLoginState = new Map<string, { status: string; accountId?: string; email?: string; error?: string; doneAt?: number }>();
 
@@ -458,7 +458,7 @@ export async function primeCodexPoolQuotas(config: OcxConfig, reason: string): P
     } catch {
       // Priming is best-effort; never propagate.
     }
-    if (process.env.OPENCODEX_DEBUG_QUOTA === "1") {
+    if (process.env.OPENPROVIDER_DEBUG_QUOTA === "1") {
       console.warn(`[codex-quota] prime done (reason=${reason}, pool=${pool.length}, refreshed=${stale.length})`);
     }
   })().finally(() => { primeInFlight = null; });

@@ -16,7 +16,7 @@ import { invalidateStartupHealthCache } from "../src/server/startup-health-cache
 import type { OcxConfig } from "../src/types";
 
 let TEST_DIR = "";
-const previousHome = process.env.OPENCODEX_HOME;
+const previousHome = process.env.OPENPROVIDER_HOME;
 
 function baseConfig(): OcxConfig {
   return {
@@ -50,13 +50,13 @@ function getSettings(config: OcxConfig): Promise<Response | null> {
 beforeEach(() => {
   invalidateStartupHealthCache();
   TEST_DIR = mkdtempSync(join(tmpdir(), "opr-settings-stream-"));
-  process.env.OPENCODEX_HOME = TEST_DIR;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
 });
 
 afterEach(() => {
   invalidateStartupHealthCache();
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   if (TEST_DIR && existsSync(TEST_DIR)) {
     try {
       rmSync(TEST_DIR, { recursive: true, force: true });
@@ -122,7 +122,7 @@ describe("GET /api/settings", () => {
         };
       };
       expect(typeof body.codexRuntime?.path).toBe("string");
-      // OPENCODEX_HOME lives under the OS user profile; username must stay redacted on all OS.
+      // OPENPROVIDER_HOME lives under the OS user profile; username must stay redacted on all OS.
       expect(body.codexRuntime?.path?.toLowerCase()).not.toMatch(/[/\\]users[/\\][^/\\[\]]+[/\\]/i);
       expect(body.codexRuntime?.path?.toLowerCase()).not.toContain("alice");
       expect(body.codexRuntime?.version).toBe("0.133.0");

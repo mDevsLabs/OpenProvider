@@ -18,16 +18,16 @@ let originalFetch: typeof fetch;
 
 beforeEach(() => {
   originalFetch = globalThis.fetch;
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-xai-parity-codex-");
   testDir = mkdtempSync(join(tmpdir(), "opr-xai-parity-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
 });
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (testDir) rmSync(testDir, { recursive: true, force: true });

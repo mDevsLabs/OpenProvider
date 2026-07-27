@@ -30,9 +30,9 @@ function diskConfig(): Record<string, unknown> {
 }
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   home = mkdtempSync(join(tmpdir(), "opr-user-edits-"));
-  process.env.OPENCODEX_HOME = home;
+  process.env.OPENPROVIDER_HOME = home;
   saveConfig({
     port: 10100,
     defaultProvider: "test",
@@ -42,8 +42,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   rmSync(home, { recursive: true, force: true });
 });
 

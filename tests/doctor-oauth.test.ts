@@ -8,21 +8,21 @@ import { CODEX_REAUTH_ACTION } from "../src/oauth/health";
 import { getAccountSet, getAuthStorePath, markAccountNeedsReauth, saveCredential } from "../src/oauth/store";
 
 const origHome = process.env.HOME;
-const origOcxHome = process.env.OPENCODEX_HOME;
+const origOcxHome = process.env.OPENPROVIDER_HOME;
 let tmp: string;
 
 beforeEach(() => {
   tmp = join(tmpdir(), `doctor-oauth-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(tmp, { recursive: true });
   process.env.HOME = tmp;
-  process.env.OPENCODEX_HOME = join(tmp, "opr");
+  process.env.OPENPROVIDER_HOME = join(tmp, "opr");
 });
 
 afterEach(() => {
   if (origHome === undefined) delete process.env.HOME;
   else process.env.HOME = origHome;
-  if (origOcxHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = origOcxHome;
+  if (origOcxHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = origOcxHome;
   rmSync(tmp, { recursive: true, force: true });
 });
 

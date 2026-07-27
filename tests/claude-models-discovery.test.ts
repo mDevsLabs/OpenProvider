@@ -16,15 +16,15 @@ let previousHome: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-claude-discovery-");
   testDir = mkdtempSync(join(tmpdir(), "opr-claude-discovery-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (testDir) rmSync(testDir, { recursive: true, force: true });

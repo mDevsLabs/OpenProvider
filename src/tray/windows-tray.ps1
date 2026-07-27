@@ -91,7 +91,7 @@ function Start-OcxCommand([string[]]$CommandArgs) {
     $psi.CreateNoWindow = $true
     $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     $psi.EnvironmentVariables["CODEX_HOME"] = $CodexHome
-    $psi.EnvironmentVariables["OPENCODEX_HOME"] = $OpenProviderHome
+    $psi.EnvironmentVariables["OPENPROVIDER_HOME"] = $OpenProviderHome
     $process = [System.Diagnostics.Process]::Start($psi)
     if ($null -ne $process) { $process.Dispose() }
     Write-ActionLog "dispatched $($CommandArgs -join ' ')"

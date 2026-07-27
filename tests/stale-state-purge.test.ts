@@ -3,19 +3,19 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import { join } from "node:path";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-stale-state-purge-test");
-let prevOpencodexHome: string | undefined;
+let prevOpenproviderHome: string | undefined;
 
 describe("snapshot-guarded stale-state purge", () => {
   beforeEach(() => {
-    prevOpencodexHome = process.env.OPENCODEX_HOME;
+    prevOpenproviderHome = process.env.OPENPROVIDER_HOME;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
   });
 
   afterEach(() => {
-    if (prevOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = prevOpencodexHome;
+    if (prevOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+    else process.env.OPENPROVIDER_HOME = prevOpenproviderHome;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   });
 

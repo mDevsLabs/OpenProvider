@@ -544,7 +544,7 @@ export async function handleAgentSettingsRoutes(ctx: ManagementContext): Promise
       const { createHash } = await import("node:crypto");
       const { join } = await import("node:path");
       const { homedir } = await import("node:os");
-      const libraryPath = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR?.trim()
+      const libraryPath = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR?.trim()
         || join(homedir(), "Library", "Application Support", "Claude-3p", "configLibrary");
       const metaPath = join(libraryPath, "_meta.json");
       let onDiskFingerprint: string | null = null;

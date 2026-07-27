@@ -37,14 +37,14 @@ setDefaultTimeout(30_000);
 const originalFetch = globalThis.fetch;
 const originalNow = Date.now;
 let testDir: string;
-let previousOpencodexHome: string | undefined;
+let previousOpenproviderHome: string | undefined;
 let previousCodexHome: string | undefined;
 
 beforeEach(() => {
   testDir = mkdtempSync(join(tmpdir(), "opr-subagent-hr-"));
-  previousOpencodexHome = process.env.OPENCODEX_HOME;
+  previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
   previousCodexHome = process.env.CODEX_HOME;
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   process.env.CODEX_HOME = testDir;
   clearThreadAccountMap();
   clearCodexUpstreamHealth();
@@ -60,8 +60,8 @@ afterEach(() => {
   clearAccountQuota();
   resetSubagentModelFallbackStateForTests();
   rmSync(testDir, { recursive: true, force: true });
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
 });

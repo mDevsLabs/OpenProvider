@@ -9,12 +9,12 @@ import { join } from "node:path";
 import { handleManagementAPI } from "../src/server/management-api";
 import type { OcxConfig } from "../src/types";
 
-const savedHome = process.env.OPENCODEX_HOME;
+const savedHome = process.env.OPENPROVIDER_HOME;
 let tempHome: string | null = null;
 
 afterEach(() => {
-  if (savedHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = savedHome;
+  if (savedHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = savedHome;
   if (tempHome) {
     rmSync(tempHome, { recursive: true, force: true });
     tempHome = null;
@@ -23,7 +23,7 @@ afterEach(() => {
 
 function isolatedHome(): void {
   tempHome = mkdtempSync(join(tmpdir(), "opr-subagent-fallback-api-"));
-  process.env.OPENCODEX_HOME = tempHome;
+  process.env.OPENPROVIDER_HOME = tempHome;
 }
 
 function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {

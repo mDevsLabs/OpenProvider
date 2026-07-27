@@ -364,9 +364,9 @@ export function buildUnixCodexShim(realCodexPath: string, bunPath: string, cliPa
   const valueOptions = CODEX_GLOBAL_OPTIONS_WITH_VALUE.join("|");
   return `#!/usr/bin/env sh
 # ${SHIM_MARKER}
-if [ -z "$OPENCODEX_API_AUTH_TOKEN" ] && [ -f ${shQuote(tokenFile)} ]; then
-  OPENCODEX_API_AUTH_TOKEN="$(cat ${shQuote(tokenFile)})"
-  export OPENCODEX_API_AUTH_TOKEN
+if [ -z "$OPENPROVIDER_API_AUTH_TOKEN" ] && [ -f ${shQuote(tokenFile)} ]; then
+  OPENPROVIDER_API_AUTH_TOKEN="$(cat ${shQuote(tokenFile)})"
+  export OPENPROVIDER_API_AUTH_TOKEN
 fi
 ocx_subcommand=""
 ocx_skip_next=0
@@ -433,7 +433,7 @@ ${windowsBatchSet("OCX_REAL_CODEX", realCodexPath)}\r
 ${windowsBatchSet("OCX_BUN", bunPath)}\r
 ${windowsBatchSet("OCX_CLI", cliPath)}\r
 ${windowsBatchSet("OCX_API_TOKEN_FILE", serviceApiTokenFilePath())}\r
-if "%OPENCODEX_API_AUTH_TOKEN%"=="" if exist "%OCX_API_TOKEN_FILE%" set /p OPENCODEX_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"\r
+if "%OPENPROVIDER_API_AUTH_TOKEN%"=="" if exist "%OCX_API_TOKEN_FILE%" set /p OPENPROVIDER_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"\r
 if not "%OCX_SHIM_BYPASS%"=="" goto run_codex\r
 goto scan_codex_args\r
 :scan_codex_args\r
@@ -471,8 +471,8 @@ export function buildWindowsPowerShellCodexShim(realCodexPath: string, bunPath: 
   const tokenFile = serviceApiTokenFilePath();
   return `#!/usr/bin/env pwsh
 # ${SHIM_MARKER}
-if (-not $env:OPENCODEX_API_AUTH_TOKEN -and (Test-Path -LiteralPath ${psString(tokenFile)})) {
-  $env:OPENCODEX_API_AUTH_TOKEN = (Get-Content -Raw -LiteralPath ${psString(tokenFile)}).Trim()
+if (-not $env:OPENPROVIDER_API_AUTH_TOKEN -and (Test-Path -LiteralPath ${psString(tokenFile)})) {
+  $env:OPENPROVIDER_API_AUTH_TOKEN = (Get-Content -Raw -LiteralPath ${psString(tokenFile)}).Trim()
 }
 $internalCommands = @(${internalCommands})
 $valueOptions = @(${valueOptions})

@@ -31,8 +31,8 @@ import type { OcxConfig } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
-const previousApiToken = process.env.OPENCODEX_API_AUTH_TOKEN;
-const previousOpencodexHome = process.env.OPENCODEX_HOME;
+const previousApiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN;
+const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
 const originalGlobalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-server-auth-test");
 let isolatedCodexHome: IsolatedCodexHome | null = null;
@@ -98,10 +98,10 @@ beforeEach(() => {
 
 afterEach(() => {
   globalThis.fetch = originalGlobalFetch;
-  if (previousApiToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  else process.env.OPENCODEX_API_AUTH_TOKEN = previousApiToken;
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousApiToken === undefined) delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
+  else process.env.OPENPROVIDER_API_AUTH_TOKEN = previousApiToken;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   clearCodexUpstreamHealth();
@@ -134,7 +134,7 @@ async function startPoolRetryHarness(
 ): Promise<PoolRetryHarness> {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_DIR, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
   clearCodexUpstreamHealth();
   clearThreadAccountMap();
   clearAccountQuota();
@@ -259,16 +259,16 @@ describe("server local API auth", () => {
   });
 
   test("non-loopback binding requires env token before startup", () => {
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
     expect(isApiAuthRequired(config("0.0.0.0"))).toBe(true);
-    expect(() => assertServerAuthConfig(config("0.0.0.0"))).toThrow("OPENCODEX_API_AUTH_TOKEN");
+    expect(() => assertServerAuthConfig(config("0.0.0.0"))).toThrow("OPENPROVIDER_API_AUTH_TOKEN");
 
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     expect(() => assertServerAuthConfig(config("0.0.0.0"))).not.toThrow();
   });
 
   test("auth header must match env token when non-loopback auth is required", () => {
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     const cfg = config("0.0.0.0");
 
     expect(hasValidApiAuth(new Request("http://localhost/api/config"), cfg)).toBe(false);
@@ -281,7 +281,7 @@ describe("server local API auth", () => {
   });
 
   test("loopback remains allowed even when env token exists", () => {
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     expect(hasValidApiAuth(new Request("http://localhost/api/config"), config("127.0.0.1"))).toBe(true);
   });
 
@@ -432,8 +432,8 @@ describe("server local API auth", () => {
   test("/v1/models requires API auth and local Origin on non-loopback bindings", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     saveConfig({
       port: 0,
       hostname: "0.0.0.0",
@@ -489,8 +489,8 @@ describe("server local API auth", () => {
   test("management GET rejects non-local Origin even with a valid API key", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     saveConfig({
       ...config("0.0.0.0"),
       port: 0,
@@ -516,8 +516,8 @@ describe("server local API auth", () => {
   test("/api/system/memory rides the management auth gate; /healthz shape unchanged (#314 WP3)", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     saveConfig({
       ...config("0.0.0.0"),
       port: 0,
@@ -550,7 +550,7 @@ describe("server local API auth", () => {
   test("OPTIONS preflight rejects non-local Origin before CORS headers are trusted", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -582,7 +582,7 @@ describe("server local API auth", () => {
   test("loopback management API rejects host-header same-origin rebinding", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -604,7 +604,7 @@ describe("server local API auth", () => {
   test("management CORS echoes validated loopback Origin and covers delegated codex-auth responses", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     saveConfig(config("127.0.0.1"));
 
     const server = startServer(0);
@@ -630,8 +630,8 @@ describe("server local API auth", () => {
   test("non-loopback management API allows same-origin GUI requests with API token", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     saveConfig({
       ...config("0.0.0.0"),
       port: 0,
@@ -665,8 +665,8 @@ describe("server local API auth", () => {
   test("websocket upgrade rejects hostile Origin even with a valid API token", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
     saveConfig({
       ...config("0.0.0.0"),
       port: 0,
@@ -697,8 +697,8 @@ describe("server local API auth", () => {
   test("websocket upgrade returns 426 when the WS transport is disabled", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
     saveConfig({ ...config(), port: 0, websockets: false });
 
     const server = startServer(0);
@@ -724,8 +724,8 @@ describe("server local API auth", () => {
   test("after a 426'd upgrade the same client can immediately fall back to HTTP POST", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
 
     const upstream = Bun.serve({
       port: 0,
@@ -769,8 +769,8 @@ describe("server local API auth", () => {
   test("compact v1 on a routed model propagates a summarizer failure instead of fabricating history", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
 
     const upstream = Bun.serve({
       port: 0,
@@ -809,8 +809,8 @@ describe("server local API auth", () => {
   test("unknown /v1/* paths return JSON 404, never GUI index.html", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
     saveConfig({ ...config(), port: 0 });
 
     const server = startServer(0);
@@ -831,8 +831,8 @@ describe("server local API auth", () => {
   test("POST /v1/responses/compact on a routed model returns v1 replacement history", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
 
     const upstream = Bun.serve({
       port: 0,
@@ -892,10 +892,10 @@ describe("server local API auth", () => {
   test("OpenAI option auth matrix keeps direct, pool, and API credentials independent", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     clearThreadAccountMap();
     clearCodexUpstreamHealth();
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
 
     const seen: Array<{ host: string; authorization: string | null; chatgptAccountId: string | null }> = [];
     const upstream = Bun.serve({
@@ -1233,8 +1233,8 @@ describe("server local API auth", () => {
   test("internal web-search and vision never forward a non-ChatGPT bearer as Direct sidecar auth", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "dedicated-x-key";
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "dedicated-x-key";
     const outbound: Array<{ url: string; authorization: string | null }> = [];
     globalThis.fetch = (async (input, init) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
@@ -1295,8 +1295,8 @@ describe("server local API auth", () => {
   test("internal vision sidecar still accepts a canonical ChatGPT bearer for Direct sidecar auth", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "dedicated-x-key";
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_API_AUTH_TOKEN = "dedicated-x-key";
     const outbound: Array<{ url: string; authorization: string | null; accountId: string | null }> = [];
     globalThis.fetch = (async (input, init) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
@@ -1366,7 +1366,7 @@ describe("server local API auth", () => {
   test("expired thread affinity returns 409 before HTTP passthrough and WS resolves auth per frame", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     clearCodexUpstreamHealth();
     clearThreadAccountMap();
     clearAccountNeedsReauth("pool-a");
@@ -1477,7 +1477,7 @@ describe("server local API auth", () => {
   test("websocket passthrough refreshes pool auth for each response.create turn", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     clearCodexUpstreamHealth();
     clearThreadAccountMap();
     clearAccountNeedsReauth("pool-a");
@@ -1574,7 +1574,7 @@ describe("server local API auth", () => {
   test("websocket routed adapter records completed usage in request logs", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
 
     const upstream = Bun.serve({
       port: 0,
@@ -1983,7 +1983,7 @@ describe("server local API auth", () => {
   test("passthrough connect failure records selected pool account health", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     clearCodexUpstreamHealth();
     clearThreadAccountMap();
     clearAccountNeedsReauth("pool-a");
@@ -2036,7 +2036,7 @@ describe("server local API auth", () => {
   test("passthrough SSE terminal failure is recorded without clearing health on initial 200", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     clearCodexUpstreamHealth();
     clearThreadAccountMap();
     clearAccountNeedsReauth("pool-a");
@@ -2107,7 +2107,7 @@ describe("server local API auth", () => {
   test("native passthrough SSE records completed usage without pool terminal tracking", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
 
     const upstream = Bun.serve({
       port: 0,
@@ -2198,7 +2198,7 @@ describe("server local API auth", () => {
   test("passthrough SSE client cancel aborts the upstream request", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
 
     let releaseAbort!: () => void;
     const upstreamAborted = new Promise<void>(resolve => { releaseAbort = resolve; });
@@ -2270,7 +2270,7 @@ describe("server local API auth", () => {
   test("non-forward generated stream does not mutate active pool health", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     clearCodexUpstreamHealth();
     clearThreadAccountMap();
     clearAccountNeedsReauth("pool-a");

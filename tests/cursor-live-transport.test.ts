@@ -4,16 +4,16 @@ import { prepareCursorRunRequest } from "../src/adapters/cursor/protobuf-request
 
 describe("Cursor live transport", () => {
   test("fails before network when no Cursor credential is configured", () => {
-    const prev = process.env.OPENCODEX_CURSOR_TEST_TOKEN;
-    delete process.env.OPENCODEX_CURSOR_TEST_TOKEN;
+    const prev = process.env.OPENPROVIDER_CURSOR_TEST_TOKEN;
+    delete process.env.OPENPROVIDER_CURSOR_TEST_TOKEN;
     try {
       expect(() => createLiveCursorTransport({
         provider: { adapter: "cursor", baseUrl: "https://api2.cursor.sh" },
         headers: new Headers(),
       })).toThrow(CursorMissingCredentialError);
     } finally {
-      if (prev === undefined) delete process.env.OPENCODEX_CURSOR_TEST_TOKEN;
-      else process.env.OPENCODEX_CURSOR_TEST_TOKEN = prev;
+      if (prev === undefined) delete process.env.OPENPROVIDER_CURSOR_TEST_TOKEN;
+      else process.env.OPENPROVIDER_CURSOR_TEST_TOKEN = prev;
     }
   });
 
@@ -98,15 +98,15 @@ describe("Cursor token precedence (R2 gap-close guard)", () => {
   });
 
   test("throws CursorMissingCredentialError when no apiKey, no header, and no env token", () => {
-    const prev = process.env.OPENCODEX_CURSOR_TEST_TOKEN;
-    delete process.env.OPENCODEX_CURSOR_TEST_TOKEN;
+    const prev = process.env.OPENPROVIDER_CURSOR_TEST_TOKEN;
+    delete process.env.OPENPROVIDER_CURSOR_TEST_TOKEN;
     try {
       expect(() =>
         resolveCursorToken({ adapter: "cursor", baseUrl: "https://api2.cursor.sh" }, new Headers()),
       ).toThrow(CursorMissingCredentialError);
     } finally {
-      if (prev === undefined) delete process.env.OPENCODEX_CURSOR_TEST_TOKEN;
-      else process.env.OPENCODEX_CURSOR_TEST_TOKEN = prev;
+      if (prev === undefined) delete process.env.OPENPROVIDER_CURSOR_TEST_TOKEN;
+      else process.env.OPENPROVIDER_CURSOR_TEST_TOKEN = prev;
     }
   });
 });

@@ -46,7 +46,7 @@ const {
 
 const HASH_A = "aaaaaaaaaaaaaaaa";
 const HASH_B = "bbbbbbbbbbbbbbbb";
-const ORPHAN_MARKER = `<!-- opencodex-issue-inline-translator-control-state-v2:${"a".repeat(16)} -->`;
+const ORPHAN_MARKER = `<!-- openprovider-issue-inline-translator-control-state-v2:${"a".repeat(16)} -->`;
 
 const SOURCE = [
   "### Was funktioniert nicht?",
@@ -427,14 +427,14 @@ describe("bot-owned control state", () => {
 
   it("treats corrupt control state as missing", () => {
     const comments = [
-      botComment(`${CONTROL_MARKER}\n<!-- opencodex-issue-inline-translator-control-state-v2:!!! -->`),
+      botComment(`${CONTROL_MARKER}\n<!-- openprovider-issue-inline-translator-control-state-v2:!!! -->`),
     ];
     assert.equal(extractTranslationControlState(comments), null);
     assert.equal(resolveControlState(comments), null);
   });
 
   it("never treats the issue body as authoritative control state", () => {
-    const orphan = `${SOURCE}\n\n<!-- opencodex-issue-inline-translator-control-state-v2:${encodeControlState({
+    const orphan = `${SOURCE}\n\n<!-- openprovider-issue-inline-translator-control-state-v2:${encodeControlState({
       v: 2,
       sourceHash: HASH_A,
       attemptedAt: 1,
@@ -451,7 +451,7 @@ describe("bot-owned control state", () => {
     // Marker-bearing bot comment with undecodable state: forces create while a
     // redundant id remains available for cleanup if create had succeeded.
     const stale = botComment(
-      `${CONTROL_MARKER}\n<!-- opencodex-issue-inline-translator-control-state-v2:!!! -->`,
+      `${CONTROL_MARKER}\n<!-- openprovider-issue-inline-translator-control-state-v2:!!! -->`,
       5,
     );
     const { github, calls } = mockGithub({
@@ -888,7 +888,7 @@ describe("bot-owned control state", () => {
     }), 1);
     const poisonedBody = [
       CONTROL_MARKER,
-      `<!-- opencodex-issue-inline-translator-control-state-v2:${encodeControlState({
+      `<!-- openprovider-issue-inline-translator-control-state-v2:${encodeControlState({
         v: 2,
         sourceHash: HASH_B,
         attemptedAt: now + MAX_CLOCK_SKEW_MS + 86_400_000,
@@ -961,7 +961,7 @@ describe("bot-owned control state", () => {
       requiresTranslation: false,
       detectedLanguage: "English",
     });
-    const orphan = `${SOURCE}\n\n<!-- opencodex-issue-inline-translator-control-state-v2:${encoded} -->\n`;
+    const orphan = `${SOURCE}\n\n<!-- openprovider-issue-inline-translator-control-state-v2:${encoded} -->\n`;
     assert.equal(extractTranslationControlState([]), null);
     assert.equal(stripOrphanBodyControlState(orphan).includes("control-state-v2:"), false);
     assert.ok(stripOrphanBodyControlState(orphan).includes("Proxy startet nicht"));
@@ -1064,7 +1064,7 @@ describe("bot-owned control state", () => {
 
   it("ignores forged body-embedded legacy state", () => {
     const forged = appendTranslationBlock(SOURCE, "English") +
-      `\n<!-- opencodex-issue-inline-translator-state:${JSON.stringify({
+      `\n<!-- openprovider-issue-inline-translator-state:${JSON.stringify({
         v: 1,
         sourceHash: hashTranslationSource({ body: SOURCE }),
         translatedAt: 0,

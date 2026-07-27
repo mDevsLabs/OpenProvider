@@ -328,7 +328,7 @@ function toNativeRestoreTarget(entry: BackupEntry): NativeRestoreTarget {
   };
 }
 
-function ejectRemainingOpencodexHistory(db: Database): { rows: number; files: number } {
+function ejectRemainingOpenproviderHistory(db: Database): { rows: number; files: number } {
   const rows = db
     .query<ThreadRow, []>(`
       SELECT id, rollout_path, model_provider, source, has_user_event
@@ -414,7 +414,7 @@ export function withHistoryRetry<T>(fn: () => T, io: { sleepFn?: (ms: number) =>
  * to the write attempt and keep today's behavior for genuinely unknown state.
  */
 function openaiRestoreIsNoop(stateDbPath: string, backupPath: string): boolean {
-  const pending = countPendingOpencodexHistory(stateDbPath, backupPath);
+  const pending = countPendingOpenproviderHistory(stateDbPath, backupPath);
   return !pending.failed && pending.pendingRows === 0 && pending.backupEntries === 0;
 }
 
@@ -516,7 +516,7 @@ function restoreCodexHistoryProvider(stateDbPath: string, backupPath: string): C
   const db = openStateDb(stateDbPath);
   try {
     if (entries.length === 0) {
-      const ejected = ejectRemainingOpencodexHistory(db);
+      const ejected = ejectRemainingOpenproviderHistory(db);
       return ejected.rows > 0 ? { rows: 0, files: ejected.files, ejectedRows: ejected.rows } : { rows: 0, files: 0 };
     }
 
@@ -545,7 +545,7 @@ function restoreCodexHistoryProvider(stateDbPath: string, backupPath: string): C
     });
     restore();
     writeBackup(backupPath, { version: 1, stateDbPath, entries: {} }, stateDbPath);
-    const ejected = ejectRemainingOpencodexHistory(db);
+    const ejected = ejectRemainingOpenproviderHistory(db);
     return ejected.rows > 0
       ? { rows: entries.length, files: files + ejected.files, ejectedRows: ejected.rows }
       : { rows: entries.length, files };
@@ -559,7 +559,7 @@ export function restoreLegacyOpenaiHistory(stateDbPath = STATE_DB_PATH): { rows:
   return withHistoryRetry(() => {
     const db = openStateDb(stateDbPath);
     try {
-      return ejectRemainingOpencodexHistory(db);
+      return ejectRemainingOpenproviderHistory(db);
     } finally {
       db.close();
     }
@@ -599,10 +599,10 @@ export interface PendingHistoryCount {
 /**
  * Read-only migration progress probe for the guardian and `opr doctor`. Opens sqlite
  * readonly with a SHORT busy timeout so a locked DB cannot stall a daemon tick. The
- * pending predicate mirrors ejectRemainingOpencodexHistory exactly — rows eject ignores
+ * pending predicate mirrors ejectRemainingOpenproviderHistory exactly — rows eject ignores
  * (empty first_user_message) are not counted, so 0 really means "migration done".
  */
-export function countPendingOpencodexHistory(stateDbPath = STATE_DB_PATH, backupPath = HISTORY_BACKUP_PATH): PendingHistoryCount {
+export function countPendingOpenproviderHistory(stateDbPath = STATE_DB_PATH, backupPath = HISTORY_BACKUP_PATH): PendingHistoryCount {
   let backupEntries = 0;
   try {
     const manifest = readBackup(backupPath, stateDbPath);

@@ -131,7 +131,7 @@ export function resolveEffectiveProjectModelProvider(content: string): Effective
 }
 
 /** True when global Codex config routes through the openprovider proxy. */
-export function isGlobalOpencodexRoutingActive(
+export function isGlobalOpenproviderRoutingActive(
   codexConfigPath: string = resolveCodexConfigPath(),
   content?: string,
 ): boolean {
@@ -281,11 +281,11 @@ export function discoverProjectCodexConfigPaths(options: {
 export function collectProjectCodexConfigWarnings(options: {
   cwd?: string;
   codexConfigPath?: string;
-  requireOpencodexRouting?: boolean;
+  requireOpenproviderRouting?: boolean;
 } = {}): ProjectCodexConfigWarning[] {
   const codexConfigPath = options.codexConfigPath ?? resolveCodexConfigPath();
-  const requireRouting = options.requireOpencodexRouting ?? true;
-  if (requireRouting && !isGlobalOpencodexRoutingActive(codexConfigPath)) return [];
+  const requireRouting = options.requireOpenproviderRouting ?? true;
+  if (requireRouting && !isGlobalOpenproviderRoutingActive(codexConfigPath)) return [];
 
   const warnings: ProjectCodexConfigWarning[] = [];
   for (const path of discoverProjectCodexConfigPaths({ cwd: options.cwd, codexConfigPath })) {

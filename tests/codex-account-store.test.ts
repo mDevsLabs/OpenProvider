@@ -17,13 +17,13 @@ function refreshLockPathForToken(refreshToken: string): string {
 
 describe("codex-account-store CRUD", () => {
   beforeEach(() => {
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
   });
 
   afterEach(() => {
-    delete process.env.OPENCODEX_HOME;
+    delete process.env.OPENPROVIDER_HOME;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   });
 

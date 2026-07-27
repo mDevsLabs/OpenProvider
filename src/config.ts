@@ -301,7 +301,7 @@ export function backupConfigBeforeOpenAiTierMigration(
 
 /**
  * Expand a leading `~` to the home directory in user-supplied paths
- * (OPENCODEX_HOME/CODEX_HOME set from GUIs/service files where no shell expanded it).
+ * (OPENPROVIDER_HOME/CODEX_HOME set from GUIs/service files where no shell expanded it).
  * `~user` and `%VAR%`/`$VAR` forms pass through untouched — those belong to the shell.
  */
 export function expandUserPath(raw: string): string {
@@ -313,7 +313,7 @@ export function expandUserPath(raw: string): string {
 let resolvedConfigDirCache: { raw: string | undefined; path: string } | null = null;
 
 function resolveConfigDir(): string {
-  const raw = process.env["OPENCODEX_HOME"]?.trim() || undefined;
+  const raw = process.env["OPENPROVIDER_HOME"]?.trim() || undefined;
   if (resolvedConfigDirCache && resolvedConfigDirCache.raw === raw) return resolvedConfigDirCache.path;
   const path = raw ? resolve(expandUserPath(raw)) : join(homedir(), ".openprovider");
   resolvedConfigDirCache = { raw, path };
@@ -966,7 +966,7 @@ export function codexAutoStartEnabled(config: Pick<OcxConfig, "codexAutoStart">)
   return config.codexAutoStart !== false;
 }
 
-export const CODEX_SHIM_AUTO_RESTORE_ENV = "OPENCODEX_CODEX_SHIM_AUTO_RESTORE";
+export const CODEX_SHIM_AUTO_RESTORE_ENV = "OPENPROVIDER_CODEX_SHIM_AUTO_RESTORE";
 
 export function codexShimAutoRestoreEnabled(
   config: Pick<OcxConfig, "codexShimAutoRestore">,

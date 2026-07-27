@@ -303,7 +303,7 @@ describe("opr status --json codexPlugins (spawned, read-only)", () => {
       const before = readdirSync(codexHome).sort();
       const result = spawnSync(process.execPath, [cliPath, "status", "--json"], {
         cwd: repoRoot,
-        env: { ...process.env, OPENCODEX_HOME: openproviderHome, CODEX_HOME: codexHome },
+        env: { ...process.env, OPENPROVIDER_HOME: openproviderHome, CODEX_HOME: codexHome },
         encoding: "utf8",
       });
       const after = readdirSync(codexHome).sort();

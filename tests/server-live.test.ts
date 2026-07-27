@@ -14,8 +14,8 @@ import type { OcxConfig } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
-const previousApiToken = process.env.OPENCODEX_API_AUTH_TOKEN;
-const previousOpencodexHome = process.env.OPENCODEX_HOME;
+const previousApiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN;
+const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
 const originalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-server-live-test");
 let isolatedCodexHome: IsolatedCodexHome | null = null;
@@ -24,8 +24,8 @@ const DIRECT_CHATGPT_TOKEN = fakeChatGptJwt({ chatgpt_account_id: "acct-123" });
 beforeEach(() => {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_DIR, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
-  delete process.env.OPENCODEX_API_AUTH_TOKEN;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
+  delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
   isolatedCodexHome = installIsolatedCodexHome("opr-server-live-codex-");
   clearCodexUpstreamHealth();
   clearThreadAccountMap();
@@ -36,10 +36,10 @@ beforeEach(() => {
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
-  if (previousApiToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  else process.env.OPENCODEX_API_AUTH_TOKEN = previousApiToken;
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousApiToken === undefined) delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
+  else process.env.OPENPROVIDER_API_AUTH_TOKEN = previousApiToken;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   clearCodexUpstreamHealth();

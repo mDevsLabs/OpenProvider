@@ -7,14 +7,14 @@ import { handleManagementAPI } from "../src/server/management-api";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const TEST_DIR = join(import.meta.dir, `.tmp-model-visibility-management-${process.pid}`);
-const previousOpencodexHome = process.env.OPENCODEX_HOME;
+const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 let refreshes = 0;
 
 beforeEach(() => {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_DIR, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
   isolatedCodexHome = installIsolatedCodexHome("opr-model-visibility-codex-");
   refreshes = 0;
   saveConfig({
@@ -39,8 +39,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });

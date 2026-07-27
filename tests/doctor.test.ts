@@ -21,8 +21,8 @@ import { collectOrcaCodexHomeDiagnostic } from "../src/codex/home";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-doctor-test");
 const TEST_CODEX_HOME = join(TEST_DIR, "codex");
-const TEST_OPENCODEX_HOME = join(TEST_DIR, "openprovider");
-let prevOpencodexHome: string | undefined;
+const TEST_OPENPROVIDER_HOME = join(TEST_DIR, "openprovider");
+let prevOpenproviderHome: string | undefined;
 let prevCodexHome: string | undefined;
 let prevHttpsProxy: string | undefined;
 let prevLowerHttpsProxy: string | undefined;
@@ -30,15 +30,15 @@ let prevProxyRef: string | undefined;
 
 describe("doctor", () => {
   beforeEach(() => {
-    prevOpencodexHome = process.env.OPENCODEX_HOME;
+    prevOpenproviderHome = process.env.OPENPROVIDER_HOME;
     prevCodexHome = process.env.CODEX_HOME;
     prevHttpsProxy = process.env.HTTPS_PROXY;
     prevLowerHttpsProxy = process.env.https_proxy;
     prevProxyRef = process.env.OCX_TEST_PROXY_REF;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_CODEX_HOME, { recursive: true });
-    mkdirSync(TEST_OPENCODEX_HOME, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_OPENCODEX_HOME;
+    mkdirSync(TEST_OPENPROVIDER_HOME, { recursive: true });
+    process.env.OPENPROVIDER_HOME = TEST_OPENPROVIDER_HOME;
     process.env.CODEX_HOME = TEST_CODEX_HOME;
     delete process.env.HTTPS_PROXY;
     delete process.env.https_proxy;
@@ -46,8 +46,8 @@ describe("doctor", () => {
   });
 
   afterEach(() => {
-    if (prevOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = prevOpencodexHome;
+    if (prevOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+    else process.env.OPENPROVIDER_HOME = prevOpenproviderHome;
     if (prevCodexHome === undefined) delete process.env.CODEX_HOME;
     else process.env.CODEX_HOME = prevCodexHome;
     if (prevHttpsProxy === undefined) delete process.env.HTTPS_PROXY;
@@ -62,12 +62,12 @@ describe("doctor", () => {
   test("path report flips auth.json/config.json from absent to present", () => {
     let rows = collectPaths();
     const auth = () => rows.find(r => r.label === "CODEX_HOME/auth.json")!;
-    const cfg = () => rows.find(r => r.label === "OPENCODEX_HOME/config.json")!;
+    const cfg = () => rows.find(r => r.label === "OPENPROVIDER_HOME/config.json")!;
     expect(auth().exists).toBe(false);
     expect(cfg().exists).toBe(false);
 
     writeFileSync(join(TEST_CODEX_HOME, "auth.json"), "{}");
-    writeFileSync(join(TEST_OPENCODEX_HOME, "config.json"), "{}");
+    writeFileSync(join(TEST_OPENPROVIDER_HOME, "config.json"), "{}");
     rows = collectPaths();
     expect(auth().exists).toBe(true);
     expect(cfg().exists).toBe(true);
@@ -284,7 +284,7 @@ describe("doctor", () => {
   });
 
   test("collectConfiguredProxy reports effective config proxy without leaking values", () => {
-    writeFileSync(join(TEST_OPENCODEX_HOME, "config.json"), JSON.stringify({ proxy: "${OCX_TEST_PROXY_REF}" }));
+    writeFileSync(join(TEST_OPENPROVIDER_HOME, "config.json"), JSON.stringify({ proxy: "${OCX_TEST_PROXY_REF}" }));
 
     let diagnostic = collectConfiguredProxy();
     expect(diagnostic.configured).toBe(true);
@@ -385,7 +385,7 @@ describe("service memory section (#314 WP4)", () => {
 
   test("guidance gating: win32 + auto-known-bad prints version-claiming guidance", () => {
     const lines = formatServiceMemoryLines({ status: "ok", data: baseData });
-    expect(lines.some(l => l.includes("OPENCODEX_BUN_PATH"))).toBe(true);
+    expect(lines.some(l => l.includes("OPENPROVIDER_BUN_PATH"))).toBe(true);
     // Version-claiming, never binary-claiming.
     expect(lines.join("\n")).not.toContain("bundled binary");
   });
@@ -395,13 +395,13 @@ describe("service memory section (#314 WP4)", () => {
       status: "ok",
       data: { ...baseData, platform: "darwin", eagerRelay: null },
     });
-    expect(darwin.some(l => l.includes("OPENCODEX_BUN_PATH"))).toBe(false);
+    expect(darwin.some(l => l.includes("OPENPROVIDER_BUN_PATH"))).toBe(false);
 
     const fixedRuntime = formatServiceMemoryLines({
       status: "ok",
       data: { ...baseData, eagerRelay: { useEagerRelay: true, reason: "auto-fixed-runtime" } },
     });
-    expect(fixedRuntime.some(l => l.includes("OPENCODEX_BUN_PATH"))).toBe(false);
+    expect(fixedRuntime.some(l => l.includes("OPENPROVIDER_BUN_PATH"))).toBe(false);
   });
 
   test("unauthorized and unreachable render honest lines without fake data", () => {

@@ -141,7 +141,7 @@ export async function handleManagementAPI(req: Request, url: URL, config: OcxCon
       stopServiceIfInstalled();
     } catch (err) {
       if (isServiceOwnershipError(err)) {
-        // The installed service belongs to another CODEX_HOME/OPENCODEX_HOME: it would respawn
+        // The installed service belongs to another CODEX_HOME/OPENPROVIDER_HOME: it would respawn
         // this proxy immediately, and its shared config is not ours to tear down. Refuse the
         // stop instead of half-performing it. 409, not 500 — the request is well-formed.
         return jsonResponse({ success: false, message: err.message }, 409, req, config);

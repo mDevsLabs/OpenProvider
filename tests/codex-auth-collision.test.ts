@@ -8,21 +8,21 @@ import type { OcxConfig } from "../src/types";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-auth-collision-test");
 const TEST_CODEX_HOME = join(TEST_DIR, "codex");
-let previousOpencodexHome: string | undefined;
+let previousOpenproviderHome: string | undefined;
 let previousCodexHome: string | undefined;
 
 beforeEach(() => {
-  previousOpencodexHome = process.env.OPENCODEX_HOME;
+  previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
   previousCodexHome = process.env.CODEX_HOME;
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_CODEX_HOME, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
   process.env.CODEX_HOME = TEST_CODEX_HOME;
 });
 
 afterEach(() => {
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });

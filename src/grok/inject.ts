@@ -114,7 +114,7 @@ function userModelAliases(content: string, region: ManagedRegion | null): Set<st
  * The api_key literal every generated entry carries. It is the STRONG ownership signal:
  * a value we mint, that a human has no reason to type by hand.
  */
-const OPENCODEX_API_KEY = "openprovider-loopback";
+const OPENPROVIDER_API_KEY = "openprovider-loopback";
 
 /** A plain `[model.<alias>]` table outside the fence that openprovider itself wrote. */
 interface OrphanTable {
@@ -170,7 +170,7 @@ function isLoopbackBaseUrl(value: string | undefined): boolean {
  * A loopback base_url ALONE is not enough: aiming your own model at the local proxy is a
  * legitimate thing to do.
  */
-function findOpencodexOrphans(content: string, region: ManagedRegion | null): OrphanTable[] {
+function findOpenproviderOrphans(content: string, region: ManagedRegion | null): OrphanTable[] {
   const orphans: OrphanTable[] = [];
   // Collect every table header first: a table body runs to the NEXT header, whatever it is.
   const headers: Array<{ index: number; length: number; segments: string[]; array: boolean }> = [];
@@ -188,7 +188,7 @@ function findOpencodexOrphans(content: string, region: ManagedRegion | null): Or
     if (region && header.index >= region.start && header.index < region.end) continue;
     const bodyEnd = headers[position + 1]?.index ?? content.length;
     const keys = tableBodyKeys(content.slice(header.index + header.length, bodyEnd));
-    if (keys.get("api_key") !== OPENCODEX_API_KEY) continue;
+    if (keys.get("api_key") !== OPENPROVIDER_API_KEY) continue;
     if (!isLoopbackBaseUrl(keys.get("base_url"))) continue;
     // Swallow the entry's OWN sub-tables (`[model.<alias>.extra_headers]`). Grok writes
     // them when it re-serializes the file, and leaving one behind keeps the alias
@@ -370,7 +370,7 @@ export function injectGrokConfig(
     // Adopt our own pre-fence entries (#511) BEFORE reserving user aliases, so the stale
     // duplicate is replaced instead of routed around forever. Runs inside the normalized
     // window so the user's dominant EOL is still restored below.
-    const orphans = findOpencodexOrphans(originalContent, originalRegion);
+    const orphans = findOpenproviderOrphans(originalContent, originalRegion);
     const content = removeOrphanTables(originalContent, orphans);
     // Removing bytes above the fence MOVES it: recompute rather than adjust arithmetic,
     // so the splice below cannot cut the file in the wrong place.

@@ -37,13 +37,13 @@ import {
 import type { OcxConfig, OcxProviderConfig } from "../src/types";
 
 let testDir: string;
-let previousOpencodexHome: string | undefined;
+let previousOpenproviderHome: string | undefined;
 let previousCodexHome: string | undefined;
 
 beforeEach(() => {
   testDir = mkdtempSync(join(tmpdir(), "opr-auth-ctx-"));
-  previousOpencodexHome = process.env.OPENCODEX_HOME;
-  process.env.OPENCODEX_HOME = testDir;
+  previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
+  process.env.OPENPROVIDER_HOME = testDir;
   // Isolate the main-account credential source: testDir has no auth.json, so the main
   // account is deterministically absent (these cases test pool-only fail-closed behavior).
   previousCodexHome = process.env.CODEX_HOME;
@@ -60,8 +60,8 @@ afterEach(() => {
   clearCodexUpstreamHealth();
   clearAccountNeedsReauth("pool-a");
   clearAccountNeedsReauth("pool-b");
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
 });

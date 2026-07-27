@@ -1,7 +1,7 @@
 "use strict";
 
 // ---------------------------------------------------------------------------
-// Pure issue-quality validation for OpenCodex.
+// Pure issue-quality validation for OpenProvider.
 // CommonJS, zero runtime dependencies. No GitHub API calls.
 // ---------------------------------------------------------------------------
 
@@ -164,7 +164,7 @@ function hasSubstantialStructuredContent(body, minSectionLen = 40) {
 const FEATURE_NEW_HEADINGS = [
   "What are you trying to accomplish?",
   "What prevents this today?",
-  "What should OpenCodex do?",
+  "What should OpenProvider do?",
 ];
 const FEATURE_LEGACY_HEADINGS = ["Problem to solve", "Proposed solution"];
 const FEATURE_GOAL_HEADINGS = [
@@ -179,7 +179,7 @@ const FEATURE_BLOCKER_HEADINGS = [
   "Current workaround",
 ];
 const FEATURE_BEHAVIOUR_HEADINGS = [
-  "What should OpenCodex do?",
+  "What should OpenProvider do?",
   "Expected behaviour",
   "Expected behavior",
   "Proposed solution",
@@ -532,7 +532,7 @@ function validateIssue(issue) {
     if (!softPass && version !== null && os !== null && isEmpty(version) && isEmpty(os) &&
         !isRawPlaceholder(version) && !isRawPlaceholder(os)) {
       reasons.push("Version and Operating system are both missing.");
-      guidance.push("Add your OpenCodex version and OS so we can reproduce the environment.");
+      guidance.push("Add your OpenProvider version and OS so we can reproduce the environment.");
     }
 
     if (!softPass) {
@@ -566,10 +566,10 @@ function validateIssue(issue) {
     if (isEmpty(expected)) emptyCore.push("expected behaviour");
     // Metadata fields: provider, version, endpoint are required on the form.
     const provider = extractSection(body, "Provider or upstream service");
-    const version = extractSection(body, "OpenCodex version");
+    const version = extractSection(body, "OpenProvider version");
     const endpoint = extractSection(body, "Endpoint or capability");
     if (provider !== null && isEmpty(provider)) emptyCore.push("provider or upstream service");
-    if (version !== null && isRawPlaceholder(version) === false && isEmpty(version)) emptyCore.push("OpenCodex version");
+    if (version !== null && isRawPlaceholder(version) === false && isEmpty(version)) emptyCore.push("OpenProvider version");
     if (endpoint !== null && isEmpty(endpoint)) emptyCore.push("endpoint or capability");
     if (emptyCore.length > 0) {
       reasons.push(`Required sections are missing or empty: ${emptyCore.join(", ")}.`);

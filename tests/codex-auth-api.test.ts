@@ -30,9 +30,9 @@ import {
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-auth-api-test");
 const TEST_CODEX_HOME = join(TEST_DIR, "codex");
-const MANUAL_IMPORT_ENV = "OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT";
+const MANUAL_IMPORT_ENV = "OPENPROVIDER_ENABLE_UNVERIFIED_CODEX_IMPORT";
 const WARMUP_INPUT = [{ type: "message", role: "user", content: [{ type: "input_text", text: "hi" }] }];
-let previousOpencodexHome: string | undefined;
+let previousOpenproviderHome: string | undefined;
 let previousCodexHome: string | undefined;
 let previousManualImportEnv: string | undefined;
 let previousFetch: typeof fetch;
@@ -105,13 +105,13 @@ function seedPoolAccount(
 }
 
 beforeEach(() => {
-  previousOpencodexHome = process.env.OPENCODEX_HOME;
+  previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
   previousCodexHome = process.env.CODEX_HOME;
   previousManualImportEnv = process.env[MANUAL_IMPORT_ENV];
   previousFetch = globalThis.fetch;
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_CODEX_HOME, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
   process.env.CODEX_HOME = TEST_CODEX_HOME;
   delete process.env[MANUAL_IMPORT_ENV];
   clearAccountNeedsReauth("__main__");
@@ -127,8 +127,8 @@ afterEach(() => {
   clearAccountNeedsReauth(MAIN_CODEX_ACCOUNT_ID);
   clearCodexWebSocketRegistry();
   globalThis.fetch = previousFetch;
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
   if (previousManualImportEnv === undefined) delete process.env[MANUAL_IMPORT_ENV];

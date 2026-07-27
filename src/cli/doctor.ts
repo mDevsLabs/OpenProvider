@@ -17,7 +17,7 @@ import { loadServiceTokenFromFile } from "../lib/service-secrets";
 import { readCodexTokens } from "../codex/auth-collision";
 import { collectOrcaCodexHomeDiagnostic, resolveCodexHomeDir as resolveCodexHomeDirImpl, isWslRuntime, listWslWindowsCodexHomes, wslAutomountRoot, type CodexHomeDeps } from "../codex/home";
 import { findCodexOnPath, isWindowsInteropDir } from "../codex/shim";
-import { countPendingOpencodexHistory } from "../codex/history-provider";
+import { countPendingOpenproviderHistory } from "../codex/history-provider";
 import { collectProjectCodexConfigWarnings, formatProjectCodexConfigWarningsForDoctor } from "../codex/project-config-warnings";
 import { collectStartupHealth, startupHealthSummary } from "../codex/autostart-health";
 import {
@@ -126,7 +126,7 @@ export async function collectOAuthDoctorChecks(
     checks.push({
       level: "WARN",
       message:
-        "OAuth credential storage directory is not writable. Action: fix permissions on OPENCODEX_HOME so opr can create temp files and rename auth.json",
+        "OAuth credential storage directory is not writable. Action: fix permissions on OPENPROVIDER_HOME so opr can create temp files and rename auth.json",
     });
   }
 
@@ -136,7 +136,7 @@ export async function collectOAuthDoctorChecks(
     checks.push({
       level: "WARN",
       message:
-        "Token refresh single-flight is unavailable. Action: fix permissions on OPENCODEX_HOME so opr can create refresh lock files",
+        "Token refresh single-flight is unavailable. Action: fix permissions on OPENPROVIDER_HOME so opr can create refresh lock files",
     });
   }
 
@@ -177,8 +177,8 @@ export function collectPaths(): PathRow[] {
   return [
     { label: "CODEX_HOME", path: codexHome, exists: existsSync(codexHome) },
     { label: "CODEX_HOME/auth.json", path: join(codexHome, "auth.json"), exists: existsSync(join(codexHome, "auth.json")) },
-    { label: "OPENCODEX_HOME", path: openproviderHome, exists: existsSync(openproviderHome) },
-    { label: "OPENCODEX_HOME/config.json", path: getConfigPath(), exists: existsSync(getConfigPath()) },
+    { label: "OPENPROVIDER_HOME", path: openproviderHome, exists: existsSync(openproviderHome) },
+    { label: "OPENPROVIDER_HOME/config.json", path: getConfigPath(), exists: existsSync(getConfigPath()) },
   ];
 }
 
@@ -541,7 +541,7 @@ export function formatServiceMemoryLines(report: ServiceMemoryReport): string[] 
   const lines: string[] = [];
   lines.push(`  --     doctor process Bun ${Bun.version} (this is NOT the service process)`);
   if (report.status === "unauthorized") {
-    lines.push("  --     proxy reachable but rejected the request — set OPENCODEX_API_AUTH_TOKEN to match the service");
+    lines.push("  --     proxy reachable but rejected the request — set OPENPROVIDER_API_AUTH_TOKEN to match the service");
     return lines;
   }
   if (report.status === "unreachable") {
@@ -570,10 +570,10 @@ export function formatServiceMemoryLines(report: ServiceMemoryReport): string[] 
     lines.push("  !!     high RSS, indeterminate split — capture two doctor runs over time to see the trend");
   }
   // Version-claiming (never binary-claiming): the endpoint cannot distinguish
-  // the bundled binary from an OPENCODEX_BUN_PATH override of the same version.
+  // the bundled binary from an OPENPROVIDER_BUN_PATH override of the same version.
   if (d.platform === "win32" && d.eagerRelay?.reason === "auto-known-bad") {
     lines.push(`         service is running Bun ${d.bunVersion} on Windows — a version affected by the upstream Bun memory issue.`);
-    lines.push("         Options: wait for a bundled runtime update, or set OPENCODEX_BUN_PATH to a runtime you trust (unvalidated — own risk),");
+    lines.push("         Options: wait for a bundled runtime update, or set OPENPROVIDER_BUN_PATH to a runtime you trust (unvalidated — own risk),");
     lines.push("         or opt into streamMode \"eager-relay\" via PUT /api/settings (crash risk on this runtime; see docs).");
   }
   return lines;
@@ -719,7 +719,7 @@ export async function runDoctor(args: string[] = []): Promise<void> {
       console.log(`  --     doctor process Bun ${Bun.version} (this is NOT the service process)`);
       console.log("  --     no running opr proxy found (no live pid/runtime record)");
     } else {
-      const token = process.env.OPENCODEX_API_AUTH_TOKEN ?? loadServiceTokenFromFile(process.env);
+      const token = process.env.OPENPROVIDER_API_AUTH_TOKEN ?? loadServiceTokenFromFile(process.env);
       const report = await fetchServiceMemory(gracefulStopHost(runtime.hostname), runtime.port, token);
       for (const line of formatServiceMemoryLines(report)) console.log(line);
     }
@@ -735,7 +735,7 @@ export async function runDoctor(args: string[] = []): Promise<void> {
   // Codex app until the one-time migration lands. Read-only probe (readonly sqlite, 100ms
   // busy timeout) — reports state, never mutates.
   console.log("\nCodex history migration");
-  const pending = countPendingOpencodexHistory();
+  const pending = countPendingOpenproviderHistory();
   if (pending.failed) {
     console.log("  --     state DB locked or unreadable (Codex app open?) — migration state unknown");
   } else if (pending.pendingRows === 0 && pending.backupEntries === 0) {

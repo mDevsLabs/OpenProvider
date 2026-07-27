@@ -1,6 +1,6 @@
 name: Release
 
-# Publish opencodex to npm — jawcode-style: triggered from the Actions tab with an explicit
+# Publish openprovider to npm — jawcode-style: triggered from the Actions tab with an explicit
 # version, dist-tag, and a dry-run-first default. Bump package.json on main BEFORE dispatching
 # (or use `bun run release <version>`, which does the bump+commit+push+dispatch for you); the
 # workflow verifies the version matches before publishing.
@@ -23,7 +23,7 @@ on:
         description: "Dry run (build + pack, no actual publish)"
         required: false
         type: boolean
-        default: true
+        default: false
       expected-sha:
         description: "Immutable release commit this dispatch must publish (fail if the branch moved)"
         required: false
@@ -59,7 +59,7 @@ jobs:
             exit 1
           fi
 
-      # opencodex is bun-native (the prepublishOnly GUI build + typecheck run under bun).
+      # openprovider is bun-native (the prepublishOnly GUI build + typecheck run under bun).
       - name: Setup Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:

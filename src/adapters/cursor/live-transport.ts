@@ -128,7 +128,7 @@ export class CursorMissingCredentialError extends Error {
   readonly code = "cursor_missing_credential";
 
   constructor() {
-    super("Cursor live transport requires a Cursor access token in provider.apiKey, Authorization, or OPENCODEX_CURSOR_TEST_TOKEN.");
+    super("Cursor live transport requires a Cursor access token in provider.apiKey, Authorization, or OPENPROVIDER_CURSOR_TEST_TOKEN.");
     this.name = "CursorMissingCredentialError";
   }
 }
@@ -140,7 +140,7 @@ export function resolveCursorToken(provider: OcxProviderConfig, headers?: Header
   const forwarded = headers?.get("authorization") ?? headers?.get("Authorization");
   if (forwarded?.toLowerCase().startsWith("bearer ")) return forwarded.slice("bearer ".length).trim();
 
-  const envToken = process.env.OPENCODEX_CURSOR_TEST_TOKEN?.trim();
+  const envToken = process.env.OPENPROVIDER_CURSOR_TEST_TOKEN?.trim();
   if (envToken) return envToken;
   throw new CursorMissingCredentialError();
 }

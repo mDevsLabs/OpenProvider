@@ -15,11 +15,11 @@ import { startServer } from "../src/server";
 import { usageLogPath } from "../src/usage/log";
 
 const moduleOriginalFetch = globalThis.fetch;
-const moduleOriginalHome = process.env.OPENCODEX_HOME;
+const moduleOriginalHome = process.env.OPENPROVIDER_HOME;
 afterEach(() => {
   globalThis.fetch = moduleOriginalFetch;
-  if (moduleOriginalHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = moduleOriginalHome;
+  if (moduleOriginalHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = moduleOriginalHome;
 });
 
 describe("OpenAI API virtual model resolution", () => {
@@ -162,7 +162,7 @@ describe("OpenAI API compact transport", () => {
   test("maps every Pro id to base, strips reasoning, buffers failures, caps bodies, and logs exactly once", async () => {
     const originalFetch = globalThis.fetch;
     const home = mkdtempSync(join(tmpdir(), "opr-openai-api-compact-"));
-    process.env.OPENCODEX_HOME = home;
+    process.env.OPENPROVIDER_HOME = home;
     saveConfig({
       port: 0,
       defaultProvider: "openai-apikey",
@@ -343,7 +343,7 @@ describe("OpenAI API compact transport", () => {
     } finally {
       globalThis.fetch = originalFetch;
       await server.stop(true);
-      delete process.env.OPENCODEX_HOME;
+      delete process.env.OPENPROVIDER_HOME;
       rmSync(home, { recursive: true, force: true });
     }
   }, 20_000);
@@ -353,7 +353,7 @@ describe("OpenAI API Pro transport identities", () => {
   test("HTTP JSON, HTTP SSE, and real WebSocket keep base wire/client identity and virtual logs", async () => {
     const originalFetch = globalThis.fetch;
     const home = mkdtempSync(join(tmpdir(), "opr-openai-api-pro-"));
-    process.env.OPENCODEX_HOME = home;
+    process.env.OPENPROVIDER_HOME = home;
     saveConfig({
       port: 0,
       websockets: true,
@@ -493,7 +493,7 @@ describe("OpenAI API Pro transport identities", () => {
     } finally {
       globalThis.fetch = originalFetch;
       await server.stop(true);
-      delete process.env.OPENCODEX_HOME;
+      delete process.env.OPENPROVIDER_HOME;
       rmSync(home, { recursive: true, force: true });
     }
   }, 20_000);

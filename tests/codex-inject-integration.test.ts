@@ -8,7 +8,7 @@ import { Database } from "bun:sqlite";
 
 const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
 
-// Full injectCodexConfig runs in a subprocess with isolated CODEX_HOME/OPENCODEX_HOME so
+// Full injectCodexConfig runs in a subprocess with isolated CODEX_HOME/OPENPROVIDER_HOME so
 // module-level path constants bind to the temp dirs (same pattern as codex-journal.test.ts).
 function runInject(codexHome: string, ocxHome: string, configJson = "{}"): { stdout: string; status: number } {
   const script = `
@@ -19,7 +19,7 @@ function runInject(codexHome: string, ocxHome: string, configJson = "{}"): { std
   `;
   const result = spawnSync(process.execPath, ["--eval", script], {
     cwd: repoRoot,
-    env: { ...process.env, CODEX_HOME: codexHome, OPENCODEX_HOME: ocxHome, TEST_OCX_CONFIG: configJson },
+    env: { ...process.env, CODEX_HOME: codexHome, OPENPROVIDER_HOME: ocxHome, TEST_OCX_CONFIG: configJson },
     encoding: "utf8",
   });
   return { stdout: result.stdout?.trim() ?? "", status: result.status ?? 1 };
@@ -32,7 +32,7 @@ function runRestore(codexHome: string, ocxHome: string): { stdout: string; statu
   `;
   const result = spawnSync(process.execPath, ["--eval", script], {
     cwd: repoRoot,
-    env: { ...process.env, CODEX_HOME: codexHome, OPENCODEX_HOME: ocxHome },
+    env: { ...process.env, CODEX_HOME: codexHome, OPENPROVIDER_HOME: ocxHome },
     encoding: "utf8",
   });
   return { stdout: result.stdout?.trim() ?? "", status: result.status ?? 1 };
@@ -246,7 +246,7 @@ describe("injectCodexConfig integration (Design B)", () => {
     expect(r.status).toBe(0);
     const message = JSON.parse(r.stdout).message;
     expect(message).toContain("http://192.168.1.20:10100/v1");
-    expect(message).toContain("x-openprovider-api-key from OPENCODEX_API_AUTH_TOKEN");
+    expect(message).toContain("x-openprovider-api-key from OPENPROVIDER_API_AUTH_TOKEN");
     expect(readFileSync(join(codexHome, "config.toml"), "utf8")).toBe(original);
   });
 

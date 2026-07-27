@@ -366,10 +366,10 @@ describe("resolveCodexRuntime", () => {
     writeLauncher(oldBin, "0.133.0", ["low", "medium", "high"]);
     writeLauncher(newBin, "0.145.0-alpha.30", ["low", "medium", "high", "max", "ultra"]);
 
-    const previousHome = process.env.OPENCODEX_HOME;
+    const previousHome = process.env.OPENPROVIDER_HOME;
     const previousCli = process.env.CODEX_CLI_PATH;
     const previousPath = process.env.PATH;
-    process.env.OPENCODEX_HOME = home;
+    process.env.OPENPROVIDER_HOME = home;
     process.env.PATH = "";
     resetCodexRuntimeResolveCacheForTests();
     resetBundledCatalogCacheForTests();
@@ -401,8 +401,8 @@ describe("resolveCodexRuntime", () => {
         level => (level as { effort?: string }).effort === "max",
       )).toBe(true);
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previousHome;
+      if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+      else process.env.OPENPROVIDER_HOME = previousHome;
       if (previousCli === undefined) delete process.env.CODEX_CLI_PATH;
       else process.env.CODEX_CLI_PATH = previousCli;
       if (previousPath === undefined) delete process.env.PATH;

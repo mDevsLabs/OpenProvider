@@ -92,7 +92,7 @@ function listenerIdentity10100(): ListenerIdentity {
 }
 
 async function checkLiveKey(): Promise<void> {
-  const configHome = process.env.OPENCODEX_HOME?.trim() || join(homedir(), ".openprovider");
+  const configHome = process.env.OPENPROVIDER_HOME?.trim() || join(homedir(), ".openprovider");
   const configPath = join(configHome, "config.json");
   let key: string | null = null;
   if (existsSync(configPath)) {
@@ -155,7 +155,7 @@ if (Bun.argv.includes("--check-live-key")) {
   }
 
   const liveBefore = listenerIdentity10100();
-  const realOcxHome = process.env.OPENCODEX_HOME?.trim() || join(homedir(), ".openprovider");
+  const realOcxHome = process.env.OPENPROVIDER_HOME?.trim() || join(homedir(), ".openprovider");
   const realCodexHome = process.env.CODEX_HOME?.trim() || join(homedir(), ".codex");
   const realState = [
     ["openprovider-config", join(realOcxHome, "config.json")],

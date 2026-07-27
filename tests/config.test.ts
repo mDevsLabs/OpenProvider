@@ -31,11 +31,11 @@ let testDir = "";
 
 beforeEach(() => {
   testDir = mkdtempSync(join(tmpdir(), "opr-config-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
 });
 
 afterEach(() => {
-  delete process.env.OPENCODEX_HOME;
+  delete process.env.OPENPROVIDER_HOME;
   if (testDir && existsSync(testDir)) rmSync(testDir, { recursive: true, force: true });
   testDir = "";
 });
@@ -174,7 +174,7 @@ describe("openprovider config defaults", () => {
     }
   });
 
-  test("loads valid config from OPENCODEX_HOME", () => {
+  test("loads valid config from OPENPROVIDER_HOME", () => {
     writeConfig({
       port: 12345,
       providers: {
@@ -348,11 +348,11 @@ describe("openprovider config defaults", () => {
     expect(backupNames()).toHaveLength(0);
   });
 
-  test("resolves relative OPENCODEX_HOME once to an absolute config directory", () => {
+  test("resolves relative OPENPROVIDER_HOME once to an absolute config directory", () => {
     const parent = mkdtempSync(join(tmpdir(), "opr-config-parent-"));
     const oldCwd = process.cwd();
     try {
-      process.env.OPENCODEX_HOME = "relative-home";
+      process.env.OPENPROVIDER_HOME = "relative-home";
       process.chdir(parent);
       const firstPath = getConfigPath();
       const expectedConfigDir = resolve("relative-home");
@@ -368,8 +368,8 @@ describe("openprovider config defaults", () => {
     }
   });
 
-  test("uses the default home when OPENCODEX_HOME is unset", () => {
-    delete process.env.OPENCODEX_HOME;
+  test("uses the default home when OPENPROVIDER_HOME is unset", () => {
+    delete process.env.OPENPROVIDER_HOME;
 
     expect(getConfigPath()).toBe(join(homedir(), ".openprovider", "config.json"));
     expect(getPidPath()).toBe(join(homedir(), ".openprovider", "opr.pid"));

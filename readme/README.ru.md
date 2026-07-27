@@ -3,7 +3,7 @@
 Две команды — и Codex, и Claude Code работают на любой LLM, которую вы укажете.</p>
 
 <p align="center">
-  <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="Подписывайтесь на @claudeebum в X"></a>
+  <a href="https://x.com/mDevsLabs"><img src="https://img.shields.io/badge/%40mDevsLabs-000000?logo=x&logoColor=white" alt="Подписывайтесь на @mDevsLabs в X"></a>
   <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="npm version"></a>
   <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="license"></a>
   <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="node version">
@@ -321,7 +321,7 @@ opr update [--tag preview]     # обновить openprovider; preview-уста
 остаётся нетронутым до следующей команды. Ошибка восстановления выдаёт предупреждение, но не приводит
 к сбою запрошенной команды; ручной вариант — `opr codex-shim install`. Для отключения установите
 `codexShimAutoRestore` в `false` или задайте процессу
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`.
+`OPENPROVIDER_CODEX_SHIM_AUTO_RESTORE=0`.
 Используйте **shim** для лёгкого запуска прокси по требованию без фонового демона. Автозапуск через
 shim включён по умолчанию и отключается в GUI-панели управления. Если настроенный порт прокси уже
 занят, `opr start` автоматически выберет другой свободный локальный порт и обновит настройки Codex.
@@ -421,7 +421,7 @@ JSON обрезан или испорчен вручную), openprovider сох
 `/v1/images/generations` и `/v1/images/edits`):
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+export OPENPROVIDER_API_AUTH_TOKEN="your-secret-token"
 opr start
 ```
 

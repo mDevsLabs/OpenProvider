@@ -9,7 +9,7 @@ import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../src/provi
 import type { OcxConfig } from "../src/types";
 
 const originalFetch = globalThis.fetch;
-const previousOpencodexHome = process.env.OPENCODEX_HOME;
+const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
 const previousCodexHome = process.env.CODEX_HOME;
 
 let openproviderHome: string;
@@ -63,7 +63,7 @@ function testConfig(): OcxConfig {
 beforeEach(() => {
   openproviderHome = mkdtempSync(join(tmpdir(), "opr-quota-"));
   codexHome = mkdtempSync(join(tmpdir(), "codex-quota-"));
-  process.env.OPENCODEX_HOME = openproviderHome;
+  process.env.OPENPROVIDER_HOME = openproviderHome;
   process.env.CODEX_HOME = codexHome;
   mkdirSync(codexHome, { recursive: true });
   writeFileSync(join(codexHome, "auth.json"), JSON.stringify({
@@ -77,8 +77,8 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
   clearAccountQuota();
   clearProviderQuotaCache();
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
   rmSync(openproviderHome, { recursive: true, force: true });

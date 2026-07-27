@@ -4,7 +4,7 @@
 Deux commandes suffisent pour utiliser n’importe quel LLM avec chacun de ces outils.</p>
 
 <p align="center">
-  <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="Suivre @claudeebum sur X"></a>
+  <a href="https://x.com/mDevsLabs"><img src="https://img.shields.io/badge/%40mDevsLabs-000000?logo=x&logoColor=white" alt="Suivre @mDevsLabs sur X"></a>
   <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="Version npm"></a>
   <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="Licence"></a>
   <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="Version de Node.js">
@@ -593,7 +593,7 @@ Pour désactiver cette restauration automatique dans la configuration :
 Pour la désactiver avec une variable d’environnement :
 
 ```bash
-export OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0
+export OPENPROVIDER_CODEX_SHIM_AUTO_RESTORE=0
 ```
 
 ## Désinstallation
@@ -746,7 +746,7 @@ Un jeton Bearer devient alors obligatoire pour protéger :
 Définissez le jeton avant de démarrer OpenProvider :
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="votre-jeton-secret"
+export OPENPROVIDER_API_AUTH_TOKEN="votre-jeton-secret"
 opr start
 ```
 
@@ -755,7 +755,7 @@ Le proxy refuse de démarrer sans cette variable lorsqu’il écoute sur une adr
 Pour installer un service avec accès réseau :
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="votre-jeton-secret"
+export OPENPROVIDER_API_AUTH_TOKEN="votre-jeton-secret"
 opr service install
 ```
 

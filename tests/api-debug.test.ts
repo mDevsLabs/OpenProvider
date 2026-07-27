@@ -36,21 +36,21 @@ function loopbackOrigin(server: { port: number }): string {
 }
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-api-debug-codex-");
   testDir = mkdtempSync(join(tmpdir(), "opr-api-debug-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   saveConfig(baseConfig());
   resetDebugLogBufferForTests();
   resetInjectionDebugLogBufferForTests();
   clearDebugSettings();
   delete process.env.OCX_DEBUG;
-  delete process.env.OPENCODEX_USAGE_DEBUG;
+  delete process.env.OPENPROVIDER_USAGE_DEBUG;
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   resetDebugLogBufferForTests();

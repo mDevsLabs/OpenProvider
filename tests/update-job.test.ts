@@ -20,18 +20,18 @@ function fakeSpawn(result: SpawnResult): typeof import("node:child_process").spa
   return (() => ({ ...result, stderr: "", pid: 1, output: [], signal: null })) as never;
 }
 
-const prevHome = process.env.OPENCODEX_HOME;
+const prevHome = process.env.OPENPROVIDER_HOME;
 let dir: string;
 
 beforeEach(() => {
   dir = join(tmpdir(), `opr-update-job-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   mkdirSync(dir, { recursive: true });
-  process.env.OPENCODEX_HOME = dir;
+  process.env.OPENPROVIDER_HOME = dir;
 });
 
 afterEach(() => {
-  if (prevHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = prevHome;
+  if (prevHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = prevHome;
   rmSync(dir, { recursive: true, force: true });
 });
 

@@ -67,7 +67,7 @@ describe("CLI subcommand help", () => {
       Bun.sleepSync(120);
 
       for (const args of [[], ["help"], ["--help"], ["-h"]]) {
-        const result = runCli(args, { OPENCODEX_HOME: openproviderHome, PATH: binDir });
+        const result = runCli(args, { OPENPROVIDER_HOME: openproviderHome, PATH: binDir });
         expect(result.status).toBe(0);
         expect(result.stdout).toContain("openprovider (opr)");
         expect(readFileSync(wrapper, "utf8")).toBe(replacement);
@@ -113,7 +113,7 @@ describe("CLI subcommand help", () => {
 
       const result = spawnSync(process.execPath, [cliPath, "status"], {
         cwd: repoRoot,
-        env: { ...process.env, OPENCODEX_HOME: openproviderHome },
+        env: { ...process.env, OPENPROVIDER_HOME: openproviderHome },
         encoding: "utf8",
       });
 
@@ -184,7 +184,7 @@ describe("CLI subcommand help", () => {
       for (const testCase of cases) {
         const result = runCli(testCase.args, {
           CODEX_HOME: codexHome,
-          OPENCODEX_HOME: openproviderHome,
+          OPENPROVIDER_HOME: openproviderHome,
         });
         expect(result.status).toBe(0);
         expect(result.stdout).toContain(testCase.expected);

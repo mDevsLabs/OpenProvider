@@ -7,12 +7,12 @@ import { reconcileOAuthProviders } from "../src/oauth";
 import { getCredential, saveCredential } from "../src/oauth/store";
 import type { OcxConfig } from "../src/types";
 
-const originalHome = process.env.OPENCODEX_HOME;
+const originalHome = process.env.OPENPROVIDER_HOME;
 const homes: string[] = [];
 
 afterEach(() => {
-  if (originalHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = originalHome;
+  if (originalHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = originalHome;
   for (const home of homes.splice(0)) rmSync(home, { recursive: true, force: true });
 });
 
@@ -20,7 +20,7 @@ describe("OAuth provider reconciliation", () => {
   test("migrates a saved Antigravity 3.5 preset without touching credentials or user fields", async () => {
     const home = mkdtempSync(join(tmpdir(), "opr-gemini-36-reconcile-"));
     homes.push(home);
-    process.env.OPENCODEX_HOME = home;
+    process.env.OPENPROVIDER_HOME = home;
     await saveCredential("google-antigravity", {
       access: "sentinel-access",
       refresh: "sentinel-refresh",

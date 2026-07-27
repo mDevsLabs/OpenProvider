@@ -92,7 +92,7 @@ function currentCodexHome(): string {
 }
 
 function currentOpenProviderHome(): string {
-  // getConfigDir() already resolves OPENCODEX_HOME with ~ expansion; keep the
+  // getConfigDir() already resolves OPENPROVIDER_HOME with ~ expansion; keep the
   // install-state comparison on the same normalization or `~/...` values falsely
   // fail the environment-match check depending on cwd.
   return getConfigDir();
@@ -176,7 +176,7 @@ export function serviceReinstallArgs(): string[] {
 }
 
 /**
- * The service was installed under a different CODEX_HOME/OPENCODEX_HOME, so this process may not
+ * The service was installed under a different CODEX_HOME/OPENPROVIDER_HOME, so this process may not
  * touch it. Distinct from "stop failed": the manager was never even contacted, which means the
  * installed service is still live and shared state (native Codex config, the Grok fence) must be
  * left alone — tearing it down would strip config out from under a running service.
@@ -191,7 +191,7 @@ export function isServiceOwnershipError(err: unknown): err is ServiceOwnershipEr
 
 /**
  * True when no installed service exists, or the installed one belongs to THIS
- * CODEX_HOME/OPENCODEX_HOME. Callers use it to decide whether they may tear down shared state
+ * CODEX_HOME/OPENPROVIDER_HOME. Callers use it to decide whether they may tear down shared state
  * (native Codex config, the Grok fence) that a foreign service would still be relying on.
  */
 export function serviceEnvironmentOwnedHere(): boolean {
@@ -219,7 +219,7 @@ export function assertServiceEnvironmentMatchesInstall(): void {
   const actualOpenProviderHome = normalizePathForCompare(currentOpenProviderHome());
   if (expectedOpenProviderHome !== actualOpenProviderHome) {
     throw new ServiceOwnershipError(
-      `Service was installed with OPENCODEX_HOME=${state.openproviderHome}, but current OPENCODEX_HOME=${currentOpenProviderHome()}. ` +
+      `Service was installed with OPENPROVIDER_HOME=${state.openproviderHome}, but current OPENPROVIDER_HOME=${currentOpenProviderHome()}. ` +
         "Run the service command from the same OpenProvider home so service state and secrets match.",
     );
   }
@@ -242,15 +242,15 @@ function isLoopbackHostname(hostname: string | undefined): boolean {
 export function assertServiceAuthEnvironment(): void {
   const config = loadConfig();
   if (isLoopbackHostname(config.hostname)) return;
-  if (process.env.OPENCODEX_API_AUTH_TOKEN?.trim()) return;
+  if (process.env.OPENPROVIDER_API_AUTH_TOKEN?.trim()) return;
   throw new Error(
-    "OPENCODEX_API_AUTH_TOKEN is required before installing a service for non-loopback hostname. " +
+    "OPENPROVIDER_API_AUTH_TOKEN is required before installing a service for non-loopback hostname. " +
       "Set it in the same shell, then rerun `opr service install`.",
   );
 }
 
 function writeServiceApiTokenFile(): string | null {
-  const token = process.env.OPENCODEX_API_AUTH_TOKEN?.trim();
+  const token = process.env.OPENPROVIDER_API_AUTH_TOKEN?.trim();
   if (!token) return null;
   const path = serviceApiTokenFilePath();
   const dir = getConfigDir();
@@ -267,12 +267,12 @@ export function buildPlist(): string {
   const log = logPath();
   const path = process.env.PATH ?? "/usr/local/bin:/usr/bin:/bin";
   const codexHome = process.env.CODEX_HOME?.trim();
-  const openproviderHome = process.env.OPENCODEX_HOME?.trim();
+  const openproviderHome = process.env.OPENPROVIDER_HOME?.trim();
   const envLines = [
     `    <key>OCX_SERVICE</key><string>1</string>`,
     `    <key>PATH</key><string>${plistString(path)}</string>`,
     codexHome ? `    <key>CODEX_HOME</key><string>${plistString(codexHome)}</string>` : null,
-    openproviderHome ? `    <key>OPENCODEX_HOME</key><string>${plistString(openproviderHome)}</string>` : null,
+    openproviderHome ? `    <key>OPENPROVIDER_HOME</key><string>${plistString(openproviderHome)}</string>` : null,
   ].filter((line): line is string => Boolean(line)).join("\n");
   const command = buildServiceShellCommand(bun, cli);
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -325,7 +325,7 @@ export function resolveServiceListenPort(override?: number): number {
 
 function buildServiceShellCommand(bun: string, cli: string, port = resolveServiceListenPort()): string {
   const tokenFile = serviceApiTokenFilePath();
-  return `if [ -f ${shellQuote(tokenFile)} ]; then OPENCODEX_API_AUTH_TOKEN="$(cat ${shellQuote(tokenFile)})"; export OPENCODEX_API_AUTH_TOKEN; fi; exec ${shellQuote(bun)} ${shellQuote(cli)} start --port ${port}`;
+  return `if [ -f ${shellQuote(tokenFile)} ]; then OPENPROVIDER_API_AUTH_TOKEN="$(cat ${shellQuote(tokenFile)})"; export OPENPROVIDER_API_AUTH_TOKEN; fi; exec ${shellQuote(bun)} ${shellQuote(cli)} start --port ${port}`;
 }
 
 function systemdQuote(value: string): string {
@@ -905,20 +905,20 @@ export function buildWindowsServiceScript(entry = cliEntry(), port = resolveServ
     windowsBatchSet("OCX_SERVICE", "1"),
     windowsBatchSet("PATH", path, "pathList"),
     windowsBatchSet("CODEX_HOME", process.env.CODEX_HOME?.trim(), "path"),
-    windowsBatchSet("OPENCODEX_HOME", process.env.OPENCODEX_HOME?.trim(), "path"),
+    windowsBatchSet("OPENPROVIDER_HOME", process.env.OPENPROVIDER_HOME?.trim(), "path"),
     windowsBatchSet("OCX_API_TOKEN_FILE", serviceApiTokenFilePath(), "path"),
     windowsBatchSet("OCX_SERVICE_LOG", serviceLogPath(), "path"),
     windowsBatchSet("OCX_BUN", bun, "path"),
     windowsBatchSet("OCX_CLI", cli, "path"),
     'if exist "%OCX_API_TOKEN_FILE%" (',
-    '  set /p OPENCODEX_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"',
+    '  set /p OPENPROVIDER_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"',
     ")",
     ":loop",
     '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] openprovider service wrapper start',
     '>>"%OCX_SERVICE_LOG%" echo bun="%OCX_BUN%"',
     `>>"%OCX_SERVICE_LOG%" echo bun_source="${bunRuntime.source}"`,
     '>>"%OCX_SERVICE_LOG%" echo cli="%OCX_CLI%"',
-    '>>"%OCX_SERVICE_LOG%" echo openprovider_home="%OPENCODEX_HOME%"',
+    '>>"%OCX_SERVICE_LOG%" echo openprovider_home="%OPENPROVIDER_HOME%"',
     '>>"%OCX_SERVICE_LOG%" echo codex_home="%CODEX_HOME%"',
     '>>"%OCX_SERVICE_LOG%" echo token_file="%OCX_API_TOKEN_FILE%"',
     `"%OCX_BUN%" "%OCX_CLI%" start --port ${port} >>"%OCX_SERVICE_LOG%" 2>&1`,
@@ -1258,7 +1258,7 @@ export function buildUnit(): string {
   const log = logPath();
   const path = process.env.PATH ?? "/usr/local/bin:/usr/bin:/bin";
   const codexHome = systemdEnvironmentAssignment("CODEX_HOME", process.env.CODEX_HOME?.trim());
-  const openproviderHome = systemdEnvironmentAssignment("OPENCODEX_HOME", process.env.OPENCODEX_HOME?.trim());
+  const openproviderHome = systemdEnvironmentAssignment("OPENPROVIDER_HOME", process.env.OPENPROVIDER_HOME?.trim());
   const envLines = [
     systemdEnvironmentAssignment("OCX_SERVICE", "1"),
     systemdEnvironmentAssignment("PATH", path),

@@ -66,8 +66,8 @@ test("the guard rejects an over-long label", () => {
 
 test("writeDesktop3pConfig emits a config whose model list passes the guard end to end", () => {
   const dir = mkdtempSync(join(tmpdir(), "opr-desktop-guard-"));
-  const prev = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = dir;
+  const prev = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+  process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = dir;
   try {
     const result = writeDesktop3pConfig(
       10100,
@@ -84,8 +84,8 @@ test("writeDesktop3pConfig emits a config whose model list passes the guard end 
     const kimi = written.inferenceModels.find(m => m.labelOverride.includes("kimi"));
     expect(kimi?.labelOverride).toBe("K3 1M (kimi)");
   } finally {
-    if (prev === undefined) delete process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-    else process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = prev;
+    if (prev === undefined) delete process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+    else process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = prev;
     rmSync(dir, { recursive: true, force: true });
   }
 });

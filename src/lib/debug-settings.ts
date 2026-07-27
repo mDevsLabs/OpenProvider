@@ -1,7 +1,7 @@
 /**
  * Runtime-controllable debug flags.
  * Provider debug: `opr debug provider on|off|status|reset|logs [-f]` (or OCX_DEBUG=1 on start).
- * Usage capture: `opr debug usage on|off|status|reset|logs [-f]` (or OPENCODEX_USAGE_DEBUG=1).
+ * Usage capture: `opr debug usage on|off|status|reset|logs [-f]` (or OPENPROVIDER_USAGE_DEBUG=1).
  * Injection log: `opr debug injection on|off|status|reset` (or OCX_INJECTION_DEBUG=1) —
  * multi-agent guidance-injection console lines, default OFF.
  * Claude inbound capture: `opr debug claude on|off|status|reset` (or OCX_CLAUDE_DEBUG=1) —
@@ -11,7 +11,7 @@
 
 export const DEBUG_ENV = {
   debug: "OCX_DEBUG",
-  usage: "OPENCODEX_USAGE_DEBUG",
+  usage: "OPENPROVIDER_USAGE_DEBUG",
   injection: "OCX_INJECTION_DEBUG",
   claude: "OCX_CLAUDE_DEBUG",
 } as const;

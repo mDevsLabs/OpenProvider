@@ -21,10 +21,10 @@ let sidecar: ReturnType<typeof Bun.serve> | null = null;
 const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-vision-e2e-codex-");
   testDir = mkdtempSync(join(tmpdir(), "opr-vision-e2e-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   globalThis.fetch = originalFetch;
 });
 
@@ -34,15 +34,15 @@ afterEach(() => {
   sidecar?.stop(true);
   sidecar = null;
   globalThis.fetch = originalFetch;
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
 const PNG_DATA_URL = "data:image/png;base64,aGVsbG8taW1hZ2UtYnl0ZXM=";
-const CAPTION = "A red square logo with the word OPENCODEX in white monospace text.";
+const CAPTION = "A red square logo with the word OPENPROVIDER in white monospace text.";
 
 /** Fake ChatGPT forward backend: answers /responses with an SSE caption stream. */
 function serveSidecar(onRequest: (req: Request, bodyText: string) => void) {

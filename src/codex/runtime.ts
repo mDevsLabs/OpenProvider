@@ -386,7 +386,7 @@ function resolveCacheKey(deps: ResolveCodexRuntimeDeps): string | null {
     path: env.PATH ?? "",
     platform: deps.platform ?? process.platform,
     discover: deps.discoverAlternatives !== false,
-    home: process.env.OPENCODEX_HOME ?? "",
+    home: process.env.OPENPROVIDER_HOME ?? "",
     persisted: persistedRuntimeCacheStamp(deps),
   });
 }

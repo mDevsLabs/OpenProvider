@@ -10,7 +10,7 @@ const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.ur
 function runScript(codexHome: string, openproviderHome: string, script: string): { stdout: string; status: number; stderr: string } {
   const result = spawnSync(process.execPath, ["--eval", script], {
     cwd: repoRoot,
-    env: { ...process.env, CODEX_HOME: codexHome, OPENCODEX_HOME: openproviderHome },
+    env: { ...process.env, CODEX_HOME: codexHome, OPENPROVIDER_HOME: openproviderHome },
     encoding: "utf8",
   });
   return { stdout: result.stdout?.trim() ?? "", stderr: result.stderr ?? "", status: result.status ?? 1 };

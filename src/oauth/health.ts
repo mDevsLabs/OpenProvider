@@ -320,7 +320,7 @@ async function fetchCodexHealthFromLiveProxy(
 ): Promise<OAuthHealthEntry[] | null> {
   const live = await findLiveProxyImpl();
   if (!live) return null;
-  const token = process.env.OPENCODEX_API_AUTH_TOKEN ?? loadServiceTokenFromFile(process.env);
+  const token = process.env.OPENPROVIDER_API_AUTH_TOKEN ?? loadServiceTokenFromFile(process.env);
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   try {

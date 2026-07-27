@@ -25,8 +25,8 @@ test("the DTO and the writer share one threshold constant", () => {
 
 test("supports1m is true at and above the threshold, false below it", async () => {
   const home = mkdtempSync(join(tmpdir(), "opr-desktop-1m-"));
-  const prev = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = home;
+  const prev = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+  process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = home;
   try {
     const state = await buildClaudeDesktopState(config);
     // Live-backed assertions against the real catalog: 1 MiB windows qualify.
@@ -44,8 +44,8 @@ test("supports1m is true at and above the threshold, false below it", async () =
     expect(983_616 >= DESKTOP_SUPPORTS_1M_THRESHOLD).toBe(false);
     expect(1_000_000 >= DESKTOP_SUPPORTS_1M_THRESHOLD).toBe(true);
   } finally {
-    if (prev === undefined) delete process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-    else process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = prev;
+    if (prev === undefined) delete process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+    else process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = prev;
     rmSync(home, { recursive: true, force: true });
   }
 });

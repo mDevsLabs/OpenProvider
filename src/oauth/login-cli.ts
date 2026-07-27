@@ -8,7 +8,7 @@ import type { OcxProviderConfig } from "../types";
 
 export function runningProxyUpdateHeaders(): Headers {
   const headers = new Headers({ "Content-Type": "application/json" });
-  const apiToken = process.env.OPENCODEX_API_AUTH_TOKEN?.trim();
+  const apiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN?.trim();
   if (apiToken) headers.set("X-OpenProvider-API-Key", apiToken);
   return headers;
 }

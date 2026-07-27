@@ -25,16 +25,16 @@ function setPlatform(platform: NodeJS.Platform): void {
 const originalPlatform = process.platform;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   previousClaudeConfigDir = process.env.CLAUDE_CONFIG_DIR;
-  previousDesktopConfigDir = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
+  previousDesktopConfigDir = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
   isolatedCodexHome = installIsolatedCodexHome("opr-claude-mgmt-");
   testDir = mkdtempSync(join(tmpdir(), "opr-claude-mgmt-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   // These API tests intentionally toggle agent injection off. Never let that
   // prune the developer's real ~/.claude/agents directory.
   process.env.CLAUDE_CONFIG_DIR = join(testDir, "claude");
-  process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = join(testDir, "claude-desktop");
+  process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = join(testDir, "claude-desktop");
   saveConfig({
     port: 0,
     defaultProvider: "mock",
@@ -46,12 +46,12 @@ beforeEach(() => {
 
 afterEach(() => {
   setPlatform(originalPlatform);
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   if (previousClaudeConfigDir === undefined) delete process.env.CLAUDE_CONFIG_DIR;
   else process.env.CLAUDE_CONFIG_DIR = previousClaudeConfigDir;
-  if (previousDesktopConfigDir === undefined) delete process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  else process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = previousDesktopConfigDir;
+  if (previousDesktopConfigDir === undefined) delete process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR;
+  else process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR = previousDesktopConfigDir;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (testDir) rmSync(testDir, { recursive: true, force: true });
@@ -613,7 +613,7 @@ test("Claude Desktop profile GET, PUT and apply round-trip four-family assignmen
     expect(apply.status).toBe(200);
     const result = await apply.json() as { path: string; applied: boolean };
     expect(result.applied).toBe(true);
-    expect(result.path.startsWith(process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR!)).toBe(true);
+    expect(result.path.startsWith(process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR!)).toBe(true);
     const appliedConfig = JSON.parse(readFileSync(result.path, "utf8")) as { inferenceGatewayBaseUrl: string };
     expect(appliedConfig.inferenceGatewayBaseUrl).toBe(new URL(server.url).origin);
   } finally {

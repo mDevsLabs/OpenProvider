@@ -94,10 +94,10 @@ describe("mimo-free client id", () => {
   const { tmpdir } = require("node:os") as typeof import("node:os");
   const { join: joinPath } = require("node:path") as typeof import("node:path");
 
-  test("random UUID persisted under OPENCODEX_HOME and stable across cache resets", () => {
+  test("random UUID persisted under OPENPROVIDER_HOME and stable across cache resets", () => {
     const home = mkdtempSync(joinPath(tmpdir(), "opr-mimo-id-"));
-    const prevHome = process.env["OPENCODEX_HOME"];
-    process.env["OPENCODEX_HOME"] = home;
+    const prevHome = process.env["OPENPROVIDER_HOME"];
+    process.env["OPENPROVIDER_HOME"] = home;
     resetMimoClientIdCache();
     try {
       const id1 = getMimoClientId();
@@ -111,8 +111,8 @@ describe("mimo-free client id", () => {
       resetMimoClientIdCache();
       expect(getMimoClientId()).toBe(id1);
     } finally {
-      if (prevHome === undefined) delete process.env["OPENCODEX_HOME"];
-      else process.env["OPENCODEX_HOME"] = prevHome;
+      if (prevHome === undefined) delete process.env["OPENPROVIDER_HOME"];
+      else process.env["OPENPROVIDER_HOME"] = prevHome;
       resetMimoClientIdCache();
       rmSync(home, { recursive: true, force: true });
     }
@@ -121,18 +121,18 @@ describe("mimo-free client id", () => {
   test("client id is not derived from machine attributes (two homes differ)", () => {
     const homeA = mkdtempSync(joinPath(tmpdir(), "opr-mimo-a-"));
     const homeB = mkdtempSync(joinPath(tmpdir(), "opr-mimo-b-"));
-    const prevHome = process.env["OPENCODEX_HOME"];
+    const prevHome = process.env["OPENPROVIDER_HOME"];
     try {
-      process.env["OPENCODEX_HOME"] = homeA;
+      process.env["OPENPROVIDER_HOME"] = homeA;
       resetMimoClientIdCache();
       const idA = getMimoClientId();
-      process.env["OPENCODEX_HOME"] = homeB;
+      process.env["OPENPROVIDER_HOME"] = homeB;
       resetMimoClientIdCache();
       const idB = getMimoClientId();
       expect(idA).not.toBe(idB);
     } finally {
-      if (prevHome === undefined) delete process.env["OPENCODEX_HOME"];
-      else process.env["OPENCODEX_HOME"] = prevHome;
+      if (prevHome === undefined) delete process.env["OPENPROVIDER_HOME"];
+      else process.env["OPENPROVIDER_HOME"] = prevHome;
       resetMimoClientIdCache();
       rmSync(homeA, { recursive: true, force: true });
       rmSync(homeB, { recursive: true, force: true });

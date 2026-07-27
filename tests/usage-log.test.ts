@@ -22,15 +22,15 @@ let testDir = "";
 let previousHome: string | undefined;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   testDir = mkdtempSync(join(tmpdir(), "opr-usage-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   resetUsageReadCacheForTests();
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
@@ -299,7 +299,7 @@ describe("usage log", () => {
     });
   });
 
-  test("uses OPENCODEX_HOME for the append-only JSONL path", () => {
+  test("uses OPENPROVIDER_HOME for the append-only JSONL path", () => {
     expect(usageLogPath()).toBe(join(testDir, "usage.jsonl"));
   });
 

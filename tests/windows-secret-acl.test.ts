@@ -375,7 +375,7 @@ describe("icacls failure paths (injected seams)", () => {
     expect(result.diagnostics).toContain("broad ACL grants still present");
   });
 
-  test("OPENCODEX_ACL_TIMEOUT_MS overrides the total budget with clamping", () => {
+  test("OPENPROVIDER_ACL_TIMEOUT_MS overrides the total budget with clamping", () => {
     const budgets: number[] = [];
     let now = 0;
     setNowForTests(() => now);
@@ -385,27 +385,27 @@ describe("icacls failure paths (injected seams)", () => {
       return ok;
     });
 
-    const prev = process.env.OPENCODEX_ACL_TIMEOUT_MS;
+    const prev = process.env.OPENPROVIDER_ACL_TIMEOUT_MS;
     try {
-      process.env.OPENCODEX_ACL_TIMEOUT_MS = "10000";
+      process.env.OPENPROVIDER_ACL_TIMEOUT_MS = "10000";
       hardenSecretPath(secretFile("env-a.json"), { required: true });
       expect(budgets[0]).toBeLessThanOrEqual(10_000);
       expect(budgets[0]).toBeGreaterThan(5_000);
 
       budgets.length = 0;
-      process.env.OPENCODEX_ACL_TIMEOUT_MS = "50"; // below floor → clamped to 1000
+      process.env.OPENPROVIDER_ACL_TIMEOUT_MS = "50"; // below floor → clamped to 1000
       hardenSecretPath(secretFile("env-b.json"), { required: true });
       expect(budgets[0]).toBeLessThanOrEqual(1_000);
       expect(budgets[0]).toBeGreaterThan(500);
 
       budgets.length = 0;
-      process.env.OPENCODEX_ACL_TIMEOUT_MS = "5000ms"; // malformed → default 5000
+      process.env.OPENPROVIDER_ACL_TIMEOUT_MS = "5000ms"; // malformed → default 5000
       hardenSecretPath(secretFile("env-c.json"), { required: true });
       expect(budgets[0]).toBeLessThanOrEqual(5_000);
       expect(budgets[0]).toBeGreaterThan(4_000);
     } finally {
-      if (prev === undefined) delete process.env.OPENCODEX_ACL_TIMEOUT_MS;
-      else process.env.OPENCODEX_ACL_TIMEOUT_MS = prev;
+      if (prev === undefined) delete process.env.OPENPROVIDER_ACL_TIMEOUT_MS;
+      else process.env.OPENPROVIDER_ACL_TIMEOUT_MS = prev;
     }
   });
 

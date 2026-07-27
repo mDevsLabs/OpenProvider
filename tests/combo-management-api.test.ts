@@ -94,16 +94,16 @@ function successfulPicks(config: OcxConfig, count: number): string[] {
 }
 
 async function withTempHome<T>(run: (dir: string) => Promise<T> | T): Promise<T> {
-  const previousHome = process.env.OPENCODEX_HOME;
+  const previousHome = process.env.OPENPROVIDER_HOME;
   const previousClaudeConfigDir = process.env.CLAUDE_CONFIG_DIR;
   const dir = mkdtempSync(join(tmpdir(), "opr-combos-"));
-  process.env.OPENCODEX_HOME = dir;
+  process.env.OPENPROVIDER_HOME = dir;
   process.env.CLAUDE_CONFIG_DIR = join(dir, "claude");
   try {
     return await run(dir);
   } finally {
-    if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = previousHome;
+    if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+    else process.env.OPENPROVIDER_HOME = previousHome;
     if (previousClaudeConfigDir === undefined) delete process.env.CLAUDE_CONFIG_DIR;
     else process.env.CLAUDE_CONFIG_DIR = previousClaudeConfigDir;
     rmSync(dir, { recursive: true, force: true });

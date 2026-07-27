@@ -80,7 +80,7 @@ describe("Codex shim CLI auto-restore policy", () => {
   });
 
   test("opt-out config and environment are evaluated lazily only for a candidate", () => {
-    for (const [configValue, env] of [[false, {}], [true, { OPENCODEX_CODEX_SHIM_AUTO_RESTORE: "0" }]] as const) {
+    for (const [configValue, env] of [[false, {}], [true, { OPENPROVIDER_CODEX_SHIM_AUTO_RESTORE: "0" }]] as const) {
       let enabledValue: boolean | undefined;
       const { deps, warnings } = cliDeps({ status: "disabled" }, {
         env,
@@ -102,9 +102,9 @@ describe("Codex shim CLI auto-restore policy", () => {
 
   test("oversized shim state is bounded, skipped, and warned without loading config", () => {
     const home = mkdtempSync(join(tmpdir(), "opr-shim-oversized-state-"));
-    const oldHome = process.env.OPENCODEX_HOME;
+    const oldHome = process.env.OPENPROVIDER_HOME;
     try {
-      process.env.OPENCODEX_HOME = home;
+      process.env.OPENPROVIDER_HOME = home;
       const statePath = join(home, "codex-shim.json");
       writeFileSync(statePath, Buffer.alloc(CODEX_SHIM_STATE_MAX_BYTES + 1, 0x20));
       const before = readFileSync(statePath);
@@ -118,8 +118,8 @@ describe("Codex shim CLI auto-restore policy", () => {
       expect(readConfigCalls()).toBe(0);
       expect(readFileSync(statePath)).toEqual(before);
     } finally {
-      if (oldHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldHome;
+      if (oldHome === undefined) delete process.env.OPENPROVIDER_HOME;
+      else process.env.OPENPROVIDER_HOME = oldHome;
       rmSync(home, { recursive: true, force: true });
     }
   });
@@ -132,10 +132,10 @@ describe("Codex shim CLI auto-restore policy", () => {
     const backup = join(binDir, "codex.openprovider-real");
     const replacement = "#!/bin/sh\necho externally updated codex\n";
     const oldPath = process.env.PATH;
-    const oldHome = process.env.OPENCODEX_HOME;
+    const oldHome = process.env.OPENPROVIDER_HOME;
     try {
       process.env.PATH = binDir;
-      process.env.OPENCODEX_HOME = home;
+      process.env.OPENPROVIDER_HOME = home;
       writeFileSync(wrapper, "#!/bin/sh\necho original codex\n", "utf8");
       chmodSync(wrapper, 0o755);
       expect(installCodexShim().installed).toBe(true);
@@ -145,7 +145,7 @@ describe("Codex shim CLI auto-restore policy", () => {
 
       const result = spawnSync(process.execPath, [join(import.meta.dir, "..", "src", "cli", "index.ts"), "codex-shim", "status"], {
         encoding: "utf8",
-        env: { ...process.env, PATH: binDir, OPENCODEX_HOME: home },
+        env: { ...process.env, PATH: binDir, OPENPROVIDER_HOME: home },
       });
 
       expect(result.status).toBe(0);
@@ -156,8 +156,8 @@ describe("Codex shim CLI auto-restore policy", () => {
     } finally {
       if (oldPath === undefined) delete process.env.PATH;
       else process.env.PATH = oldPath;
-      if (oldHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldHome;
+      if (oldHome === undefined) delete process.env.OPENPROVIDER_HOME;
+      else process.env.OPENPROVIDER_HOME = oldHome;
       rmSync(binDir, { recursive: true, force: true });
       rmSync(home, { recursive: true, force: true });
     }

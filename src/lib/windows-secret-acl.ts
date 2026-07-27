@@ -43,7 +43,7 @@ export interface HardenOptions {
  * Total icacls budget per harden call — ALL steps share it, including the single
  * timeout retry and the diagnostic verification pass (no per-attempt fresh budget:
  * loadConfig hardens dir+config+auth sequentially, so per-attempt budgets stack
- * into multi-minute startup stalls). Override with OPENCODEX_ACL_TIMEOUT_MS
+ * into multi-minute startup stalls). Override with OPENPROVIDER_ACL_TIMEOUT_MS
  * (integer ms, clamped to [1000, 60000]; invalid values fall back to 5000).
  */
 const HARDEN_DEADLINE_DEFAULT_MS = 5_000;
@@ -52,7 +52,7 @@ const HARDEN_DEADLINE_MAX_MS = 60_000;
 
 /** Resolve the total harden budget once per call (env mutation cannot change it midway). */
 function resolveHardenDeadlineMs(): number {
-  const raw = env["OPENCODEX_ACL_TIMEOUT_MS"]?.trim();
+  const raw = env["OPENPROVIDER_ACL_TIMEOUT_MS"]?.trim();
   if (!raw) return HARDEN_DEADLINE_DEFAULT_MS;
   const parsed = Number(raw);
   if (!Number.isSafeInteger(parsed)) return HARDEN_DEADLINE_DEFAULT_MS;

@@ -114,7 +114,7 @@ export function buildProviderTableBlock(port: number, supportsWebsockets = false
     "requires_openai_auth = true",
   ];
   if (includeApiAuthHeader) {
-    lines.push('env_http_headers = { "x-openprovider-api-key" = "OPENCODEX_API_AUTH_TOKEN" }');
+    lines.push('env_http_headers = { "x-openprovider-api-key" = "OPENPROVIDER_API_AUTH_TOKEN" }');
   }
   if (supportsWebsockets) lines.push("supports_websockets = true");
   return lines.join("\n") + "\n";
@@ -343,7 +343,7 @@ function setRootModelCatalogPath(content: string, catalogPath: string): string {
     const m = lines[i].match(/^\s*model_catalog_json\s*=\s*("(?:\\.|[^"])*"|'[^']*')\s*$/);
     if (!m) continue;
     const existing = parseTomlString(m[1]);
-    if (isOpencodexCatalogPath(existing)) {
+    if (isOpenproviderCatalogPath(existing)) {
       lines[i] = key;
       return lines.join("\n");
     }
@@ -405,16 +405,16 @@ function ensureFastModeFeature(content: string): string {
   return lines.join("\n");
 }
 
-function isOpencodexCatalogPath(path: string): boolean {
+function isOpenproviderCatalogPath(path: string): boolean {
   return path.replace(/\\/g, "/").split("/").pop() === "openprovider-catalog.json";
 }
 
-function stripOpencodexCatalogPath(content: string): string {
+function stripOpenproviderCatalogPath(content: string): string {
   return content
     .split("\n")
     .filter(line => {
       const m = line.match(/^\s*model_catalog_json\s*=\s*("(?:\\.|[^"])*"|'[^']*')\s*$/);
-      return !m || !isOpencodexCatalogPath(parseTomlString(m[1]));
+      return !m || !isOpenproviderCatalogPath(parseTomlString(m[1]));
     })
     .join("\n");
 }
@@ -452,7 +452,7 @@ export function chooseCatalogPathForInjection(content: string, requested?: strin
   const existing = readRootModelCatalogPath(content);
   if (existing) {
     const resolved = resolveCodexConfigPath(existing);
-    if (!isOpencodexCatalogPath(resolved) || existsSync(resolved)) return existing;
+    if (!isOpenproviderCatalogPath(resolved) || existsSync(resolved)) return existing;
   }
 
   return existsSync(DEFAULT_CATALOG_PATH) ? DEFAULT_CATALOG_PATH : null;
@@ -474,7 +474,7 @@ export async function injectCodexConfig(port: number, config?: OcxConfig, option
       message: `⚠️ Codex routing NOT injected: config.toml selects the external model_provider ${tomlString(activeProvider)}.\n` +
         `  OpenProvider preserves external provider configuration so existing ${tomlString(activeProvider)} session history stays visible.\n` +
         `  Configure that provider for Responses passthrough at http://${providerBaseHost(config?.hostname)}:${port}/v1` +
-        `${shouldInjectApiAuthHeader(config) ? ` with x-openprovider-api-key from OPENCODEX_API_AUTH_TOKEN` : ""}.\n` +
+        `${shouldInjectApiAuthHeader(config) ? ` with x-openprovider-api-key from OPENPROVIDER_API_AUTH_TOKEN` : ""}.\n` +
         `  For direct injection, switch to the built-in openai provider, remove any user-owned root openai_base_url, and rerun 'opr start'.`,
     };
   }
@@ -506,7 +506,7 @@ export async function injectCodexConfig(port: number, config?: OcxConfig, option
   content = ensureFastModeFeature(content);
 
   const catalogPath = chooseCatalogPathForInjection(content, options.catalogPath);
-  content = catalogPath ? setRootModelCatalogPath(content, catalogPath) : stripOpencodexCatalogPath(content);
+  content = catalogPath ? setRootModelCatalogPath(content, catalogPath) : stripOpenproviderCatalogPath(content);
 
   const legacyMode = shouldInjectApiAuthHeader(config);
   let keptUserBaseUrl = false;
@@ -608,7 +608,7 @@ function removeOcxSection(content: string): string {
 }
 
 /** Pure transform: strip the openprovider provider block + `model_provider = "openprovider"` lines. */
-export function stripOpencodexConfig(content: string): string {
+export function stripOpenproviderConfig(content: string): string {
   let out = content;
   const hadRootOcxProvider = readRootTomlString(out, "model_provider") === "openprovider";
   const hadInjectedBaseUrl = hasInjectedOpenaiBaseUrl(out);
@@ -623,11 +623,11 @@ export function stripOpencodexConfig(content: string): string {
   // Routed root model ids (`model = "provider/slug"`) only make sense while the proxy serves
   // them — strip on both the legacy re-tag form and the Design B injected-base-url form.
   if (hadRootOcxProvider || hadInjectedBaseUrl) out = stripRootRoutedModel(out);
-  out = stripOpencodexCatalogPath(out);
+  out = stripOpenproviderCatalogPath(out);
   return out.replace(/\n{3,}/g, "\n\n").trimEnd() + "\n";
 }
 
-function hasOpencodexRouting(content: string): boolean {
+function hasOpenproviderRouting(content: string): boolean {
   return content.includes("[model_providers.openprovider]")
     || /^\s*model_provider\s*=\s*"openprovider"/m.test(content)
     || hasInjectedOpenaiBaseUrl(content);
@@ -642,8 +642,8 @@ export function removeCodexConfig(options: { preserveProfile?: boolean } = {}): 
   // The unchanged fast path compares in LF space so an untouched file is never rewritten.
   const eol = dominantEol(rawContent);
   const content = applyEol(rawContent, "\n");
-  const had = hasOpencodexRouting(content);
-  const stripped = stripOpencodexConfig(content);
+  const had = hasOpenproviderRouting(content);
+  const stripped = stripOpenproviderConfig(content);
   if (had || stripped !== content) {
     atomicWriteFile(CODEX_CONFIG_PATH, applyEol(stripped, eol));
   }

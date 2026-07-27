@@ -164,7 +164,7 @@ export function loadBundledCodexCatalog(deps: BundledCatalogDeps = {}): RawCatal
       cacheKey = [
         resolved.runtime.command,
         resolved.runtime.version ?? "",
-        process.env.OPENCODEX_HOME ?? "",
+        process.env.OPENPROVIDER_HOME ?? "",
       ].join("\0");
     }
     return [resolved.runtime.command];

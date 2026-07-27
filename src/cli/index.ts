@@ -147,9 +147,9 @@ async function chooseListenPort(requestedPort?: number): Promise<number> {
 async function handleStart(options: { block?: boolean } = {}) {
   // Native (WinSW) service mode has no batch wrapper to read the service token file
   // into the environment, so the app loads it here before the server binds. The server
-  // auth path reads OPENCODEX_API_AUTH_TOKEN from the environment.
+  // auth path reads OPENPROVIDER_API_AUTH_TOKEN from the environment.
   const serviceToken = loadServiceTokenFromFile(process.env);
-  if (serviceToken) process.env.OPENCODEX_API_AUTH_TOKEN = serviceToken;
+  if (serviceToken) process.env.OPENPROVIDER_API_AUTH_TOKEN = serviceToken;
   const requestedPort = parsePortOption();
   if (!currentExternalCodexModelProvider()) reconcileJournal();
   const existingPid = readPid();

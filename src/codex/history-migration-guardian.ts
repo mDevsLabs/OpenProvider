@@ -1,4 +1,4 @@
-import { countPendingOpencodexHistory, migrateHistoryToOpenai } from "./history-provider";
+import { countPendingOpenproviderHistory, migrateHistoryToOpenai } from "./history-provider";
 
 /**
  * Daemon-side retry for the one-time Design-B history migration.
@@ -22,7 +22,7 @@ export interface HistoryMigrationGuardianHandle {
 }
 
 export interface HistoryMigrationGuardianDeps {
-  countFn?: typeof countPendingOpencodexHistory;
+  countFn?: typeof countPendingOpenproviderHistory;
   migrateFn?: () => ReturnType<typeof migrateHistoryToOpenai>;
   log?: Pick<Console, "log">;
   tickMs?: number;
@@ -41,7 +41,7 @@ function defaultSchedule(fn: () => void, ms: number): { cancel(): void } {
 }
 
 export function startHistoryMigrationGuardian(deps: HistoryMigrationGuardianDeps = {}): HistoryMigrationGuardianHandle {
-  const countFn = deps.countFn ?? countPendingOpencodexHistory;
+  const countFn = deps.countFn ?? countPendingOpenproviderHistory;
   const migrateFn = deps.migrateFn ?? (() => migrateHistoryToOpenai(undefined, undefined, { attempts: 1 }));
   const log = deps.log ?? console;
   const tickMs = deps.tickMs ?? DEFAULT_TICK_MS;

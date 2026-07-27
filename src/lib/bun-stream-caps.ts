@@ -11,7 +11,7 @@
  *
  * Prerelease conservatism: a version carrying a prerelease suffix (e.g.
  * `1.4.0-canary.3`) is NEVER treated as fixed even when its numeric triple
- * reaches the threshold — canaries are exactly the OPENCODEX_BUN_PATH audience
+ * reaches the threshold — canaries are exactly the OPENPROVIDER_BUN_PATH audience
  * and may predate the fix commit.
  */
 

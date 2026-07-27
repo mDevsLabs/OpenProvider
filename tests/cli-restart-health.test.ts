@@ -53,7 +53,7 @@ describe("opr health", () => {
       codexAutoStart: false,
     }), "utf8");
     try {
-      const result = runCli(["health"], { OPENCODEX_HOME: dir });
+      const result = runCli(["health"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(1);
       expect(result.stdout).toContain("not healthy");
     } finally {
@@ -70,7 +70,7 @@ describe("opr health", () => {
       codexAutoStart: false,
     }), "utf8");
     try {
-      const result = runCli(["health", "--json"], { OPENCODEX_HOME: dir });
+      const result = runCli(["health", "--json"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(1);
       const parsed = JSON.parse(result.stdout);
       expect(parsed.ok).toBe(false);

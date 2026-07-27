@@ -222,9 +222,9 @@ describe("Anthropic vision planning and management config", () => {
   });
 
   test("GET/PUT persists valid vision backend and cap and rejects invalid values", async () => {
-    const previousHome = process.env.OPENCODEX_HOME;
+    const previousHome = process.env.OPENPROVIDER_HOME;
     const isolatedHome = mkdtempSync(join(tmpdir(), "opr-vision-management-"));
-    process.env.OPENCODEX_HOME = isolatedHome;
+    process.env.OPENPROVIDER_HOME = isolatedHome;
     const config: OcxConfig = { port: 10100, defaultProvider: "none", providers: {} };
     try {
       const put = await handleManagementAPI(
@@ -309,16 +309,16 @@ describe("Anthropic vision planning and management config", () => {
       expect(config.webSearchSidecar).toEqual({ reasoning: "high" });
       expect(config.visionSidecar).toEqual({ maxDescriptionsPerTurn: 4 });
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previousHome;
+      if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+      else process.env.OPENPROVIDER_HOME = previousHome;
       rmSync(isolatedHome, { recursive: true, force: true });
     }
   });
 
   test("PUT rejects malformed body shapes with 400 and never persists them (review F2)", async () => {
-    const previousHome = process.env.OPENCODEX_HOME;
+    const previousHome = process.env.OPENPROVIDER_HOME;
     const isolatedHome = mkdtempSync(join(tmpdir(), "opr-vision-management-malformed-"));
-    process.env.OPENCODEX_HOME = isolatedHome;
+    process.env.OPENPROVIDER_HOME = isolatedHome;
     const config: OcxConfig = { port: 10100, defaultProvider: "none", providers: {} };
     try {
       for (const raw of ["null", "[]", "\"str\"", "123",
@@ -339,8 +339,8 @@ describe("Anthropic vision planning and management config", () => {
       expect(config.visionSidecar).toBeUndefined();
       expect(config.webSearchSidecar).toBeUndefined();
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previousHome;
+      if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+      else process.env.OPENPROVIDER_HOME = previousHome;
       rmSync(isolatedHome, { recursive: true, force: true });
     }
   });

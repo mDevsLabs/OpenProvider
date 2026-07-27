@@ -18,12 +18,12 @@ let previousGrokHome: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OPENPROVIDER_HOME;
   previousGrokHome = process.env.GROK_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-grok-mgmt-");
   testDir = mkdtempSync(join(tmpdir(), "opr-grok-mgmt-"));
   grokRoot = mkdtempSync(join(tmpdir(), "opr-grok-home-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   process.env.GROK_HOME = grokRoot;
   saveConfig({
     port: 0,
@@ -35,8 +35,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousHome;
   if (previousGrokHome === undefined) delete process.env.GROK_HOME;
   else process.env.GROK_HOME = previousGrokHome;
   isolatedCodexHome?.restore();

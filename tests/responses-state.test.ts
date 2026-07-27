@@ -46,22 +46,22 @@ function isExactGuidanceItem(item: unknown, text: string): boolean {
 }
 
 describe("Responses previous_response_id state", () => {
-  // Sandbox OPENCODEX_HOME: the state store now snapshots to disk, and these tests must never
+  // Sandbox OPENPROVIDER_HOME: the state store now snapshots to disk, and these tests must never
   // touch the real ~/.openprovider.
   let home: string;
-  const priorHome = process.env["OPENCODEX_HOME"];
+  const priorHome = process.env["OPENPROVIDER_HOME"];
 
   beforeEach(() => {
     home = mkdtempSync(join(tmpdir(), "opr-state-test-"));
-    process.env["OPENCODEX_HOME"] = home;
+    process.env["OPENPROVIDER_HOME"] = home;
     clearResponseStateMemoryForTests();
   });
 
   afterEach(() => {
     clearResponseStateForTests();
     rmSync(home, { recursive: true, force: true });
-    if (priorHome === undefined) delete process.env["OPENCODEX_HOME"];
-    else process.env["OPENCODEX_HOME"] = priorHome;
+    if (priorHome === undefined) delete process.env["OPENPROVIDER_HOME"];
+    else process.env["OPENPROVIDER_HOME"] = priorHome;
   });
 
   test("expands later input with stored prior input and output", () => {

@@ -38,12 +38,12 @@ function pool3(): OcxProviderConfig["apiKeyPool"] {
 
 beforeEach(() => {
   home = mkdtempSync(join(tmpdir(), "opr-keyfailover-"));
-  process.env.OPENCODEX_HOME = home;
+  process.env.OPENPROVIDER_HOME = home;
   clearKeyCooldowns();
 });
 
 afterEach(() => {
-  delete process.env.OPENCODEX_HOME;
+  delete process.env.OPENPROVIDER_HOME;
   rmSync(home, { recursive: true, force: true });
   clearKeyCooldowns();
 });

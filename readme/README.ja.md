@@ -3,7 +3,7 @@
 コマンド2つで、Codex と Claude Code の両方が好きな LLM で動きます。</p>
 
 <p align="center">
-  <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="X で @claudeebum をフォロー"></a>
+  <a href="https://x.com/mDevsLabs"><img src="https://img.shields.io/badge/%40mDevsLabs-000000?logo=x&logoColor=white" alt="X で @mDevsLabs をフォロー"></a>
   <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="npm version"></a>
   <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="license"></a>
   <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="node version">
@@ -290,7 +290,7 @@ openprovider にはプロキシを自動起動する方法が 2 つあります:
 後続のコマンドで再試行します。修復失敗は要求されたコマンドを失敗させず警告だけを表示し、手動の
 代替手段は `opr codex-shim install` です。自動修復を無効にするには
 `codexShimAutoRestore` を `false` にするか、プロセスで
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0` を設定します。
+`OPENPROVIDER_CODEX_SHIM_AUTO_RESTORE=0` を設定します。
 shim 自動起動はデフォルトでオンで、GUI ダッシュボードからオフにできます。設定されたプロキシポートが既に使用
 中の場合、`opr start` が自動的に別の空きローカルポートを選び、Codex の設定もそのポートに更新します。
 
@@ -383,7 +383,7 @@ WebSocket トランスポートはデフォルトでオフです。Codex が HTT
 (`/v1/responses`、`/v1/images/generations`、`/v1/images/edits`)の両方に bearer トークンを要求します:
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+export OPENPROVIDER_API_AUTH_TOKEN="your-secret-token"
 opr start
 ```
 

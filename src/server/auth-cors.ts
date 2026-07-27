@@ -109,7 +109,7 @@ export function jsonResponse(data: unknown, status = 200, req?: Request, config?
 }
 
 export function configuredApiAuthToken(_config: OcxConfig): string | undefined {
-  const token = process.env.OPENCODEX_API_AUTH_TOKEN?.trim();
+  const token = process.env.OPENPROVIDER_API_AUTH_TOKEN?.trim();
   return token || undefined;
 }
 
@@ -124,7 +124,7 @@ export function isApiAuthRequired(config: OcxConfig): boolean {
 
 export function assertServerAuthConfig(config: OcxConfig): void {
   if (isApiAuthRequired(config) && !configuredApiAuthToken(config)) {
-    throw new Error("OPENCODEX_API_AUTH_TOKEN is required when binding openprovider to a non-loopback hostname");
+    throw new Error("OPENPROVIDER_API_AUTH_TOKEN is required when binding openprovider to a non-loopback hostname");
   }
 }
 

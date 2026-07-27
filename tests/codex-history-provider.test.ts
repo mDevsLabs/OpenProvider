@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Database } from "bun:sqlite";
 import { describe, expect, setDefaultTimeout, test } from "bun:test";
-import { countPendingOpencodexHistory, isRecoverableHistoryError, migrateHistoryToOpenai, restoreLegacyOpenaiHistory, setHistoryDbBusyTimeoutForTests, syncCodexHistoryProvider, withHistoryRetry } from "../src/codex/history-provider";
+import { countPendingOpenproviderHistory, isRecoverableHistoryError, migrateHistoryToOpenai, restoreLegacyOpenaiHistory, setHistoryDbBusyTimeoutForTests, syncCodexHistoryProvider, withHistoryRetry } from "../src/codex/history-provider";
 
 // Windows CI: a transient file lock can consume the full production 5s busy timeout, tripping
 // bun's 5s default per-test timeout by itself. Fail fast into withHistoryRetry instead.
@@ -368,10 +368,10 @@ describe("Design B migration helpers", () => {
     expect(sleeps.length).toBe(0);
   });
 
-  test("countPendingOpencodexHistory mirrors the eject predicate and reaches 0 after migration", () => {
+  test("countPendingOpenproviderHistory mirrors the eject predicate and reaches 0 after migration", () => {
     const { dbPath, backupPath } = makeFixture({ includeExec: true, includeLegacy: true });
 
-    const before = countPendingOpencodexHistory(dbPath, backupPath);
+    const before = countPendingOpenproviderHistory(dbPath, backupPath);
     expect(before.failed).toBeUndefined();
     expect(before.pendingRows).toBe(2); // exec + legacy rows, both with non-empty first_user_message
 
@@ -379,7 +379,7 @@ describe("Design B migration helpers", () => {
     expect(migrated.failed).toBeUndefined();
     expect((migrated.rows ?? 0) + (migrated.ejectedRows ?? 0)).toBeGreaterThan(0);
 
-    const after = countPendingOpencodexHistory(dbPath, backupPath);
+    const after = countPendingOpenproviderHistory(dbPath, backupPath);
     expect(after.pendingRows).toBe(0);
     expect(after.backupEntries).toBe(0);
 
@@ -389,9 +389,9 @@ describe("Design B migration helpers", () => {
     expect(again.ejectedRows ?? 0).toBe(0);
   });
 
-  test("countPendingOpencodexHistory returns zeros for a missing DB", () => {
+  test("countPendingOpenproviderHistory returns zeros for a missing DB", () => {
     const missing = join(tmpdir(), `opr-none-${Date.now()}`, "state_5.sqlite");
-    const result = countPendingOpencodexHistory(missing, join(tmpdir(), "no-backup.json"));
+    const result = countPendingOpenproviderHistory(missing, join(tmpdir(), "no-backup.json"));
     expect(result).toEqual({ pendingRows: 0, backupEntries: 0 });
   });
 
@@ -431,7 +431,7 @@ describe("Design B migration helpers", () => {
       entries: { "thread-1": { id: "thread-1", rolloutPath: join(dir, "r.jsonl"), modelProvider: "openai", source: "cli", hasUserEvent: 1 } },
     }));
 
-    const pending = countPendingOpencodexHistory(missingDb, backupPath);
+    const pending = countPendingOpenproviderHistory(missingDb, backupPath);
     expect(pending.backupEntries).toBe(1); // gate must see this and NOT report a provable no-op
 
     // migrateHistoryToOpenai keeps its missing-DB early return (no crash, no manifest consumption).

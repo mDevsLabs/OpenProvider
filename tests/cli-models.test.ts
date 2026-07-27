@@ -45,7 +45,7 @@ describe("opr models", () => {
   test("models lists all provider models", () => {
     const { dir } = freshConfig();
     try {
-      const result = runCli(["models"], { OPENCODEX_HOME: dir });
+      const result = runCli(["models"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(0);
       expect(result.stdout).toContain("test-model-1");
       expect(result.stdout).toContain("test-model-2");
@@ -59,7 +59,7 @@ describe("opr models", () => {
   test("models --provider filters to one provider", () => {
     const { dir } = freshConfig();
     try {
-      const result = runCli(["models", "--provider", "test"], { OPENCODEX_HOME: dir });
+      const result = runCli(["models", "--provider", "test"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(0);
       expect(result.stdout).toContain("test-model-1");
       expect(result.stdout).toContain("test:");
@@ -71,7 +71,7 @@ describe("opr models", () => {
   test("models --provider rejects unknown provider", () => {
     const { dir } = freshConfig();
     try {
-      const result = runCli(["models", "--provider", "nonexistent"], { OPENCODEX_HOME: dir });
+      const result = runCli(["models", "--provider", "nonexistent"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(1);
       expect(result.stderr).toContain("not configured");
     } finally {
@@ -82,7 +82,7 @@ describe("opr models", () => {
   test("models --json returns valid JSON", () => {
     const { dir } = freshConfig();
     try {
-      const result = runCli(["models", "--json"], { OPENCODEX_HOME: dir });
+      const result = runCli(["models", "--json"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(0);
       const parsed = JSON.parse(result.stdout);
       expect(parsed.models).toBeArray();
@@ -98,7 +98,7 @@ describe("opr models", () => {
   test("models --provider X --json combines flags", () => {
     const { dir } = freshConfig();
     try {
-      const result = runCli(["models", "--provider", "test", "--json"], { OPENCODEX_HOME: dir });
+      const result = runCli(["models", "--provider", "test", "--json"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(0);
       const parsed = JSON.parse(result.stdout);
       expect(parsed.models.every((m: { provider: string }) => m.provider === "test")).toBe(true);
@@ -142,7 +142,7 @@ describe("opr models richer metadata", () => {
     };
     writeFileSync(join(dir, "config.json"), JSON.stringify(config), "utf8");
     try {
-      const result = runCli(["models", "--json"], { OPENCODEX_HOME: dir });
+      const result = runCli(["models", "--json"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(0);
       const parsed = JSON.parse(result.stdout);
       const modelA = parsed.models.find((m: { model: string }) => m.model === "model-a");
@@ -161,7 +161,7 @@ describe("opr models richer metadata", () => {
   test("models rejects unknown flags", () => {
     const { dir } = freshConfig();
     try {
-      const result = runCli(["models", "--bogus"], { OPENCODEX_HOME: dir });
+      const result = runCli(["models", "--bogus"], { OPENPROVIDER_HOME: dir });
       expect(result.status).toBe(1);
       expect(result.stderr).toContain("Unknown flag");
     } finally {

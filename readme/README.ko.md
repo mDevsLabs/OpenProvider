@@ -3,7 +3,7 @@
 명령어 두 줄이면 Codex와 Claude Code가 원하는 LLM으로 돌아갑니다.</p>
 
 <p align="center">
-  <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="X에서 @claudeebum 팔로우"></a>
+  <a href="https://x.com/mDevsLabs"><img src="https://img.shields.io/badge/%40mDevsLabs-000000?logo=x&logoColor=white" alt="X에서 @mDevsLabs 팔로우"></a>
   <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="npm version"></a>
   <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="license"></a>
   <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="node version">
@@ -304,7 +304,7 @@ openprovider에는 프록시를 자동 시작하는 두 가지 방법이 있습�
 shim을 복구합니다. 아직 변경 중인 런처는 건드리지 않고 이후 명령에서 다시 시도합니다. 복구 실패는
 요청한 명령을 실패시키지 않고 경고만 출력하며, 수동 대체 명령은 `opr codex-shim install`입니다.
 자동 복구를 끄려면 `codexShimAutoRestore`를 `false`로 설정하거나 프로세스에
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`을 설정하세요.
+`OPENPROVIDER_CODEX_SHIM_AUTO_RESTORE=0`을 설정하세요.
 shim 자동 시작은 기본으로 켜져 있으며 GUI 대시보드에서 끌 수 있습니다. 설정된 프록시 포트가 이미 사용
 중이면 `opr start`가 자동으로 다른 빈 로컬 포트를 고르고 Codex 설정도 그 포트로 갱신합니다.
 
@@ -397,7 +397,7 @@ WebSocket 전송은 기본적으로 꺼져 있습니다. Codex가 HTTP/SSE 대�
 (`/v1/responses`, `/v1/images/generations`, `/v1/images/edits`) 모두에 bearer 토큰을 요구합니다:
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+export OPENPROVIDER_API_AUTH_TOKEN="your-secret-token"
 opr start
 ```
 

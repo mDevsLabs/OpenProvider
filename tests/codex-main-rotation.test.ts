@@ -38,7 +38,7 @@ import type { OcxConfig } from "../src/types";
 
 const STORE_DIR = join(import.meta.dir, ".tmp-main-rotation-store");
 const CODEX_DIR = join(import.meta.dir, ".tmp-main-rotation-codex");
-let prevOpencodexHome: string | undefined;
+let prevOpenproviderHome: string | undefined;
 let prevCodexHome: string | undefined;
 
 function writeMainAuth(): void {
@@ -74,11 +74,11 @@ function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
 
 describe("main account rotation (Option A)", () => {
   beforeEach(() => {
-    prevOpencodexHome = process.env.OPENCODEX_HOME;
+    prevOpenproviderHome = process.env.OPENPROVIDER_HOME;
     prevCodexHome = process.env.CODEX_HOME;
     for (const d of [STORE_DIR, CODEX_DIR]) if (existsSync(d)) rmSync(d, { recursive: true });
     mkdirSync(STORE_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = STORE_DIR;
+    process.env.OPENPROVIDER_HOME = STORE_DIR;
     process.env.CODEX_HOME = CODEX_DIR;
     clearThreadAccountMap();
     clearCodexUpstreamHealth();
@@ -101,7 +101,7 @@ describe("main account rotation (Option A)", () => {
     setMainAccountPlan(null);
     for (const id of ["a", "b", MAIN_CODEX_ACCOUNT_ID]) clearAccountNeedsReauth(id);
     for (const d of [STORE_DIR, CODEX_DIR]) if (existsSync(d)) rmSync(d, { recursive: true });
-    if (prevOpencodexHome === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = prevOpencodexHome;
+    if (prevOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = prevOpenproviderHome;
     if (prevCodexHome === undefined) delete process.env.CODEX_HOME; else process.env.CODEX_HOME = prevCodexHome;
   });
 

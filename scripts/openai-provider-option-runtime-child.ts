@@ -7,13 +7,13 @@ if (!openproviderHome || !codexHome || !capturePath) {
 }
 
 for (const key of Object.keys(process.env)) {
-  if (/^(?:OPENAI_|CODEX_|OPENCODEX_)/.test(key) || /^(?:http|https|all)_proxy$/i.test(key)) {
+  if (/^(?:OPENAI_|CODEX_|OPENPROVIDER_)/.test(key) || /^(?:http|https|all)_proxy$/i.test(key)) {
     delete process.env[key];
   }
 }
-process.env.OPENCODEX_HOME = openproviderHome;
+process.env.OPENPROVIDER_HOME = openproviderHome;
 process.env.CODEX_HOME = codexHome;
-process.env.OPENCODEX_API_AUTH_TOKEN = "fixture-admission";
+process.env.OPENPROVIDER_API_AUTH_TOKEN = "fixture-admission";
 process.env.NO_PROXY = "127.0.0.1,localhost,::1";
 process.env.no_proxy = "127.0.0.1,localhost,::1";
 mkdirSync(openproviderHome, { recursive: true, mode: 0o700 });

@@ -12,7 +12,7 @@ const cliPath = join(repoRoot, "src", "cli", "index.ts");
 function runStatusJson(openproviderHome: string) {
   return spawnSync(process.execPath, [cliPath, "status", "--json"], {
     cwd: repoRoot,
-    env: { ...process.env, OPENCODEX_HOME: openproviderHome },
+    env: { ...process.env, OPENPROVIDER_HOME: openproviderHome },
     encoding: "utf8",
   });
 }
@@ -170,7 +170,7 @@ describe("CLI status JSON", () => {
         cwd: repoRoot,
         env: {
           ...process.env,
-          OPENCODEX_HOME: openproviderHome,
+          OPENPROVIDER_HOME: openproviderHome,
           CODEX_CLI_PATH: fakeCodex,
           PATH: "",
         },
@@ -206,7 +206,7 @@ describe("CLI status JSON", () => {
 
       const result = spawnSync(process.execPath, [cliPath, "status", "--yaml"], {
         cwd: repoRoot,
-        env: { ...process.env, OPENCODEX_HOME: openproviderHome },
+        env: { ...process.env, OPENPROVIDER_HOME: openproviderHome },
         encoding: "utf8",
       });
 
@@ -229,7 +229,7 @@ describe("CLI status JSON", () => {
 
       const result = spawnSync(process.execPath, [cliPath, "status", "--json", "--yaml"], {
         cwd: repoRoot,
-        env: { ...process.env, OPENCODEX_HOME: openproviderHome },
+        env: { ...process.env, OPENPROVIDER_HOME: openproviderHome },
         encoding: "utf8",
       });
 

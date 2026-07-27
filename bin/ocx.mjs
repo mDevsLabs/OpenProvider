@@ -59,7 +59,7 @@ function expandUserPath(raw) {
 }
 
 function configDir() {
-  const raw = process.env.OPENCODEX_HOME?.trim();
+  const raw = process.env.OPENPROVIDER_HOME?.trim();
   return resolve(raw ? expandUserPath(raw) : join(homedir(), ".openprovider"));
 }
 

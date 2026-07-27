@@ -60,8 +60,8 @@ test("parseUsageSurface accepts grok and still rejects unknown values", () => {
 // would make the grok tag invisible after a restart. This is the write->read proof.
 test("a grok surface survives the usage-log round trip", async () => {
   const home = mkdtempSync(join(tmpdir(), "opr-usage-grok-"));
-  const prev = process.env.OPENCODEX_HOME;
-  process.env.OPENCODEX_HOME = home;
+  const prev = process.env.OPENPROVIDER_HOME;
+  process.env.OPENPROVIDER_HOME = home;
   try {
     appendUsageEntry(entry("grok", "opr-kimi-k3"));
     appendUsageEntry(entry(undefined, "plain-codex"));
@@ -71,8 +71,8 @@ test("a grok surface survives the usage-log round trip", async () => {
     expect(grok?.surface).toBe("grok");
     expect(plain?.surface).toBeUndefined();
   } finally {
-    if (prev === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = prev;
+    if (prev === undefined) delete process.env.OPENPROVIDER_HOME;
+    else process.env.OPENPROVIDER_HOME = prev;
     rmSync(home, { recursive: true, force: true });
   }
 });

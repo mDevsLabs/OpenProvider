@@ -15,14 +15,14 @@ import { mapReasoningEffort } from "../src/reasoning-effort";
 import { nativeEffortClamp } from "../src/codex/catalog";
 import type { OcxConfig, OcxParsedRequest } from "../src/types";
 
-const savedHome = process.env.OPENCODEX_HOME;
+const savedHome = process.env.OPENPROVIDER_HOME;
 const savedCodexHome = process.env.CODEX_HOME;
 let tempHome: string | null = null;
 let tempCodexHome: string | null = null;
 
 afterEach(() => {
-  if (savedHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = savedHome;
+  if (savedHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = savedHome;
   if (savedCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = savedCodexHome;
   if (tempHome) { rmSync(tempHome, { recursive: true, force: true }); tempHome = null; }
@@ -420,7 +420,7 @@ describe("cap composition with downstream clamps", () => {
 describe("/api/effort-caps", () => {
   function isolatedHome(): void {
     tempHome = mkdtempSync(join(tmpdir(), "opr-effort-caps-"));
-    process.env.OPENCODEX_HOME = tempHome;
+    process.env.OPENPROVIDER_HOME = tempHome;
   }
 
   async function put(config: OcxConfig, body: unknown): Promise<Response> {

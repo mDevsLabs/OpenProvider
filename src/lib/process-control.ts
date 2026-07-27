@@ -67,7 +67,7 @@ export async function stopProxyGracefully(pid: number, io: GracefulStopIo = {}):
   const env = io.env ?? process.env;
   const headers: Record<string, string> = {};
   // Non-loopback binds require management auth; loopback ignores the extra header.
-  const token = env.OPENCODEX_API_AUTH_TOKEN?.trim();
+  const token = env.OPENPROVIDER_API_AUTH_TOKEN?.trim();
   if (token) headers["x-openprovider-api-key"] = token;
   const fetchFn = io.fetchFn ?? fetch;
   try {
@@ -112,7 +112,7 @@ export async function stopProxy(pid: number): Promise<void> {
     // config while that service keeps the proxy alive.
     throw new Error(
       "The running proxy refused to stop: a service installed under a different "
-      + "CODEX_HOME/OPENCODEX_HOME owns it. Run the stop from that home.",
+      + "CODEX_HOME/OPENPROVIDER_HOME owns it. Run the stop from that home.",
     );
   }
   if (graceful) {

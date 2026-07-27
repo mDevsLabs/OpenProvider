@@ -14,8 +14,8 @@ import { formatPassthroughUpstreamError } from "../src/server/responses/passthro
 import type { OcxConfig, OcxParsedRequest } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
-const previousApiToken = process.env.OPENCODEX_API_AUTH_TOKEN;
-const previousOpencodexHome = process.env.OPENCODEX_HOME;
+const previousApiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN;
+const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
 const previousOcxDebug = process.env.OCX_DEBUG;
 const originalGlobalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-issue-452-empty-503");
@@ -44,10 +44,10 @@ beforeEach(() => {
 afterEach(() => {
   globalThis.fetch = originalGlobalFetch;
   setDraining(false);
-  if (previousApiToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  else process.env.OPENCODEX_API_AUTH_TOKEN = previousApiToken;
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousApiToken === undefined) delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
+  else process.env.OPENPROVIDER_API_AUTH_TOKEN = previousApiToken;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   if (previousOcxDebug === undefined) delete process.env.OCX_DEBUG;
   else process.env.OCX_DEBUG = previousOcxDebug;
   resetDebugSettingsForTests();
@@ -113,8 +113,8 @@ async function withPoolPassthrough(
 ): Promise<void> {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true, force: true });
   mkdirSync(TEST_DIR, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
-  delete process.env.OPENCODEX_API_AUTH_TOKEN;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
+  delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
   clearCodexUpstreamHealth();
   clearThreadAccountMap();
   clearAccountQuota();
@@ -242,8 +242,8 @@ describe("drain 503 JSON (#452)", () => {
   test("POST /v1/responses while draining returns JSON error body", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true, force: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    process.env.OPENPROVIDER_HOME = TEST_DIR;
+    delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
     saveConfig({
       port: 0,
       defaultProvider: "xiaomi",

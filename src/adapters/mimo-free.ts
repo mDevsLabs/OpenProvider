@@ -39,7 +39,7 @@ function randomUserAgent(): string {
 
 /**
  * Anonymous per-install client id for the bootstrap `client` field. A random UUID
- * persisted under the config dir (OPENCODEX_HOME-aware) — deliberately NOT derived
+ * persisted under the config dir (OPENPROVIDER_HOME-aware) — deliberately NOT derived
  * from machine attributes (hostname/username/CPU), which would be a stable
  * pseudonymous device fingerprint. Delete the file to rotate the id.
  */

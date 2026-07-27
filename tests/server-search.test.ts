@@ -15,8 +15,8 @@ import type { OcxConfig } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
-const previousApiToken = process.env.OPENCODEX_API_AUTH_TOKEN;
-const previousOpencodexHome = process.env.OPENCODEX_HOME;
+const previousApiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN;
+const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
 const originalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-server-search-test");
 let isolatedCodexHome: IsolatedCodexHome | null = null;
@@ -25,8 +25,8 @@ const DIRECT_CHATGPT_TOKEN = fakeChatGptJwt({ chatgpt_account_id: "acct-123" });
 beforeEach(() => {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_DIR, { recursive: true });
-  process.env.OPENCODEX_HOME = TEST_DIR;
-  delete process.env.OPENCODEX_API_AUTH_TOKEN;
+  process.env.OPENPROVIDER_HOME = TEST_DIR;
+  delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
   isolatedCodexHome = installIsolatedCodexHome("opr-server-search-codex-");
   clearCodexUpstreamHealth();
   clearThreadAccountMap();
@@ -37,10 +37,10 @@ beforeEach(() => {
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
-  if (previousApiToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  else process.env.OPENCODEX_API_AUTH_TOKEN = previousApiToken;
-  if (previousOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpencodexHome;
+  if (previousApiToken === undefined) delete process.env.OPENPROVIDER_API_AUTH_TOKEN;
+  else process.env.OPENPROVIDER_API_AUTH_TOKEN = previousApiToken;
+  if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   clearCodexUpstreamHealth();
@@ -371,7 +371,7 @@ test("GET /v1/alpha/search still falls through to the JSON 404 guard", async () 
 });
 
 test("search routes require API auth and local Origin on non-loopback bindings", async () => {
-  process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+  process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
   saveConfig({
     ...forwardConfig("https://chatgpt.example/backend-api/codex"),
     hostname: "0.0.0.0",
@@ -403,7 +403,7 @@ test("search routes require API auth and local Origin on non-loopback bindings",
 });
 
 test("the proxy admission secret is never relayed to the search upstream", async () => {
-  process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+  process.env.OPENPROVIDER_API_AUTH_TOKEN = "local-secret";
   const captured: CapturedRequest[] = [];
   const upstream = fakeSearchUpstream(captured);
   saveConfig({ ...forwardConfig(), hostname: "0.0.0.0" });

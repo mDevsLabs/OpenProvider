@@ -23,7 +23,7 @@ import { clearAccountQuota, updateAccountQuota } from "../src/codex/quota";
 import type { OcxConfig } from "../src/types";
 
 const savedCodexHome = process.env.CODEX_HOME;
-const savedOpencodexHome = process.env.OPENCODEX_HOME;
+const savedOpenproviderHome = process.env.OPENPROVIDER_HOME;
 let testDir: string;
 
 function installPoolCredential(accountId: string, now = Date.now()): void {
@@ -72,7 +72,7 @@ function codexHomeFixture(): string {
 
 beforeEach(() => {
   testDir = mkdtempSync(join(tmpdir(), "opr-subagent-fb-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OPENPROVIDER_HOME = testDir;
   process.env.CODEX_HOME = testDir;
   installPoolCredential("pool-a");
   installPoolCredential("account-a");
@@ -86,8 +86,8 @@ beforeEach(() => {
 afterEach(() => {
   if (savedCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = savedCodexHome;
-  if (savedOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = savedOpencodexHome;
+  if (savedOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = savedOpenproviderHome;
   clearAccountQuota();
   resetSubagentModelFallbackStateForTests();
   clearAccountNeedsReauth("pool-a");

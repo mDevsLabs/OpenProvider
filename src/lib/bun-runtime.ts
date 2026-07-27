@@ -20,7 +20,7 @@ const require = createRequire(import.meta.url);
 // postinstall downloads the real ~60MB binary; reject the stub by size so we
 // never bake a non-executable path into durable artifacts.
 const REAL_BUN_MIN_BYTES = 1_000_000;
-const BUN_OVERRIDE_ENV = "OPENCODEX_BUN_PATH";
+const BUN_OVERRIDE_ENV = "OPENPROVIDER_BUN_PATH";
 
 export type DurableBunRuntime = {
   path: string;

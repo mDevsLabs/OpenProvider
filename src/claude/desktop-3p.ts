@@ -308,7 +308,7 @@ export function writeDesktop3pConfig(
   mode: Desktop3pConfigMode = "static",
   profile?: OcxClaudeDesktopProfile,
 ): { written: boolean; path: string; reason?: string; fingerprint?: string } {
-  const libraryPath = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR?.trim()
+  const libraryPath = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR?.trim()
     || join(homedir(), "Library", "Application Support", "Claude-3p", "configLibrary");
   const metadataPath = join(libraryPath, "_meta.json");
   let configPath = libraryPath;

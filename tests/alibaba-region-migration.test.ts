@@ -53,16 +53,16 @@ test("the migrated config survives a reload", () => {
   expect(projection.changed).toBe(true);
 
   const home = mkdtempSync(join(tmpdir(), "opr-alibaba-"));
-  const prev = process.env.OPENCODEX_HOME;
-  process.env.OPENCODEX_HOME = home;
+  const prev = process.env.OPENPROVIDER_HOME;
+  process.env.OPENPROVIDER_HOME = home;
   try {
     saveConfig(projection.config);
     const reloaded = loadConfig();
     expect(reloaded.providers["alibaba-token-plan-intl"]?.apiKey).toBe("sk-intl-key");
     expect(reloaded.combos?.fast?.targets[0]?.provider).toBe("alibaba-token-plan-intl");
   } finally {
-    if (prev === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = prev;
+    if (prev === undefined) delete process.env.OPENPROVIDER_HOME;
+    else process.env.OPENPROVIDER_HOME = prev;
     rmSync(home, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });
