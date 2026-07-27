@@ -1,9 +1,9 @@
 ---
 title: Architecture
-description: opencodex internals — module map, the AdapterEvent bridge, the request parser, and caching.
+description: OpenProvider internals — module map, the AdapterEvent bridge, the request parser, and caching.
 ---
 
-opencodex is a single Bun process. A request enters as OpenAI Responses, is normalized to an internal
+OpenProvider is a single Bun process. A request enters as OpenAI Responses, is normalized to an internal
 model, routed, sent to a provider via an adapter, and bridged back to Responses SSE. See
 [How It Works](/getting-started/how-it-works/) for the end-to-end flow.
 
@@ -21,7 +21,7 @@ src/
 ├── lib/                # runtime, process, retry, privacy, token estimate helpers
 ├── web-search/         # web-search sidecar (synthetic tool, loop, executor, parser)
 ├── vision/             # vision sidecar (describe + plan)
-├── config.ts           # ~/.opencodex/config.json, defaults, PID, env resolution
+├── config.ts           # ~/.OpenProvider/config.json, defaults, PID, env resolution
 ├── router.ts           # model id → provider + adapter
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
@@ -120,7 +120,7 @@ single non-streaming response object from the same events.
 provider CRUD and key pools, model selection/context caps/v2 controls, catalog sync, diagnostics and
 debug logs, usage and quotas, sidecar settings, updates, generated client API keys, OAuth login/status/
 logout and account selection, Codex account management, and graceful stop. `server/auth-cors.ts`
-requires `OPENCODEX_API_AUTH_TOKEN` for both `/api/*` and `/v1/*` when the proxy binds beyond
+requires `OpenProvider_API_AUTH_TOKEN` for both `/api/*` and `/v1/*` when the proxy binds beyond
 loopback; configured `corsAllowOrigins` entries extend the local-origin allowlist.
 
 OAuth implementations live in `oauth/`; access tokens are loaded or refreshed immediately before a
@@ -137,7 +137,7 @@ diagnostics.
 ## Transport and compaction
 
 `server/index.ts` serves HTTP/SSE on `/v1/responses` by default. If Codex attempts a Responses
-WebSocket upgrade while `websockets` is `false`, opencodex returns `426 upgrade_required`; Codex then
+WebSocket upgrade while `websockets` is `false`, OpenProvider returns `426 upgrade_required`; Codex then
 falls back to HTTP for that session. When `"websockets": true` is set, the same endpoint accepts the
 upgrade and uses the WebSocket bridge.
 
@@ -172,3 +172,4 @@ The internal model lives in `types.ts`: `OcxParsedRequest`, `OcxContext`, the `O
 `OcxContentPart` (text / image), `OcxToolCall`, `OcxTool`, `AdapterEvent`, and the config types
 (`OcxConfig`, `OcxProviderConfig`). Two helpers are widely used: `namespacedToolName()` and
 `modelInList()` (tolerant `:size`-tag matching for `noVisionModels` / `noReasoningModels`).
+

@@ -115,3 +115,4 @@ test("right alignment anchors the menu to the trigger's right edge", () => {
   expect(style.right).toBe(704);
   expect(style.left).toBeUndefined();
 });
+

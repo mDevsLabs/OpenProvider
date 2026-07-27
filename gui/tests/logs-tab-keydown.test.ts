@@ -103,3 +103,4 @@ test("unrelated keys do not navigate or preventDefault", () => {
   expect(e.prevented).toBe(false);
   expect(testWindow.location.hash).toBe("#logs");
 });
+

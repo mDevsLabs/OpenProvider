@@ -99,7 +99,7 @@ Self-contained module; never throws out to startup.
 
   Release notes: https://github.com/lidge-jun/opencodex/releases/latest
 
-  1) Update now (runs `npm install -g @bitkyc08/opencodex@latest`)
+  1) Update now (runs `npm install -g @mdevs/openprovider@latest`)
   2) Skip
   3) Skip until next version
 
@@ -147,3 +147,4 @@ TTY (pure helpers exported; the readline shell stays thin).
 STANDARD. Touches the startup path. Mitigated by: hard source-build/TTY guards,
 full try/catch so it can never block startup, prompt fires before any port/PID
 is taken, and no change to the existing upgrade mechanics.
+

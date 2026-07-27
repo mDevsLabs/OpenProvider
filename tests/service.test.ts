@@ -8,17 +8,17 @@ import { serviceApiTokenFilePath } from "../src/lib/service-secrets";
 import type { OcxConfig } from "../src/types";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-service-test");
-const previousOpenCodexHome = process.env.OPENCODEX_HOME;
+const previousOpenProviderHome = process.env.OpenProvider_HOME;
 const previousCodexHome = process.env.CODEX_HOME;
-const previousApiAuthToken = process.env.OPENCODEX_API_AUTH_TOKEN;
+const previousApiAuthToken = process.env.OpenProvider_API_AUTH_TOKEN;
 
 afterEach(() => {
-  if (previousOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpenCodexHome;
+  if (previousOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+  else process.env.OpenProvider_HOME = previousOpenProviderHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
-  if (previousApiAuthToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  else process.env.OPENCODEX_API_AUTH_TOKEN = previousApiAuthToken;
+  if (previousApiAuthToken === undefined) delete process.env.OpenProvider_API_AUTH_TOKEN;
+  else process.env.OpenProvider_API_AUTH_TOKEN = previousApiAuthToken;
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
 });
 
@@ -52,7 +52,7 @@ function expectTextToContainPath(text: string, path: string): void {
 
 describe("service listen-port bake", () => {
   test("resolveServiceListenPort prefers override, then OCX_BAKE_PORT, then config", () => {
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OpenProvider_HOME = TEST_DIR;
     mkdirSync(TEST_DIR, { recursive: true });
     saveConfig({ port: 10100, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as OcxConfig);
     expect(resolveServiceListenPort(18765)).toBe(18765);
@@ -71,10 +71,10 @@ describe("service listen-port bake", () => {
   });
 
   test("Windows batch and launchd/systemd shell commands bake start --port", () => {
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OpenProvider_HOME = TEST_DIR;
     mkdirSync(TEST_DIR, { recursive: true });
     saveConfig({ port: 13337, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as OcxConfig);
-    const script = buildWindowsServiceScript({ bun: "C:\\OpenCodex\\bun.exe", cli: "C:\\OpenCodex\\cli.ts" });
+    const script = buildWindowsServiceScript({ bun: "C:\\OpenProvider\\bun.exe", cli: "C:\\OpenProvider\\cli.ts" });
     expect(script).toContain("start --port 13337");
     expect(buildPlist()).toContain("start --port 13337");
     expect(buildUnit()).toContain("start --port 13337");
@@ -104,27 +104,27 @@ describe("systemd service unit", () => {
     expect(unit).not.toContain('StandardError="append:');
   });
 
-  test("preserves custom Codex and OpenCodex homes", () => {
+  test("preserves custom Codex and OpenProvider homes", () => {
     const oldCodexHome = process.env.CODEX_HOME;
-    const oldOpenCodexHome = process.env.OPENCODEX_HOME;
-    const oldApiAuthToken = process.env.OPENCODEX_API_AUTH_TOKEN;
+    const oldOpenProviderHome = process.env.OpenProvider_HOME;
+    const oldApiAuthToken = process.env.OpenProvider_API_AUTH_TOKEN;
     try {
       process.env.CODEX_HOME = "/tmp/codex-home";
-      process.env.OPENCODEX_HOME = "/tmp/opencodex-home";
-      process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+      process.env.OpenProvider_HOME = "/tmp/OpenProvider-home";
+      process.env.OpenProvider_API_AUTH_TOKEN = "local-secret";
       const unit = buildUnit();
       expect(unit).toContain('Environment="CODEX_HOME=/tmp/codex-home"');
-      expect(unit).toContain('Environment="OPENCODEX_HOME=/tmp/opencodex-home"');
+      expect(unit).toContain('Environment="OpenProvider_HOME=/tmp/OpenProvider-home"');
       expectTextToContainPath(unit, serviceApiTokenFilePath());
       expect(unit).not.toContain("local-secret");
-      expect(unit).not.toContain("Environment=\"OPENCODEX_API_AUTH_TOKEN=");
+      expect(unit).not.toContain("Environment=\"OpenProvider_API_AUTH_TOKEN=");
     } finally {
       if (oldCodexHome === undefined) delete process.env.CODEX_HOME;
       else process.env.CODEX_HOME = oldCodexHome;
-      if (oldOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldOpenCodexHome;
-      if (oldApiAuthToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-      else process.env.OPENCODEX_API_AUTH_TOKEN = oldApiAuthToken;
+      if (oldOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+      else process.env.OpenProvider_HOME = oldOpenProviderHome;
+      if (oldApiAuthToken === undefined) delete process.env.OpenProvider_API_AUTH_TOKEN;
+      else process.env.OpenProvider_API_AUTH_TOKEN = oldApiAuthToken;
     }
   });
 
@@ -158,8 +158,8 @@ describe("service install auth preflight", () => {
   test("rejects non-loopback service install without a persisted API token", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
+    process.env.OpenProvider_HOME = TEST_DIR;
+    delete process.env.OpenProvider_API_AUTH_TOKEN;
     saveConfig({
       port: 10100,
       hostname: "0.0.0.0",
@@ -167,14 +167,14 @@ describe("service install auth preflight", () => {
       defaultProvider: "openai",
     } as OcxConfig);
 
-    expect(() => assertServiceAuthEnvironment()).toThrow("OPENCODEX_API_AUTH_TOKEN");
+    expect(() => assertServiceAuthEnvironment()).toThrow("OpenProvider_API_AUTH_TOKEN");
   });
 
   test("allows non-loopback service install when the API token is in the service environment", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+    process.env.OpenProvider_HOME = TEST_DIR;
+    process.env.OpenProvider_API_AUTH_TOKEN = "local-secret";
     saveConfig({
       port: 10100,
       hostname: "0.0.0.0",
@@ -188,12 +188,12 @@ describe("service install auth preflight", () => {
   test("rejects restore operations from a different CODEX_HOME than service install", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
+    process.env.OpenProvider_HOME = TEST_DIR;
     process.env.CODEX_HOME = "/tmp/current-codex-home";
     writeFileSync(join(TEST_DIR, "service-state.json"), JSON.stringify({
       version: 1,
       codexHome: "/tmp/installed-codex-home",
-      opencodexHome: TEST_DIR,
+      OpenProviderHome: TEST_DIR,
     }) + "\n");
 
     expect(() => assertServiceEnvironmentMatchesInstall()).toThrow("Service was installed with CODEX_HOME");
@@ -202,7 +202,7 @@ describe("service install auth preflight", () => {
 
 describe("Windows service task", () => {
   test("builds schtasks create args from XML instead of runtime flags", () => {
-    const script = "C:\\Users\\a&b\\.opencodex\\opencodex-service.cmd";
+    const script = "C:\\Users\\a&b\\.OpenProvider\\OpenProvider-service.cmd";
     const args = buildWindowsSchtasksCreateArgs(script);
 
     expect(args).toContain("/create");
@@ -217,8 +217,8 @@ describe("Windows service task", () => {
   });
 
   test("builds service-like Task Scheduler XML settings", () => {
-    const script = "C:\\Users\\a&b\\.opencodex\\opencodex-service.cmd";
-    const launcher = "C:\\Users\\a&b\\.opencodex\\opencodex-service-launcher.vbs";
+    const script = "C:\\Users\\a&b\\.OpenProvider\\OpenProvider-service.cmd";
+    const launcher = "C:\\Users\\a&b\\.OpenProvider\\OpenProvider-service-launcher.vbs";
     const xml = buildWindowsTaskXml(script, launcher);
 
     expect(xml).toContain('<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">');
@@ -233,13 +233,13 @@ describe("Windows service task", () => {
     expect(xml).toContain("<Count>3</Count>");
     // The action is wscript running the hidden VBS launcher, never the console batch directly.
     expect(xml).toMatch(/<Command>.*wscript\.exe<\/Command>/);
-    expect(xml).toContain('<Arguments>/b /nologo &quot;C:\\Users\\a&amp;b\\.opencodex\\opencodex-service-launcher.vbs&quot;</Arguments>');
-    expect(xml).not.toContain("<Command>C:\\Users\\a&amp;b\\.opencodex\\opencodex-service.cmd</Command>");
+    expect(xml).toContain('<Arguments>/b /nologo &quot;C:\\Users\\a&amp;b\\.OpenProvider\\OpenProvider-service-launcher.vbs&quot;</Arguments>');
+    expect(xml).not.toContain("<Command>C:\\Users\\a&amp;b\\.OpenProvider\\OpenProvider-service.cmd</Command>");
   });
 
   test("validates the registered scheduler action, trigger, principal, and settings", () => {
     const wscript = "C:\\Windows\\System32\\wscript.exe";
-    const launcher = "C:\\Users\\Test\\.opencodex\\service-launcher.vbs";
+    const launcher = "C:\\Users\\Test\\.OpenProvider\\service-launcher.vbs";
     const xml = buildWindowsTaskXml("ignored.cmd", launcher).replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
     expect(windowsTaskRegistrationHealthy(xml, wscript, launcher)).toBe(true);
     for (const mutated of [
@@ -256,7 +256,7 @@ describe("Windows service task", () => {
 
   test("accepts canonicalized scheduler XML with omitted defaults", () => {
     const wscript = "C:\\Windows\\System32\\wscript.exe";
-    const launcher = "C:\\Users\\Test\\.opencodex\\service-launcher.vbs";
+    const launcher = "C:\\Users\\Test\\.OpenProvider\\service-launcher.vbs";
     const xml = buildWindowsTaskXml("ignored.cmd", launcher)
       .replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
     // Windows drops elements equal to their schema default when it exports a task:
@@ -278,7 +278,7 @@ describe("Windows service task", () => {
 
   test("rejects explicit unsafe values even though defaults may be omitted", () => {
     const wscript = "C:\\Windows\\System32\\wscript.exe";
-    const launcher = "C:\\Users\\Test\\.opencodex\\service-launcher.vbs";
+    const launcher = "C:\\Users\\Test\\.OpenProvider\\service-launcher.vbs";
     const xml = buildWindowsTaskXml("ignored.cmd", launcher)
       .replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
 
@@ -296,7 +296,7 @@ describe("Windows service task", () => {
 
   test("a decoy trigger outside Triggers does not satisfy the logon requirement", () => {
     const wscript = "C:\\Windows\\System32\\wscript.exe";
-    const launcher = "C:\\Users\\Test\\.opencodex\\service-launcher.vbs";
+    const launcher = "C:\\Users\\Test\\.OpenProvider\\service-launcher.vbs";
     const xml = buildWindowsTaskXml("ignored.cmd", launcher)
       .replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
     const bootOnly = xml.replace("<LogonTrigger>\n      <Enabled>true</Enabled>\n    </LogonTrigger>", "<BootTrigger />");
@@ -311,7 +311,7 @@ describe("Windows service task", () => {
 
   test("namespace-prefixed values are not mistaken for omissions", () => {
     const wscript = "C:\\Windows\\System32\\wscript.exe";
-    const launcher = "C:\\Users\\Test\\.opencodex\\service-launcher.vbs";
+    const launcher = "C:\\Users\\Test\\.OpenProvider\\service-launcher.vbs";
     const xml = buildWindowsTaskXml("ignored.cmd", launcher)
       .replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
 
@@ -325,7 +325,7 @@ describe("Windows service task", () => {
 
   test("a Data block disqualifies the registration", () => {
     const wscript = "C:\\Windows\\System32\\wscript.exe";
-    const launcher = "C:\\Users\\Test\\.opencodex\\service-launcher.vbs";
+    const launcher = "C:\\Users\\Test\\.OpenProvider\\service-launcher.vbs";
     const xml = buildWindowsTaskXml("ignored.cmd", launcher)
       .replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
     // taskXmlSection() takes the first match, so a Data block placed ahead of the
@@ -348,7 +348,7 @@ describe("Windows service task", () => {
 
   test("duplicate elements are not trusted", () => {
     const wscript = "C:\\Windows\\System32\\wscript.exe";
-    const launcher = "C:\\Users\\Test\\.opencodex\\service-launcher.vbs";
+    const launcher = "C:\\Users\\Test\\.OpenProvider\\service-launcher.vbs";
     const xml = buildWindowsTaskXml("ignored.cmd", launcher)
       .replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
     const duplicated = xml.replace(
@@ -359,18 +359,18 @@ describe("Windows service task", () => {
   });
 
   test("hidden launcher VBS stays resident and escapes quotes in the wrapper path", () => {
-    const vbs = buildWindowsLauncherVbs('C:\\Users\\quo"te\\.opencodex\\opencodex-service.cmd');
+    const vbs = buildWindowsLauncherVbs('C:\\Users\\quo"te\\.OpenProvider\\OpenProvider-service.cmd');
 
     // windowStyle 0 (hidden) + bWaitOnReturn True (resident, so IgnoreNew and /end keep working).
     expect(vbs).toContain(", 0, True");
-    expect(vbs).toContain('shell.Run """C:\\Users\\quo""te\\.opencodex\\opencodex-service.cmd""", 0, True');
+    expect(vbs).toContain('shell.Run """C:\\Users\\quo""te\\.OpenProvider\\OpenProvider-service.cmd""", 0, True');
     expect(vbs).toContain('CreateObject("WScript.Shell")');
   });
 
   test("hidden launcher VBS carries non-ASCII profile paths verbatim", () => {
-    const vbs = buildWindowsLauncherVbs("C:\\Users\\한글사용자\\.opencodex\\opencodex-service.cmd");
+    const vbs = buildWindowsLauncherVbs("C:\\Users\\한글사용자\\.OpenProvider\\OpenProvider-service.cmd");
 
-    expect(vbs).toContain("C:\\Users\\한글사용자\\.opencodex\\opencodex-service.cmd");
+    expect(vbs).toContain("C:\\Users\\한글사용자\\.OpenProvider\\OpenProvider-service.cmd");
   });
 
   test("writes the launcher VBS with a UTF-16 BOM so non-ASCII paths survive WSH decoding", async () => {
@@ -389,44 +389,44 @@ describe("Windows service task", () => {
 
   test("escapes environment values that would break out of set quotes", () => {
     const oldPath = process.env.PATH;
-    const oldOpenCodexHome = process.env.OPENCODEX_HOME;
-    const oldApiAuthToken = process.env.OPENCODEX_API_AUTH_TOKEN;
+    const oldOpenProviderHome = process.env.OpenProvider_HOME;
+    const oldApiAuthToken = process.env.OpenProvider_API_AUTH_TOKEN;
     try {
       process.env.PATH = 'C:\\safe" & echo PWNED & rem "';
-      process.env.OPENCODEX_HOME = 'C:\\ocx" & del C:\\important & rem "';
-      process.env.OPENCODEX_API_AUTH_TOKEN = 'token" & echo LEAK & rem "';
+      process.env.OpenProvider_HOME = 'C:\\ocx" & del C:\\important & rem "';
+      process.env.OpenProvider_API_AUTH_TOKEN = 'token" & echo LEAK & rem "';
       const script = buildWindowsServiceScript();
       expect(script).toContain('set "PATH=C:\\safe & echo PWNED & rem "');
-      expect(script).toContain('set "OPENCODEX_HOME=C:\\ocx & del C:\\important & rem "');
+      expect(script).toContain('set "OpenProvider_HOME=C:\\ocx & del C:\\important & rem "');
       expect(script).toContain('set "OCX_API_TOKEN_FILE=');
-      expect(script).toContain('set /p OPENCODEX_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"');
+      expect(script).toContain('set /p OpenProvider_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"');
       expect(script).not.toContain('set "PATH=C:\\safe" & echo PWNED');
-      expect(script).not.toContain('set "OPENCODEX_HOME=C:\\ocx" & del');
+      expect(script).not.toContain('set "OpenProvider_HOME=C:\\ocx" & del');
       expect(script).not.toContain("token & echo LEAK");
     } finally {
       if (oldPath === undefined) delete process.env.PATH;
       else process.env.PATH = oldPath;
-      if (oldOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldOpenCodexHome;
-      if (oldApiAuthToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-      else process.env.OPENCODEX_API_AUTH_TOKEN = oldApiAuthToken;
+      if (oldOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+      else process.env.OpenProvider_HOME = oldOpenProviderHome;
+      if (oldApiAuthToken === undefined) delete process.env.OpenProvider_API_AUTH_TOKEN;
+      else process.env.OpenProvider_API_AUTH_TOKEN = oldApiAuthToken;
     }
   });
 
   test("escapes service executable paths through variables", () => {
     const script = buildWindowsServiceScript({
       bun: "C:\\Bun&Dir\\100%bun^\\bun.exe",
-      cli: "C:\\OpenCodex&Dir\\cli.ts",
+      cli: "C:\\OpenProvider&Dir\\cli.ts",
     });
 
     expect(script).toContain('set "OCX_BUN=C:\\Bun&Dir\\100%%bun^^\\bun.exe"');
-    expect(script).toContain('set "OCX_CLI=C:\\OpenCodex&Dir\\cli.ts"');
+    expect(script).toContain('set "OCX_CLI=C:\\OpenProvider&Dir\\cli.ts"');
     expect(script).toContain('"%OCX_BUN%" "%OCX_CLI%" start --port');
     expect(script).not.toContain('"C:\\Bun&Dir\\100%bun^\\bun.exe"');
   });
 
   test("switches the wrapper console to UTF-8 and sleeps via ping (timeout dies without console stdin)", () => {
-    const script = buildWindowsServiceScript({ bun: "C:\\OpenCodex\\bun.exe", cli: "C:\\OpenCodex\\cli.ts" });
+    const script = buildWindowsServiceScript({ bun: "C:\\OpenProvider\\bun.exe", cli: "C:\\OpenProvider\\cli.ts" });
 
     expect(script).toContain("chcp 65001 >nul");
     expect(script.indexOf("chcp 65001 >nul")).toBeLessThan(script.indexOf('set "OCX_SERVICE=1"'));
@@ -442,11 +442,11 @@ describe("Windows service task", () => {
       process.env.APPDATA = "C:\\Users\\한글사용자\\AppData\\Roaming";
       const script = buildWindowsServiceScript({
         bun: "C:\\Users\\한글사용자\\AppData\\Roaming\\npm\\node_modules\\bun\\bin\\bun.exe",
-        cli: "C:\\Users\\한글사용자\\AppData\\Roaming\\npm\\node_modules\\opencodex\\src\\cli.ts",
+        cli: "C:\\Users\\한글사용자\\AppData\\Roaming\\npm\\node_modules\\OpenProvider\\src\\cli.ts",
       });
 
       expect(script).toContain('set "OCX_BUN=%APPDATA%\\npm\\node_modules\\bun\\bin\\bun.exe"');
-      expect(script).toContain('set "OCX_CLI=%APPDATA%\\npm\\node_modules\\opencodex\\src\\cli.ts"');
+      expect(script).toContain('set "OCX_CLI=%APPDATA%\\npm\\node_modules\\OpenProvider\\src\\cli.ts"');
       expect(script).not.toContain('set "OCX_BUN=C:\\Users\\한글사용자');
     } finally {
       if (oldUserProfile === undefined) delete process.env.USERPROFILE;
@@ -458,63 +458,63 @@ describe("Windows service task", () => {
 
   test("writes token-safe startup identity and child output to the service log", () => {
     const oldCodexHome = process.env.CODEX_HOME;
-    const oldOpenCodexHome = process.env.OPENCODEX_HOME;
-    const oldApiAuthToken = process.env.OPENCODEX_API_AUTH_TOKEN;
+    const oldOpenProviderHome = process.env.OpenProvider_HOME;
+    const oldApiAuthToken = process.env.OpenProvider_API_AUTH_TOKEN;
     try {
       process.env.CODEX_HOME = "C:\\codex-home";
-      process.env.OPENCODEX_HOME = TEST_DIR;
-      process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+      process.env.OpenProvider_HOME = TEST_DIR;
+      process.env.OpenProvider_API_AUTH_TOKEN = "local-secret";
       const script = buildWindowsServiceScript({
-        bun: "C:\\OpenCodex\\bun.exe",
-        cli: "C:\\OpenCodex\\cli.ts",
+        bun: "C:\\OpenProvider\\bun.exe",
+        cli: "C:\\OpenProvider\\cli.ts",
       });
 
       expectTextToContainPath(script, serviceLogPath());
       expect(script).toContain('set "OCX_SERVICE_LOG=');
-      expect(script).toContain("opencodex service wrapper start");
+      expect(script).toContain("OpenProvider service wrapper start");
       expect(script).toContain('echo bun="%OCX_BUN%"');
       expect(script).toContain('echo bun_source="');
       expect(script).toContain('echo cli="%OCX_CLI%"');
-      expect(script).toContain('echo opencodex_home="%OPENCODEX_HOME%"');
+      expect(script).toContain('echo OpenProvider_home="%OpenProvider_HOME%"');
       expect(script).toContain('echo codex_home="%CODEX_HOME%"');
       expect(script).toContain('echo token_file="%OCX_API_TOKEN_FILE%"');
       expect(script).toMatch(/"%OCX_BUN%" "%OCX_CLI%" start --port \d+ >>"%OCX_SERVICE_LOG%" 2>&1/);
       expect(script).toContain("child exited with code %ERRORLEVEL%");
       expect(script).not.toContain("local-secret");
-      expect(script).not.toContain('set "OPENCODEX_API_AUTH_TOKEN=');
+      expect(script).not.toContain('set "OpenProvider_API_AUTH_TOKEN=');
     } finally {
       if (oldCodexHome === undefined) delete process.env.CODEX_HOME;
       else process.env.CODEX_HOME = oldCodexHome;
-      if (oldOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldOpenCodexHome;
-      if (oldApiAuthToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-      else process.env.OPENCODEX_API_AUTH_TOKEN = oldApiAuthToken;
+      if (oldOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+      else process.env.OpenProvider_HOME = oldOpenProviderHome;
+      if (oldApiAuthToken === undefined) delete process.env.OpenProvider_API_AUTH_TOKEN;
+      else process.env.OpenProvider_API_AUTH_TOKEN = oldApiAuthToken;
     }
   });
 });
 
 describe("launchd service plist", () => {
-  test("preserves custom Codex and OpenCodex homes", () => {
+  test("preserves custom Codex and OpenProvider homes", () => {
     const oldCodexHome = process.env.CODEX_HOME;
-    const oldOpenCodexHome = process.env.OPENCODEX_HOME;
-    const oldApiAuthToken = process.env.OPENCODEX_API_AUTH_TOKEN;
+    const oldOpenProviderHome = process.env.OpenProvider_HOME;
+    const oldApiAuthToken = process.env.OpenProvider_API_AUTH_TOKEN;
     try {
       process.env.CODEX_HOME = "/tmp/codex-home";
-      process.env.OPENCODEX_HOME = "/tmp/opencodex-home";
-      process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
+      process.env.OpenProvider_HOME = "/tmp/OpenProvider-home";
+      process.env.OpenProvider_API_AUTH_TOKEN = "local-secret";
       const plist = buildPlist();
       expect(plist).toContain("<key>CODEX_HOME</key><string>/tmp/codex-home</string>");
-      expect(plist).toContain("<key>OPENCODEX_HOME</key><string>/tmp/opencodex-home</string>");
+      expect(plist).toContain("<key>OpenProvider_HOME</key><string>/tmp/OpenProvider-home</string>");
       expectTextToContainPath(plist, serviceApiTokenFilePath());
       expect(plist).not.toContain("local-secret");
-      expect(plist).not.toContain("<key>OPENCODEX_API_AUTH_TOKEN</key>");
+      expect(plist).not.toContain("<key>OpenProvider_API_AUTH_TOKEN</key>");
     } finally {
       if (oldCodexHome === undefined) delete process.env.CODEX_HOME;
       else process.env.CODEX_HOME = oldCodexHome;
-      if (oldOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldOpenCodexHome;
-      if (oldApiAuthToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-      else process.env.OPENCODEX_API_AUTH_TOKEN = oldApiAuthToken;
+      if (oldOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+      else process.env.OpenProvider_HOME = oldOpenProviderHome;
+      if (oldApiAuthToken === undefined) delete process.env.OpenProvider_API_AUTH_TOKEN;
+      else process.env.OpenProvider_API_AUTH_TOKEN = oldApiAuthToken;
     }
   });
 });
@@ -647,7 +647,7 @@ describe("service diagnostics", () => {
     const valid = {
       version: 2,
       codexHome: "C:\\codex",
-      opencodexHome: "C:\\opencodex",
+      OpenProviderHome: "C:\\OpenProvider",
       backend: "scheduler",
     };
     expect(parseServiceInstallState(valid)?.backend).toBe("scheduler");
@@ -664,10 +664,10 @@ describe("service diagnostics", () => {
   });
 
   test("flags stale baked service paths recorded at install time", () => {
-    const oldOpenCodexHome = process.env.OPENCODEX_HOME;
+    const oldOpenProviderHome = process.env.OpenProvider_HOME;
     const stateDir = join(TEST_DIR, "baked-paths-home");
     try {
-      process.env.OPENCODEX_HOME = stateDir;
+      process.env.OpenProvider_HOME = stateDir;
       mkdirSync(stateDir, { recursive: true });
       const statePath = join(stateDir, "service-state.json");
 
@@ -675,7 +675,7 @@ describe("service diagnostics", () => {
       writeFileSync(statePath, JSON.stringify({
         version: 1,
         codexHome: stateDir,
-        opencodexHome: stateDir,
+        OpenProviderHome: stateDir,
         bunPath: missing,
         cliPath: join(import.meta.dir, "service.test.ts"),
       }), "utf8");
@@ -686,18 +686,18 @@ describe("service diagnostics", () => {
       writeFileSync(statePath, JSON.stringify({
         version: 1,
         codexHome: stateDir,
-        opencodexHome: stateDir,
+        OpenProviderHome: stateDir,
         bunPath: join(import.meta.dir, "service.test.ts"),
         cliPath: join(import.meta.dir, "service.test.ts"),
       }), "utf8");
       expect(bakedServicePathsDiagnostic()).toBeNull();
 
       // Pre-loop-3 state files without baked paths stay silent.
-      writeFileSync(statePath, JSON.stringify({ version: 1, codexHome: stateDir, opencodexHome: stateDir }), "utf8");
+      writeFileSync(statePath, JSON.stringify({ version: 1, codexHome: stateDir, OpenProviderHome: stateDir }), "utf8");
       expect(bakedServicePathsDiagnostic()).toBeNull();
     } finally {
-      if (oldOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldOpenCodexHome;
+      if (oldOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+      else process.env.OpenProvider_HOME = oldOpenProviderHome;
     }
   });
 
@@ -709,3 +709,4 @@ describe("service diagnostics", () => {
     expect(statusCase).toContain("serviceDiagnosticsSummary()");
   });
 });
+

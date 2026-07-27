@@ -273,10 +273,10 @@ describe("server local API auth", () => {
 
     expect(hasValidApiAuth(new Request("http://localhost/api/config"), cfg)).toBe(false);
     expect(hasValidApiAuth(new Request("http://localhost/api/config", {
-      headers: { "x-opencodex-api-key": "wrong" },
+      headers: { "X-OpenProvider-API-Key": "wrong" },
     }), cfg)).toBe(false);
     expect(hasValidApiAuth(new Request("http://localhost/api/config", {
-      headers: { "x-opencodex-api-key": "local-secret" },
+      headers: { "X-OpenProvider-API-Key": "local-secret" },
     }), cfg)).toBe(true);
   });
 
@@ -287,7 +287,7 @@ describe("server local API auth", () => {
 
   test("CORS preflight permits the opencodex API key header", () => {
     const allowed = corsHeaders()["Access-Control-Allow-Headers"];
-    expect(allowed).toContain("X-OpenCodex-API-Key");
+    expect(allowed).toContain("X-OpenProvider-API-Key");
     expect(allowed).toContain("ChatGPT-Account-Id");
   });
 
@@ -454,18 +454,18 @@ describe("server local API auth", () => {
       expect(missingAuth.status).toBe(401);
 
       const badOrigin = await fetch(modelsUrl, {
-        headers: { "x-opencodex-api-key": "local-secret", origin: "https://attacker.test" },
+        headers: { "X-OpenProvider-API-Key": "local-secret", origin: "https://attacker.test" },
       });
       expect(badOrigin.status).toBe(403);
 
       const ok = await fetch(modelsUrl, {
-        headers: { "x-opencodex-api-key": "local-secret" },
+        headers: { "X-OpenProvider-API-Key": "local-secret" },
       });
       expect(ok.status).toBe(200);
       expect(await ok.json()).toHaveProperty("data");
 
       const sameOrigin = await fetch(modelsUrl, {
-        headers: { "x-opencodex-api-key": "local-secret", origin: new URL(modelsUrl).origin },
+        headers: { "X-OpenProvider-API-Key": "local-secret", origin: new URL(modelsUrl).origin },
       });
       expect(sameOrigin.status).toBe(200);
     } finally {
@@ -499,13 +499,13 @@ describe("server local API auth", () => {
     const server = startServer(0);
     try {
       const response = await fetch(`http://127.0.0.1:${server.port}/api/config`, {
-        headers: { "x-opencodex-api-key": "local-secret", origin: "https://attacker.test" },
+        headers: { "X-OpenProvider-API-Key": "local-secret", origin: "https://attacker.test" },
       });
       expect(response.status).toBe(403);
       expect(await response.json()).toMatchObject({ error: "cross-origin request blocked" });
 
       const ok = await fetch(`http://127.0.0.1:${server.port}/api/config`, {
-        headers: { "x-opencodex-api-key": "local-secret", origin: `http://127.0.0.1:${server.port}` },
+        headers: { "X-OpenProvider-API-Key": "local-secret", origin: `http://127.0.0.1:${server.port}` },
       });
       expect(ok.status).toBe(200);
     } finally {
@@ -529,7 +529,7 @@ describe("server local API auth", () => {
       expect(missing.status).toBe(401);
 
       const ok = await fetch(`http://127.0.0.1:${server.port}/api/system/memory`, {
-        headers: { "x-opencodex-api-key": "local-secret" },
+        headers: { "X-OpenProvider-API-Key": "local-secret" },
       });
       expect(ok.status).toBe(200);
       const body = await ok.json() as { rss?: number; bunVersion?: string };
@@ -652,7 +652,7 @@ describe("server local API auth", () => {
         headers: {
           host: `lan.example.test:${server.port}`,
           origin,
-          "x-opencodex-api-key": "local-secret",
+          "X-OpenProvider-API-Key": "local-secret",
         },
       });
       expect(ok.status).toBe(200);
@@ -682,7 +682,7 @@ describe("server local API auth", () => {
           connection: "Upgrade",
           upgrade: "websocket",
           origin: "https://attacker.test",
-          "x-opencodex-api-key": "local-secret",
+          "X-OpenProvider-API-Key": "local-secret",
         },
       });
       expect(response.status).toBe(403);
@@ -929,7 +929,7 @@ describe("server local API auth", () => {
     const request = (server: ReturnType<typeof startServer>, headers?: HeadersInit, model = "gpt-test") => {
       const requestHeaders = new Headers(headers);
       requestHeaders.set("content-type", "application/json");
-      requestHeaders.set("x-opencodex-api-key", "local-secret");
+      requestHeaders.set("X-OpenProvider-API-Key", "local-secret");
       return fetch(new URL("/v1/responses", server.url), {
         method: "POST",
         headers: requestHeaders,
@@ -939,7 +939,7 @@ describe("server local API auth", () => {
     const compact = (server: ReturnType<typeof startServer>, headers?: HeadersInit, model = "gpt-test") => {
       const requestHeaders = new Headers(headers);
       requestHeaders.set("content-type", "application/json");
-      requestHeaders.set("x-opencodex-api-key", "local-secret");
+      requestHeaders.set("X-OpenProvider-API-Key", "local-secret");
       return fetch(new URL("/v1/responses/compact", server.url), {
         method: "POST",
         headers: requestHeaders,
@@ -949,7 +949,7 @@ describe("server local API auth", () => {
     const wsTurn = (server: ReturnType<typeof startServer>, headers?: Record<string, string>, model = "gpt-test") => {
       const url = new URL("/v1/responses", server.url);
       url.protocol = "ws:";
-      const ws = new WebSocket(url, { headers: { "x-opencodex-api-key": "local-secret", ...(headers ?? {}) } } as unknown as string[]);
+      const ws = new WebSocket(url, { headers: { "X-OpenProvider-API-Key": "local-secret", ...(headers ?? {}) } } as unknown as string[]);
       return new Promise<string>((resolve, reject) => {
         const timer = setTimeout(() => reject(new Error("tier websocket timeout")), 1000);
         ws.addEventListener("open", () => {
@@ -1173,7 +1173,7 @@ describe("server local API auth", () => {
       const beforeHandshake = seen.length;
       const ws = new WebSocket(wsUrl, {
         headers: {
-          "x-opencodex-api-key": "local-secret",
+          "X-OpenProvider-API-Key": "local-secret",
           authorization: "Bearer caller-codex",
         },
       } as unknown as string[]);
@@ -1213,7 +1213,7 @@ describe("server local API auth", () => {
 
         const switched = await fetch(new URL("/api/codex-auth/active", sequential.url), {
           method: "PUT",
-          headers: { "content-type": "application/json", "x-opencodex-api-key": "local-secret" },
+          headers: { "content-type": "application/json", "X-OpenProvider-API-Key": "local-secret" },
           body: JSON.stringify({ accountId: "pool-b" }),
         });
         expect(switched.status).toBe(200);
@@ -1274,7 +1274,7 @@ describe("server local API auth", () => {
             method: "POST",
             headers: {
               "content-type": "application/json",
-              "x-opencodex-api-key": "dedicated-x-key",
+              "X-OpenProvider-API-Key": "dedicated-x-key",
               authorization,
               "chatgpt-account-id": "acct-forged",
             },
@@ -1343,7 +1343,7 @@ describe("server local API auth", () => {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "x-opencodex-api-key": "dedicated-x-key",
+          "X-OpenProvider-API-Key": "dedicated-x-key",
           authorization: `Bearer ${token}`,
           "chatgpt-account-id": "acct-direct",
         },
@@ -2334,3 +2334,4 @@ describe("server local API auth", () => {
     }
   });
 });
+

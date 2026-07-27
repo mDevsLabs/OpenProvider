@@ -33,3 +33,4 @@ test("ClaudeCode stacked layout mounts every section in order", async () => {
     cursor = at;
   }
 });
+

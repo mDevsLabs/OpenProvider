@@ -3,10 +3,10 @@ title: Sub-agent Surface (v1 / base / v2)
 description: Control how Codex spawns and manages sub-agents across all models.
 ---
 
-opencodex lets you choose the multi-agent collaboration surface for every model in the catalog. The **Sub-agent** toggle in the dashboard and Models page controls this globally.
+OpenProvider lets you choose the multi-agent collaboration surface for every model in the catalog. The **Sub-agent** toggle in the dashboard and Models page controls this globally.
 
 :::note
-On the v2 surface (`multi_agent_v2`), a spawned sub-agent inherits the parent model **by default**: `fork_turns` defaults to `all`, and full-history forks reject overrides. Since v2.7.2 opencodex injects guidance that teaches the model how to break inheritance — a `spawn_agent` call that sets `fork_turns` to `"none"` (or a partial fork such as `"3"`) can pass `model` / `reasoning_effort` arguments, which the Codex runtime parses and applies even though the published tool schema hides them. Known transport limitation: when a **native** parent spawns a child routed to a **non-native** provider, the Codex client may send the `NEW_TASK` payload only as backend-encrypted `encrypted_content` ([#92](https://github.com/lidge-jun/opencodex/issues/92)). opencodex does not forward that unreadable task to an external provider: a direct route fails with HTTP 400 and code `unreadable_encrypted_agent_task`, while a combo skips non-decrypting targets and selects a canonical native ChatGPT target when one is available. Use v1 for heterogeneous-provider delegation, select a native ChatGPT child, or resend the task as plaintext v2 `agent_message` content.
+On the v2 surface (`multi_agent_v2`), a spawned sub-agent inherits the parent model **by default**: `fork_turns` defaults to `all`, and full-history forks reject overrides. Since v2.7.2 OpenProvider injects guidance that teaches the model how to break inheritance — a `spawn_agent` call that sets `fork_turns` to `"none"` (or a partial fork such as `"3"`) can pass `model` / `reasoning_effort` arguments, which the Codex runtime parses and applies even though the published tool schema hides them. Known transport limitation: when a **native** parent spawns a child routed to a **non-native** provider, the Codex client may send the `NEW_TASK` payload only as backend-encrypted `encrypted_content` ([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)). OpenProvider does not forward that unreadable task to an external provider: a direct route fails with HTTP 400 and code `unreadable_encrypted_agent_task`, while a combo skips non-decrypting targets and selects a canonical native ChatGPT target when one is available. Use v1 for heterogeneous-provider delegation, select a native ChatGPT child, or resend the task as plaintext v2 `agent_message` content.
 :::
 
 ## Modes
@@ -15,11 +15,11 @@ On the v2 surface (`multi_agent_v2`), a spawned sub-agent inherits the parent mo
 | --- | --- | --- |
 | **v1** | `multi_agent_v1` | Classic namespaced agent tools with `send_input` / `close_agent` / `resume_agent`. A `spawn_agent` model override can start a sub-agent on a different model. |
 | **base** (default) | Upstream pins | Restores upstream model pins: gpt-5.6-sol and gpt-5.6-terra use v2, gpt-5.6-luna uses v1, and unpinned models follow the Codex `multi_agent_v2` feature flag. Spawn behavior follows the surface that resolves for that model. |
-| **v2** | `multi_agent_v2` | Flat `spawn_agent` tools with concurrent sessions and `send_message` / `followup_task` / `wait_agent` / `interrupt_agent`. Children inherit the parent model on full-history forks; `fork_turns: "none"` (or a partial fork) accepts `model` / `reasoning_effort` overrides. If a native→routed child receives only backend-encrypted task content, external routes return `unreadable_encrypted_agent_task`; mixed combos prefer a decrypt-capable native target ([#92](https://github.com/lidge-jun/opencodex/issues/92)). |
+| **v2** | `multi_agent_v2` | Flat `spawn_agent` tools with concurrent sessions and `send_message` / `followup_task` / `wait_agent` / `interrupt_agent`. Children inherit the parent model on full-history forks; `fork_turns: "none"` (or a partial fork) accepts `model` / `reasoning_effort` overrides. If a native→routed child receives only backend-encrypted task content, external routes return `unreadable_encrypted_agent_task`; mixed combos prefer a decrypt-capable native target ([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)). |
 
 ### Encrypted v2 task delivery
 
-Only the native ChatGPT backend can read its encrypted task payload. For an unreadable v2 `agent_message`, opencodex applies these rules before provider dispatch:
+Only the native ChatGPT backend can read its encrypted task payload. For an unreadable v2 `agent_message`, OpenProvider applies these rules before provider dispatch:
 
 - A direct non-native route returns HTTP 400 with `error.code = "unreadable_encrypted_agent_task"`. The response never echoes the encrypted payload.
 - A combo considers only canonical native ChatGPT targets for that task, including retries. If the combo has no decrypt-capable target, it returns the same 400 response instead of sending an empty task to an external provider.
@@ -56,7 +56,7 @@ To replace the built-in v2 guidance, set `injectionPrompt` (config key, or `PUT 
 - **Dashboard** → first stat cell: click **v1**, **base**, or **v2**.
 - **Models** page → top-row segmented control.
 - Both pages have a **?** button that opens a help modal with a link back here.
-- **Dashboard** → **Sub-agent delegation**: choose a preferred model and optional reasoning effort. On v2 the injected guidance instructs the agent to spawn with `fork_turns: "none"` so the model override applies. If a native→routed child receives only encrypted task content, use a native target or v1; external-only delivery now fails explicitly with `unreadable_encrypted_agent_task` ([#92](https://github.com/lidge-jun/opencodex/issues/92)).
+- **Dashboard** → **Sub-agent delegation**: choose a preferred model and optional reasoning effort. On v2 the injected guidance instructs the agent to spawn with `fork_turns: "none"` so the model override applies. If a native→routed child receives only encrypted task content, use a native target or v1; external-only delivery now fails explicitly with `unreadable_encrypted_agent_task` ([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)).
 
 ### CLI
 
@@ -109,7 +109,7 @@ curl -X PUT http://localhost:10100/api/injection-model \
 
 The optional sub-agent effort setting is stored as `injectionEffort` and is meaningful only with an injection model. It adds a `reasoning_effort` instruction to the injected v2 guidance; it does not change the parent session's effort. On any fork that accepts overrides, Codex applies a `reasoning_effort` passed to `spawn_agent` directly.
 
-`ultra` ranks above `max` in the Codex catalog and adds automatic-delegation semantics, but it never reaches a provider as a literal wire value. Codex converts `ultra` to `max` at the client boundary. opencodex then keeps the provider request valid:
+`ultra` ranks above `max` in the Codex catalog and adds automatic-delegation semantics, but it never reaches a provider as a literal wire value. Codex converts `ultra` to `max` at the client boundary. OpenProvider then keeps the provider request valid:
 
 | Model | `max` on wire | `ultra` selection on wire |
 | --- | --- | --- |
@@ -125,3 +125,5 @@ Catalog availability is independent of the v1/v2 mode. Reasoning-capable generat
 The global context cap value defaults to 350k and limits the advertised `context_window` only for routed providers whose cap is enabled. Native OpenAI models keep their real context windows.
 
 Change the value or the all-provider setting in the Models page, or toggle the cap next to an individual provider group header.
+
+

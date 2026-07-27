@@ -81,3 +81,4 @@ test("CodexAccountEntry is defined once, by the controller", async () => {
   expect(pool).not.toContain("export interface CodexAccountEntry");
   expect(pool).toContain('export type { CodexAccountEntry } from "../hooks/useCodexAccountPool";');
 });
+

@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import { createInterface } from "node:readline/promises";
 import { getConfigDir } from "../config";
 
-const REPO = "lidge-jun/opencodex";
+const REPO = "mDevsLabs/OpenProvider";
 /** Fires exactly once from the first interactive `ocx start`. */
 const MARKER = ".star-prompted";
 
@@ -62,3 +62,4 @@ export async function maybeShowStarPrompt(): Promise<void> {
     console.log(r.ok ? "  Thanks for the star! ⭐\n" : `  Couldn't star automatically (${r.error}) — ${REPO}\n`);
   } catch { /* never let the star prompt disrupt startup */ }
 }
+

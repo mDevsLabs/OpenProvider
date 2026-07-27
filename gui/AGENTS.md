@@ -1,4 +1,4 @@
-# OpenCodex GUI — agent rules
+# OpenProvider GUI — agent rules
 
 ## Text and i18n
 
@@ -23,3 +23,5 @@
 ## Failure mode
 
 Hardcoding English (or German) in JSX to “fix” a bad translation is **not** allowed. Add or fix the key in all locale files instead.
+
+

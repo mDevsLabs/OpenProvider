@@ -147,7 +147,7 @@ export function loadBundledCodexCatalog(deps: BundledCatalogDeps = {}): RawCatal
   const useCache = !deps.commandCandidates && !deps.execFileSync && !deps.configDir && !deps.env;
   const execFile = deps.execFileSync ?? (execFileSync as unknown as ExecFile);
   // Prefer the single resolved runtime so sync/clamp never probe a different binary
-  // than OpenCodex will launch. Tests may inject commandCandidates to stub probing.
+  // than OpenProvider will launch. Tests may inject commandCandidates to stub probing.
   let cacheKey: string | null = null;
   const candidates = deps.commandCandidates?.() ?? (() => {
     const resolved = resolveAndPersistCodexRuntime({
@@ -242,3 +242,4 @@ export function loadCatalogTemplate(): RawEntry | null {
     ?? findNativeTemplate(loadBundledCodexCatalog());
   return native ? JSON.parse(JSON.stringify(native)) : null;
 }
+

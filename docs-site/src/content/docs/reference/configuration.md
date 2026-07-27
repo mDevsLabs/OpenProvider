@@ -1,11 +1,11 @@
 ---
 title: Configuration Reference
-description: Every field in ~/.opencodex/config.json — top-level options, providers, and sidecars.
+description: Every field in ~/.OpenProvider/config.json — top-level options, providers, and sidecars.
 ---
 
-opencodex is configured by `~/.opencodex/config.json`. It's written by `ocx init` and the dashboard,
+OpenProvider is configured by `~/.OpenProvider/config.json`. It's written by `ocx init` and the dashboard,
 but you can edit it directly; the proxy reloads it on start. If the file cannot be parsed (e.g.
-truncated or invalid JSON), opencodex backs it up to `config.json.invalid-<timestamp>`, prints a
+truncated or invalid JSON), OpenProvider backs it up to `config.json.invalid-<timestamp>`, prints a
 console warning, and starts with defaults. Missing files also fall back to a default (a single
 `openai` forward provider).
 
@@ -19,7 +19,7 @@ login. API uses only its configured API key/key pool. Use a bare model or
 virtual ids rewrite to the base wire model with `reasoning.mode: "pro"`.
 
 `openaiProviderTierVersion: 2` marks the current single-provider projection. Before migrating a
-shipped v1 config, opencodex creates `config.json.pre-openai-tiers-v2.bak` without replacing a
+shipped v1 config, OpenProvider creates `config.json.pre-openai-tiers-v2.bak` without replacing a
 differing backup and rewrites known legacy namespaced selected ids to bare ids.
 
 ## Top level (`OcxConfig`)
@@ -27,7 +27,7 @@ differing backup and rewrites known legacy namespaced selected ids to bare ids.
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `port` | `number` | `10100` | Port the proxy listens on. |
-| `hostname?` | `string` | `"127.0.0.1"` | Bind address. Set `"0.0.0.0"` to expose on the LAN (requires `OPENCODEX_API_AUTH_TOKEN`; see [Remote access](#remote-access) below). |
+| `hostname?` | `string` | `"127.0.0.1"` | Bind address. Set `"0.0.0.0"` to expose on the LAN (requires `OpenProvider_API_AUTH_TOKEN`; see [Remote access](#remote-access) below). |
 | `proxy?` | `string` | — | Outbound HTTP(S) proxy URL or `${ENV_VAR}` reference. Applied to `HTTP_PROXY` / `HTTPS_PROXY` when those env vars are unset; loopback stays in `NO_PROXY`. |
 | `providers` | `Record<string, OcxProviderConfig>` | — | Map of provider name → config. |
 | `openaiProviderTierVersion?` | `2` | set by migration | Marks the single option-aware OpenAI projection as complete. |
@@ -38,7 +38,7 @@ differing backup and rewrites known legacy namespaced selected ids to bare ids.
 | `effortCap?` | `string` | — | Hard per-request ceiling for reasoning effort. A multi-agent V2 feature: it applies to main turns whose own tool list carries the V2 collab surface, plus spawned-child turns marked with exactly `x-openai-subagent: collab_spawn` or `"subagent_kind": "thread_spawn"` in `x-codex-turn-metadata` (marked children qualify regardless of their own tool surface). Plain and V1-surface main turns are untouched, compaction turns always bypass caps, and `multiAgentMode: "v1"` disables caps entirely (the Dashboard hides the panel). Accepts `low` through `ultra`; caps only lower, never raise. Snaps down to the highest supported rung at or below the cap. If the model exposes no effort control, or no supported rung fits under the cap, the effort field is removed and the provider default applies. `max` and `ultra` are accepted but do not impose a lower rank ceiling (requests arrive as `low` through `max` after the client's `ultra` → `max` conversion), though known model ladders may still cause snap-down or strip. The Dashboard picker offers `low` through `xhigh`. Managed via `GET /api/effort-caps` and `PUT /api/effort-caps`. |
 | `subagentEffortCap?` | `string` | — | The same hard ceiling, applied only to spawned-child turns identified by codex-rs markers matched exactly: `x-openai-subagent: collab_spawn` or `"subagent_kind": "thread_spawn"` in `x-codex-turn-metadata`. Other internal sub-agent categories (review, compaction, memory consolidation) never trip this cap, and `multiAgentMode: "v1"` disables it entirely. Accepts `low` through `ultra`; when both caps are set, the lower one wins, and caps only lower, never raise. Snaps down to the highest supported rung at or below the cap. If the model exposes no effort control, or no supported rung fits under the cap, the effort field is removed and the provider default applies. `max` and `ultra` are accepted but do not impose a lower rank ceiling (requests arrive as `low` through `max` after the client's `ultra` → `max` conversion), though known model ladders may still cause snap-down or strip. The Dashboard picker offers `low` through `xhigh`. Managed via `GET /api/effort-caps` and `PUT /api/effort-caps`. |
 | `injectionPrompt?` | `string` | — | Custom override for the injected v2 guidance body. Replaces the built-in text; `{{model}}`, `{{effort}}`, and `{{roster}}` placeholders are substituted. Firing gates are unchanged. Settable via `PUT /api/injection-model` (`prompt` key). |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | Controls only OpenCodex-authored multi-agent developer guidance. Unset/`true` preserves v1/v2 guidance; `false` suppresses both without changing the collaboration surface, `subagentModels`, routing, or effort caps. `GET/PUT /api/injection-model` exposes the effective value; PUT is a partial update. |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | Controls only OpenProvider-authored multi-agent developer guidance. Unset/`true` preserves v1/v2 guidance; `false` suppresses both without changing the collaboration surface, `subagentModels`, routing, or effort caps. `GET/PUT /api/injection-model` exposes the effective value; PUT is a partial update. |
 | `disabledModels?` | `string[]` | — | Models hidden from Codex. Routed `provider/model` ids are excluded from the catalog and `/v1/models`; bare native GPT slugs (e.g. `gpt-5.4`) flip their catalog entry to `visibility: "hide"` and drop from the bare `/v1/models` list. Toggleable per model from the dashboard Models page. |
 | `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3-state multi-agent surface override. `"v1"` forces all models to the v1 surface (overrides upstream pins); `"default"` respects upstream model pins (sol/terra=v2, luna=v1); `"v2"` forces all models to v2. Settable from the dashboard Models page or `ocx v2 mode`. |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | Per-provider Codex-visible context caps. A cap only lowers known context windows. |
@@ -49,8 +49,8 @@ differing backup and rewrites known legacy namespaced selected ids to bare ids.
 | `websockets?` | `boolean` | `false` | Advertise `supports_websockets` so Codex uses the Responses WebSocket path. Omit or set `false` to keep HTTP/SSE. |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | Additional generated `ocx_…` credentials accepted by management and data-plane auth on non-loopback binds. Managed by the dashboard; entry fields are listed below. |
 | `codexAutoStart?` | `boolean` | `true` | Let the Codex shim run `ocx ensure` before launching Codex. `false` makes `ocx ensure` a no-op. |
-| `codexShimAutoRestore?` | `boolean` | `true` | Restore a previously installed Codex shim when a completed external Codex update replaces it. Set `false`, or set `OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0` for a process-level opt-out. |
-| `syncResumeHistory?` | `boolean` | `true` | Reversible Codex App history compatibility mode. opencodex backs up original Codex thread metadata, remaps old OpenAI interactive rows to `opencodex`, and temporarily promotes opencodex-created `exec` rows to an app-visible source. `ocx stop` / `ocx restore` restore backed-up OpenAI rows and eject remaining opencodex user threads to OpenAI so native Codex can resume them after the proxy is removed from `config.toml`. Set `false` to opt out. |
+| `codexShimAutoRestore?` | `boolean` | `true` | Restore a previously installed Codex shim when a completed external Codex update replaces it. Set `false`, or set `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` for a process-level opt-out. |
+| `syncResumeHistory?` | `boolean` | `true` | Reversible Codex App history compatibility mode. OpenProvider backs up original Codex thread metadata, remaps old OpenAI interactive rows to `OpenProvider`, and temporarily promotes OpenProvider-created `exec` rows to an app-visible source. `ocx stop` / `ocx restore` restore backed-up OpenAI rows and eject remaining OpenProvider user threads to OpenAI so native Codex can resume them after the proxy is removed from `config.toml`. Set `false` to opt out. |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | ChatGPT/Codex pool account metadata managed by the Codex Auth dashboard. Secrets live separately in `codex-accounts.json`. |
 | `activeCodexAccountId?` | `string` | — | Manually selected Pool account. Selection clears existing thread affinity and applies to the next request; in-flight requests keep their captured account. |
 | `autoSwitchThreshold?` | `number` | `80` | Usage percent threshold for new-session auto-switching. The score uses the hottest known 5h, weekly, or 30d quota window. Set `0` to disable quota auto-switching. |
@@ -87,7 +87,7 @@ body-occupancy guard):
 | --- | --- | --- | --- |
 | `claudeCode.bodyStallSec?` | `number` | `90` | Native passthrough body inactivity budget in seconds — raw upstream-byte silence while a read is pending, never total duration. Min 1. Exactly `0` disables. |
 | `claudeCode.bodyMaxBytes?` | `number` | `67108864` | Native passthrough cumulative body byte cap (streamed SSE and buffered non-stream). Exactly `0` disables. |
-| `claudeCode.authMode?` | `"proxy" \| "subscription"` | unset (auto) | How `ANTHROPIC_AUTH_TOKEN` is handled at launch. Unset means auto: opencodex detects Claude auth on every launch and picks subscription when it finds any, proxy when it finds none, and subscription with a warning when it cannot tell. An explicit value is never overridden by detection. See [Claude Code](/guides/claude-code/#auth-mode). |
+| `claudeCode.authMode?` | `"proxy" \| "subscription"` | unset (auto) | How `ANTHROPIC_AUTH_TOKEN` is handled at launch. Unset means auto: OpenProvider detects Claude auth on every launch and picks subscription when it finds any, proxy when it finds none, and subscription with a warning when it cannot tell. An explicit value is never overridden by detection. See [Claude Code](/guides/claude-code/#auth-mode). |
 | `claudeCode.authModeMigratedAt?` | `string` | unset | Internal one-time marker. Written once when an upgrade pins a pre-`auto` config to `subscription`, so a deliberate subscriber is not silently moved onto the proxy. Do not set by hand. |
 
 ### Managed record shapes
@@ -114,24 +114,24 @@ normally dashboard-managed.
 
 ## Remote access
 
-By default opencodex binds to `127.0.0.1` (loopback only). When `hostname` is set to a non-loopback
-address such as `0.0.0.0`, opencodex enforces token authentication on **both** the management API
+By default OpenProvider binds to `127.0.0.1` (loopback only). When `hostname` is set to a non-loopback
+address such as `0.0.0.0`, OpenProvider enforces token authentication on **both** the management API
 (`/api/*`) and the data-plane (`/v1/responses`).
 
-Set the `OPENCODEX_API_AUTH_TOKEN` environment variable before starting:
+Set the `OpenProvider_API_AUTH_TOKEN` environment variable before starting:
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+export OpenProvider_API_AUTH_TOKEN="your-secret-token"
 ocx start
 ```
 
 The proxy refuses to start without this variable when binding beyond loopback. If you install a
 background service for LAN access, export the same variable before `ocx service install` so launchd,
 systemd, or Task Scheduler receives it. Clients must include the token in every request via the
-`x-opencodex-api-key` header:
+`x-OpenProvider-api-key` header:
 
 ```
-x-opencodex-api-key: your-secret-token
+x-OpenProvider-api-key: your-secret-token
 ```
 
 An `Authorization: Bearer …` header is also accepted. Dashboard-generated `apiKeys` may be used in
@@ -140,7 +140,7 @@ place of the environment token after startup; all candidates are compared in con
 
 :::caution[LAN exposure]
 Binding to `0.0.0.0` exposes your proxy — and all configured provider credentials — to the local
-network. Only do this on trusted networks, and always set a strong `OPENCODEX_API_AUTH_TOKEN`.
+network. Only do this on trusted networks, and always set a strong `OpenProvider_API_AUTH_TOKEN`.
 :::
 
 ## Providers (`OcxProviderConfig`)
@@ -186,7 +186,7 @@ network. Only do this on trusted networks, and always set a strong `OPENCODEX_AP
 | `thinkingToggleModels?` | `string[]` | Chat models using a vendor `thinking.enabled` toggle instead of an effort ladder. |
 | `thinkingBudgetModels?` | `string[]` | Chat models using an integer `thinking_budget`; effort is mapped to a budget fraction. |
 | `noVisionModels?` | `string[]` | Text-only models — the [vision sidecar](/guides/sidecars/) describes images for them. Matching tolerates an Ollama `:size` tag. |
-| `escapeBuiltinToolNames?` | `boolean` | Anthropic-compatible gateways such as Umans can require tool-name escaping on the wire; opencodex strips the prefix before returning tool calls to Codex. |
+| `escapeBuiltinToolNames?` | `boolean` | Anthropic-compatible gateways such as Umans can require tool-name escaping on the wire; OpenProvider strips the prefix before returning tool calls to Codex. |
 | `googleMode?` | `"ai-studio" \| "vertex" \| "cloud-code-assist"` | Google transport/auth mode. Default `ai-studio`. |
 | `project?` | `string` | Vertex project id or Antigravity Cloud Code Assist project id. |
 | `location?` | `string` | Vertex location; environment fallback is `GOOGLE_CLOUD_LOCATION`. |
@@ -211,7 +211,7 @@ Adapters may adjust the resolved URL afterward. The `kiro` adapter, for example,
 region of the imported credential for a canonical `runtime.{region}.kiro.dev` host. See
 [Adapters](/reference/adapters/) for per-adapter rules.
 
-When routing discards a configured `baseUrl`, opencodex logs a warning. It names the registry
+When routing discards a configured `baseUrl`, OpenProvider logs a warning. It names the registry
 endpoint in full and your configured one by origin only, shown as `https://host/…` when it had a
 path — a configured path can itself be a credential, so none of it is logged. Either drop the
 `baseUrl` — the registry endpoint is what routing will use regardless — or switch to the provider
@@ -246,7 +246,7 @@ Responses providers so passthrough stays byte-for-byte identical to upstream.
 ## Cursor provider (`adapter: "cursor"`)
 
 The Cursor bridge is experimental. After `ocx login cursor`, add or edit the `cursor` entry under
-`providers` in `~/.opencodex/config.json` (Windows: `%USERPROFILE%\.opencodex\config.json`).
+`providers` in `~/.OpenProvider/config.json` (Windows: `%USERPROFILE%\.OpenProvider\config.json`).
 
 Cursor Router's complete optimization ladder is exposed as separate Codex model ids because Codex's
 model picker cannot render Cursor-specific model parameters:
@@ -272,7 +272,7 @@ tools (`apply_patch`, `exec_command`, and so on) with approval and sandbox polic
   Use it only for a trusted local experiment on a host where every data-plane caller is trusted.
 - **`"codex-sandbox"` (accepted, fail-closed)** — recognized for backwards compatibility, but
   currently behaves like `"off"`. Responses `instructions` / `system` / `developer` text is
-  caller-controlled prose, and opencodex has no trustworthy per-request attestation that it reflects
+  caller-controlled prose, and OpenProvider has no trustworthy per-request attestation that it reflects
   a real Codex sandbox state, so it never authorizes native local exec.
 
 ```json
@@ -356,8 +356,8 @@ other eligible providers after the ordered list. An `only` list is always an all
 }
 ```
 
-Model keys are exact OpenRouter model ids, without the outer OpenCodex provider prefix. With the
-example above, select `openrouter/anthropic-claude-sonnet-5` in Codex; OpenCodex restores the native
+Model keys are exact OpenRouter model ids, without the outer OpenProvider provider prefix. With the
+example above, select `openrouter/anthropic-claude-sonnet-5` in Codex; OpenProvider restores the native
 `anthropic/claude-sonnet-5` id before applying the model-specific rule.
 
 ## Static model allowlists
@@ -365,7 +365,7 @@ example above, select `openrouter/anthropic-claude-sonnet-5` in Codex; OpenCodex
 Some providers expose very large or slow live model catalogs. Set `liveModels` to `false` when you
 want Codex to see only the models pinned in `models`:
 
-When `liveModels` is `false` and `models` is empty or omitted, opencodex exposes no routed models
+When `liveModels` is `false` and `models` is empty or omitted, OpenProvider exposes no routed models
 for that provider.
 
 Use `selectedModels` for a different purpose: discovery still runs, but only the selected ids are
@@ -408,7 +408,7 @@ with those explicit additions, or set it to `false` to expose only `models`.
 | `timeoutMs?` | `number` | `60000` | Separate deadline for one hosted web-search request. Lowered from 200000 so an unavailable/limit-exhausted search backend degrades to a no-result answer within ~1 min instead of hanging the whole turn (#398). |
 
 The `openai` backend runs hosted search through an enabled ChatGPT `forward` provider, so it needs
-both a ChatGPT login and that provider. On Claude-inbound routed replays, opencodex injects the main
+both a ChatGPT login and that provider. On Claude-inbound routed replays, OpenProvider injects the main
 ChatGPT auth into the internal sidecar request so this path remains reachable. The `anthropic`
 backend uses the active stored credential from an enabled Anthropic OAuth provider and runs
 Claude's `web_search_20250305` tool. If `backend: "anthropic"` is explicit but no active account is
@@ -438,7 +438,7 @@ model, detail, image bytes, and normalized message context. Cache hits and same-
 not consume `maxDescriptionsPerTurn`. Remote `https:` images and failed/empty descriptions are not
 cached.
 
-Anthropic-OAuth search and image-description requests reuse opencodex's existing Claude Code OAuth
+Anthropic-OAuth search and image-description requests reuse OpenProvider's existing Claude Code OAuth
 fingerprint. This is within the repository's existing OAuth precedent, but should be soak-tested
 with the intended account and workload.
 
@@ -488,7 +488,9 @@ providers store no key at all.
 :::
 
 :::note[Atomic writes]
-All config and catalog files (`config.toml`, `opencodex-catalog.json`) are written atomically via
+All config and catalog files (`config.toml`, `OpenProvider-catalog.json`) are written atomically via
 `atomicWriteFile` (temp file + rename). This prevents half-written files when concurrent writers —
 e.g. `ocx stop` and the proxy's own shutdown handler — both restore Codex at the same time.
 :::
+
+

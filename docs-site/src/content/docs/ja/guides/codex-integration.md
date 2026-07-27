@@ -1,9 +1,9 @@
 ---
 title: Codex 連携
-description: opencodex が Codex に自身を注入し、モデルカタログを同期し、サブエージェントピッカーを駆動し、綺麗に復元する方式。
+description: OpenProvider が Codex に自身を注入し、モデルカタログを同期し、サブエージェントピッカーを駆動し、綺麗に復元する方式。
 ---
 
-opencodex は Codex が読む 2 つ、設定(`$CODEX_HOME/config.toml`、デフォルト `~/.codex/config.toml`)とモデルカタログを編集して Codex が
+OpenProvider は Codex が読む 2 つ、設定(`$CODEX_HOME/config.toml`、デフォルト `~/.codex/config.toml`)とモデルカタログを編集して Codex が
 プロキシ経由になるようにします。すべての編集は冪等で元に戻せます。
 
 OpenAI は bare モデル用の単一 `openai` 経路と `openai-apikey/<model>` API 経路を提供します。
@@ -14,12 +14,12 @@ OpenAI は bare モデル用の単一 `openai` 経路と `openai-apikey/<model>`
 ## 設定の注入
 
 `ocx init`、`ocx start`、`ocx sync` はすべてインジェクターを呼び出します。デフォルトのループバックバインドでは Codex の
-組み込み `openai` プロバイダー ID を維持したまま、そのプロバイダーが opencodex を見るようにします。
+組み込み `openai` プロバイダー ID を維持したまま、そのプロバイダーが OpenProvider を見るようにします。
 
 ```toml
 # 最初のテーブルより前に来るルートキー
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
-# Auto-injected by opencodex
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
+# Auto-injected by OpenProvider
 openai_base_url = "http://127.0.0.1:10100/v1"
 
 [features]
@@ -34,7 +34,7 @@ fast_mode = true
 
 Codex の組み込み `image_gen` ツールは `/v1/responses` を経由しません。codex-rs 拡張が
 `{base_url}/images/generations`(参照画像があれば `/images/edits`)をチャットと同じ
-ChatGPT bearer 認証で直接 POST します。注入された `base_url` が opencodex を指すため、
+ChatGPT bearer 認証で直接 POST します。注入された `base_url` が OpenProvider を指すため、
 プロキシがこの呼び出しを OpenAI 上流に中継します。
 
 - **モード対応 forward 候補 1 つ:** Pool は適格メイン/追加アカウントを選び、Direct は caller OAuth
@@ -51,21 +51,21 @@ ChatGPT bearer 認証で直接 POST します。注入された `base_url` が o
 
 ```toml
 # ルートキー
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_provider = "OpenProvider"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 
 # ファイル末尾に追加されるブロック
-# Auto-injected by opencodex
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+# Auto-injected by OpenProvider
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 # supports_websockets = true   # config.websockets が true のときのみ
 ```
 
-OpenCodex がルーティングを管理する場合、両モードとも `$CODEX_HOME/opencodex.config.toml` を
+OpenProvider がルーティングを管理する場合、両モードとも `$CODEX_HOME/OpenProvider.config.toml` を
 参考用フォールバック設定として書き出します。ループバックモードでは自動注入が漏れたときに直接統合できる
 ルートキーが、非ループバックモードでは専用プロバイダー設定が含まれます。外部プロバイダーモードでは
 このプロファイルを変更しません。
@@ -79,13 +79,13 @@ OpenCodex がルーティングを管理する場合、両モードとも `$CODE
 
 ## 共有モデルカタログ
 
-Codex CLI、TUI、App、SDK はすべて同じ Codex home を読みます。opencodex はこのディレクトリを
+Codex CLI、TUI、App、SDK はすべて同じ Codex home を読みます。OpenProvider はこのディレクトリを
 `CODEX_HOME` で解決し、なければ `~/.codex` にフォールバックし次のファイルを管理します:
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
@@ -101,7 +101,7 @@ Windows の Orca シェルは `CODEX_HOME` と `ORCA_CODEX_HOME` を Orca のバ
 App home を `CODEX_HOME` に設定して `ORCA_CODEX_HOME` を解除した後、同期/復元とサービスインストールをやり直してください。
 
 専用プロバイダーモードの `requires_openai_auth = true` は Codex App/TUI のアカウントゲート UI がネイティブ
-Codex と同じ条件で動作するようにします。opencodex は `/v1/responses` WebSocket も提供します。専用
+Codex と同じ条件で動作するようにします。OpenProvider は `/v1/responses` WebSocket も提供します。専用
 プロバイダーは `"websockets": true` のときのみ `supports_websockets = true` を宣言します。ループバックでは
 Codex の組み込みプロバイダーが先に WebSocket を試みる可能性があり、機能がオフならプロキシが `426` を
 返して HTTP/SSE にフォールバックさせます。
@@ -109,16 +109,16 @@ Codex の組み込みプロバイダーが先に WebSocket を試みる可能性
 ## スレッド識別子と会話履歴
 
 デフォルトのループバック方式は新規スレッドのプロバイダーをネイティブ `openai` に維持するので、一般的な会話再開履歴を
-再マッピングする必要はありません。初回同期時は昔の opencodex ビルドがタグを変えたスレッドも `openai` に
-戻します。非ループバック専用プロバイダーモードは実行中のみ履歴を `opencodex` 側に合わせ、
+再マッピングする必要はありません。初回同期時は昔の OpenProvider ビルドがタグを変えたスレッドも `openai` に
+戻します。非ループバック専用プロバイダーモードは実行中のみ履歴を `OpenProvider` 側に合わせ、
 終了時にバックアップされたメタデータを復元します。履歴を触りたくない場合は `syncResumeHistory: false` に設定してください。
 
 ## モデルカタログの同期
 
-Codex はディスクのカタログ(デフォルト `$CODEX_HOME/opencodex-catalog.json`)にあるモデルを表示します。起動時と
-`ocx sync` 時、opencodex は:
+Codex はディスクのカタログ(デフォルト `$CODEX_HOME/OpenProvider-catalog.json`)にあるモデルを表示します。起動時と
+`ocx sync` 時、OpenProvider は:
 
-1. オリジナルカタログを `~/.opencodex/catalog-backup.json` に一度**バックアップ**します(フィーチャリングを元に戻せるように)。
+1. オリジナルカタログを `~/.OpenProvider/catalog-backup.json` に一度**バックアップ**します(フィーチャリングを元に戻せるように)。
 2. 対応プロバイダーのライブモデルカタログを**取得**します(約 5 分間キャッシュ; 最後の正常一覧、
    設定された `models[]` 順でフォールバック)。`forward` 認証にはモデルエンドポイントがなく、Cursor は `/models` の代わりに
    `GetUsableModels` RPC を使います。
@@ -134,7 +134,7 @@ Codex はディスクのカタログ(デフォルト `$CODEX_HOME/opencodex-cata
 ## プロキシ接続エラー
 
 Codex がリトライの末に `stream disconnected before completion: error sending request for url (http://127.0.0.1:10100/v1/responses)`
-のようなエラーを出す場合(Claude Code で同様の接続失敗が出る場合も同じ)、opencodex プロキシが起動していません。
+のようなエラーを出す場合(Claude Code で同様の接続失敗が出る場合も同じ)、OpenProvider プロキシが起動していません。
 設定ポートにリスナーがないため、クライアントが生の接続エラーをそのまま表示します。プロキシを再起動してください:
 
 ```bash
@@ -178,9 +178,9 @@ Token Guardian が有効で、`chatgpt` の更新ポリシーが `proactive` で
 
 ## ネイティブ Codex への復元
 
-opencodex は決してあなたを閉じ込めません。**`ocx stop` はネイティブ Codex に完全に戻す単一コマンドです** —
+OpenProvider は決してあなたを閉じ込めません。**`ocx stop` はネイティブ Codex に完全に戻す単一コマンドです** —
 プロキシを停止し、インストールされたバックグラウンドサービスを停止した後、注入されたすべての行とルーティングされたカタログ項目を削除し
-opencodex が最初からなかったかのように通常の `codex` が正確に動作します:
+OpenProvider が最初からなかったかのように通常の `codex` が正確に動作します:
 
 ```bash
 ocx stop       # プロキシ + サービス停止、ネイティブ Codex を復元
@@ -188,6 +188,7 @@ ocx restore    # 停止せずに復元  (エイリアス: ocx eject)
 ocx restore back # 実行中のプロキシに通常 Codex を再接続
 ```
 
-opencodex が管理対象[バックグラウンドサービス](/ja/reference/cli/#ocx-service)として実行されるときは
+OpenProvider が管理対象[バックグラウンドサービス](/ja/reference/cli/#ocx-service)として実行されるときは
 `OCX_SERVICE=1` を設定するため、サービス主導の再起動が Codex 設定を揺るがすことは**ありません** — 明示的な
 `ocx stop` / `ocx service stop` のみがネイティブ Codex を復元します。
+

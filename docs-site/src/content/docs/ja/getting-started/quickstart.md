@@ -1,6 +1,6 @@
 ---
 title: クイックスタート
-description: 最初のプロバイダーを設定し、3 つのコマンドで OpenAI Codex を opencodex 経由にルーティングします。
+description: 最初のプロバイダーを設定し、3 つのコマンドで OpenAI Codex を OpenProvider 経由にルーティングします。
 ---
 
 このガイドは新規インストール状態から非 OpenAI モデルで Codex を実行するまでを案内します。
@@ -24,7 +24,7 @@ ocx init
    構成では API 認証ヘッダーを含む専用プロバイダーエントリを代わりに使います。
 6. **自動起動 shim をインストールしますか?** — オンにすると `codex` 実行時にまず `ocx ensure` が実行されます。
 
-結果は `$OPENCODEX_HOME/config.json`(デフォルト `~/.opencodex/config.json`)に保存されます。
+結果は `$OpenProvider_HOME/config.json`(デフォルト `~/.OpenProvider/config.json`)に保存されます。
 
 :::note[GPT-5.6 ロールアウト準備項目]
 安定版 v2.7.1 は ChatGPT パススルー、OpenAI API キー、OpenRouter、実験段階の Cursor アダプターに
@@ -40,9 +40,9 @@ ocx start            # デフォルトポート 10100
 ocx start --port 8080
 ```
 
-起動時に opencodex は:
+起動時に OpenProvider は:
 
-- PID を `~/.opencodex/ocx.pid` に記録し(二重起動を拒否)、
+- PID を `~/.OpenProvider/ocx.pid` に記録し(二重起動を拒否)、
 - 対応プロバイダーではライブモデルを照会し、ネイティブおよびルーティング項目を **Codex モデル
   カタログに同期**し、
 - `http://localhost:<port>/v1` で待機します。
@@ -59,7 +59,7 @@ ocx gui       # 現在のポートでダッシュボードを開く
 
 ## 3. Codex の使用
 
-これで Codex は opencodex と透過的に通信します:
+これで Codex は OpenProvider と透過的に通信します:
 
 ```bash
 codex "Refactor this function for readability"
@@ -86,7 +86,7 @@ codex -m "openrouter/openai/gpt-5.6-luna" "Summarize this trace"
 新規構成では `gpt-5.5`、`gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-5.6-luna`、`gpt-5.4-mini` が
 Codex のサブエージェントピッカーにデフォルトで表示されます。`ocx gui` でネイティブモデルとルーティングモデルを
 合わせて最大 5 つまで変更や並び替えができます。推奨サブエージェントモデルと推論負荷も指定でき、
-opencodex はこの値を v1 コラボリクエストのガイダンスメッセージに反映します。
+OpenProvider はこの値を v1 コラボリクエストのガイダンスメッセージに反映します。
 
 ## キーを貼り付ける代わりにログイン
 
@@ -115,3 +115,4 @@ ocx restore back  # 実行中のプロキシに Codex を再接続
 - [仕組み](/ja/getting-started/how-it-works/) — 各リクエストで何が起きるか。
 - [プロバイダー](/ja/guides/providers/) — 認証のすべての方法。
 - [設定](/ja/reference/configuration/) — 完全な `config.json` リファレンス。
+

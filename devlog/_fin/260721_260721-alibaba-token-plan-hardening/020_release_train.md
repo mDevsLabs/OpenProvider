@@ -23,7 +23,7 @@ Promote the verified Alibaba Token Plan/Qwen 3.8 changes from `dev` through
 - Run `bun scripts/release.ts 2.7.31-preview.20260721 --publish` on `preview`.
 - The helper must pass local preflight, push the release commit, wait for both CI
   workflows, dispatch `release.yml`, and watch it to success.
-- Verify `npm view @bitkyc08/opencodex dist-tags --json` points `preview` at the
+- Verify `npm view @mdevs/openprovider dist-tags --json` points `preview` at the
   new prerelease.
 
 ## WP4 — Stable publish and convergence
@@ -39,3 +39,4 @@ Promote the verified Alibaba Token Plan/Qwen 3.8 changes from `dev` through
 - Stop if either required CI workflow fails for the exact release SHA.
 - Stop if npm version/tag/GitHub Release metadata is already partially occupied.
 - Preserve a clean worktree throughout; no force pushes.
+

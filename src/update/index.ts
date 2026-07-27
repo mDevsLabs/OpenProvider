@@ -19,7 +19,7 @@ export function historyRestoreIncomplete(configDir = getConfigDir()): boolean {
   }
 }
 
-export const PKG = "@bitkyc08/opencodex";
+export const PKG = "@mdevs/openprovider";
 const HERE = dirname(fileURLToPath(import.meta.url)); // .../opencodex/src/update
 
 export type Installer = "bun" | "npm" | "source";
@@ -344,3 +344,4 @@ export async function runUpdate(): Promise<void> {
     process.exit(1);
   }
 }
+

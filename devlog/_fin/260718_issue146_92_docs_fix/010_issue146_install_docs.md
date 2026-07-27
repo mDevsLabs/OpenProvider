@@ -7,23 +7,23 @@ string-level; no lifecycle or code-path changes.
 
 ```bash
 # preferred: user-owned npm prefix (nvm/volta/fnm or npm prefix in $HOME)
-npm install -g --allow-scripts=bun @bitkyc08/opencodex
+npm install -g --allow-scripts=bun @mdevs/openprovider
 
 # if the original install was made with sudo into a system prefix
-sudo npm install -g --allow-scripts=bun @bitkyc08/opencodex
+sudo npm install -g --allow-scripts=bun @mdevs/openprovider
 ```
 
 Rationale to state in each troubleshooting section: recent npm (`--allow-scripts`
 exists as of npm 11.18; absent in 11.5 — verified against npm/cli sources) may
 block bun's postinstall under `allowScripts`; its abbreviated warning
 (`npm install -g --allow-scripts=bun`) omits the package argument and would
-reinstall the current directory — always pass `@bitkyc08/opencodex` explicitly,
+reinstall the current directory — always pass `@mdevs/openprovider` explicitly,
 and match `sudo` to however the package was originally installed.
 
 Note on the grep gate: prose that intentionally QUOTES npm's abbreviated warning
 (to explain why it is wrong) is exempt; the gate applies to every command we
 RECOMMEND. Concretely: recommended command lines must match
-`--allow-scripts=bun @bitkyc08/opencodex`; the quoted-warning mention appears
+`--allow-scripts=bun @mdevs/openprovider`; the quoted-warning mention appears
 only inside explanatory prose, never in a fenced command block.
 
 ## MODIFY [README.md](../../../README.md)
@@ -43,14 +43,14 @@ only inside explanatory prose, never in a fenced command block.
 
 ## MODIFY docs-site installation.md (en `:21` area, ko `:21`, zh-cn `:21`)
 
-- After the `npm install -g @bitkyc08/opencodex` block, add a short
+- After the `npm install -g @mdevs/openprovider` block, add a short
   "npm blocked the bun postinstall?" aside (Starlight `:::note` or plain
   paragraph, match file's existing style) with the canonical two-command block.
 
 ## MODIFY [scripts/install.sh](../../../scripts/install.sh) `~:24-26`
 
 - Comment only: note that if npm reports `install scripts blocked` for bun,
-  rerun as `npm install -g --allow-scripts=bun @bitkyc08/opencodex` with the
+  rerun as `npm install -g --allow-scripts=bun @mdevs/openprovider` with the
   same sudo-ness as the original install. The comment states the FULL command
   (grep-gate compliant); script behavior unchanged — it does not pass the flag
   by default.
@@ -68,7 +68,7 @@ only inside explanatory prose, never in a fenced command block.
 - Extend hint string:
 
 ```text
-  npm install -g --allow-scripts=bun @bitkyc08/opencodex
+  npm install -g --allow-scripts=bun @mdevs/openprovider
 (use sudo if the original install used sudo; without --ignore-scripts and
 without --omit=optional / optional=false)
 ```
@@ -87,3 +87,4 @@ without --omit=optional / optional=false)
   (`tests/install-scripts.test.ts` and any launcher-hint tests) and run them:
   `bun test --isolate tests/install-scripts.test.ts`.
 - Rollback: single revert commit; no state migration.
+

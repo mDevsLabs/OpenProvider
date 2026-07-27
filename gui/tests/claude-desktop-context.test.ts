@@ -34,3 +34,4 @@ test("sub-MiB windows keep the k formatting", () => {
 test("no window is null, so the page shows the unknown marker", () => {
   expect(format(undefined, t)).toBeNull();
 });
+

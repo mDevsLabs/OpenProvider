@@ -2,7 +2,7 @@
 
 ## Objective
 
-Make `npm install -g @bitkyc08/opencodex` work on a machine that has only
+Make `npm install -g @mdevs/openprovider` work on a machine that has only
 Node (no Bun). Bundle the Bun runtime via the official `bun` npm package and
 route the `ocx`/`opencodex` bin through a Node launcher shim that execs the
 bundled Bun to run `src/cli.ts`.
@@ -19,7 +19,7 @@ Release-surface change → C4-level care on the publish/verify gate.
 ## Design (validated by Backend employee review)
 
 ```
-npm install -g @bitkyc08/opencodex
+npm install -g @mdevs/openprovider
   → installs `bun` dep + @oven/bun-<platform> (~60MB) via optionalDependencies
   → bun postinstall (node install.js) places binary at node_modules/bun/bin/bun.exe
   → npm links bin: ocx → bin/ocx.mjs  (#!/usr/bin/env node)
@@ -85,7 +85,7 @@ function fail() {
     "opencodex: bundled Bun runtime is missing.\n" +
     "This usually means the install skipped scripts or optional deps.\n" +
     "Reinstall without those flags:\n" +
-    "  npm install -g @bitkyc08/opencodex   (no --ignore-scripts, no --omit=optional)"
+    "  npm install -g @mdevs/openprovider   (no --ignore-scripts, no --omit=optional)"
   );
   process.exit(1);
 }
@@ -212,7 +212,7 @@ either add lightweight existence checks or print the advisory unconditionally.)
 
 `detectInstall()` needs no change — npm global path has no `.bun` segment,
 so it correctly returns `"npm"` and `ocx update` runs `npm install -g
-@bitkyc08/opencodex@latest`, which re-pulls the bun dep.
+@mdevs/openprovider@latest`, which re-pulls the bun dep.
 
 ### 3.2 NEW CI job — npm-global path (`.github/workflows/ci.yml`)
 
@@ -244,7 +244,7 @@ npm-global-smoke:
 - Remove "Requires Bun 1.1+" / "bun must be on your PATH" for npm users.
 - New install block:
   ```
-  npm install -g @bitkyc08/opencodex
+  npm install -g @mdevs/openprovider
   ocx start
   ```
 - Keep a "Dev from source" note that uses bun (`bun run src/cli.ts`).
@@ -294,3 +294,4 @@ npm install path.
    shell (PATH stripped of bun) → `ocx help` / `ocx status` succeed
 4. CI npm-global-smoke job green on ubuntu + windows
 5. Only after all green: version bump + publish (existing release.ts gate)
+

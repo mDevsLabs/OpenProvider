@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Configure your first provider and route OpenAI Codex through opencodex in three commands.
+description: Configure your first provider and route OpenAI Codex through OpenProvider in three commands.
 ---
 
 This guide takes you from a fresh install to running Codex against a non-OpenAI model.
@@ -18,12 +18,12 @@ ocx init
 2. **API key** — paste a key, or reference an environment variable like `${ANTHROPIC_API_KEY}`.
 3. **Default model** — for key, local, and custom providers, accept the preset or enter a model id.
 4. **Proxy port** — defaults to `10100`.
-5. **Inject into Codex?** — on a normal loopback setup, opencodex adds a root `openai_base_url` to
+5. **Inject into Codex?** — on a normal loopback setup, OpenProvider adds a root `openai_base_url` to
    `$CODEX_HOME/config.toml` (default `~/.codex/config.toml`) so Codex's built-in `openai` provider
    targets the proxy. Remote/LAN binds use a dedicated provider entry with an API-auth header instead.
 6. **Install the autostart shim?** — when enabled, launching `codex` runs `ocx ensure` first.
 
-The result is saved to `$OPENCODEX_HOME/config.json` (default `~/.opencodex/config.json`).
+The result is saved to `$OpenProvider_HOME/config.json` (default `~/.OpenProvider/config.json`).
 
 :::note[GPT-5.6 rollout entries]
 Stable v2.7.1 seeds GPT-5.6 Sol/Terra/Luna for ChatGPT passthrough, OpenAI API-key, OpenRouter, and
@@ -39,9 +39,9 @@ ocx start            # defaults to port 10100
 ocx start --port 8080
 ```
 
-On start, opencodex:
+On start, OpenProvider:
 
-- writes its PID to `~/.opencodex/ocx.pid` (and refuses to start twice),
+- writes its PID to `~/.OpenProvider/ocx.pid` (and refuses to start twice),
 - discovers live models where the provider supports it and **syncs native and routed entries into
   Codex's model catalog**,
 - listens on `http://localhost:<port>/v1`.
@@ -58,7 +58,7 @@ ocx gui       # open the dashboard on the live port
 
 ## 3. Use Codex
 
-Codex now talks to opencodex transparently:
+Codex now talks to OpenProvider transparently:
 
 ```bash
 codex "Refactor this function for readability"
@@ -76,7 +76,7 @@ codex -m "ollama-cloud/glm-5.2"      "Write a SQL migration"
 A fresh config features five native models in Codex's sub-agent picker: `gpt-5.5`,
 `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, and `gpt-5.4-mini`. Open `ocx gui` to replace or
 reorder up to five native or routed models. The dashboard can also set one preferred sub-agent model
-and reasoning effort; opencodex adds that guidance to v1 collaboration requests.
+and reasoning effort; OpenProvider adds that guidance to v1 collaboration requests.
 
 ## Logging in instead of pasting a key
 
@@ -103,3 +103,4 @@ ocx restore back  # route Codex through the still-running proxy again
 - [How It Works](/getting-started/how-it-works/) — what happens to each request.
 - [Providers](/guides/providers/) — every way to authenticate.
 - [Configuration](/reference/configuration/) — the full `config.json` reference.
+

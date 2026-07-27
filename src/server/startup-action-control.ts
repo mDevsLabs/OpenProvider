@@ -42,11 +42,11 @@ export type StartupInstallState =
 
 const INSTALL_DETAIL_LIMIT = 2_000;
 const INDETERMINATE_MESSAGE =
-  "Windows elevation timed out, but the elevated Task Scheduler transaction may still be running. New service installation attempts are temporarily blocked while OpenCodex reconciles its final state.";
+  "Windows elevation timed out, but the elevated Task Scheduler transaction may still be running. New service installation attempts are temporarily blocked while OpenProvider reconciles its final state.";
 const RECONCILING_MESSAGE =
   "A previous elevated Windows service installation is still being reconciled. Wait for it to finish or inspect the Task Scheduler state before retrying.";
 const BLOCKED_PARTIAL_MESSAGE =
-  "A previous elevated Windows service installation left a partial Task Scheduler state. Remove the OpenCodex scheduler task (or confirm it is absent), then clear the install block before retrying.";
+  "A previous elevated Windows service installation left a partial Task Scheduler state. Remove the OpenProvider scheduler task (or confirm it is absent), then clear the install block before retrying.";
 
 let installState: StartupInstallState = { status: "idle" };
 
@@ -88,7 +88,7 @@ export function clearStartupInstallPartialBlock(options: {
   if (options.probe.status === "present") {
     return {
       cleared: false,
-      detail: "OpenCodex Task Scheduler task is still present; remove it before clearing the block.",
+      detail: "OpenProvider Task Scheduler task is still present; remove it before clearing the block.",
     };
   }
   if (options.probe.status === "unknown") {
@@ -290,3 +290,4 @@ export function runStartupInstallAction(action: StartupInstallAction): Promise<{
     }
   });
 }
+

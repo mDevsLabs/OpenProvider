@@ -2,7 +2,7 @@
 
 ## Problem
 
-opencodex publishes to npm as `@bitkyc08/opencodex`. The `bin` entries point
+opencodex publishes to npm as `@mdevs/openprovider`. The `bin` entries point
 directly at a TypeScript file with a Bun shebang:
 
 ```json
@@ -15,7 +15,7 @@ directly at a TypeScript file with a Bun shebang:
 ```
 
 npm creates a bin shim that executes the target via its shebang. With
-`#!/usr/bin/env bun`, a user who ran `npm install -g @bitkyc08/opencodex`
+`#!/usr/bin/env bun`, a user who ran `npm install -g @mdevs/openprovider`
 but does not have Bun on PATH gets:
 
 ```
@@ -128,3 +128,4 @@ launcher execs bun to run cli.ts). This is critical — see §Ripple effects.
 - Publishing binaries on npm (Sentry): https://sentry.engineering/blog/publishing-binaries-on-npm
 - bun build --compile external-asset caveat (relevant to future Option 2):
   https://github.com/oven-sh/bun/issues/14676
+

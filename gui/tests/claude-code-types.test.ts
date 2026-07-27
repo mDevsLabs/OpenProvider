@@ -9,3 +9,4 @@ test("formatCompactWindow uses k below 1M and exact millions at/above 1M", () =>
   // Off-ladder values that would round to a colliding "1M" keep a distinct k label.
   expect(formatCompactWindow(1_040_000, "en")).toBe("1040k");
 });
+

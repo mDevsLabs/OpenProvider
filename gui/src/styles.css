@@ -226,10 +226,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
   -webkit-backdrop-filter: var(--glass-blur);
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 14px; }
-/* logo is a white-on-transparent silhouette → recolor via mask with the theme text color so it
-   stays visible in BOTH light and dark (a plain <img> was invisible white-on-white in light). */
-.brand-logo { width: 26px; height: 26px; flex-shrink: 0; background: var(--text);
-  -webkit-mask: url(/logo.png) center / contain no-repeat; mask: url(/logo.png) center / contain no-repeat; }
+.brand-logo { width: 26px; height: 26px; flex-shrink: 0; background: url(/logo.png) center / contain no-repeat; }
 .brand .name { font-weight: var(--weight-semibold); font-size: var(--text-subtitle); letter-spacing: 0; line-height: 26px; }
 .brand .ver {
   font-family: var(--font-code); font-size: var(--text-micro); color: var(--muted); line-height: var(--leading-tight);

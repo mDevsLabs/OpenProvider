@@ -4,13 +4,13 @@ Two commands, and every one of them runs any LLM you point it at.</p>
 
 <p align="center">
   <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="Follow @claudeebum on X"></a>
-  <a href="https://www.npmjs.com/package/@bitkyc08/opencodex"><img src="https://img.shields.io/npm/v/@bitkyc08/opencodex?color=cb3837&label=npm&logo=npm" alt="npm version"></a>
-  <a href="https://github.com/lidge-jun/opencodex/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@bitkyc08/opencodex?color=blue" alt="license"></a>
-  <img src="https://img.shields.io/node/v/@bitkyc08/opencodex?logo=node.js&label=node" alt="node version">
+  <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="npm version"></a>
+  <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="license"></a>
+  <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="node version">
 </p>
 
 ```bash
-npm install -g @bitkyc08/opencodex
+npm install -g @mdevs/openprovider
 ocx start        # proxy + dashboard on localhost:10100
 ```
 
@@ -95,7 +95,7 @@ Requires [Node](https://nodejs.org) 18+. The Bun runtime is bundled automaticall
 ```bash
 # Install (bundles the Bun runtime automatically — only Node 18+ required)
 # Prefer a user-owned Node (nvm/fnm) — avoid `sudo npm install -g …`
-npm install -g @bitkyc08/opencodex
+npm install -g @mdevs/openprovider
 
 # Interactive setup (writes config, injects into Codex, and offers autostart shim install)
 ocx init
@@ -122,15 +122,15 @@ launcher, so you do **not** need to install Bun yourself. If you see a
 dependencies. Reinstall without those flags, allowing bun's install script:
 
 ```bash
-npm install -g --allow-scripts=bun @bitkyc08/opencodex   # no --ignore-scripts, no --omit=optional
+npm install -g --allow-scripts=bun @mdevs/openprovider   # no --ignore-scripts, no --omit=optional
 
 # if the original install used sudo, keep using sudo:
-sudo npm install -g --allow-scripts=bun @bitkyc08/opencodex
+sudo npm install -g --allow-scripts=bun @mdevs/openprovider
 ```
 
 npm's own warning suggests an abbreviated command without the package name —
 that would reinstall the current directory, so always pass
-`@bitkyc08/opencodex` explicitly.
+`@mdevs/openprovider` explicitly.
 
 If you installed with `sudo` into a root-owned prefix, the sudo reinstall above
 unblocks that prefix — but prefer migrating to a user-owned Node (nvm, fnm, or
@@ -253,13 +253,13 @@ next Codex session. opencodex keeps these behaviors:
 
 - **Use any LLM with Codex.** 5 protocol adapters cover Anthropic Messages, Google Gemini, Azure, OpenAI Responses passthrough, and every OpenAI-compatible Chat Completions endpoint — that's 40+ providers out of the box.
 - **Use any LLM with Claude Code too.** The same daemon serves the Anthropic Messages API (`/v1/messages` + `count_tokens`): `ocx claude` launches Claude Code fully wired, and routed models appear in its native `/model` picker via gateway model discovery (`claude-ocx-<provider>--<model>` aliases, Claude Code 2.1.129+). Configure slots and model maps on the dashboard's Claude page. The Claude page also carries a separate Desktop profile with Opus, Fable, Sonnet, and Haiku families, accessible drag/keyboard controls, and JSON import/export.
-- **Use any LLM with GitHub Copilot App too.** Point Copilot's Model providers at `http://127.0.0.1:10100/v1` — OpenCodex serves OpenAI-compatible `GET /v1/models` and `POST /v1/chat/completions` so routed models sync into the app. See [docs/github-copilot-app.md](docs/github-copilot-app.md).
+- **Use any LLM with GitHub Copilot App too.** Point Copilot's Model providers at `http://127.0.0.1:10100/v1` — OpenProvider serves OpenAI-compatible `GET /v1/models` and `POST /v1/chat/completions` so routed models sync into the app. See [docs/github-copilot-app.md](docs/github-copilot-app.md).
 - **Pool ChatGPT accounts safely.** Keep existing Codex threads on one account while new sessions
   can auto-pick a lower-usage account from the pool, with quota refresh and non-PII request labels.
 - **Log in once, skip the API key.** OAuth support for xAI, Anthropic, and Kimi means you can authenticate with your existing account. Tokens auto-refresh. Or forward your `codex login`, paste an API key, or use `${ENV_VAR}` references — your call.
 - **Works everywhere Codex does.** Injects into Codex CLI, TUI, App, and SDK automatically. Routed models show up in Codex's model picker just like native ones.
 - **History-safe injection.** On local installs the proxy points Codex's own built-in `openai` provider at itself via a single `openai_base_url` line — new threads keep their native provider tag, so ongoing chat history is never remapped and an unclean shutdown can't hide it. (Threads re-tagged by older versions are migrated back once on the first start; remote/LAN binds use a dedicated provider entry instead, since they need an API-key header.)
-- **Delegate to the right model.** Feature up to five routed or native models in Codex's subagent picker from the dashboard or config — route complex tasks to a reasoning model, fast tasks to a cheap one. On the v2 multi-agent surface (GPT-5.6 Sol/Terra) the proxy injects compact, schema-agnostic delegation guidance: an eligible preferred sub-agent model and effort (`injectionModel` / `injectionEffort`), the configured intersection of Codex's picker-visible, v2-compatible, priority-sorted first five with available effort ladders, and the `fork_turns` rules that let cross-model `spawn_agent` calls apply their overrides. Known limitation: when a native parent spawns a routed child, the task body can currently arrive backend-encrypted and be lost ([#92](https://github.com/lidge-jun/opencodex/issues/92)) — use the v1 surface for reliable cross-provider delegation. Want your own wording? Set `injectionPrompt` with `{{model}}` / `{{effort}}` / `{{roster}}` placeholders.
+- **Delegate to the right model.** Feature up to five routed or native models in Codex's subagent picker from the dashboard or config — route complex tasks to a reasoning model, fast tasks to a cheap one. On the v2 multi-agent surface (GPT-5.6 Sol/Terra) the proxy injects compact, schema-agnostic delegation guidance: an eligible preferred sub-agent model and effort (`injectionModel` / `injectionEffort`), the configured intersection of Codex's picker-visible, v2-compatible, priority-sorted first five with available effort ladders, and the `fork_turns` rules that let cross-model `spawn_agent` calls apply their overrides. Known limitation: when a native parent spawns a routed child, the task body can currently arrive backend-encrypted and be lost ([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)) — use the v1 surface for reliable cross-provider delegation. Want your own wording? Set `injectionPrompt` with `{{model}}` / `{{effort}}` / `{{roster}}` placeholders.
 - **Prepare for preview-gated OpenAI rollouts.** GPT-5.6 Sol/Terra/Luna entries preserve the upstream effort ladders. Direct/Multi use the 372k Codex contract; OpenAI API and OpenRouter use 1.05M metadata when upstream access is available.
 - **Give any model superpowers.** Non-OpenAI models get real web search and image understanding via a `gpt-5.4-mini` sidecar over your ChatGPT login.
 - **Generate images natively.** Codex's standalone `image_gen` tool uses `POST /v1/images/generations` for generation and `POST /v1/images/edits` for edits; it is separate from the hosted Responses `image_generation` tool.
@@ -373,7 +373,7 @@ Before removing the npm package, clean up local state:
 
 ```bash
 ocx uninstall
-npm uninstall -g @bitkyc08/opencodex
+npm uninstall -g @mdevs/openprovider
 ```
 
 `ocx uninstall` stops the proxy, removes any installed service, removes the Codex shim, restores
@@ -508,7 +508,7 @@ Source development requires the `bun` CLI on your `PATH`. This is separate from 
 package's bundled Bun runtime, which is used only by installed `ocx` commands.
 
 ```bash
-git clone https://github.com/lidge-jun/opencodex.git
+git clone https://github.com/mDevsLabs/OpenProvider.git
 cd opencodex
 bun install
 bun run dev:proxy    # start the proxy API in dev mode
@@ -536,3 +536,6 @@ Some providers — notably Anthropic (Claude) — may suspend or restrict accoun
 ## License
 
 MIT
+
+
+

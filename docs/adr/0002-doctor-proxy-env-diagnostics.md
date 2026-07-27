@@ -13,7 +13,7 @@ started `ocx start` or a service from a different environment and then ran
 
 Environment variables are inherited by child processes, not shared globally
 between existing shells. A new terminal can therefore show `HTTP_PROXY` as unset
-while the already-running opencodex proxy process still has it set.
+while the already-running OpenProvider proxy process still has it set.
 
 ## Decision
 
@@ -21,7 +21,7 @@ while the already-running opencodex proxy process still has it set.
 
 - the current doctor process environment
 - the effective `config.proxy` state, with the value hidden
-- the running opencodex proxy process environment when a recorded PID is
+- the running OpenProvider proxy process environment when a recorded PID is
   available and Linux `/proc/<pid>/environ` can be read
 
 The process environment diagnostic reports only presence/absence of known proxy
@@ -36,3 +36,5 @@ credentials.
   parsing.
 - Non-Linux platforms show the running-process env check as unavailable instead
   of pretending service environment inspection is portable.
+
+

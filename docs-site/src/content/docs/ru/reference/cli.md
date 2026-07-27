@@ -3,23 +3,23 @@ title: Справочник CLI
 description: Все команды и флаги ocx.
 ---
 
-CLI opencodex — это `ocx`. Запустите `ocx help` (или `--help` / `-h`) для общей справки по
+CLI OpenProvider — это `ocx`. Запустите `ocx help` (или `--help` / `-h`) для общей справки по
 использованию. Для команд, зарегистрированных в таблице справки, используйте `ocx help <command>`.
 Команды справки и версии доступны только для чтения и не запускают, не останавливают, не
-устанавливают, не удаляют и не переписывают состояние Codex/opencodex.
+устанавливают, не удаляют и не переписывают состояние Codex/OpenProvider.
 
 ## Настройка и жизненный цикл
 
 ### `ocx init`
 
 Интерактивный мастер настройки. Запрашивает провайдера (пресет или пользовательский), API-ключ
-(литерал или `${ENV}`), модель по умолчанию и порт прокси; сохраняет `~/.opencodex/config.json`;
+(литерал или `${ENV}`), модель по умолчанию и порт прокси; сохраняет `~/.OpenProvider/config.json`;
 по желанию внедряет прокси в `$CODEX_HOME/config.toml` (по умолчанию `~/.codex/config.toml`); и
 по желанию устанавливает shim автозапуска Codex.
 
 ### `ocx start [--port <port>]`
 
-Запускает прокси-сервер (предпочтительный порт `10100`). Если этот порт занят, opencodex выбирает
+Запускает прокси-сервер (предпочтительный порт `10100`). Если этот порт занят, OpenProvider выбирает
 и записывает другой свободный порт. Команда сохраняет состояние PID/runtime-порта и отказывается
 запускать второй живой экземпляр. При старте она синхронизирует модели каждого провайдера в
 каталог Codex. При завершении она восстанавливает нативный Codex — если только прокси не был
@@ -99,8 +99,8 @@ ocx status --json
     "url": "http://localhost:10100/"
   },
   "paths": {
-    "config": "/Users/example/.opencodex/config.json",
-    "pid": "/Users/example/.opencodex/ocx.pid",
+    "config": "/Users/example/.OpenProvider/config.json",
+    "pid": "/Users/example/.OpenProvider/ocx.pid",
     "runtime": "/path/to/bun"
   },
   "runtime": {
@@ -116,7 +116,7 @@ ocx status --json
   "codexAutostart": true,
   "defaultProvider": "openai",
   "service": {
-    "summary": "not installed (logs: /Users/example/.opencodex/service.log)"
+    "summary": "not installed (logs: /Users/example/.OpenProvider/service.log)"
   },
   "codexShim": {
     "summary": "Codex autostart shim: not installed"
@@ -139,7 +139,7 @@ ocx status --json
 ### `ocx uninstall` &nbsp;·&nbsp; `ocx remove`
 
 Останавливает сервис и прокси, удаляет сервис и shim Codex, восстанавливает нативный Codex, затем
-удаляет локальную конфигурацию opencodex только если все шаги восстановления завершились успешно.
+удаляет локальную конфигурацию OpenProvider только если все шаги восстановления завершились успешно.
 `remove` — алиас `uninstall`.
 
 ## Модели и Codex
@@ -153,7 +153,7 @@ ocx status --json
 ### `ocx sync-cache`
 
 Инвалидирует локальный кэш селектора моделей Codex, чтобы он был перестроен из активного каталога
-opencodex.
+OpenProvider.
 
 ### `ocx v2 [subcommand]`
 
@@ -177,7 +177,7 @@ ocx v2 on
 ocx v2 threads 16
 ```
 
-Подкоманда `mode` записывает `multiAgentMode` в конфигурацию opencodex и повторно синхронизирует
+Подкоманда `mode` записывает `multiAgentMode` в конфигурацию OpenProvider и повторно синхронизирует
 каталог Codex. `mode v1`/`mode v2` и `on`/`off` переносят текущий числовой лимит потоков между
 действительными ключами Codex v1/v2, переключая нативную функцию через
 `codex features enable|disable`. Неудачный переход восстанавливает исходный `config.toml`.
@@ -355,7 +355,7 @@ security find-generic-password -w openrouter | ocx account add-key openrouter --
 ### `ocx login <provider>`
 
 Запускает зарегистрированный процесс входа провайдера. OAuth-провайдеры открывают браузер и
-сохраняют автоматически обновляемые учётные данные в `~/.opencodex/`; провайдеры со входом по
+сохраняют автоматически обновляемые учётные данные в `~/.OpenProvider/`; провайдеры со входом по
 API-ключу открывают свой дашборд ключей, запрашивают ключ, по возможности валидируют его и
 сохраняют полученную конфигурацию провайдера. Если имя отсутствует или неизвестно, команда
 печатает принимаемые в данный момент id OAuth-провайдеров и провайдеров с API-ключами.
@@ -379,7 +379,7 @@ ocx login xai
 
 ### `ocx service [subcommand]`
 
-Запускает opencodex как фоновый сервис, управляемый при входе в систему (macOS **launchd**, Linux
+Запускает OpenProvider как фоновый сервис, управляемый при входе в систему (macOS **launchd**, Linux
 **systemd user unit**, Windows **Task Scheduler**), который автоматически стартует при входе и
 автоматически перезапускается при сбое. Запуски сервиса устанавливают `OCX_SERVICE=1`, поэтому
 перезапуск не перетряхивает конфигурацию Codex.
@@ -411,7 +411,7 @@ ocx service uninstall
 который ещё меняется, остаётся нетронутым до следующей попытки. Ошибка восстановления выдаёт
 предупреждение, но не приводит к сбою запрошенной команды; ручной вариант —
 `ocx codex-shim install`. Для отключения установите `codexShimAutoRestore` в `false` или задайте
-процессу `OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`.
+процессу `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0`.
 
 | Subcommand | Action |
 | --- | --- |
@@ -458,13 +458,13 @@ ocx debug usage logs [-f|--follow]
 Без указания области `ocx debug` печатает справку по использованию, а когда прокси остановлен —
 ещё и значения окружения по умолчанию для следующего запуска. Отладка провайдеров по умолчанию
 включается через `OCX_DEBUG=1` (устаревший `OCX_DEBUG_FRAMES=1` тоже работает); отладка
-использования — через `OPENCODEX_USAGE_DEBUG=1`.
+использования — через `OpenProvider_USAGE_DEBUG=1`.
 
 ## Обновление
 
 ### `ocx update`
 
-Самообновление opencodex из npm. Стабильные установки используют `@latest`; preview-установки
+Самообновление OpenProvider из npm. Стабильные установки используют `@latest`; preview-установки
 остаются на `@preview`, если не передать `--tag latest|preview`. Команда обнаруживает checkout
 исходного кода и предлагает вместо этого выполнить `git pull && bun install`, и ничего не делает,
 если у вас уже новейшая версия для этого тега. Работающий прокси останавливается перед заменой
@@ -476,7 +476,7 @@ ocx update
 ocx update --tag preview
 ```
 
-Новые версии становятся доступны в момент, когда [workflow Release](https://github.com/lidge-jun/opencodex/actions/workflows/release.yml)
+Новые версии становятся доступны в момент, когда [workflow Release](https://github.com/mDevsLabs/OpenProvider/actions/workflows/release.yml)
 публикует их в npm.
 
 ## Справка
@@ -501,3 +501,5 @@ ocx update --tag preview
 обновляет кэш уведомлений об обновлениях в отсоединённом процессе, а
 `__gui-update-worker <job-id> [latest|preview] [restart]` выполняет задание обновления из
 дашборда. Это детали реализации, а не стабильные пользовательские команды.
+
+

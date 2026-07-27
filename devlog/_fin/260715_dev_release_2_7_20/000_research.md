@@ -7,7 +7,7 @@ Work class: C4 (release surface)
 
 - Archetype: repair-and-promote release integration
 - Trigger: `origin/dev` received maintainer PR #134 while local `dev` retained three unpushed cross-platform fixes
-- Goal: preserve both histories, verify the combined candidate, promote it through `dev` -> `main` -> `preview`, and publish `@bitkyc08/opencodex@2.7.20`
+- Goal: preserve both histories, verify the combined candidate, promote it through `dev` -> `main` -> `preview`, and publish `@mdevs/openprovider@2.7.20`
 - Non-goals: rewrite public history, force-push, redesign PR #134, add dependencies, or broaden the release beyond the five divergent commits
 - Verifier: repository prepush gates, GUI lint/build and rendered browser QA, GitHub Cross-platform CI for each pushed release head, release workflow success, npm registry/dist-tag, Git tag, GitHub Release, and clean install smoke
 - Stop condition: all three protected branches contain the release commit, npm `latest` is 2.7.20, the tag/release point to that commit, and install smoke succeeds
@@ -46,4 +46,5 @@ Work class: C4 (release surface)
 - Terms: `release`, `preview`, `npm publish`, `dev/main/preview`, `fontSize`, `fontWeight`, `lineHeight`, `borderRadius`, `OPENCODEX_PROXY_TARGET`.
 - Inspected: `package.json`, `scripts/release.ts`, `.github/workflows/release.yml`, `structure/06_docs-and-release.md`, PR #134 metadata/diff, all 19 remote changed-file paths, all 13 local changed-file paths, and the design-system ADR/docs.
 - Reuse decision: no new runtime abstraction or dependency is planned. Any repair must stay in the existing GUI token/CSS/component owners or the touched cross-platform modules.
+
 

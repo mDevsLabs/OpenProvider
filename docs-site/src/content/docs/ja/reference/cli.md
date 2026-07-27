@@ -3,21 +3,21 @@ title: CLI リファレンス
 description: すべての ocx コマンドとフラグ。
 ---
 
-opencodex CLI は `ocx` です。最上位の使い方は `ocx help`（または `--help` / `-h`）で確認します。
+OpenProvider CLI は `ocx` です。最上位の使い方は `ocx help`（または `--help` / `-h`）で確認します。
 ヘルプ表に登録されたコマンドの詳細な使い方は `ocx help <command>` で見られます。ヘルプとバージョン
-コマンドは読み取り専用で、Codex/opencodex の状態を開始、停止、インストール、削除、書き換えしません。
+コマンドは読み取り専用で、Codex/OpenProvider の状態を開始、停止、インストール、削除、書き換えしません。
 
 ## 設定とライフサイクル
 
 ### `ocx init`
 
 対話型設定ウィザードです。プロバイダー（プリセットまたはカスタム）、API キー（直接入力または `${ENV}`）、
-デフォルトモデル、プロキシポートを順に尋ね、`~/.opencodex/config.json` を保存します。選択に応じてプロキシを
+デフォルトモデル、プロキシポートを順に尋ね、`~/.OpenProvider/config.json` を保存します。選択に応じてプロキシを
 `$CODEX_HOME/config.toml`（デフォルト `~/.codex/config.toml`）に注入し、Codex 自動起動 shim もインストールします。
 
 ### `ocx start [--port <port>]`
 
-プロキシサーバーを起動します（優先ポート `10100`）。そのポートが既に使われていると opencodex が別の空き
+プロキシサーバーを起動します（優先ポート `10100`）。そのポートが既に使われていると OpenProvider が別の空き
 ポートを選び、記録します。PID とランタイムポート状態を保存し、生きている 2 つ目のインスタンスは起動しません。起動時に各プロバイダーのモデルを Codex カタログに同期します。管理型サービス
 （`OCX_SERVICE=1`）として実行した場合を除き、終了時にネイティブ Codex を復元します。
 
@@ -89,8 +89,8 @@ ocx status --json
     "url": "http://localhost:10100/"
   },
   "paths": {
-    "config": "/Users/example/.opencodex/config.json",
-    "pid": "/Users/example/.opencodex/ocx.pid",
+    "config": "/Users/example/.OpenProvider/config.json",
+    "pid": "/Users/example/.OpenProvider/ocx.pid",
     "runtime": "/path/to/bun"
   },
   "runtime": {
@@ -106,7 +106,7 @@ ocx status --json
   "codexAutostart": true,
   "defaultProvider": "openai",
   "service": {
-    "summary": "not installed (logs: /Users/example/.opencodex/service.log)"
+    "summary": "not installed (logs: /Users/example/.OpenProvider/service.log)"
   },
   "codexShim": {
     "summary": "Codex autostart shim: not installed"
@@ -127,7 +127,7 @@ ocx status --json
 ### `ocx uninstall` &nbsp;·&nbsp; `ocx remove`
 
 サービスとプロキシを停止し、サービスと Codex shim を削除したのちネイティブ Codex を復元します。すべての
-復元ステップが成功した場合にのみ opencodex のローカル設定まで消します。`remove` は `uninstall` の別名です。
+復元ステップが成功した場合にのみ OpenProvider のローカル設定まで消します。`remove` は `uninstall` の別名です。
 
 ## モデルと Codex
 
@@ -138,7 +138,7 @@ ocx status --json
 
 ### `ocx sync-cache`
 
-Codex のローカルモデルセレクターキャッシュを無効化し、現在の opencodex カタログで再構築させます。
+Codex のローカルモデルセレクターキャッシュを無効化し、現在の OpenProvider カタログで再構築させます。
 
 ### `ocx v2 [subcommand]`
 
@@ -162,7 +162,7 @@ ocx v2 on
 ocx v2 threads 16
 ```
 
-`mode` サブコマンドは opencodex 設定に `multiAgentMode` を記録し Codex カタログを再
+`mode` サブコマンドは OpenProvider 設定に `multiAgentMode` を記録し Codex カタログを再
 同期します。`mode v1`/`mode v2` と `on`/`off` は現在の数値を有効な v1/v2 設定キーに
 移しながら `codex features enable|disable` で codex-rs 機能フラグを変えます。切り替えに失敗すると
 既存の `config.toml` をそのまま復元します。
@@ -316,7 +316,7 @@ security find-generic-password -w openrouter | ocx account add-key openrouter --
 ### `ocx login <provider>`
 
 プロバイダーに登録されたログイン手順を開始します。OAuth プロバイダーはブラウザを開き、自動更新される
-認証情報を `~/.opencodex/` 以下に保存します。API キーログインプロバイダーはキーダッシュボードを開き、キーを
+認証情報を `~/.OpenProvider/` 以下に保存します。API キーログインプロバイダーはキーダッシュボードを開き、キーを
 入力させて可能な場合は検証したのち、結果のプロバイダー設定を保存します。名前がない、または不明な名前の場合は現在許可される OAuth および API キープロバイダー id を出力します。
 
 ```bash
@@ -338,7 +338,7 @@ ocx login xai
 
 ### `ocx service [subcommand]`
 
-opencodex をログイン管理型のバックグラウンドサービス（macOS **launchd**、Linux **systemd user unit**、
+OpenProvider をログイン管理型のバックグラウンドサービス（macOS **launchd**、Linux **systemd user unit**、
 Windows **Task Scheduler**）として実行します。ログイン時に自動的に起動し、異常終了時に再
 開始します。サービス実行は `OCX_SERVICE=1` を設定するため、再起動時に Codex 設定を繰り返し
 変えません。
@@ -370,7 +370,7 @@ PATH 上のスクリプトベース `codex` ランチャーを軽量な自動起
 ランチャーには触れず、後で再試行します。修復失敗は要求されたコマンドを失敗させず警告だけを
 表示し、手動の代替手段は `ocx codex-shim install` です。自動修復を無効にするには
 `codexShimAutoRestore` を `false` にするか、プロセスで
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0` を設定します。
+`OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` を設定します。
 
 | Subcommand | Action |
 | --- | --- |
@@ -412,13 +412,13 @@ ocx debug usage logs [-f|--follow]
 
 スコープを指定しないと `ocx debug` が使い方を出力します。プロキシが止まっているときは次回起動時に
 適用される環境変数のデフォルト値も示します。プロバイダーデバッグのデフォルトは `OCX_DEBUG=1` で既存の
-`OCX_DEBUG_FRAMES=1` もサポートします。使用量デバッグのデフォルトは `OPENCODEX_USAGE_DEBUG=1` です。
+`OCX_DEBUG_FRAMES=1` もサポートします。使用量デバッグのデフォルトは `OpenProvider_USAGE_DEBUG=1` です。
 
 ## アップデート
 
 ### `ocx update`
 
-npm から opencodex を自己更新します。安定版インストールは `@latest`、プレビューインストールは `@preview` を
+npm から OpenProvider を自己更新します。安定版インストールは `@latest`、プレビューインストールは `@preview` を
 維持し `--tag latest|preview` で切り替えできます。ソース checkout では代わりに
 `git pull && bun install` を案内し、該当タグの最新版なら何もしません。ファイルを
 差し替える前に実行中のプロキシを停止します。インストール済みのサービスは再ビルドして自動起動し、
@@ -429,7 +429,7 @@ ocx update
 ocx update --tag preview
 ```
 
-[Release ワークフロー](https://github.com/lidge-jun/opencodex/actions/workflows/release.yml) が npm に
+[Release ワークフロー](https://github.com/mDevsLabs/OpenProvider/actions/workflows/release.yml) が npm に
 公開した直後に新しいバージョンが使えるようになります。
 
 ## ヘルプ
@@ -452,3 +452,5 @@ ocx update --tag preview
 プロセスで更新通知キャッシュを更新します。
 `__gui-update-worker <job-id> [latest|preview] [restart]` はダッシュボードの更新ジョブを実行します。
 実装の詳細であり安定したユーザーコマンドではありません。
+
+

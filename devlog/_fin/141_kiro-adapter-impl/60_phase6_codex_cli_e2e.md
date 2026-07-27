@@ -6,7 +6,7 @@ temporary errors" and never produced output. "안되는데?" → "codex exec으�
 
 ## Root cause (confirmed, not guessed)
 The proxy listening on `localhost:10100` was the **globally-installed published build**
-`/opt/homebrew/lib/node_modules/@bitkyc08/opencodex/dist` (v2.6.0) — which has **no kiro
+`/opt/homebrew/lib/node_modules/@mdevs/openprovider/dist` (v2.6.0) — which has **no kiro
 adapter**. Evidence: `grep 'kiro/' /Users/jun/.codex/opencodex-catalog.json` returned
 **empty** → kiro models were never advertised to Codex, so `kiro/*` requests failed.
 My kiro implementation lives only on `feat/kiro-on-dev` in the workspace, never published.
@@ -40,3 +40,4 @@ write-time 62725). To make this permanent in the normal `ocx` flow, the publishe
 must be updated to include the kiro adapter (publish from `feat/kiro-on-dev`, then
 `ocx update`) — otherwise a future `ocx start` from the global binary reverts to the
 kiro-less build. The full Codex CLI path is now proven working against the branch build.
+

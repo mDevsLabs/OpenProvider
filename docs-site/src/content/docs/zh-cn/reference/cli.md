@@ -3,21 +3,21 @@ title: CLI 参考
 description: 所有 ocx 命令与参数。
 ---
 
-opencodex 的命令行工具是 `ocx`。运行 `ocx help`（或 `--help` / `-h`）可查看顶层用法。
+OpenProvider 的命令行工具是 `ocx`。运行 `ocx help`（或 `--help` / `-h`）可查看顶层用法。
 对帮助表中注册的命令，可运行 `ocx help <command>` 查看命令专属帮助。帮助和版本命令均为只读，
-不会启动、停止、安装、卸载或改写 Codex/opencodex 状态。
+不会启动、停止、安装、卸载或改写 Codex/OpenProvider 状态。
 
 ## 安装与生命周期
 
 ### `ocx init`
 
 交互式设置向导。它会依次询问 provider（预设或自定义）、API key（字面值或 `${ENV}`）、默认模型
-和代理端口，保存 `~/.opencodex/config.json`，并可选择把代理注入
+和代理端口，保存 `~/.OpenProvider/config.json`，并可选择把代理注入
 `$CODEX_HOME/config.toml`（默认 `~/.codex/config.toml`），以及安装 Codex 自动启动 shim。
 
 ### `ocx start [--port <port>]`
 
-启动代理服务器（首选端口 `10100`）。如果该端口已被占用，opencodex 会选择并记录另一个可用
+启动代理服务器（首选端口 `10100`）。如果该端口已被占用，OpenProvider 会选择并记录另一个可用
 端口。它会写入 PID/运行时端口状态，并拒绝启动第二个仍存活的实例。启动时会把各 provider 的
 模型同步进 Codex 目录。关闭时会恢复原生 Codex，除非它以受管服务运行（`OCX_SERVICE=1`）。
 
@@ -90,8 +90,8 @@ ocx status --json
     "url": "http://localhost:10100/"
   },
   "paths": {
-    "config": "/Users/example/.opencodex/config.json",
-    "pid": "/Users/example/.opencodex/ocx.pid",
+    "config": "/Users/example/.OpenProvider/config.json",
+    "pid": "/Users/example/.OpenProvider/ocx.pid",
     "runtime": "/path/to/bun"
   },
   "runtime": {
@@ -107,7 +107,7 @@ ocx status --json
   "codexAutostart": true,
   "defaultProvider": "openai",
   "service": {
-    "summary": "not installed (logs: /Users/example/.opencodex/service.log)"
+    "summary": "not installed (logs: /Users/example/.OpenProvider/service.log)"
   },
   "codexShim": {
     "summary": "Codex autostart shim: not installed"
@@ -127,7 +127,7 @@ API key、OAuth token、authorization header、请求内容、电子邮件和账
 ### `ocx uninstall` &nbsp;·&nbsp; `ocx remove`
 
 停止服务和代理，移除服务与 Codex shim，恢复原生 Codex；只有所有恢复步骤成功后，才删除
-opencodex 本地配置。`remove` 是 `uninstall` 的别名。
+OpenProvider 本地配置。`remove` 是 `uninstall` 的别名。
 
 ## 模型与 Codex
 
@@ -138,7 +138,7 @@ opencodex 本地配置。`remove` 是 `uninstall` 的别名。
 
 ### `ocx sync-cache`
 
-使 Codex 的本地模型选择器缓存失效，随后用当前 opencodex 目录重新构建。
+使 Codex 的本地模型选择器缓存失效，随后用当前 OpenProvider 目录重新构建。
 
 ### `ocx v2 [subcommand]`
 
@@ -162,7 +162,7 @@ ocx v2 on
 ocx v2 threads 16
 ```
 
-`mode` subcommand 会把 `multiAgentMode` 写入 opencodex 配置并重新同步 Codex 目录。
+`mode` subcommand 会把 `multiAgentMode` 写入 OpenProvider 配置并重新同步 Codex 目录。
 `mode v1`/`mode v2` 与 `on`/`off` 会在有效的 v1/v2 配置 key 之间迁移当前数值，同时用
 `codex features enable|disable` 切换 codex-rs feature flag；失败时恢复原始 `config.toml`。变更从新的 Codex
 session 开始生效，正在运行的 session 保持已固定的 surface。
@@ -319,7 +319,7 @@ security find-generic-password -w openrouter | ocx account add-key openrouter --
 ### `ocx login <provider>`
 
 启动 provider 注册的登录流程。OAuth provider 会打开浏览器，并把可自动刷新的 credential 存入
-`~/.opencodex/`；API-key 登录 provider 会打开 key 仪表盘，提示输入 key，在条件允许时进行
+`~/.OpenProvider/`；API-key 登录 provider 会打开 key 仪表盘，提示输入 key，在条件允许时进行
 验证，再保存生成的 provider 配置。如果名称缺失或未知，命令会打印当前接受的 OAuth 和 API-key
 provider id。
 
@@ -342,7 +342,7 @@ ocx login xai
 
 ### `ocx service [subcommand]`
 
-把 opencodex 作为登录管理的后台服务运行（macOS **launchd**、Linux **systemd user unit**、
+把 OpenProvider 作为登录管理的后台服务运行（macOS **launchd**、Linux **systemd user unit**、
 Windows **Task Scheduler**），登录时自动启动，崩溃后自动重启。服务进程会设置
 `OCX_SERVICE=1`，因此重启不会反复改动 Codex 配置。
 
@@ -372,7 +372,7 @@ ocx service uninstall
 新启动器并恢复 shim。仍在变化的启动器不会被改动，而会稍后重试。修复失败只会警告，不会让请求的
 命令失败；手动备用命令为 `ocx codex-shim install`。若要关闭自动恢复，请将
 `codexShimAutoRestore` 设为 `false`，或为进程设置
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`。
+`OpenProvider_CODEX_SHIM_AUTO_RESTORE=0`。
 
 | Subcommand | Action |
 | --- | --- |
@@ -414,13 +414,13 @@ ocx debug usage logs [-f|--follow]
 
 不指定范围时，`ocx debug` 会打印用法；代理停止时，还会显示下次启动采用的环境变量默认值。
 provider debug 默认读取 `OCX_DEBUG=1`（旧的 `OCX_DEBUG_FRAMES=1` 仍可用），usage debug 默认读取
-`OPENCODEX_USAGE_DEBUG=1`。
+`OpenProvider_USAGE_DEBUG=1`。
 
 ## 更新
 
 ### `ocx update`
 
-从 npm 自助更新 opencodex。稳定版安装使用 `@latest`，preview 安装继续使用 `@preview`，除非传入
+从 npm 自助更新 OpenProvider。稳定版安装使用 `@latest`，preview 安装继续使用 `@preview`，除非传入
 `--tag latest|preview`。在源码 checkout 中，它会改为提示 `git pull && bun install`；如果已经是
 相应 tag 的最新版，则不执行任何操作。替换文件前会停止正在运行的代理；已安装的服务会自动重建
 并启动，而前台安装会把 `ocx start` 显示为下一步。
@@ -430,7 +430,7 @@ ocx update
 ocx update --tag preview
 ```
 
-[Release workflow](https://github.com/lidge-jun/opencodex/actions/workflows/release.yml) 发布到 npm
+[Release workflow](https://github.com/mDevsLabs/OpenProvider/actions/workflows/release.yml) 发布到 npm
 后，新版本会立即可用。
 
 ## 帮助
@@ -452,3 +452,5 @@ ocx update --tag preview
 两个 dispatch 目标会刻意从普通帮助中隐藏：`__refresh-version [preview]` 在 detached process 中
 刷新更新通知缓存；`__gui-update-worker <job-id> [latest|preview] [restart]` 执行仪表盘更新任务。
 它们属于实现细节，不是稳定的用户命令。
+
+

@@ -568,7 +568,7 @@ test("routed Claude requests give OpenAI sidecars main auth without leaking it t
         ? "web-search"
         : "vision";
       sidecarCalls.push({ headers: new Headers(req.headers), body, kind });
-      const text = kind === "vision" ? visionCaption : "OpenCodex search results are available.";
+      const text = kind === "vision" ? visionCaption : "OpenProvider search results are available.";
       return new Response([
         `event: response.output_text.delta\ndata: ${JSON.stringify({ type: "response.output_text.delta", delta: text })}\n\n`,
         `event: response.completed\ndata: ${JSON.stringify({ type: "response.completed", response: { status: "completed" } })}\n\n`,
@@ -643,7 +643,7 @@ test("routed Claude requests give OpenAI sidecars main auth without leaking it t
     messages: [{
       role: "user",
       content: [
-        { type: "text", text: "Search for OpenCodex and inspect this logo." },
+        { type: "text", text: "Search for OpenProvider and inspect this logo." },
         { type: "image", source: { type: "base64", media_type: "image/png", data: imageBytes } },
       ],
     }],
@@ -845,3 +845,4 @@ test("count_tokens is CJK-aware: Korean body counts more tokens than equal-lengt
     server.stop(true);
   }
 });
+

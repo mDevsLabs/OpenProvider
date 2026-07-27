@@ -729,7 +729,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
         nativeStatusUnknown: true,
         conflict: false,
         ok: false,
-        detail: "The Task Scheduler task was created, but OpenCodex could not verify that the native WinSW service is absent.",
+        detail: "The Task Scheduler task was created, but OpenProvider could not verify that the native WinSW service is absent.",
       }),
       writeInstallState: () => { writeCount += 1; },
     });
@@ -838,3 +838,4 @@ describe("evaluateSchedulerInstallRestartReconciliation", () => {
     }).status).toBe("unhealthy");
   });
 });
+

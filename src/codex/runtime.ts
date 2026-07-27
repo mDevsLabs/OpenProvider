@@ -392,7 +392,7 @@ function resolveCacheKey(deps: ResolveCodexRuntimeDeps): string | null {
 }
 
 /**
- * Resolve the single Codex runtime OpenCodex should use for sync, clamp, and probes.
+ * Resolve the single Codex runtime OpenProvider should use for sync, clamp, and probes.
  */
 export function resolveCodexRuntime(deps: ResolveCodexRuntimeDeps = {}): ResolveCodexRuntimeResult {
   const cacheKey = resolveCacheKey(deps);
@@ -527,3 +527,4 @@ export function formatClampLogLines(diagnostic: EffortClampDiagnostic): string[]
     "[opencodex] Run ocx doctor for diagnosis and recovery.",
   ];
 }
+

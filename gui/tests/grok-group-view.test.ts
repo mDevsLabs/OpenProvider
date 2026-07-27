@@ -43,3 +43,4 @@ test("a model not in the fence has a null alias", () => {
   expect(kimi!.alias).toBeNull();
   expect(cursor!.alias).toBe("ocx-cursor-grok-4-5");
 });
+

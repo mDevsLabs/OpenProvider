@@ -148,7 +148,7 @@ describe("logOAuthEvent", () => {
       console.info = original;
     }
     expect(lines.length).toBe(1);
-    expect(lines[0]).toContain("[opencodex]");
+    expect(lines[0]).toContain("[OpenProvider]");
     expect(lines[0]).toContain("provider=kiro");
     expect(lines[0]).toContain("account=account-…wxyz");
     expect(lines[0]).not.toContain("acct_abcdefghijklmnopqrstuvwxyz");
@@ -174,7 +174,7 @@ export function logOAuthEvent(
   event: string,
   fields: { provider: string; accountId?: string; [key: string]: unknown },
 ): void {
-  const parts = [`[opencodex] ${event}`, `provider=${fields.provider}`];
+  const parts = [`[OpenProvider] ${event}`, `provider=${fields.provider}`];
   if (fields.accountId) parts.push(`account=${maskAccountId(fields.accountId)}`);
   for (const [key, value] of Object.entries(fields)) {
     if (key === "provider" || key === "accountId") continue;
@@ -228,7 +228,7 @@ Create `tests/oauth-refresh-generic-lock.test.ts` covering at least:
 4. Older refresh result cannot overwrite newer stored token (`mergeAccountCredential` superseded path)
 5. Rotated refresh token is persisted on disk
 
-Use the existing test helpers that point `OPENCODEX_HOME` at a temp dir and stub `OAUTH_PROVIDERS[provider].refresh` / fetch. Follow `tests/oauth-refresh.test.ts` setup patterns for auth store isolation.
+Use the existing test helpers that point `OpenProvider_HOME` at a temp dir and stub `OAUTH_PROVIDERS[provider].refresh` / fetch. Follow `tests/oauth-refresh.test.ts` setup patterns for auth store isolation.
 
 Sketch for concurrent refresh:
 
@@ -760,3 +760,5 @@ bun run build:gui
 - `OAuthAccountHealth` shape is identical in Tasks 4–7
 - `maskAccountId` / `logOAuthEvent` / `collectOAuthHealthEntries` names are stable across tasks
 - Policy A is restated wherever affinity/429 tests are mentioned so implementers do not “fix” it to pin-through-429
+
+

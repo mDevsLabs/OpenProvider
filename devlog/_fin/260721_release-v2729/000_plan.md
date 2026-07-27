@@ -24,7 +24,7 @@ Key changes:
 - c1: merge without conflicts
 - c2: build (tsc) exit 0
 - c3: test suite exit 0
-- c4: npm view @bitkyc08/opencodex dist-tags latest = 2.7.29
+- c4: npm view @mdevs/openprovider dist-tags latest = 2.7.29
 > DIFFLEVEL-ROADMAP-01: write this doc to full diff-level precision (exact paths,
 > NEW/MODIFY/DELETE, before/after diffs) BEFORE P -> A. An empty scaffold does not
 > satisfy the rule; the A-phase reviewer FAILS outline-only phase docs.
@@ -47,3 +47,4 @@ Key changes:
 ## Accept criteria
 
 - (mirror into the goalplan criteria[])
+

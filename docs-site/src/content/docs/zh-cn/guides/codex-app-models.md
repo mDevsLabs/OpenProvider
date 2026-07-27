@@ -1,9 +1,9 @@
 ---
 title: Codex App 模型选择器
-description: opencodex 模型如何通过共享 Codex 目录出现在 Codex App、Codex CLI 和 Codex TUI 中。
+description: OpenProvider 模型如何通过共享 Codex 目录出现在 Codex App、Codex CLI 和 Codex TUI 中。
 ---
 
-opencodex 不会修改 Codex App。它会写入 Codex CLI/TUI 已经使用的同一套 Codex 配置和模型目录。
+OpenProvider 不会修改 Codex App。它会写入 Codex CLI/TUI 已经使用的同一套 Codex 配置和模型目录。
 Codex App 也会读取这份共享状态，因此路由模型可以像普通 Codex 目录条目一样出现在 App 的模型
 选择器中。
 
@@ -18,29 +18,29 @@ context / 922,000 max input；`*-pro` picker id 保持公开身份，线上使�
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
-使用默认的 loopback 监听地址时，Codex 会保留内置的 `openai` provider id。opencodex 通过以下
+使用默认的 loopback 监听地址时，Codex 会保留内置的 `openai` provider id。OpenProvider 通过以下
 根级键把该 provider 和模型目录指向代理：
 
 ```toml
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 openai_base_url = "http://127.0.0.1:10100/v1"
 ```
 
 如果 hostname 不是 loopback，Codex 还需要发送生成的 API 认证 header。此模式会使用根级
-`model_provider = "opencodex"` 和一个独立的 Responses 兼容 provider：
+`model_provider = "OpenProvider"` 和一个独立的 Responses 兼容 provider：
 
 ```toml
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 ```
 
 `websockets` 默认关闭。只有设置 `"websockets": true` 时，独立 provider 和目录条目才会声明
@@ -50,7 +50,7 @@ WebSocket；若代理未启用该功能，则返回 `426`，让 Codex 回退到 
 
 ## 为什么路由模型会显示
 
-Codex 模型选择器要求条目符合 Codex 目录结构。opencodex 会克隆一个原生 Codex 模型模板，然后
+Codex 模型选择器要求条目符合 Codex 目录结构。OpenProvider 会克隆一个原生 Codex 模型模板，然后
 替换路由模型的身份信息：
 
 ```text
@@ -60,12 +60,12 @@ visibility = "list"
 ```
 
 克隆后的条目会保留 reasoning 级别、shell 类型、API 支持标志和 base instructions 等严格解析器
-所需字段。随后，opencodex 会移除该路由无法兑现的原生专属能力，例如 OpenAI service-tier 元数据。
+所需字段。随后，OpenProvider 会移除该路由无法兑现的原生专属能力，例如 OpenAI service-tier 元数据。
 
 ## v2.7.1 模型范围
 
 原生回退列表包含 `gpt-5.5`、`gpt-5.4`、`gpt-5.4-mini`、
-`gpt-5.3-codex-spark` 以及 GPT-5.6 Sol/Terra/Luna。对于 GPT-5.5/5.4 系列，opencodex 会
+`gpt-5.3-codex-spark` 以及 GPT-5.6 Sol/Terra/Luna。对于 GPT-5.5/5.4 系列，OpenProvider 会
 保留已安装 Codex 目录中信息更完整的实时条目，仅在条目缺失时才合成。内置的上游快照只用于
 GPT-5.6，以便提供每个模型真实的身份和元数据，而不是套用旧模板近似生成。
 
@@ -96,7 +96,7 @@ GPT-5.6，以便提供每个模型真实的身份和元数据，而不是套用�
 
 ## Multi-agent surface 模式
 
-opencodex 为每个目录条目的 `multi_agent_version` 提供三态 override：
+OpenProvider 为每个目录条目的 `multi_agent_version` 提供三态 override：
 
 | 模式 | 效果 |
 | --- | --- |
@@ -134,7 +134,7 @@ service_tier = "fast"
 fast_mode = true
 ```
 
-模型目录和运行时请求使用的 tier id 则是 `priority`。opencodex 会保留这一差异。原生 OpenAI
+模型目录和运行时请求使用的 tier id 则是 `priority`。OpenProvider 会保留这一差异。原生 OpenAI
 透传模型继续支持 fast；路由到非 OpenAI provider 的模型会移除 service-tier 元数据，避免显示
 无法兑现的 fast 选项。
 
@@ -142,7 +142,7 @@ fast_mode = true
 
 Codex 会按 `priority` 升序排列选择器中可见的目录条目，并将前五个显示为 `spawn_agent` 模型
 override。你可以通过 `subagentModels` 或仪表盘的 Subagents 页面选择最多五个原生 id 或
-`provider/model` id；opencodex 会按所选顺序赋予它们 0-4 的 priority。其他模型仍可通过精确 id
+`provider/model` id；OpenProvider 会按所选顺序赋予它们 0-4 的 priority。其他模型仍可通过精确 id
 直接调用。
 
 置顶模型列表与 Dashboard 的 **Sub-agent delegation** 指引相互独立。尤其需要注意，置顶模型
@@ -156,5 +156,6 @@ override 不能绕过 v2 的父模型继承规则。
 ocx sync
 ```
 
-当目录的可见性、priority 或元数据发生变化时，opencodex 会用一个刻意标记为过期的缓存 wrapper
+当目录的可见性、priority 或元数据发生变化时，OpenProvider 会用一个刻意标记为过期的缓存 wrapper
 重写 `models_cache.json`，使 Codex 下次刷新模型时读取新目录。
+

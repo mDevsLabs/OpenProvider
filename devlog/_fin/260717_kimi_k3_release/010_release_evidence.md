@@ -9,7 +9,7 @@
   scan, and diff integrity all pass.
 - [ ] `dev`, `preview`, and `main` preserve their existing histories and receive
   the validated candidate.
-- [ ] `@bitkyc08/opencodex@2.7.23` publishes under npm `latest`.
+- [ ] `@mdevs/openprovider@2.7.23` publishes under npm `latest`.
 - [ ] `v2.7.23`, the GitHub Release, and all three remote branches resolve to the
   exact release commit.
 - [ ] A clean temporary-prefix install runs `ocx help` without a system Bun.
@@ -40,3 +40,4 @@ Pending.
 ## Final check evidence
 
 Pending.
+

@@ -6,7 +6,7 @@ import { mkdtempSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const entry = { bun: "C:\\OpenCodex\\bun.exe", cli: "C:\\Open Codex\\cli & co\\index.ts" };
+const entry = { bun: "C:\\OpenProvider\\bun.exe", cli: "C:\\Open Codex\\cli & co\\index.ts" };
 
 describe("winsw xml", () => {
   const env = { USERDOMAIN: "WORKGROUP", USERNAME: "jun", PATH: "C:\\bin;C:\\tools & more" } as NodeJS.ProcessEnv;
@@ -31,13 +31,13 @@ describe("winsw xml", () => {
     expect(xml).toContain('<env name="OCX_API_TOKEN_FILE"');
     expect(xml).toContain('<env name="PATH" value="C:\\bin;C:\\tools &amp; more"/>');
     // The token VALUE never lands in the XML — only the file pointer.
-    expect(xml).not.toContain("OPENCODEX_API_AUTH_TOKEN");
+    expect(xml).not.toContain("OpenProvider_API_AUTH_TOKEN");
   });
 
   test("escapes executable/arguments and configures restart + graceful stop", () => {
     const xml = buildWinswXml(entry, env);
 
-    expect(xml).toContain("<executable>C:\\OpenCodex\\bun.exe</executable>");
+    expect(xml).toContain("<executable>C:\\OpenProvider\\bun.exe</executable>");
     expect(xml).toContain("<arguments>&quot;C:\\Open Codex\\cli &amp; co\\index.ts&quot; start --port 10100</arguments>");
     expect(xml).toContain('<onfailure action="restart" delay="5 sec"/>');
     expect(xml).toContain("<stoptimeout>20 sec</stoptimeout>");
@@ -218,7 +218,7 @@ describe("app-side service token loading", () => {
     writeFileSync(file, "  tok-123  \n");
     try {
       expect(loadServiceTokenFromFile({ OCX_API_TOKEN_FILE: file })).toBe("tok-123");
-      expect(loadServiceTokenFromFile({ OCX_API_TOKEN_FILE: file, OPENCODEX_API_AUTH_TOKEN: "already" })).toBeNull();
+      expect(loadServiceTokenFromFile({ OCX_API_TOKEN_FILE: file, OpenProvider_API_AUTH_TOKEN: "already" })).toBeNull();
       expect(loadServiceTokenFromFile({})).toBeNull();
       expect(loadServiceTokenFromFile({ OCX_API_TOKEN_FILE: join(dir, "missing") })).toBeNull();
     } finally {
@@ -226,3 +226,4 @@ describe("app-side service token loading", () => {
     }
   });
 });
+

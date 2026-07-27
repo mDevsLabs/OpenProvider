@@ -1,9 +1,9 @@
 ---
 title: Codex App 모델 선택기
-description: 공유 Codex 카탈로그를 통해 opencodex 모델이 Codex App, Codex CLI, Codex TUI에 표시되는 방식.
+description: 공유 Codex 카탈로그를 통해 OpenProvider 모델이 Codex App, Codex CLI, Codex TUI에 표시되는 방식.
 ---
 
-opencodex는 Codex App을 패치하지 않습니다. Codex CLI/TUI가 이미 쓰는 설정과 모델 카탈로그를
+OpenProvider는 Codex App을 패치하지 않습니다. Codex CLI/TUI가 이미 쓰는 설정과 모델 카탈로그를
 같은 위치에 기록합니다. Codex App도 이 상태를 공유하므로 라우팅 모델이 일반 Codex 카탈로그
 항목처럼 App의 모델 선택기에 나타날 수 있습니다.
 
@@ -18,29 +18,29 @@ id는 변하지 않습니다. API GPT-5.6은 context 1,050,000 / max input 922,0
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
 기본 루프백 바인드에서는 Codex의 내장 `openai` 프로바이더 id를 그대로 둡니다. 대신 다음 루트
-키로 프로바이더와 모델 카탈로그를 opencodex에 연결합니다.
+키로 프로바이더와 모델 카탈로그를 OpenProvider에 연결합니다.
 
 ```toml
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 openai_base_url = "http://127.0.0.1:10100/v1"
 ```
 
 루프백이 아닌 hostname을 쓰면 Codex가 생성된 API 인증 헤더도 보내야 합니다. 이때는 루트의
-`model_provider = "opencodex"`와 Responses 호환 전용 프로바이더를 사용합니다.
+`model_provider = "OpenProvider"`와 Responses 호환 전용 프로바이더를 사용합니다.
 
 ```toml
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 ```
 
 `websockets`는 기본적으로 꺼져 있습니다. 전용 프로바이더와 카탈로그 항목은
@@ -51,7 +51,7 @@ HTTP/SSE로 폴백시킵니다. 주입과 복원 전체 흐름은
 
 ## 라우팅 모델이 표시되는 이유
 
-Codex 모델 선택기는 Codex 형식의 카탈로그 항목을 요구합니다. opencodex는 네이티브 Codex 모델
+Codex 모델 선택기는 Codex 형식의 카탈로그 항목을 요구합니다. OpenProvider는 네이티브 Codex 모델
 템플릿을 복제한 뒤 라우팅 모델의 식별 정보를 바꿉니다.
 
 ```text
@@ -101,7 +101,7 @@ Codex 카탈로그의 더 풍부한 실시간 항목을 보존하고, 빠진 항
 
 ## Multi-agent surface 모드
 
-opencodex는 모든 카탈로그 항목의 `multi_agent_version`을 제어하는 3단계 override를 제공합니다.
+OpenProvider는 모든 카탈로그 항목의 `multi_agent_version`을 제어하는 3단계 override를 제공합니다.
 
 | 모드 | 동작 |
 | --- | --- |
@@ -142,7 +142,7 @@ service_tier = "fast"
 fast_mode = true
 ```
 
-반면 모델 카탈로그와 런타임 요청의 tier id는 `priority`입니다. opencodex는 이 차이를 유지합니다.
+반면 모델 카탈로그와 런타임 요청의 tier id는 `priority`입니다. OpenProvider는 이 차이를 유지합니다.
 네이티브 OpenAI 패스스루 모델은 fast 지원을 보존하고, 라우팅된 비 OpenAI 모델에서는 service-tier
 메타데이터를 지워 처리할 수 없는 fast 옵션이 표시되지 않게 합니다.
 
@@ -150,7 +150,7 @@ fast_mode = true
 
 Codex는 선택기에 표시되는 카탈로그 항목을 `priority` 오름차순으로 정렬한 뒤 처음 5개를
 `spawn_agent` 모델 override로 노출합니다. `subagentModels`나 대시보드 Subagents 페이지에서
-네이티브 id 또는 `provider/model` id를 최대 5개 고르면 opencodex가 선택 순서대로 priority 0-4를
+네이티브 id 또는 `provider/model` id를 최대 5개 고르면 OpenProvider가 선택 순서대로 priority 0-4를
 부여합니다. 나머지 모델도 정확한 id로 직접 호출할 수 있습니다.
 
 featured 모델 목록은 Dashboard의 **Sub-agent delegation** 안내와 별개입니다. 특히 featured 모델
@@ -164,5 +164,6 @@ override로 v2의 부모 모델 상속 규칙을 우회할 수 없습니다.
 ocx sync
 ```
 
-opencodex는 카탈로그의 표시 여부, priority, 메타데이터가 바뀔 때마다 `models_cache.json`을 의도적으로
+OpenProvider는 카탈로그의 표시 여부, priority, 메타데이터가 바뀔 때마다 `models_cache.json`을 의도적으로
 오래된 캐시 wrapper로 다시 씁니다. 다음 Codex 모델 새로고침이 새 카탈로그를 읽도록 하기 위해서입니다.
+

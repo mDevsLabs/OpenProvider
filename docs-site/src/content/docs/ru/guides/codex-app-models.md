@@ -1,9 +1,9 @@
 ---
 title: Селектор модели Codex App
-description: Как модели opencodex появляются в Codex App, Codex CLI и Codex TUI через общий каталог Codex.
+description: Как модели OpenProvider появляются в Codex App, Codex CLI и Codex TUI через общий каталог Codex.
 ---
 
-opencodex не патчит Codex App. Он записывает ту же конфигурацию Codex и тот же каталог моделей,
+OpenProvider не патчит Codex App. Он записывает ту же конфигурацию Codex и тот же каталог моделей,
 которыми уже пользуются Codex CLI/TUI. Поскольку Codex App читает это общее состояние,
 маршрутизируемые модели могут появляться в селекторе модели App как обычные записи каталога Codex.
 
@@ -26,10 +26,10 @@ openai-apikey/gpt-5.6-sol           # API key
 
 Свежие установки и конфигурации без сохранённого режима по умолчанию используют Pool. Текущие
 конфигурации используют маркер 2 и сохраняют поставлявшийся v1-вариант в
-`~/.opencodex/config.json.pre-openai-tiers-v2.bak`; восстановить его можно так:
+`~/.OpenProvider/config.json.pre-openai-tiers-v2.bak`; восстановить его можно так:
 
 ```sh
-cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json
+cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json
 ```
 
 Более ранние v1-конфигурации с тремя провайдерами автоматически мигрируют в единственную строку
@@ -42,30 +42,30 @@ cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
 При привязке к loopback по умолчанию Codex сохраняет свой встроенный id провайдера `openai`.
-opencodex устанавливает корневые ключи, которые направляют провайдера и каталог моделей на прокси:
+OpenProvider устанавливает корневые ключи, которые направляют провайдера и каталог моделей на прокси:
 
 ```toml
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 openai_base_url = "http://127.0.0.1:10100/v1"
 ```
 
 Для hostname, отличного от loopback, Codex также должен отправлять сгенерированный заголовок
-API-аутентификации. В этом режиме используются корневой ключ `model_provider = "opencodex"` и
+API-аутентификации. В этом режиме используются корневой ключ `model_provider = "OpenProvider"` и
 выделенный Responses-совместимый провайдер:
 
 ```toml
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 ```
 
 `websockets` по умолчанию выключен. Записи выделенного провайдера и каталога объявляют
@@ -76,7 +76,7 @@ Codex может сначала попробовать WebSocket, и прокс�
 
 ## Почему маршрутизируемые модели появляются в селекторе
 
-Селектор модели Codex ожидает записи каталога в формате Codex. opencodex строит маршрутизируемые
+Селектор модели Codex ожидает записи каталога в формате Codex. OpenProvider строит маршрутизируемые
 записи, клонируя шаблон нативной модели Codex и заменяя идентичность на маршрутизируемую модель:
 
 ```text
@@ -86,13 +86,13 @@ visibility = "list"
 ```
 
 Клон сохраняет поля, требуемые строгим парсером: уровни рассуждений, тип shell, флаги поддержки
-API и базовые инструкции. Затем opencodex удаляет чисто нативные возможности, которые маршрут не
+API и базовые инструкции. Затем OpenProvider удаляет чисто нативные возможности, которые маршрут не
 может обеспечить, включая метаданные service tier OpenAI.
 
 ## Покрытие моделей в v2.7.1
 
 Нативный резервный набор включает `gpt-5.5`, `gpt-5.4`, `gpt-5.4-mini`,
-`gpt-5.3-codex-spark` и GPT-5.6 Sol/Terra/Luna. Для семейства GPT-5.5/5.4 opencodex сохраняет
+`gpt-5.3-codex-spark` и GPT-5.6 Sol/Terra/Luna. Для семейства GPT-5.5/5.4 OpenProvider сохраняет
 более богатые актуальные записи установленного каталога Codex и синтезирует только отсутствующие.
 Комплектный снапшот вышестоящего источника используется только для GPT-5.6 — он даёт настоящую
 идентичность и метаданные каждой модели вместо приближения по старому шаблону.
@@ -129,7 +129,7 @@ API и базовые инструкции. Затем opencodex удаляет 
 
 ## Режим multi-agent surface
 
-opencodex добавляет трёхпозиционное переопределение поля `multi_agent_version` для каждой записи
+OpenProvider добавляет трёхпозиционное переопределение поля `multi_agent_version` для каждой записи
 каталога:
 
 | Режим | Эффект |
@@ -172,7 +172,7 @@ service_tier = "fast"
 fast_mode = true
 ```
 
-Но каталог моделей и id уровня в запросах во время выполнения используют `priority`. opencodex
+Но каталог моделей и id уровня в запросах во время выполнения используют `priority`. OpenProvider
 сохраняет это разделение. Нативные модели OpenAI с пробросом сохраняют поддержку fast; у
 маршрутизируемых не-OpenAI-моделей метаданные service tier удаляются, чтобы опция fast не
 предлагалась там, где её нельзя обеспечить.
@@ -181,7 +181,7 @@ fast_mode = true
 
 Codex сортирует видимые в селекторе записи каталога по возрастанию `priority` и объявляет первые
 пять как переопределения модели для `spawn_agent`. Выберите до пяти нативных id без префикса или
-id `provider/model` через `subagentModels` или страницу Subagents в дашборде; opencodex
+id `provider/model` через `subagentModels` или страницу Subagents в дашборде; OpenProvider
 присваивает этим записям приоритеты 0–4 в выбранном порядке. Остальные модели по-прежнему можно
 вызывать по точному id.
 
@@ -198,6 +198,7 @@ id `provider/model` через `subagentModels` или страницу Subagent
 ocx sync
 ```
 
-Каждый раз, когда меняются видимость, priority или метаданные каталога, opencodex перезаписывает
+Каждый раз, когда меняются видимость, priority или метаданные каталога, OpenProvider перезаписывает
 `models_cache.json` с намеренно устаревшей обёрткой кеша, чтобы следующее обновление моделей
 Codex прочитало новый каталог.
+

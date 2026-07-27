@@ -1,4 +1,4 @@
-export const packageName = "@bitkyc08/opencodex";
+export const packageName = "@mdevs/openprovider";
 export const cliCommand = "ocx";
 
 export async function loadBunApi() {
@@ -7,3 +7,4 @@ export async function loadBunApi() {
   }
   return import("../src/index.ts");
 }
+

@@ -1,13 +1,13 @@
 ---
 title: コントリビュート
-description: opencodex の開発環境、構成、規約、プロバイダーとアダプターの追加方法。
+description: OpenProvider の開発環境、構成、規約、プロバイダーとアダプターの追加方法。
 ---
 
 ## セットアップ
 
 ```bash
-git clone https://github.com/lidge-jun/opencodex.git
-cd opencodex
+git clone https://github.com/mDevsLabs/OpenProvider.git
+cd OpenProvider
 bun install
 bun run dev:proxy    # 開発モードのプロキシ API
 bun run dev:gui      # ダッシュボード dev サーバー(別ターミナル)
@@ -46,7 +46,7 @@ cd docs-site && bun install && bun dev
 
 ## ドキュメントのデプロイ
 
-公開ドキュメントは GitHub Pages の <https://opencodex.me/ja/> に公開されます。
+公開ドキュメントは GitHub Pages の <https://OpenProvider.me/ja/> に公開されます。
 `.github/workflows/deploy-docs.yml` は `main` push で `docs-site/**` またはワークフロー自体が変わると
 実行されます。`docs-site` をビルドした後、生成されたサイトをデプロイします。ドキュメント変更を push する前に以下を
 実行してください。
@@ -126,4 +126,6 @@ factory の場合は `src/index.ts` からも export してください。
 
 変更を証明する最も狭いコマンドから実行してください。型は `bun run typecheck`、動作は集中した
 `bun test tests/<name>.test.ts` またはランタイム probe で確認した後、影響範囲に応じた広い gate を
-実行します。opencodex は大きな batch より小さく検証可能な commit を好みます。
+実行します。OpenProvider は大きな batch より小さく検証可能な commit を好みます。
+
+

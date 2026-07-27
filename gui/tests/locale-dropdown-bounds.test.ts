@@ -52,3 +52,4 @@ test("the mobile drawer keeps its own upward placement", async () => {
   const css = await styles();
   expect(css).toMatch(/\.sidebar \.lang-toggle \.select-dropdown-beside\s*\{[^}]*bottom:\s*calc\(100% \+ 6px\)/);
 });
+

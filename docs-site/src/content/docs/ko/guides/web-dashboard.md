@@ -1,9 +1,9 @@
 ---
 title: 웹 대시보드
-description: 프록시 상태, 프로바이더, 모델, 위임 안내, 인증 풀, 사용량, 로그를 관리하는 opencodex GUI.
+description: 프록시 상태, 프로바이더, 모델, 위임 안내, 인증 풀, 사용량, 로그를 관리하는 OpenProvider GUI.
 ---
 
-opencodex는 프록시가 제공하는 로컬 웹 대시보드(`gui/` 아래의 Vite/React 앱)를 포함합니다.
+OpenProvider는 프록시가 제공하는 로컬 웹 대시보드(`gui/` 아래의 Vite/React 앱)를 포함합니다.
 프로바이더, Codex/ChatGPT 계정, 카탈로그 모델, 사이드카, 서브에이전트 설정, 요청 트래픽을 가장
 빠르게 관리할 수 있는 화면입니다.
 
@@ -55,7 +55,7 @@ bun run dev:gui
 ## 위임 선택기와 스폰 라우팅의 차이
 
 Dashboard의 **Sub-agent delegation** 선택기는 `injectionModel`과 선택적인 `injectionEffort`를
-저장합니다. v1 턴에서는 opencodex가 부모 에이전트에게 `spawn_agent`에 넘길 정확한 모델과 reasoning
+저장합니다. v1 턴에서는 OpenProvider가 부모 에이전트에게 `spawn_agent`에 넘길 정확한 모델과 reasoning
 강도를 알려 주는 안내를 주입합니다. 모델을 고르면 부모의 현재 reasoning 강도와 관계없이 이 안내가
 활성화되며, 모델을 지우면 저장된 강도도 함께 지워집니다.
 
@@ -117,3 +117,4 @@ GUI는 프록시의 JSON 관리 API를 사용하는 얇은 클라이언트입니
 프로바이더 설정에 복사됩니다. 별도 분류 작업 없이도
 [비전 사이드카](/ko/guides/sidecars/)가 올바른 조건에서만 실행됩니다.
 :::
+

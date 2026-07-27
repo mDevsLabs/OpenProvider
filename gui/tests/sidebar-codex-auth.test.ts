@@ -22,3 +22,4 @@ test("Codex Auth is always present in the sidebar, never filtered by view mode",
   expect(src).toContain('{ id: "codex-auth", tkey: "nav.codexAuth", Icon: IconKey }');
   expect(src).toContain('{page === "codex-auth" && <CodexAuth apiBase={API_BASE} />}');
 });
+

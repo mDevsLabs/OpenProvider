@@ -24,13 +24,13 @@ Write-Host "Using Node v$nodeVersion"
 
 # Install opencodex globally
 # If npm reports "install scripts blocked" for bun, rerun as:
-#   npm install -g --allow-scripts=bun @bitkyc08/opencodex
+#   npm install -g --allow-scripts=bun @mdevs/openprovider
 # (use an elevated PowerShell if the original install was elevated)
 $npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
 if (-not $npm) {
     $npm = Get-Command npm -ErrorAction Stop
 }
-& $npm.Source install -g @bitkyc08/opencodex
+& $npm.Source install -g @mdevs/openprovider
 if ($LASTEXITCODE -ne 0) {
     Write-Error "npm install failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
@@ -54,3 +54,4 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host ""
 Write-Host "opencodex installed! Run 'ocx init' to set up." -ForegroundColor Green
+

@@ -162,7 +162,7 @@ describe("codex-journal", () => {
         'model = "opencode-go/glm-5.2"',
         '',
         '[model_providers.opencodex]',
-        'name = "OpenCodex Proxy"',
+        'name = "OpenProvider Proxy"',
         'base_url = "http://localhost:10100/v1"',
         ''
       ].join("\\n"), "utf8");
@@ -365,7 +365,7 @@ describe("codex-journal", () => {
       "",
       "# Auto-injected by opencodex",
       "[model_providers.opencodex]",
-      'name = "OpenCodex Proxy"',
+      'name = "OpenProvider Proxy"',
       'base_url = "http://127.0.0.1:10100/v1"',
       "",
     ].join("\n");
@@ -432,3 +432,4 @@ describe("codex-journal", () => {
     expect(existsSync(join(testDir, "opencodex-journal.json"))).toBe(false);
   });
 });
+

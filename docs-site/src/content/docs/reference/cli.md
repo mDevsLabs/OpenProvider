@@ -3,22 +3,22 @@ title: CLI Reference
 description: Every ocx command and flag.
 ---
 
-The opencodex CLI is `ocx`. Run `ocx help` (or `--help` / `-h`) for top-level usage.
+The OpenProvider CLI is `ocx`. Run `ocx help` (or `--help` / `-h`) for top-level usage.
 Run `ocx help <command>` for commands registered in the help table. Help and version commands are
-read-only and do not start, stop, install, uninstall, or rewrite Codex/opencodex state.
+read-only and do not start, stop, install, uninstall, or rewrite Codex/OpenProvider state.
 
 ## Setup & lifecycle
 
 ### `ocx init`
 
 Interactive setup wizard. Prompts for a provider (preset or custom), API key (literal or `${ENV}`),
-default model, and proxy port; saves `~/.opencodex/config.json`; optionally injects the proxy into
+default model, and proxy port; saves `~/.OpenProvider/config.json`; optionally injects the proxy into
 `$CODEX_HOME/config.toml` (default `~/.codex/config.toml`); and optionally installs the Codex
 autostart shim.
 
 ### `ocx start [--port <port>]`
 
-Start the proxy server (preferred port `10100`). If that port is occupied, opencodex selects and
+Start the proxy server (preferred port `10100`). If that port is occupied, OpenProvider selects and
 records another available port. It writes PID/runtime-port state and refuses to start a second live
 instance. On start it syncs each provider's models into Codex's catalog. On shutdown it restores
 native Codex — unless it was launched as a managed service (`OCX_SERVICE=1`).
@@ -100,8 +100,8 @@ Abbreviated example shape:
     "url": "http://localhost:10100/"
   },
   "paths": {
-    "config": "/Users/example/.opencodex/config.json",
-    "pid": "/Users/example/.opencodex/ocx.pid",
+    "config": "/Users/example/.OpenProvider/config.json",
+    "pid": "/Users/example/.OpenProvider/ocx.pid",
     "runtime": "/path/to/bun"
   },
   "runtime": {
@@ -117,7 +117,7 @@ Abbreviated example shape:
   "codexAutostart": true,
   "defaultProvider": "openai",
   "service": {
-    "summary": "not installed (logs: /Users/example/.opencodex/service.log)"
+    "summary": "not installed (logs: /Users/example/.OpenProvider/service.log)"
   },
   "codexShim": {
     "summary": "Codex autostart shim: not installed"
@@ -138,7 +138,7 @@ command exits 0 only when healthy and 1 otherwise, making it suitable for servic
 ### `ocx uninstall` &nbsp;·&nbsp; `ocx remove`
 
 Stop the service and proxy, remove the service and Codex shim, restore native Codex, then remove
-opencodex local config only if all restore steps succeeded. `remove` is an alias of `uninstall`.
+OpenProvider local config only if all restore steps succeeded. `remove` is an alias of `uninstall`.
 
 ## Models & Codex
 
@@ -149,7 +149,7 @@ Run it after adding a provider or to refresh available models.
 
 ### `ocx sync-cache`
 
-Invalidate Codex's local model picker cache so it is rebuilt from the active opencodex catalog.
+Invalidate Codex's local model picker cache so it is rebuilt from the active OpenProvider catalog.
 
 ### `ocx v2 [subcommand]`
 
@@ -173,7 +173,7 @@ ocx v2 on
 ocx v2 threads 16
 ```
 
-The `mode` subcommand writes `multiAgentMode` to the opencodex config and resyncs the Codex catalog.
+The `mode` subcommand writes `multiAgentMode` to the OpenProvider config and resyncs the Codex catalog.
 `mode v1`/`mode v2` and `on`/`off` move the current numeric thread limit between the valid v1/v2
 Codex keys while flipping the native feature through `codex features enable|disable`. A failed
 transition restores the original `config.toml`.
@@ -339,7 +339,7 @@ security find-generic-password -w openrouter | ocx account add-key openrouter --
 ### `ocx login <provider>`
 
 Start the provider's registered login flow. OAuth providers open a browser and store auto-refreshed
-credentials under `~/.opencodex/`; API-key login providers open their key dashboard, prompt for the
+credentials under `~/.OpenProvider/`; API-key login providers open their key dashboard, prompt for the
 key, validate it when possible, and save the resulting provider config. The command prints the
 currently accepted OAuth and API-key provider ids when the name is missing or unknown.
 
@@ -368,7 +368,7 @@ the proxy if it isn't running.
 
 ### `ocx service [subcommand]`
 
-Run opencodex as a login-managed background service (macOS **launchd**, Linux **systemd user unit**,
+Run OpenProvider as a login-managed background service (macOS **launchd**, Linux **systemd user unit**,
 Windows **Task Scheduler**) that auto-starts on login and auto-restarts on crash. Service runs set
 `OCX_SERVICE=1` so a restart doesn't churn the Codex config.
 
@@ -398,7 +398,7 @@ If a completed external Codex update overwrites an installed shim, the next ordi
 backs up the stable new launcher and restores the shim before dispatch. A launcher that is still
 changing is left untouched and retried later. Repair failures warn without failing the requested
 command; manual fallback: `ocx codex-shim install`. Set `codexShimAutoRestore` to `false`, or set
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0` for a process-level opt-out.
+`OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` for a process-level opt-out.
 
 | Subcommand | Action |
 | --- | --- |
@@ -429,7 +429,7 @@ Orca runtime-home mismatch and explains service migration when applicable. Paths
 diagnostic redact the OS username. Doctor prints repair hints but does not apply them.
 
 The **OAuth reliability** section reports whether credential storage is writable, whether refresh
-single-flight / lock files can be created under `OPENCODEX_HOME`, non-healthy OAuth or Codex pool
+single-flight / lock files can be created under `OpenProvider_HOME`, non-healthy OAuth or Codex pool
 accounts (redacted ids) with a recovery `Action:`, and a static OK that the Codex forward path does
 not fabricate official-client metadata. Doctor never mutates credentials or applies repairs.
 
@@ -446,13 +446,13 @@ ocx debug usage logs [-f|--follow]
 
 With no scope, `ocx debug` prints usage and, when the proxy is stopped, the next-start environment
 defaults. Provider debug defaults from `OCX_DEBUG=1` (legacy `OCX_DEBUG_FRAMES=1` also works); usage
-debug defaults from `OPENCODEX_USAGE_DEBUG=1`.
+debug defaults from `OpenProvider_USAGE_DEBUG=1`.
 
 ## Updating
 
 ### `ocx update`
 
-Self-update opencodex from npm. Stable installs use `@latest`; preview installs stay on `@preview`
+Self-update OpenProvider from npm. Stable installs use `@latest`; preview installs stay on `@preview`
 unless you pass `--tag latest|preview`. It detects a source checkout and tells you to
 `git pull && bun install` instead, and is a no-op if you're already on the newest version for that
 tag. A running proxy is stopped before files are replaced; an installed service is rebuilt and
@@ -463,7 +463,7 @@ ocx update
 ocx update --tag preview
 ```
 
-New versions become available the moment the [Release workflow](https://github.com/lidge-jun/opencodex/actions/workflows/release.yml)
+New versions become available the moment the [Release workflow](https://github.com/mDevsLabs/OpenProvider/actions/workflows/release.yml)
 publishes them to npm.
 
 ## Help
@@ -487,3 +487,5 @@ Two dispatch targets are intentionally omitted from normal help: `__refresh-vers
 refreshes the update-notification cache in a detached process, and
 `__gui-update-worker <job-id> [latest|preview] [restart]` runs a dashboard update job. They are
 implementation details, not stable user-facing commands.
+
+

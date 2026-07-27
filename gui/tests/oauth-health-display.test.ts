@@ -127,3 +127,4 @@ describe("oauth health badge helpers", () => {
     expect(displayAccountId("   ")).toBe("account-…");
   });
 });
+

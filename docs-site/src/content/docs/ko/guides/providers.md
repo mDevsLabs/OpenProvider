@@ -1,10 +1,10 @@
 ---
 title: 프로바이더
-description: opencodex가 LLM 프로바이더를 인증하고 통신하는 모든 방식 — OAuth, API 키, ChatGPT 포워드, 그리고 로컬.
+description: OpenProvider가 LLM 프로바이더를 인증하고 통신하는 모든 방식 — OAuth, API 키, ChatGPT 포워드, 그리고 로컬.
 ---
 
 **프로바이더**는 하나의 업스트림 LLM 엔드포인트와 거기에 도달하는 방법을 합친 것입니다: 어댑터, 베이스 URL, 인증
-모드, 그리고 선택적인 모델 목록으로 구성됩니다. 프로바이더는 `~/.opencodex/config.json`의 `providers` 아래에 위치합니다.
+모드, 그리고 선택적인 모델 목록으로 구성됩니다. 프로바이더는 `~/.OpenProvider/config.json`의 `providers` 아래에 위치합니다.
 
 ## OpenAI 계정 모드
 
@@ -21,8 +21,8 @@ max input 922,000이며 `*-pro` virtual id는 공개 상태에 유지되고 wire
 내장 `openai` 제공자가 없거나 비활성화된 경우 대시보드 Accounts 선택기와 Codex Auth 페이지에서 복구할 수 있습니다. 없는 항목은 정규 프리셋으로 만들고, 비활성화된 정규 항목은 저장된 모드/모델 설정을 바꾸지 않고 다시 켜며, 비정규 `openai` 항목에는 그 복구 경로를 제공하지 않습니다.
 
 shipped v1 config는 marker 2의 단일 옵션 행으로 자동 이관됩니다. 원본은
-`~/.opencodex/config.json.pre-openai-tiers-v2.bak`에 한 번 보존되며 다음 명령으로 복원합니다:
-`cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`.
+`~/.OpenProvider/config.json.pre-openai-tiers-v2.bak`에 한 번 보존되며 다음 명령으로 복원합니다:
+`cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json`.
 
 ## 인증 모드
 
@@ -61,7 +61,7 @@ ChatGPT 패스스루 카탈로그에는 GPT-5.6 Sol/Terra/Luna의 네임스페�
 ## 2. 계정 로그인 (OAuth)
 
 OAuth 로그인을 사용하는 프로바이더 프리셋은 여섯 개입니다. 자격 증명은
-`~/.opencodex/auth.json`에 저장되고 자동으로 갱신됩니다. 로그인 CLI는 `chatgpt`도 받습니다.
+`~/.OpenProvider/auth.json`에 저장되고 자동으로 갱신됩니다. 로그인 CLI는 `chatgpt`도 받습니다.
 이 명령은 ChatGPT 자격 증명을 발급받고 `forward` 모드 프로바이더 항목을 만듭니다.
 
 ```bash
@@ -91,12 +91,12 @@ ocx logout <provider>
 자격 증명에 고정된 계정 id나 이메일이 있는 OAuth 프로바이더는 로그인을 여러 개 보관할 수 있습니다.
 Providers 페이지에서 계정을 추가하고, 다른 계정을 로그아웃하지 않은 채 활성 계정만 바꿀 수 있습니다.
 계정 식별 정보가 없는 Kimi와 Kiro는 활성 슬롯을 교체하며, `chatgpt`는 Codex 계정 풀에 별도 저장소가
-있어 항상 단일 슬롯만 씁니다. 토큰은 `~/.opencodex/auth.json`에 저장되고,
+있어 항상 단일 슬롯만 씁니다. 토큰은 `~/.OpenProvider/auth.json`에 저장되고,
 `/api/oauth/accounts`는 마스킹된 메타데이터만 반환합니다.
 
 ## 3. API 키 카탈로그
 
-opencodex v2.7.1에는 빌트인 프리셋이 50개 들어 있습니다. 키 방식 40개, OAuth 6개, 로컬 3개,
+OpenProvider v2.7.1에는 빌트인 프리셋이 50개 들어 있습니다. 키 방식 40개, OAuth 6개, 로컬 3개,
 기본 ChatGPT 포워드 프리셋 1개입니다. 대시보드의 **Add provider** 선택기는 키 발급 페이지를 열고,
 입력한 키를 검증한 뒤 저장합니다. 주요 항목은 다음과 같습니다:
 
@@ -166,7 +166,7 @@ Sol/Terra/Luna를 폴백 목록에 넣어 둡니다.
 기준으로 현재 계정에서 쓸 수 있는 모델만 남깁니다.
 
 :::note[게이트웨이 및 구독 프록시]
-프로바이더 지원 여부는 "에이전트" 제품인지가 아니라 opencodex에 맞는 wire 어댑터가 있는지로
+프로바이더 지원 여부는 "에이전트" 제품인지가 아니라 OpenProvider에 맞는 wire 어댑터가 있는지로
 결정됩니다. 현재 어댑터 id는 `openai-chat`, `openai-responses`, `anthropic`, `google`(AI Studio,
 Vertex, Antigravity/Cloud Code Assist 모드), `azure` / `azure-openai`, `kiro`, `cursor`입니다.
 Amazon Bedrock 네이티브 API처럼 이 구현 중 어느 것과도 맞지 않는 독자 프로토콜은 직접 지원하지 않습니다.
@@ -179,12 +179,12 @@ Gateway**는 URL에 계정 + 게이트웨이 id를 채워야 합니다.
 
 Cursor는 별도의 실험적 어댑터로 추적합니다. `adapter: "cursor"`는 `ocx init`과 dashboard Add
 Provider picker에 실험적 local config 항목으로 표시되며, Cursor의 static fallback model catalog
-metadata를 저장합니다. Cursor access token이 설정되면 opencodex는 Cursor live HTTP/2 transport를
+metadata를 저장합니다. Cursor access token이 설정되면 OpenProvider는 Cursor live HTTP/2 transport를
 사용합니다. v2.7.1 폴백 목록에는 1M 컨텍스트의 `gpt-5.6-sol` / `terra` / `luna`와 500K 컨텍스트의
 `grok-4.5` / `grok-4.5-fast`가 들어 있으며, 실시간 탐색 결과에 따라 현재 계정에 표시할 모델을
 결정합니다. Cursor 서버가 직접 보내는 native read/write/delete/ls/grep/shell/fetch 실행은 Codex
 승인 및 sandbox 경로를 우회하므로 기본적으로 비활성화되어 있습니다. 신뢰한 로컬 실험에서만
-`~/.opencodex/config.json`의 `providers.cursor`에 `unsafeAllowNativeLocalExec: true`를 설정하세요.
+`~/.OpenProvider/config.json`의 `providers.cursor`에 `unsafeAllowNativeLocalExec: true`를 설정하세요.
 대시보드에서는 **Providers → Cursor → Edit JSON**에서 설정할 수 있습니다. 전체 예시는
 [설정 레퍼런스](/ko/reference/configuration/#cursor-provider-adapter-cursor)를 참고하세요.
 MCP, 화면 녹화, computer-use는 executor hook으로 열려 있으며, 로컬
@@ -196,7 +196,7 @@ model discovery는 이 실험적 어댑터에서 활성화되어 있으며, Curs
 ### Ollama Cloud
 
 Ollama Cloud는 호스팅형(로컬이 아님) Ollama로, `https://ollama.com/v1`에서 OpenAI 호환이며 키는
-[ollama.com/settings/keys](https://ollama.com/settings/keys)에서 발급받습니다. opencodex는 클라우드
+[ollama.com/settings/keys](https://ollama.com/settings/keys)에서 발급받습니다. OpenProvider는 클라우드
 라인업을 비전 기능에 따라 분류하여 [비전 사이드카](/ko/guides/sidecars/)가 텍스트 전용 모델에만
 작동하도록 합니다. 텍스트 전용 모델(예: `glm-5.2`, `deepseek-v4-pro`, `gpt-oss`, `qwen3-coder`,
 `minimax-m2.x`, `nemotron-3-*`)은 `noVisionModels`에 나열되며, 비전 네이티브 모델(예:
@@ -205,7 +205,7 @@ Ollama의 `:size` 태그에 관대하므로 `gpt-oss`는 `gpt-oss:120b`와 `gpt-
 
 ## 4. 로컬 프로바이더
 
-opencodex를 로컬 OpenAI 호환 서버로 향하게 하세요 — 보통은 빈 키와 함께 사용합니다:
+OpenProvider를 로컬 OpenAI 호환 서버로 향하게 하세요 — 보통은 빈 키와 함께 사용합니다:
 
 | 프로바이더 | 베이스 URL |
 | --- | --- |
@@ -219,3 +219,4 @@ opencodex를 로컬 OpenAI 호환 서버로 향하게 하세요 — 보통은 �
 **Custom**을 선택하거나 `ocx init`에서 `custom`을 선택한 뒤 베이스 URL을 입력하세요. 모든 프로바이더 필드
 (`headers`, `noReasoningModels`, `noVisionModels`, `models`, …)는
 [설정 레퍼런스](/ko/reference/configuration/)를 참고하세요.
+

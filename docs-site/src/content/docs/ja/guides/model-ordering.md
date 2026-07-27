@@ -1,9 +1,9 @@
 ---
 title: モデルの並び順について
-description: opencodex が Codex モデルピッカーと spawn_agent モデルオーバーライドの順序を決める方式。
+description: OpenProvider が Codex モデルピッカーと spawn_agent モデルオーバーライドの順序を決める方式。
 ---
 
-Codex モデルピッカーは opencodex 設定に書かれたプロバイダー宣言順やモデル配列順を保存しません。
+Codex モデルピッカーは OpenProvider 設定に書かれたプロバイダー宣言順やモデル配列順を保存しません。
 最終順序はカタログ priority で決まり、同じ priority を持つルーティングモデルには決定論的
 アルファベット順ソートが適用されます。
 
@@ -12,7 +12,7 @@ Codex モデルピッカーは opencodex 設定に書かれたプロバイダー
 Codex の models-manager はピッカーに表示されるカタログ項目を `priority` 昇順でソートします。
 カタログ配列順は捨てるため、生成された JSON 配列で項目を前に動かしてもピッカーでは前に移動しません。この制約は `src/codex/catalog/sync.ts` に直接記録されています。
 
-そのため opencodex は配列位置ではなくより低い priority を付与してフィーチャー位置を制御します。
+そのため OpenProvider は配列位置ではなくより低い priority を付与してフィーチャー位置を制御します。
 関連 priority は次のとおりです。
 
 | カタログ項目 | Priority | 根拠 |
@@ -60,7 +60,7 @@ featured リストが空でないときの最終順序は次のとおりです�
 3. カタログマージ過程で featured ブロックの下に押し下げられた選択されていないネイティブモデル
 
 `subagentModels` がない場合、ルーティングモデルは priority `5` を維持し、ネイティブ GPT 項目は通常 priority
-(opencodex が作った項目は通常 `9`)を使います。ルーティンググループ内部は引き続きプロバイダー/ID
+(OpenProvider が作った項目は通常 `9`)を使います。ルーティンググループ内部は引き続きプロバイダー/ID
 アルファベット順です。
 
 ## 例
@@ -95,10 +95,11 @@ subagentModels = [
 ## 順序を変える方法
 
 先頭モデルの順序をユーザーが変えられる唯一のサポート手段は `subagentModels` を並び替えることです。
-ダッシュボードの **Sub-agents** ページまたは opencodex 設定で変更できます。一覧は最大 5 モデルを
+ダッシュボードの **Sub-agents** ページまたは OpenProvider 設定で変更できます。一覧は最大 5 モデルを
 受け付け、配列順序に意味があります。
 
 現在 `OcxConfig` には一般 `modelOrder`、`providerOrder`、priority map 設定はありません。サポートされるソート
 フィールドは `subagentModels` です(`src/types.ts:238-246`)。`disabledModels` と各プロバイダーの
 `selectedModels` は公開フィールドです(`src/types.ts:276-282`、`src/types.ts:439-446`)。そのため残りの
 ピッカー順序を変えるには設定変更ではなくコード動作の変更が必要です。
+

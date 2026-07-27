@@ -58,8 +58,8 @@ These are existing workflow branches, not new code paths. Evidence comes from th
 gh run view <ci-run-id> --json status,conclusion,url,headSha,jobs
 gh run view <service-run-id> --json status,conclusion,url,headSha,jobs
 gh run view <release-run-id> --json status,conclusion,url,headSha,jobs
-npm view @bitkyc08/opencodex@2.7.1-preview.20260710 version
-npm dist-tag ls @bitkyc08/opencodex
+npm view @mdevs/openprovider@2.7.1-preview.20260710 version
+npm dist-tag ls @mdevs/openprovider
 git ls-remote origin refs/tags/v2.7.1-preview.20260710
 gh release view v2.7.1-preview.20260710 --json tagName,targetCommitish,url,isPrerelease
 ```
@@ -73,3 +73,4 @@ gh release view v2.7.1-preview.20260710 --json tagName,targetCommitish,url,isPre
 ## Done criteria
 
 All acceptance criteria in `000_plan.md` are proven with fresh command output, the evidence ledger is complete, and the implementation unit is archived under `devlog/_fin/`.
+

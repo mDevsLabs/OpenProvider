@@ -30,3 +30,4 @@ test("Models workspace stacks via content-width container query before mobile dr
   // Mobile media rule retained for drawer layouts.
   expect(css).toContain("@media (max-width: 768px)");
 });
+

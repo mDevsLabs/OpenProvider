@@ -1,9 +1,9 @@
 ---
 title: Codex Integration
-description: How opencodex injects itself into Codex, syncs the model catalog, drives the subagent picker, and restores cleanly.
+description: How OpenProvider injects itself into Codex, syncs the model catalog, drives the subagent picker, and restores cleanly.
 ---
 
-opencodex makes Codex route through the proxy by editing two things Codex reads: its config
+OpenProvider makes Codex route through the proxy by editing two things Codex reads: its config
 (`$CODEX_HOME/config.toml`, default `~/.codex/config.toml`) and its model catalog. Every edit is
 idempotent and reversible.
 
@@ -15,12 +15,12 @@ configs migrate to marker 2 and preserve `config.json.pre-openai-tiers-v2.bak` f
 ## Config injection
 
 `ocx init`, `ocx start`, and `ocx sync` call the injector. On the default loopback bind, it keeps
-Codex's built-in `openai` provider id and points that provider at opencodex:
+Codex's built-in `openai` provider id and points that provider at OpenProvider:
 
 ```toml
 # root keys, before the first table
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
-# Auto-injected by opencodex
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
+# Auto-injected by OpenProvider
 openai_base_url = "http://127.0.0.1:10100/v1"
 
 [features]
@@ -36,7 +36,7 @@ The proxy listens on port `10100` by default and serves `POST /v1/responses`,
 Codex's built-in `image_gen` tool does not go through `/v1/responses` — the codex-rs extension
 POSTs `{base_url}/images/generations` (or `/images/edits` when reference images are attached)
 directly, with the same ChatGPT bearer auth it uses for chat. Because the injected `base_url`
-points at opencodex, the proxy relays those calls to the OpenAI upstream:
+points at OpenProvider, the proxy relays those calls to the OpenAI upstream:
 
 - **One mode-aware forward candidate:** Pool selects an eligible main/added account; Direct uses the
   caller OAuth bearer. The configured mode applies consistently to the image request.
@@ -52,21 +52,21 @@ uses a dedicated provider instead:
 
 ```toml
 # root keys
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_provider = "OpenProvider"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 
 # appended at the end of the file
-# Auto-injected by opencodex
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+# Auto-injected by OpenProvider
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 # supports_websockets = true   # only when config.websockets is true
 ```
 
-When OpenCodex owns routing, both modes write `$CODEX_HOME/opencodex.config.toml` as a
+When OpenProvider owns routing, both modes write `$CODEX_HOME/OpenProvider.config.toml` as a
 reference/fallback config. On loopback it contains the root keys you can merge manually if automatic
 injection was removed; on non-loopback it contains the dedicated provider form. External-provider
 mode leaves this profile untouched.
@@ -80,17 +80,17 @@ catalog but reports that routing was not injected.
 
 ## Shared model catalog
 
-Codex CLI, TUI, App, and SDK all read the same Codex home. opencodex resolves that directory from
+Codex CLI, TUI, App, and SDK all read the same Codex home. OpenProvider resolves that directory from
 `CODEX_HOME`, falling back to `~/.codex`, and manages:
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
-On WSL, if `CODEX_HOME` is unset and the Linux `~/.codex/config.toml` is absent, opencodex also
+On WSL, if `CODEX_HOME` is unset and the Linux `~/.codex/config.toml` is absent, OpenProvider also
 checks for a single Windows Codex Desktop home at `/mnt/c/Users/*/.codex/config.toml`. When exactly
 one candidate exists, it uses that directory so WSL app-server mode and Windows Codex Desktop share
 the same config and auth files. Set `CODEX_HOME` explicitly to override this detection.
@@ -102,7 +102,7 @@ from that Orca shell, uninstall it from the original shell first, then set `CODE
 home, unset `ORCA_CODEX_HOME`, rerun sync/restore, and install the service again.
 
 In dedicated-provider mode, `requires_openai_auth = true` keeps Codex App/TUI account-gated surfaces
-aligned with native Codex. opencodex also serves `/v1/responses` over WebSocket. The dedicated
+aligned with native Codex. OpenProvider also serves `/v1/responses` over WebSocket. The dedicated
 provider advertises `supports_websockets = true` only when `"websockets": true`; on loopback Codex's
 built-in provider may try WebSocket first, and a disabled proxy returns `426` so Codex falls back to
 HTTP/SSE.
@@ -110,17 +110,17 @@ HTTP/SSE.
 ## Thread identity and history
 
 The default loopback form keeps new threads tagged with Codex's native `openai` provider, so normal
-resume history needs no remapping. On first sync it also migrates threads tagged by older opencodex
+resume history needs no remapping. On first sync it also migrates threads tagged by older OpenProvider
 builds back to `openai`. Non-loopback dedicated-provider mode still mirrors history under the
-`opencodex` provider while active and restores the backed-up metadata on exit. Set
+`OpenProvider` provider while active and restores the backed-up metadata on exit. Set
 `syncResumeHistory: false` to leave history untouched.
 
 ## Model catalog sync
 
-Codex shows models from an on-disk catalog (`$CODEX_HOME/opencodex-catalog.json` by default). On
-start and on `ocx sync`, opencodex:
+Codex shows models from an on-disk catalog (`$CODEX_HOME/OpenProvider-catalog.json` by default). On
+start and on `ocx sync`, OpenProvider:
 
-1. **Backs up** the pristine catalog once to `~/.opencodex/catalog-backup.json` (so featuring is
+1. **Backs up** the pristine catalog once to `~/.OpenProvider/catalog-backup.json` (so featuring is
    reversible).
 2. **Fetches** eligible providers' live model catalogs (cached ~5 min; falls back to the last good
    list, then configured `models[]`). Forward auth has no model endpoint, and Cursor uses its
@@ -162,17 +162,17 @@ name.
 
 ### External provider managers
 
-If `config.toml` already selects a provider other than `openai` or `opencodex`, OpenCodex leaves the
+If `config.toml` already selects a provider other than `openai` or `OpenProvider`, OpenProvider leaves the
 file unchanged and skips profile writes, catalog/cache refresh, and both immediate and background
 Codex history migration. Tools that manage a custom provider often tag existing sessions with that
 provider id; replacing the active id can make those intact sessions disappear from Codex's history
 view. The same protection applies to an external provider selected by a legacy root profile.
 
-Keep one tool as the owner of Codex provider configuration. To use OpenCodex behind an existing
+Keep one tool as the owner of Codex provider configuration. To use OpenProvider behind an existing
 provider manager, point that provider at `http://127.0.0.1:10100/v1` with Responses passthrough
 (`wire_api = "responses"` in Codex TOML), not Chat Completions translation. When proxy API auth is
-enabled, also pass `x-opencodex-api-key` from `OPENCODEX_API_AUTH_TOKEN`, matching the non-loopback
-provider form above. To let OpenCodex inject routing directly, first switch Codex back to its
+enabled, also pass `x-OpenProvider-api-key` from `OpenProvider_API_AUTH_TOKEN`, matching the non-loopback
+provider form above. To let OpenProvider inject routing directly, first switch Codex back to its
 built-in `openai` provider and remove any user-owned root `openai_base_url`, then rerun `ocx start`.
 
 ### Catalog troubleshooting
@@ -185,7 +185,7 @@ If a model is missing from Codex, or the catalog order/visibility looks wrong, c
 2. **`disabledModels`** (top level) — hides models from both the catalog and `/v1/models`, and flips
    bare native GPT slugs to `visibility: "hide"`.
 3. **`liveModels: false` with empty `models`** — when live discovery is off and `models` is empty or
-   omitted, opencodex exposes no routed models for that provider.
+   omitted, OpenProvider exposes no routed models for that provider.
 4. **Cursor `GetUsableModels`** — the Cursor adapter discovers models through its protobuf
    `GetUsableModels` RPC, not `/models`, so a Cursor-side change can alter which ids are visible
    independently of other providers.
@@ -193,20 +193,20 @@ If a model is missing from Codex, or the catalog order/visibility looks wrong, c
    default `300000`). Run `ocx sync` to force a fresh fetch and rewrite the catalog immediately.
 
 :::caution[Other local writers]
-Catalog writes (`opencodex-catalog.json`, `config.toml`) are atomic **inside** opencodex, which only
-prevents half-written files when two opencodex-owned writers race. That does **not** stop another
-local process, file watcher, or sync agent from rewriting catalog visibility or order after opencodex
+Catalog writes (`OpenProvider-catalog.json`, `config.toml`) are atomic **inside** OpenProvider, which only
+prevents half-written files when two OpenProvider-owned writers race. That does **not** stop another
+local process, file watcher, or sync agent from rewriting catalog visibility or order after OpenProvider
 has written. Codex keeps its separate `models_cache.json` and can refresh it independently, changing
-the visible list without rewriting `opencodex-catalog.json`. If models flip unexpectedly while the
+the visible list without rewriting `OpenProvider-catalog.json`. If models flip unexpectedly while the
 proxy is running, stop or reconfigure the competing writers, then run `ocx sync` — this is an
-external-writer hazard, not a confirmed opencodex defect.
+external-writer hazard, not a confirmed OpenProvider defect.
 :::
 
 ## Proxy connection errors
 
 If Codex retries and then fails with an error like
 `stream disconnected before completion: error sending request for url (http://127.0.0.1:10100/v1/responses)`
-— or Claude Code reports a similar connection failure — the opencodex proxy is not
+— or Claude Code reports a similar connection failure — the OpenProvider proxy is not
 running: nothing is listening on the configured port, so the client renders that raw
 connection error itself. Restart the proxy:
 
@@ -241,7 +241,7 @@ Priority ranking: featured (0–4) < other routed (5) < native (9). You can also
 
 ## Codex account warmup
 
-When a ChatGPT account is added to the Codex account pool, opencodex verifies it before persistence
+When a ChatGPT account is added to the Codex account pool, OpenProvider verifies it before persistence
 with a small streaming request to the Codex Responses backend. The request uses a real Responses
 item array (`input: [{ type: "message", ... }]`), waits for `response.completed`, and defaults to
 `gpt-5.4-mini`. If that model returns HTTP 400, it retries with `gpt-5.5`; structured upstream error
@@ -251,9 +251,9 @@ off by default; it runs only when Token Guardian is enabled, the `chatgpt` refre
 
 ## Restoring native Codex
 
-opencodex never traps you. **`ocx stop` is the single command that fully reverts to native Codex** — it
+OpenProvider never traps you. **`ocx stop` is the single command that fully reverts to native Codex** — it
 stops the proxy, stops the background service if one is installed, and strips every injected line and
-routed catalog entry so plain `codex` works exactly as if opencodex was never there:
+routed catalog entry so plain `codex` works exactly as if OpenProvider was never there:
 
 ```bash
 ocx stop       # stop the proxy + service, restore native Codex
@@ -261,6 +261,7 @@ ocx restore    # restore without stopping  (alias: ocx eject)
 ocx restore back # point plain Codex at the running proxy again
 ```
 
-When opencodex runs as a managed [background service](/reference/cli/#ocx-service), it sets
+When OpenProvider runs as a managed [background service](/reference/cli/#ocx-service), it sets
 `OCX_SERVICE=1` so a service-driven restart does **not** thrash the Codex config — only an explicit
 `ocx stop` / `ocx service stop` restores native Codex.
+

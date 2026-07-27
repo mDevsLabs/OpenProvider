@@ -82,3 +82,4 @@ test("the accelerator is hidden where hover does not exist", async () => {
   expect(css).toContain("@media (hover: none)");
   expect(css.slice(css.indexOf("@media (hover: none)"))).toContain("display: none;");
 });
+

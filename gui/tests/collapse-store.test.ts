@@ -83,3 +83,4 @@ test("only empty families fold by default", () => {
     .toEqual(["fable", "haiku"]);
   expect(defaultCollapsedFamilies({ opus: 1, fable: 1, sonnet: 1, haiku: 1 }).size).toBe(0);
 });
+

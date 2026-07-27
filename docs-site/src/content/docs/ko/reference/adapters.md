@@ -3,7 +3,7 @@ title: 어댑터
 description: 7가지 프로바이더 어댑터의 대상, 요청 구성 방식, 고유 동작.
 ---
 
-**어댑터**는 opencodex의 내부 요청/응답 모델과 프로바이더 wire 형식 사이를 변환합니다. 모든
+**어댑터**는 OpenProvider의 내부 요청/응답 모델과 프로바이더 wire 형식 사이를 변환합니다. 모든
 어댑터는 `ProviderAdapter` 인터페이스(`src/adapters/base.ts`)를 구현합니다.
 
 ```ts
@@ -99,7 +99,7 @@ Kiro의 어시스턴트 텍스트에는 그 자체로 턴 종료를 알리는 �
 고갈은 재시도 불가한 context-length 오류로, 필터링이나 가드레일 정지는 filtered incomplete로 표면화합니다.
 실제 툴 호출 없이 온 `TOOL_USE`는 진행이 아니라 모순으로 처리합니다.
 
-stop reason이 아예 없을 때만 opencodex가 비공개 `codex_kiro_final_answer` 툴을 추가하고 한 번만
+stop reason이 아예 없을 때만 OpenProvider가 비공개 `codex_kiro_final_answer` 툴을 추가하고 한 번만
 이어갑니다. 중복 억제는 공백을 정규화한 완전 일치로 제한합니다. 표현만 바뀐 상태 업데이트가 결과 자체를
 뒤집을 수 있고("아직 진행 중"에서 "완료됨"으로), 그 문장을 잃는 편이 겉보기 반복을 보여주는 것보다 나쁩니다.
 
@@ -144,3 +144,4 @@ stop reason이 아예 없을 때만 opencodex가 비공개 `codex_kiro_final_ans
 - `contentPartsToText(content)` — 텍스트 전용 툴 메시지를 위해 content part를 텍스트로
   평탄화합니다. 설명이 없는 이미지는 토큰을 폭증시키는 base64 blob 대신 짧은 `[image]` marker가
   됩니다.
+

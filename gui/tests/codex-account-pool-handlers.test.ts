@@ -79,3 +79,4 @@ test("failure paths return ok:false so callers can set toastError from result.ok
   expect(result.ok).toBe(false);
   expect(result.toast).toBe("codexAuth.resetNoCredit");
 });
+

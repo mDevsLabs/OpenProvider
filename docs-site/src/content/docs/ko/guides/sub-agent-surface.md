@@ -3,10 +3,10 @@ title: 서브에이전트 서피스 (v1 / base / v2)
 description: 모든 모델의 Codex 서브에이전트 생성·관리 방식을 전역으로 제어합니다.
 ---
 
-opencodex에서는 카탈로그의 모든 모델이 사용할 멀티에이전트 협업 서피스를 선택할 수 있습니다. 대시보드와 모델 페이지의 **서브에이전트** 토글이 이 값을 전역으로 제어합니다.
+OpenProvider에서는 카탈로그의 모든 모델이 사용할 멀티에이전트 협업 서피스를 선택할 수 있습니다. 대시보드와 모델 페이지의 **서브에이전트** 토글이 이 값을 전역으로 제어합니다.
 
 :::note
-v2 서피스(`multi_agent_v2`)의 서브에이전트는 **기본적으로** 부모 모델을 상속합니다. `fork_turns` 기본값이 `all`이고, 전체 히스토리 fork는 오버라이드를 거부하기 때문입니다. v2.7.2부터 opencodex가 상속을 깨는 방법을 가이드로 주입합니다. `fork_turns`를 `"none"`(또는 `"3"` 같은 부분 fork)으로 지정한 `spawn_agent` 호출은 `model` / `reasoning_effort` 인자를 전달할 수 있고, 공개된 툴 스키마에 이 인자가 안 보여도 Codex 런타임은 파싱해서 적용합니다. 알려진 전송 제한: **네이티브** 부모가 **비네이티브**(라우팅) 프로바이더의 자식을 스폰하면 Codex 클라이언트가 `NEW_TASK` 페이로드를 백엔드 암호화된 `encrypted_content`로만 볼 수 있습니다([#92](https://github.com/lidge-jun/opencodex/issues/92)). opencodex는 읽을 수 없는 작업을 외부 프로바이더로 전달하지 않습니다. 직접 라우팅은 HTTP 400과 `unreadable_encrypted_agent_task` 코드로 실패하고, 콤보는 복호화할 수 없는 대상은 제외하고 가능하면 정규 네이티브 ChatGPT 대상을 선택합니다. 이종 프로바이더 위임에는 v1을 쓰거나, 네이티브 ChatGPT 자식을 선택하거나, 작업을 평문 v2 `agent_message` 콘텐츠로 다시 볼 수 있습니다.
+v2 서피스(`multi_agent_v2`)의 서브에이전트는 **기본적으로** 부모 모델을 상속합니다. `fork_turns` 기본값이 `all`이고, 전체 히스토리 fork는 오버라이드를 거부하기 때문입니다. v2.7.2부터 OpenProvider가 상속을 깨는 방법을 가이드로 주입합니다. `fork_turns`를 `"none"`(또는 `"3"` 같은 부분 fork)으로 지정한 `spawn_agent` 호출은 `model` / `reasoning_effort` 인자를 전달할 수 있고, 공개된 툴 스키마에 이 인자가 안 보여도 Codex 런타임은 파싱해서 적용합니다. 알려진 전송 제한: **네이티브** 부모가 **비네이티브**(라우팅) 프로바이더의 자식을 스폰하면 Codex 클라이언트가 `NEW_TASK` 페이로드를 백엔드 암호화된 `encrypted_content`로만 볼 수 있습니다([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)). OpenProvider는 읽을 수 없는 작업을 외부 프로바이더로 전달하지 않습니다. 직접 라우팅은 HTTP 400과 `unreadable_encrypted_agent_task` 코드로 실패하고, 콤보는 복호화할 수 없는 대상은 제외하고 가능하면 정규 네이티브 ChatGPT 대상을 선택합니다. 이종 프로바이더 위임에는 v1을 쓰거나, 네이티브 ChatGPT 자식을 선택하거나, 작업을 평문 v2 `agent_message` 콘텐츠로 다시 볼 수 있습니다.
 :::
 
 ## 모드
@@ -15,11 +15,11 @@ v2 서피스(`multi_agent_v2`)의 서브에이전트는 **기본적으로** 부�
 | --- | --- | --- |
 | **v1** | `multi_agent_v1` | 네임스페이스 방식의 클래식 에이전트 툴과 `send_input` / `close_agent` / `resume_agent`를 사용합니다. `spawn_agent` 모델 오버라이드로 다른 모델의 서브에이전트를 띄울 수 있습니다. |
 | **base** (기본값) | 업스트림 핀 | 업스트림 모델 핀을 복원합니다. gpt-5.6-sol과 gpt-5.6-terra는 v2, gpt-5.6-luna는 v1을 쓰고, 핀이 없는 모델은 Codex `multi_agent_v2` 기능 플래그를 따릅니다. 실제 스폰 동작은 각 모델에 결정된 서피스를 따릅니다. |
-| **v2** | `multi_agent_v2` | 플랫 `spawn_agent` 툴과 동시 세션, `send_message` / `followup_task` / `wait_agent` / `interrupt_agent`를 사용합니다. 전체 히스토리 fork에서는 자식이 부모 모델을 상속하고, `fork_turns: "none"`(또는 부분 fork)에서는 `model` / `reasoning_effort` 오버라이드가 적용됩니다. 네이티브→라우팅 자식이 백엔드 암호화된 작업 콘텐츠만 받으면 외부 라우팅은 `unreadable_encrypted_agent_task`를 반환하고, 혼합 콤보는 복호화 가능한 네이티브 대상을 우선합니다([#92](https://github.com/lidge-jun/opencodex/issues/92)). |
+| **v2** | `multi_agent_v2` | 플랫 `spawn_agent` 툴과 동시 세션, `send_message` / `followup_task` / `wait_agent` / `interrupt_agent`를 사용합니다. 전체 히스토리 fork에서는 자식이 부모 모델을 상속하고, `fork_turns: "none"`(또는 부분 fork)에서는 `model` / `reasoning_effort` 오버라이드가 적용됩니다. 네이티브→라우팅 자식이 백엔드 암호화된 작업 콘텐츠만 받으면 외부 라우팅은 `unreadable_encrypted_agent_task`를 반환하고, 혼합 콤보는 복호화 가능한 네이티브 대상을 우선합니다([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)). |
 
 ### 암호화된 v2 작업 전달
 
-네이티브 ChatGPT 백엔드만 자신의 암호화된 작업 페이로드를 읽을 수 있습니다. 읽을 수 없는 v2 `agent_message`에 대해 opencodex는 프로바이더 디스패치 전에 다음 규칙을 적용합니다.
+네이티브 ChatGPT 백엔드만 자신의 암호화된 작업 페이로드를 읽을 수 있습니다. 읽을 수 없는 v2 `agent_message`에 대해 OpenProvider는 프로바이더 디스패치 전에 다음 규칙을 적용합니다.
 
 - 비네이티브 직접 라우팅은 HTTP 400과 `error.code = "unreadable_encrypted_agent_task"`를 반환합니다. 응답에 암호화된 페이로드를 담지 않습니다.
 - 콤보는 재시도를 포함해 해당 작업에 정규 네이티브 ChatGPT 대상만 고려합니다. 복호화 가능한 대상이 없으면 외부 프로바이더로 빈 작업을 볼 수 있는 대신 같은 400 응답을 반환합니다.
@@ -56,7 +56,7 @@ v2 서피스(`multi_agent_v2`)의 서브에이전트는 **기본적으로** 부�
 - **대시보드** → 첫 번째 스탯 셀에서 **v1**, **base**, **v2**를 선택합니다.
 - **모델** 페이지 → 상단 세그먼트 컨트롤에서 선택합니다.
 - 두 페이지 모두 **?** 버튼을 누르면 이 문서로 연결되는 도움말 모달이 열립니다.
-- **대시보드** → **서브에이전트 위임**에서 선호 모델과 선택 사항인 추론 강도를 고릅니다. v2에서는 주입된 가이드가 `fork_turns: "none"` 스폰을 지시해 모델 오버라이드가 적용되게 합니다 — 다만 네이티브→라우팅 자식은 작업 본문이 암호화 상태로 도착할 수 있습니다([#92](https://github.com/lidge-jun/opencodex/issues/92)).
+- **대시보드** → **서브에이전트 위임**에서 선호 모델과 선택 사항인 추론 강도를 고릅니다. v2에서는 주입된 가이드가 `fork_turns: "none"` 스폰을 지시해 모델 오버라이드가 적용되게 합니다 — 다만 네이티브→라우팅 자식은 작업 본문이 암호화 상태로 도착할 수 있습니다([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)).
 
 ### CLI
 
@@ -109,7 +109,7 @@ curl -X PUT http://localhost:10100/api/injection-model \
 
 서브에이전트 추론 강도는 `injectionEffort`에 저장되며 주입 모델이 있을 때만 의미가 있습니다. 이 값은 주입된 v2 가이드에 `reasoning_effort` 지시를 추가하며, 부모 세션의 추론 강도를 바꾸지는 않습니다. 오버라이드가 허용되는 fork에서는 `spawn_agent`에 전달된 `reasoning_effort`를 Codex가 그대로 적용합니다.
 
-`ultra`는 Codex 카탈로그에서 `max`보다 높은 단계이며 자동 위임 의미가 더해지지만, 프로바이더 와이어에는 `ultra`라는 값이 그대로 전달되지 않습니다. Codex가 클라이언트 경계에서 `ultra`를 `max`로 바꾸고, opencodex가 프로바이더에 맞는 유효한 값으로 조정합니다.
+`ultra`는 Codex 카탈로그에서 `max`보다 높은 단계이며 자동 위임 의미가 더해지지만, 프로바이더 와이어에는 `ultra`라는 값이 그대로 전달되지 않습니다. Codex가 클라이언트 경계에서 `ultra`를 `max`로 바꾸고, OpenProvider가 프로바이더에 맞는 유효한 값으로 조정합니다.
 
 | 모델 | 와이어의 `max` | `ultra` 선택 시 와이어 값 |
 | --- | --- | --- |
@@ -125,3 +125,5 @@ curl -X PUT http://localhost:10100/api/injection-model \
 전역 컨텍스트 상한 값의 기본값은 350k입니다. 상한을 켠 라우팅 프로바이더의 `context_window`만 제한하며, 네이티브 OpenAI 모델은 실제 컨텍스트 윈도우를 그대로 사용합니다.
 
 모델 페이지에서 값이나 전체 프로바이더 설정을 바꾸거나, 각 프로바이더 그룹 헤더 옆에서 상한을 개별적으로 켜고 끌 수 있습니다.
+
+

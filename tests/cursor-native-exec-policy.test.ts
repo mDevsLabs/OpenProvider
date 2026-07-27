@@ -128,7 +128,7 @@ describe("Cursor native exec sandbox policy", () => {
     expect(deniedText).toContain("apply_patch");
     expect(deniedText).toContain("silently call");
     expect(deniedText).toContain("Do not tell the user");
-    expect(deniedText).not.toContain("disabled by OpenCodex policy");
+    expect(deniedText).not.toContain("disabled by OpenProvider policy");
     expect(deniedText).not.toContain("sandbox denial");
     expect(deniedText).not.toContain(content);
 
@@ -142,7 +142,7 @@ describe("Cursor native exec sandbox policy", () => {
     expect(deniedShellText).toContain("exec_command");
     expect(deniedShellText).toContain("mcp_opencodex-responses_*");
     expect(deniedShellText).toContain("Do not tell the user");
-    expect(deniedShellText).not.toContain("disabled by OpenCodex policy");
+    expect(deniedShellText).not.toContain("disabled by OpenProvider policy");
     expect(deniedShellText).not.toContain("sandbox denial");
     expect(deniedShell.message.case).toBe("shellResult");
     expect(deniedShell.message.value.result.case).toBe("failure");
@@ -168,7 +168,7 @@ describe("Cursor native exec sandbox policy", () => {
     expect(deniedFetchText).toContain("curl");
     expect(deniedFetchText).toContain("wget");
     expect(deniedFetchText).toContain("mcp_opencodex-responses_shell_command");
-    expect(deniedFetchText).not.toContain("disabled by OpenCodex policy");
+    expect(deniedFetchText).not.toContain("disabled by OpenProvider policy");
     expect(deniedFetchText).not.toContain("SHOULD_NOT_FETCH");
   }
 
@@ -304,3 +304,4 @@ describe("Cursor native exec sandbox policy", () => {
   // LiveCursorTransport construction is credential/network-heavy in this suite. The context rule is
   // covered by the effective-policy truth table and the adapter factory-input capture above.
 });
+

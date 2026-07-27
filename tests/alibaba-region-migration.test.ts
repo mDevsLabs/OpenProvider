@@ -63,7 +63,7 @@ test("the migrated config survives a reload", () => {
   } finally {
     if (prev === undefined) delete process.env.OPENCODEX_HOME;
     else process.env.OPENCODEX_HOME = prev;
-    rmSync(home, { recursive: true, force: true });
+    rmSync(home, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });
 
@@ -122,3 +122,4 @@ test("carries liveModels and a user-authored note, but not the Beijing catalog",
   expect(moved.note).toBe("my own note");
   expect(moved.models).toContain("kimi-k2.7-code");
 });
+

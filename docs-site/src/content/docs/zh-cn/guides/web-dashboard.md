@@ -1,9 +1,9 @@
 ---
 title: Web 仪表盘
-description: 用于管理代理健康状态、provider、模型、委派指引、认证池、usage 和日志的 opencodex GUI。
+description: 用于管理代理健康状态、provider、模型、委派指引、认证池、usage 和日志的 OpenProvider GUI。
 ---
 
-opencodex 内置了一个由代理提供服务的本地 web 仪表盘（`gui/` 下的 Vite/React 应用）。你可以在
+OpenProvider 内置了一个由代理提供服务的本地 web 仪表盘（`gui/` 下的 Vite/React 应用）。你可以在
 这里快速管理 provider、Codex/ChatGPT 账号、目录模型、sidecar、子代理设置和请求流量。
 
 ## 打开仪表盘
@@ -54,7 +54,7 @@ bun run dev:gui
 ## 委派选择器与生成路由的区别
 
 Dashboard 的 **Sub-agent delegation** 选择器会保存 `injectionModel`，以及可选的
-`injectionEffort`。在 v1 turn 中，opencodex 会注入一段指引，告诉父代理调用 `spawn_agent` 时应
+`injectionEffort`。在 v1 turn 中，OpenProvider 会注入一段指引，告诉父代理调用 `spawn_agent` 时应
 传入哪个精确模型和 reasoning 强度。只要选定模型，无论父代理当前使用何种 reasoning 强度，都会
 启用这段指引；清除模型时也会清除已保存的强度。
 
@@ -112,3 +112,4 @@ GUI 是代理 JSON 管理 API 之上的轻量客户端。常用 endpoint 包括�
 provider 配置。因此无需手动分类，[vision sidecar](/zh-cn/guides/sidecars/) 也能在正确
 条件下启用。
 :::
+

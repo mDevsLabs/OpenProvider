@@ -23,9 +23,9 @@ echo "Using Node $(node --version)"
 
 # Install opencodex globally
 # If npm reports "install scripts blocked" for bun, rerun as:
-#   npm install -g --allow-scripts=bun @bitkyc08/opencodex
+#   npm install -g --allow-scripts=bun @mdevs/openprovider
 # (keep sudo if the original install used sudo)
-npm install -g @bitkyc08/opencodex
+npm install -g @mdevs/openprovider
 
 if ! command -v ocx &>/dev/null; then
   NPM_BIN="$(npm bin -g 2>/dev/null || printf "%s/bin" "$(npm prefix -g)")"
@@ -41,3 +41,4 @@ fi
 
 echo ""
 echo "✅ opencodex installed! Run 'ocx init' to set up."
+

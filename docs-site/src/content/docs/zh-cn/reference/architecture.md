@@ -1,9 +1,9 @@
 ---
 title: 架构
-description: opencodex 内部机制 —— 模块图、请求解析器、AdapterEvent 桥接与缓存。
+description: OpenProvider 内部机制 —— 模块图、请求解析器、AdapterEvent 桥接与缓存。
 ---
 
-opencodex 运行在单个 Bun 进程中。请求以 OpenAI Responses 格式进入，规范化为内部模型后完成
+OpenProvider 运行在单个 Bun 进程中。请求以 OpenAI Responses 格式进入，规范化为内部模型后完成
 路由，再由 adapter 发送到 provider，最后桥接回 Responses SSE。端到端流程参见
 [工作原理](/zh-cn/getting-started/how-it-works/)。
 
@@ -21,7 +21,7 @@ src/
 ├── lib/                # runtime, process, retry, privacy, token estimate helpers
 ├── web-search/         # web-search sidecar (synthetic tool, loop, executor, parser)
 ├── vision/             # vision sidecar (describe + plan)
-├── config.ts           # ~/.opencodex/config.json, defaults, PID, env resolution
+├── config.ts           # ~/.OpenProvider/config.json, defaults, PID, env resolution
 ├── router.ts           # model id → provider + adapter
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
@@ -117,7 +117,7 @@ item，因此 MCP 命名空间、`apply_patch` 风格的 freeform 工具和客�
 CRUD 与 key pool、模型选择/context cap/v2 控制、catalog sync、诊断与 debug log、usage 与
 quota、sidecar 设置、更新、生成客户端 API key、OAuth 登录/状态/登出与账号选择、Codex 账号
 管理，以及 graceful stop。proxy 绑定到 loopback 之外时，`server/auth-cors.ts` 会要求
-`/api/*` 和 `/v1/*` 都提供 `OPENCODEX_API_AUTH_TOKEN`；配置的 `corsAllowOrigins` 会扩展本地
+`/api/*` 和 `/v1/*` 都提供 `OpenProvider_API_AUTH_TOKEN`；配置的 `corsAllowOrigins` 会扩展本地
 origin allowlist。
 
 OAuth 实现在 `oauth/` 中；每次路由调用前都会即时加载或刷新 access token，而
@@ -128,7 +128,7 @@ thread affinity 位于 `codex/` 下，不会出现在管理 API 响应中。请�
 ## 传输与 compaction
 
 `server/index.ts` 默认在 `/v1/responses` 上提供 HTTP/SSE。当 `websockets` 为 `false` 而 Codex
-尝试 Responses WebSocket upgrade 时，opencodex 会返回 `426 upgrade_required`，Codex 随后在该
+尝试 Responses WebSocket upgrade 时，OpenProvider 会返回 `426 upgrade_required`，Codex 随后在该
 session 中回退到 HTTP。设置 `"websockets": true` 后，同一 endpoint 会接受 upgrade 并使用
 WebSocket bridge。
 
@@ -163,3 +163,4 @@ Codex context compaction 同样适用于路由模型。`server/responses/compact
 `OcxContentPart`（text / image）、`OcxToolCall`、`OcxTool`、`AdapterEvent`，以及配置类型
 （`OcxConfig`、`OcxProviderConfig`）。两个常用 helper 是 `namespacedToolName()` 和
 `modelInList()`；后者会在匹配 `noVisionModels` / `noReasoningModels` 时容忍 `:size` 标签。
+

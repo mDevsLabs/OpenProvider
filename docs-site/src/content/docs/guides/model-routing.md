@@ -1,6 +1,6 @@
 ---
 title: Model Routing
-description: How opencodex decides which provider serves a given model id.
+description: How OpenProvider decides which provider serves a given model id.
 ---
 
 When Codex asks for a model, `router.ts` resolves it to exactly one configured provider. The rules are
@@ -89,3 +89,4 @@ Routing and catalog visibility are separate controls:
   name (e.g. `anthropic`, `openai`, `groq`) is actually configured.
 
 See [Configuration](/reference/configuration/) for the provider fields these rules read.
+

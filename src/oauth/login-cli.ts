@@ -9,7 +9,7 @@ import type { OcxProviderConfig } from "../types";
 export function runningProxyUpdateHeaders(): Headers {
   const headers = new Headers({ "Content-Type": "application/json" });
   const apiToken = process.env.OPENCODEX_API_AUTH_TOKEN?.trim();
-  if (apiToken) headers.set("X-OpenCodex-API-Key", apiToken);
+  if (apiToken) headers.set("X-OpenProvider-API-Key", apiToken);
   return headers;
 }
 
@@ -134,3 +134,4 @@ function cloneRecordOfArrays(input: Record<string, string[]>): Record<string, st
 function cloneNestedRecord(input: Record<string, Record<string, string>>): Record<string, Record<string, string>> {
   return Object.fromEntries(Object.entries(input).map(([key, value]) => [key, { ...value }]));
 }
+

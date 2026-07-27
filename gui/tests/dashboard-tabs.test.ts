@@ -66,3 +66,4 @@ test("Dashboard uses the shared page-tabs strip with a tablist", async () => {
   expect(strip).toContain("flex-wrap: nowrap");
   expect(strip).toContain("overflow-x: auto");
 });
+

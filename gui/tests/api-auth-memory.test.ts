@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import { installApiAuthFetch, resetApiAuthFetchForTests } from "../src/api";
 
-const LEGACY_TOKEN_KEY = "opencodex-api-token";
+const LEGACY_TOKEN_KEY = "OpenProvider-api-token";
 const globals = ["document", "window", "navigator", "sessionStorage", "fetch"] as const;
 let previousGlobals: Record<(typeof globals)[number], unknown>;
 let testWindow: Window;
@@ -65,7 +65,7 @@ test("prompted API tokens stay memory-only and are not written to sessionStorage
   let authorized = false;
   const mockFetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers);
-    if (headers.get("X-OpenCodex-API-Key") === "fresh-token") {
+    if (headers.get("X-OpenProvider-API-Key") === "fresh-token") {
       authorized = true;
       return new Response("{}", { status: 200 });
     }
@@ -88,9 +88,9 @@ test("cross-origin /api/* requests do not receive the API key or token prompt", 
   const seenHeaders: Array<string | null> = [];
   const stateful = (async (_input: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers);
-    seenHeaders.push(headers.get("X-OpenCodex-API-Key"));
+    seenHeaders.push(headers.get("X-OpenProvider-API-Key"));
     if (phase === "seed") {
-      if (headers.get("X-OpenCodex-API-Key") === "local-token") return new Response("{}", { status: 200 });
+      if (headers.get("X-OpenProvider-API-Key") === "local-token") return new Response("{}", { status: 200 });
       return new Response("unauthorized", { status: 401 });
     }
     return new Response("unauthorized", { status: 401 });
@@ -119,9 +119,9 @@ test("cross-origin /v1/* requests do not receive the API key or token prompt", a
   const seenHeaders: Array<string | null> = [];
   const stateful = (async (_input: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers);
-    seenHeaders.push(headers.get("X-OpenCodex-API-Key"));
+    seenHeaders.push(headers.get("X-OpenProvider-API-Key"));
     if (phase === "seed") {
-      if (headers.get("X-OpenCodex-API-Key") === "local-token") return new Response("{}", { status: 200 });
+      if (headers.get("X-OpenProvider-API-Key") === "local-token") return new Response("{}", { status: 200 });
       return new Response("unauthorized", { status: 401 });
     }
     return new Response("unauthorized", { status: 401 });
@@ -143,3 +143,4 @@ test("cross-origin /v1/* requests do not receive the API key or token prompt", a
   expect(seenHeaders).toEqual([null]);
   expect(promptCalls).toBe(beforeCrossPrompts);
 });
+

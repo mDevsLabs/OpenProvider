@@ -73,3 +73,4 @@ test("rowStartsOpen opens only the family's resolved default", () => {
   expect(rowStartsOpen("prov/second", "prov/first")).toBe(false);
   expect(rowStartsOpen("prov/first", null)).toBe(false);
 });
+

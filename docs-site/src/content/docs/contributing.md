@@ -1,6 +1,6 @@
 ---
 title: Contributing
-description: Develop opencodex — setup, layout, conventions, and how to add a provider or adapter.
+description: Develop OpenProvider — setup, layout, conventions, and how to add a provider or adapter.
 ---
 
 ## Setup
@@ -9,8 +9,8 @@ Source development requires the `bun` CLI on your `PATH`. The published npm pack
 Bun runtime for users, but this checkout's scripts run through your local Bun installation.
 
 ```bash
-git clone https://github.com/lidge-jun/opencodex.git
-cd opencodex
+git clone https://github.com/mDevsLabs/OpenProvider.git
+cd OpenProvider
 bun install
 bun run dev:proxy    # proxy API in dev mode
 bun run dev:gui      # dashboard dev server (another terminal)
@@ -48,7 +48,7 @@ cd docs-site && bun install && bun dev
 
 ## Docs publishing
 
-The public docs publish to GitHub Pages at <https://opencodex.me/>. The
+The public docs publish to GitHub Pages at <https://OpenProvider.me/>. The
 `.github/workflows/deploy-docs.yml` workflow runs on `main` pushes that touch `docs-site/**` or the
 workflow itself, builds `docs-site`, and deploys the generated site. Before pushing docs changes,
 run:
@@ -83,7 +83,7 @@ bun run release:watch               # watch the newest Release workflow run
 ## Project maintainers
 
 The current maintainers, their responsibilities, and the review and merge policy are documented in
-[`MAINTAINERS.md`](https://github.com/lidge-jun/opencodex/blob/main/MAINTAINERS.md). GitHub review
+[`MAINTAINERS.md`](https://github.com/mDevsLabs/OpenProvider/blob/main/MAINTAINERS.md). GitHub review
 ownership for the repository and security-sensitive paths is declared in `.github/CODEOWNERS`.
 
 ## Conventions
@@ -133,4 +133,6 @@ the factory from `src/index.ts` when it belongs to the public package API.
 
 Run the narrowest command that proves your change — `bun run typecheck` for types, a focused
 `bun test tests/<name>.test.ts` or runtime probe for behavior, then the broader gates appropriate to
-the affected surface. opencodex favors small, verifiable commits over large batches.
+the affected surface. OpenProvider favors small, verifiable commits over large batches.
+
+

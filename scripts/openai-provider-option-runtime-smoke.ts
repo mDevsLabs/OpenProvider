@@ -100,7 +100,7 @@ async function checkLiveKey(): Promise<void> {
     try {
       raw = JSON.parse(readFileSync(configPath, "utf8")) as typeof raw;
     } catch {
-      throw new Error("OpenCodex config is malformed; live-key status cannot be determined safely");
+      throw new Error("OpenProvider config is malformed; live-key status cannot be determined safely");
     }
     key = resolveConfiguredKey(raw.providers?.["openai-apikey"]?.apiKey);
   }
@@ -484,3 +484,4 @@ if (Bun.argv.includes("--check-live-key")) {
     }
   }
 }
+

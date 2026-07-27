@@ -82,3 +82,5 @@
 - `prefers-reduced-motion: reduce`에서는 transition과 animation을 제거한다.
 
 모션은 상태 이해를 돕는 범위에서만 사용하며 장식 목적의 반복 애니메이션은 추가하지 않는다.
+
+

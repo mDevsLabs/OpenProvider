@@ -1,9 +1,9 @@
 ---
 title: Codex App model picker
-description: How opencodex models appear in Codex App, Codex CLI, and Codex TUI through the shared Codex catalog.
+description: How OpenProvider models appear in Codex App, Codex CLI, and Codex TUI through the shared Codex catalog.
 ---
 
-opencodex does not patch Codex App. It writes the same Codex configuration and model catalog that
+OpenProvider does not patch Codex App. It writes the same Codex configuration and model catalog that
 Codex CLI/TUI already use. Because Codex App reads that shared state, routed models can appear in the
 App's model picker as normal Codex catalog entries.
 
@@ -25,10 +25,10 @@ openai-apikey/gpt-5.6-sol           # API key
 ```
 
 Fresh installs and configs with no saved mode default to Pool. Current configs use marker 2 and
-retain the shipped v1 source at `~/.opencodex/config.json.pre-openai-tiers-v2.bak`; restore it with:
+retain the shipped v1 source at `~/.OpenProvider/config.json.pre-openai-tiers-v2.bak`; restore it with:
 
 ```sh
-cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json
+cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json
 ```
 
 Earlier v1 three-provider configurations migrate automatically into the single option-aware row.
@@ -40,29 +40,29 @@ Earlier v1 three-provider configurations migrate automatically into the single o
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
-On the default loopback bind, Codex keeps its built-in `openai` provider id. opencodex installs root
+On the default loopback bind, Codex keeps its built-in `openai` provider id. OpenProvider installs root
 keys that point the provider and model catalog at the proxy:
 
 ```toml
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 openai_base_url = "http://127.0.0.1:10100/v1"
 ```
 
 For a non-loopback hostname, Codex also needs the generated API-auth header. That mode uses a root
-`model_provider = "opencodex"` key and a dedicated Responses-compatible provider:
+`model_provider = "OpenProvider"` key and a dedicated Responses-compatible provider:
 
 ```toml
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 ```
 
 `websockets` is off by default. Dedicated-provider and catalog entries advertise
@@ -72,7 +72,7 @@ may probe WebSocket first, and a disabled proxy returns `426` so Codex falls bac
 
 ## Why routed models show up
 
-Codex's model picker expects Codex-shaped catalog entries. opencodex builds routed entries by cloning
+Codex's model picker expects Codex-shaped catalog entries. OpenProvider builds routed entries by cloning
 a native Codex model template, then replacing the routed model identity:
 
 ```text
@@ -82,13 +82,13 @@ visibility = "list"
 ```
 
 The clone keeps strict-parser fields such as reasoning levels, shell type, API support flags, and
-base instructions. opencodex then removes native-only capabilities that the route cannot honor,
+base instructions. OpenProvider then removes native-only capabilities that the route cannot honor,
 including OpenAI service-tier metadata.
 
 ## Model coverage in v2.7.1
 
 The native fallback set includes `gpt-5.5`, `gpt-5.4`, `gpt-5.4-mini`,
-`gpt-5.3-codex-spark`, and GPT-5.6 Sol/Terra/Luna. For the GPT-5.5/5.4 family, opencodex preserves
+`gpt-5.3-codex-spark`, and GPT-5.6 Sol/Terra/Luna. For the GPT-5.5/5.4 family, OpenProvider preserves
 the installed Codex catalog's richer live entries and only synthesizes a missing entry. The bundled
 upstream snapshot is used only for GPT-5.6, where it supplies the real per-model identity and
 metadata instead of an older-template approximation.
@@ -124,7 +124,7 @@ forces Codex's model cache stale after a toggle.
 
 ## Multi-agent surface mode
 
-opencodex adds a 3-state override for the `multi_agent_version` field on every catalog entry:
+OpenProvider adds a 3-state override for the `multi_agent_version` field on every catalog entry:
 
 | Mode | Effect |
 | --- | --- |
@@ -164,7 +164,7 @@ service_tier = "fast"
 fast_mode = true
 ```
 
-But the model catalog and runtime request tier id use `priority`. opencodex preserves that split.
+But the model catalog and runtime request tier id use `priority`. OpenProvider preserves that split.
 Native OpenAI passthrough models keep fast support; routed non-OpenAI models strip service-tier
 metadata so the fast option is not advertised where it cannot be honored.
 
@@ -172,7 +172,7 @@ metadata so the fast option is not advertised where it cannot be honored.
 
 Codex sorts picker-visible catalog entries by ascending `priority` and advertises the first five as
 `spawn_agent` model overrides. Pick up to five bare native ids or namespaced `provider/model` ids
-through `subagentModels` or the dashboard Subagents page; opencodex gives those entries priorities
+through `subagentModels` or the dashboard Subagents page; OpenProvider gives those entries priorities
 0-4 in the chosen order. Other models remain callable by exact id.
 
 The featured-model list is separate from the Dashboard's **Sub-agent delegation** guidance. In
@@ -186,5 +186,6 @@ If the picker still shows stale entries, refresh the catalog and restart the tar
 ocx sync
 ```
 
-opencodex rewrites `models_cache.json` with a deliberately stale cache wrapper whenever catalog
+OpenProvider rewrites `models_cache.json` with a deliberately stale cache wrapper whenever catalog
 visibility, priority, or metadata changes, so the next Codex model refresh reads the new catalog.
+

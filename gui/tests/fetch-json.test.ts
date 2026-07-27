@@ -23,3 +23,4 @@ test("readJsonOrThrow surfaces server error messages", async () => {
   const res = Response.json({ error: "locked" }, { status: 503 });
   await expect(readJsonOrThrow(res, "fallback")).rejects.toThrow("locked");
 });
+

@@ -12,7 +12,7 @@
    - git commit + push
    - wait CI (ci.yml + service-lifecycle.yml)
    - dispatch release.yml → npm publish
-4. Verify: `npm view @bitkyc08/opencodex dist-tags --json` → latest: 2.7.29
+4. Verify: `npm view @mdevs/openprovider dist-tags --json` → latest: 2.7.29
 
 ## Files changed by this phase
 - package.json: version bump 2.7.28 → 2.7.29
@@ -32,3 +32,4 @@
 ## Verification (C)
 
 (fill in: exact commands + expected exit codes)
+

@@ -44,7 +44,7 @@ opened, no merge executed (user instruction).
 - Release train gates (memory skill opencodex-release-train): push dev → wait
   for BOTH `ci.yml` and `service-lifecycle.yml` green on the exact release SHA
   → dev→preview, publish preview → preview→main, publish stable → verify
-  `npm view @bitkyc08/opencodex dist-tags --json`.
+  `npm view @mdevs/openprovider dist-tags --json`.
 
 ## Verdict
 
@@ -103,3 +103,4 @@ social, not enforced.
   this branch; keep it out of this merge decision, but account for it before
   any dev push.
 - #290 remains open (needs-info); it is not a merge blocker.
+

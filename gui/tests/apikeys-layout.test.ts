@@ -78,3 +78,4 @@ test("retired apikeys workspace i18n keys stay removed from every locale", async
     expect(dict).not.toContain('"claude.workspace.');
   }
 });
+

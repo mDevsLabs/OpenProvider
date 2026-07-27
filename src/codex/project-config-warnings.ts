@@ -18,7 +18,7 @@ export type ProjectCodexConfigIssueCode = "model_providers_table" | "profile_sel
 export interface ProjectCodexConfigWarning {
   path: string;
   code: ProjectCodexConfigIssueCode;
-  /** Effective provider id that bypasses OpenCodex. */
+  /** Effective provider id that bypasses OpenProvider. */
   detail: string;
   /** Profile name when the bypass is selected via profile = "…". */
   profileName?: string;
@@ -182,7 +182,7 @@ export function analyzeProjectCodexConfig(content: string, configPath: string): 
       message:
         `Project Codex config selects provider "${provider}" via `
         + `${routing.via === "profile" ? `profile = "${routing.profileName}"` : "model_provider"} and defines `
-        + `[model_providers.${provider}] (${rel}). That routes this trusted project away from the OpenCodex proxy.`,
+        + `[model_providers.${provider}] (${rel}). That routes this trusted project away from the OpenProvider proxy.`,
     }];
   }
 
@@ -194,7 +194,7 @@ export function analyzeProjectCodexConfig(content: string, configPath: string): 
       profileName: routing.profileName,
       message:
         `Project Codex config profile "${routing.profileName}" sets model_provider = "${provider}" (${rel}). `
-        + "That routes this trusted project away from the OpenCodex proxy.",
+        + "That routes this trusted project away from the OpenProvider proxy.",
     }];
   }
 
@@ -204,7 +204,7 @@ export function analyzeProjectCodexConfig(content: string, configPath: string): 
     detail: provider,
     message:
       `Project Codex config sets model_provider = "${provider}" (${rel}). `
-      + "Use global ~/.codex/config.toml for OpenCodex routing instead of a project-local provider override.",
+      + "Use global ~/.codex/config.toml for OpenProvider routing instead of a project-local provider override.",
   }];
 }
 
@@ -329,7 +329,7 @@ export function summarizeProjectCodexIssue(warning: ProjectCodexConfigWarning): 
 function humanizeProviderDetail(detail: string): string {
   if (detail === "opencode_go") return "OpenCode Go";
   if (detail.startsWith("opencode")) return "OpenCode";
-  if (detail === "opencodex") return "OpenCodex";
+  if (detail === "opencodex") return "OpenProvider";
   return detail;
 }
 
@@ -337,7 +337,7 @@ function humanizeProviderDetail(detail: string): string {
 export function explainProjectConfigBypass(warnings: ProjectCodexConfigWarning[]): string {
   const targets = [...new Set(warnings.map(w => humanizeProviderDetail(w.detail)))];
   const via = targets.length === 1 ? targets[0]! : targets.join(" / ");
-  return `Overrides OpenCodex — Codex uses ${via} for this repo instead of the proxy (~/.codex/config.toml).`;
+  return `Overrides OpenProvider — Codex uses ${via} for this repo instead of the proxy (~/.codex/config.toml).`;
 }
 
 export interface ProjectCodexConfigWarningGroup {
@@ -370,19 +370,19 @@ export function formatProjectCodexConfigWarningsForDoctor(warnings: ProjectCodex
     lines.push(`  --     ${relPath(path)} — ${issues.join(", ")}`);
     lines.push(`         ${bypass}`);
   }
-  lines.push("       fix: remove those entries so OpenCodex proxy routing applies in this project");
+  lines.push("       fix: remove those entries so OpenProvider proxy routing applies in this project");
   return lines;
 }
 
 export function formatProjectCodexConfigWarningsForConsole(warnings: ProjectCodexConfigWarning[]): string[] {
   const grouped = groupProjectCodexConfigWarningsByPath(warnings);
   if (grouped.length === 0) return [];
-  const lines = ["⚠️  Project Codex config bypasses OpenCodex:"];
+  const lines = ["⚠️  Project Codex config bypasses OpenProvider:"];
   for (const { path, issues, bypass } of grouped) {
     lines.push(`    ${relPath(path)} — ${issues.join(", ")}`);
     lines.push(`    ${bypass}`);
   }
-  lines.push("    fix: remove those entries so OpenCodex proxy routing applies in this project");
+  lines.push("    fix: remove those entries so OpenProvider proxy routing applies in this project");
   return lines;
 }
 
@@ -398,3 +398,4 @@ export function printProjectCodexConfigWarnings(
   }
   return warnings;
 }
+

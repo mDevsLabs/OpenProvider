@@ -27,7 +27,7 @@ cycles closed with green tests.
    `gh run watch`.
    NOTE: the release bump commit lands on main AFTER step 3; re-sync dev/preview to
    include the release commit afterwards (`git merge --ff-only main` on both, push).
-6. Verify: `npm view @bitkyc08/opencodex version` == 2.7.19, `gh release view v2.7.19`.
+6. Verify: `npm view @mdevs/openprovider version` == 2.7.19, `gh release view v2.7.19`.
 7. PR closeout: confirm all 4 PRs show MERGED (`gh pr view <n> --json state`); comment
    thanks + release version on each; if any shows CLOSED-not-MERGED, comment
    merged-via-dev with the landing commit SHA.
@@ -38,3 +38,4 @@ cycles closed with green tests.
 - npm version + GitHub Release proof captured into goalplan criteria c4/c5.
 - Live proxy note: user's running `ocx` picks up the new version only after
   reinstall/restart — mention in final report, do not restart it unasked.
+

@@ -1,9 +1,9 @@
 ---
 title: 설정 레퍼런스
-description: ~/.opencodex/config.json의 모든 필드 — 최상위 옵션, 프로바이더, 사이드카.
+description: ~/.OpenProvider/config.json의 모든 필드 — 최상위 옵션, 프로바이더, 사이드카.
 ---
 
-opencodex는 `~/.opencodex/config.json`에서 설정을 읽습니다. `ocx init`과 대시보드가 이 파일을
+OpenProvider는 `~/.OpenProvider/config.json`에서 설정을 읽습니다. `ocx init`과 대시보드가 이 파일을
 쓰지만 직접 편집해도 됩니다. 프록시는 시작할 때 다시 읽습니다. 잘렸거나 올바른 JSON이 아닌 등
 파일을 파싱할 수 없으면 `config.json.invalid-<timestamp>`로 백업하고 콘솔에 경고한 뒤 기본값으로
 시작합니다. 파일이 없어도 기본 설정(단일 `openai` forward 프로바이더)을 사용합니다.
@@ -26,7 +26,7 @@ namespaced selected id를 bare id로 바꿉니다.
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `port` | `number` | `10100` | 프록시가 수신할 포트. |
-| `hostname?` | `string` | `"127.0.0.1"` | 바인드 주소. LAN에 공개하려면 `"0.0.0.0"`으로 설정합니다(`OPENCODEX_API_AUTH_TOKEN` 필요, 아래 [원격 접근](#원격-접근) 참조). |
+| `hostname?` | `string` | `"127.0.0.1"` | 바인드 주소. LAN에 공개하려면 `"0.0.0.0"`으로 설정합니다(`OpenProvider_API_AUTH_TOKEN` 필요, 아래 [원격 접근](#원격-접근) 참조). |
 | `proxy?` | `string` | — | 외부로 나가는 HTTP(S) 프록시 URL 또는 `${ENV_VAR}` 참조. 해당 환경 변수가 비어 있을 때 `HTTP_PROXY` / `HTTPS_PROXY`에 적용하고, loopback은 `NO_PROXY`에 유지합니다. |
 | `providers` | `Record<string, OcxProviderConfig>` | — | 프로바이더 이름 → 설정 map. |
 | `openaiProviderTierVersion?` | `2` | migration 설정 | 단일 옵션형 OpenAI projection 완료 마커. |
@@ -37,7 +37,7 @@ namespaced selected id를 bare id로 바꿉니다.
 | `effortCap?` | `string` | — | reasoning effort에 요청별로 적용하는 강제 상한입니다. 멀티 에이전트 V2 전용 기능으로, 자체 도구 목록에 V2 협업 표면이 있는 메인 턴과, `x-openai-subagent: collab_spawn` 헤더 또는 `x-codex-turn-metadata`의 `"subagent_kind": "thread_spawn"` 표식이 정확히 일치하는 스폰된 자식 턴에 적용됩니다(표식이 붙은 자식은 자체 도구 표면과 무관하게 적용 대상입니다). 일반 메인 턴과 V1 표면 메인 턴은 건드리지 않고, 컴팩션 턴은 항상 상한을 우회하며, `multiAgentMode: "v1"`은 상한 기능 전체를 비활성화합니다(대시보드도 패널을 숨깁니다). `low`부터 `ultra`까지 허용하며 값을 높이지 않고 낮추기만 합니다. 상한 이하에서 모델이 지원하는 가장 높은 단계로 내립니다. 모델이 effort 제어를 노출하지 않거나 상한 이하에 지원 단계가 없으면 effort 필드를 제거하고 프로바이더 기본값을 적용합니다. `max`와 `ultra`도 허용하지만 더 낮은 rank 상한을 만들지는 않습니다(클라이언트가 `ultra`를 `max`로 변환하므로 요청은 `low`부터 `max`로 들어옵니다). 단, 알려진 모델 effort 사다리에 따라 단계가 내려가거나 필드가 제거될 수 있습니다. 대시보드 선택기는 `low`부터 `xhigh`까지 제공합니다. `GET /api/effort-caps`와 `PUT /api/effort-caps`로 관리합니다. |
 | `subagentEffortCap?` | `string` | — | 같은 강제 상한을 codex-rs 표식이 정확히 일치하는 스폰된 자식 턴에만 적용합니다: `x-openai-subagent: collab_spawn` 또는 `x-codex-turn-metadata`의 `"subagent_kind": "thread_spawn"`. 그 외 내부 서브에이전트 범주(리뷰, 컴팩션, 메모리 정리)는 이 상한에 걸리지 않으며, `multiAgentMode: "v1"`은 기능 전체를 비활성화합니다. `low`부터 `ultra`까지 허용하며 두 상한이 모두 설정되면 더 낮은 값이 적용되고, 값을 높이지 않고 낮추기만 합니다. 상한 이하에서 모델이 지원하는 가장 높은 단계로 내립니다. 모델이 effort 제어를 노출하지 않거나 상한 이하에 지원 단계가 없으면 effort 필드를 제거하고 프로바이더 기본값을 적용합니다. `max`와 `ultra`도 허용하지만 더 낮은 rank 상한을 만들지는 않습니다(클라이언트가 `ultra`를 `max`로 변환하므로 요청은 `low`부터 `max`로 들어옵니다). 단, 알려진 모델 effort 사다리에 따라 단계가 내려가거나 필드가 제거될 수 있습니다. 대시보드 선택기는 `low`부터 `xhigh`까지 제공합니다. `GET /api/effort-caps`와 `PUT /api/effort-caps`로 관리합니다. |
 | `injectionPrompt?` | `string` | — | 주입되는 v2 안내 본문을 통째로 교체하는 커스텀 텍스트. `{{model}}`, `{{effort}}`, `{{roster}}` 플레이스홀더가 치환되며 발화 조건은 그대로입니다. `PUT /api/injection-model`의 `prompt` 키로도 설정할 수 있습니다. |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenCodex가 작성하는 multi-agent developer 가이던스만 제어합니다. 미설정/`true`는 v1/v2 가이던스를 유지하고, `false`는 collaboration surface, `subagentModels`, routing, effort cap을 바꾸지 않고 둘 다 억제합니다. `GET/PUT /api/injection-model`은 유효값을 제공하며 PUT은 부분 업데이트입니다. |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenProvider가 작성하는 multi-agent developer 가이던스만 제어합니다. 미설정/`true`는 v1/v2 가이던스를 유지하고, `false`는 collaboration surface, `subagentModels`, routing, effort cap을 바꾸지 않고 둘 다 억제합니다. `GET/PUT /api/injection-model`은 유효값을 제공하며 PUT은 부분 업데이트입니다. |
 | `disabledModels?` | `string[]` | — | Codex에서 숨길 모델. 라우팅된 `provider/model` id는 카탈로그와 `/v1/models`에서 제외합니다. `gpt-5.4` 같은 일반 네이티브 GPT slug는 카탈로그 항목을 `visibility: "hide"`로 바꾸고 일반 `/v1/models` 목록에서 뺍니다. 대시보드 Models 페이지에서 모델별로 전환할 수 있습니다. |
 | `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3단계 multi-agent surface override. `"v1"`은 업스트림 pin보다 우선해 모든 모델을 v1로, `"default"`는 업스트림 model pin(sol/terra=v2, luna=v1)을 따르고, `"v2"`는 모두 v2로 강제합니다. 대시보드 Models 페이지나 `ocx v2 mode`에서 설정합니다. |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | 프로바이더별 Codex 표시 context cap. 알려진 context window를 낮추기만 합니다. |
@@ -48,8 +48,8 @@ namespaced selected id를 bare id로 바꿉니다.
 | `websockets?` | `boolean` | `false` | `supports_websockets`를 알려 Codex가 Responses WebSocket 경로를 쓰게 합니다. 생략하거나 `false`이면 HTTP/SSE를 유지합니다. |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | 비-loopback 바인드에서 관리 API와 data plane 인증에 추가로 허용할 생성형 `ocx_…` 자격 증명. 대시보드가 관리하며 항목 필드는 아래에 설명합니다. |
 | `codexAutoStart?` | `boolean` | `true` | Codex shim이 Codex 실행 전에 `ocx ensure`를 실행하게 합니다. `false`이면 `ocx ensure`가 아무 작업도 하지 않습니다. |
-| `codexShimAutoRestore?` | `boolean` | `true` | 완료된 외부 Codex 업데이트가 이전에 설치한 shim을 교체하면 자동으로 복구합니다. 끄려면 `false`로 설정하거나 프로세스에 `OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`을 설정합니다. |
-| `syncResumeHistory?` | `boolean` | `true` | 되돌릴 수 있는 Codex App 기록 호환 모드. opencodex가 원래 Codex thread metadata를 백업하고, 예전 OpenAI interactive row를 `opencodex`로 재매핑하며, opencodex가 만든 `exec` row를 App에 보이는 source로 잠시 승격합니다. `ocx stop` / `ocx restore`는 백업한 OpenAI row를 복원하고 남은 opencodex user thread를 OpenAI로 돌려 네이티브 Codex가 `config.toml`에서 프록시를 제거한 뒤에도 이어서 열 수 있게 합니다. 끄려면 `false`로 설정합니다. |
+| `codexShimAutoRestore?` | `boolean` | `true` | 완료된 외부 Codex 업데이트가 이전에 설치한 shim을 교체하면 자동으로 복구합니다. 끄려면 `false`로 설정하거나 프로세스에 `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0`을 설정합니다. |
+| `syncResumeHistory?` | `boolean` | `true` | 되돌릴 수 있는 Codex App 기록 호환 모드. OpenProvider가 원래 Codex thread metadata를 백업하고, 예전 OpenAI interactive row를 `OpenProvider`로 재매핑하며, OpenProvider가 만든 `exec` row를 App에 보이는 source로 잠시 승격합니다. `ocx stop` / `ocx restore`는 백업한 OpenAI row를 복원하고 남은 OpenProvider user thread를 OpenAI로 돌려 네이티브 Codex가 `config.toml`에서 프록시를 제거한 뒤에도 이어서 열 수 있게 합니다. 끄려면 `false`로 설정합니다. |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | Codex Auth 대시보드에서 관리하는 ChatGPT/Codex pool 계정 metadata. secret은 `codex-accounts.json`에 따로 둡니다. |
 | `activeCodexAccountId?` | `string` | — | 수동으로 선택한 pool 계정. 선택 시 기존 thread affinity를 지우고 다음 요청부터 적용하며, 진행 중인 요청은 기존 계정을 유지합니다. |
 | `autoSwitchThreshold?` | `number` | `80` | 새 세션 자동 전환용 사용량 백분율 threshold. 알려진 5시간, 주간, 30일 quota window 중 가장 높은 점수를 씁니다. `0`이면 quota 자동 전환을 끕니다. |
@@ -100,24 +100,24 @@ pool 계정 추가와 quota 갱신은 대시보드의 **Codex Auth** 페이지�
 
 ## 원격 접근
 
-opencodex는 기본적으로 `127.0.0.1`(loopback 전용)에 바인드합니다. `hostname`을 `0.0.0.0` 같은
+OpenProvider는 기본적으로 `127.0.0.1`(loopback 전용)에 바인드합니다. `hostname`을 `0.0.0.0` 같은
 비-loopback 주소로 설정하면 관리 API(`/api/*`)와 data plane(`/v1/responses`) **모두**에 token
 인증을 강제합니다.
 
-시작 전에 `OPENCODEX_API_AUTH_TOKEN` 환경 변수를 설정하세요.
+시작 전에 `OpenProvider_API_AUTH_TOKEN` 환경 변수를 설정하세요.
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+export OpenProvider_API_AUTH_TOKEN="your-secret-token"
 ocx start
 ```
 
 비-loopback 바인드에서는 이 변수가 없으면 프록시가 시작되지 않습니다. LAN 접근용 백그라운드
 서비스를 설치할 때도 같은 변수를 먼저 export한 뒤 `ocx service install`을 실행해야 launchd,
-systemd, Task Scheduler에 전달됩니다. 클라이언트는 모든 요청의 `x-opencodex-api-key` 헤더에
+systemd, Task Scheduler에 전달됩니다. 클라이언트는 모든 요청의 `x-OpenProvider-api-key` 헤더에
 token을 넣어야 합니다.
 
 ```
-x-opencodex-api-key: your-secret-token
+x-OpenProvider-api-key: your-secret-token
 ```
 
 `Authorization: Bearer …` 헤더도 허용합니다. 시작 후에는 대시보드에서 생성한 `apiKeys`를 환경 변수
@@ -126,7 +126,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 
 :::caution[LAN 노출]
 `0.0.0.0`에 바인드하면 프록시와 설정된 모든 프로바이더 자격 증명이 로컬 네트워크에 노출됩니다.
-신뢰할 수 있는 네트워크에서만 사용하고 강력한 `OPENCODEX_API_AUTH_TOKEN`을 반드시 설정하세요.
+신뢰할 수 있는 네트워크에서만 사용하고 강력한 `OpenProvider_API_AUTH_TOKEN`을 반드시 설정하세요.
 :::
 
 ## 프로바이더 (`OcxProviderConfig`)
@@ -168,7 +168,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 | `thinkingToggleModels?` | `string[]` | effort 단계 대신 vendor `thinking.enabled` toggle을 쓰는 chat 모델. |
 | `thinkingBudgetModels?` | `string[]` | 정수 `thinking_budget`을 쓰는 chat 모델. effort를 budget 비율로 매핑합니다. |
 | `noVisionModels?` | `string[]` | 텍스트 전용 모델. [비전 사이드카](/ko/guides/sidecars/)가 이미지를 설명합니다. Ollama의 `:size` 태그도 일치시킵니다. |
-| `escapeBuiltinToolNames?` | `boolean` | Umans 같은 Anthropic 호환 gateway가 wire에서 툴 이름 escaping을 요구할 때 사용합니다. opencodex는 툴 호출을 Codex에 돌려주기 전에 prefix를 제거합니다. |
+| `escapeBuiltinToolNames?` | `boolean` | Umans 같은 Anthropic 호환 gateway가 wire에서 툴 이름 escaping을 요구할 때 사용합니다. OpenProvider는 툴 호출을 Codex에 돌려주기 전에 prefix를 제거합니다. |
 | `googleMode?` | `"ai-studio" \| "vertex" \| "cloud-code-assist"` | Google 전송/인증 모드. 기본 `ai-studio`. |
 | `project?` | `string` | Vertex project id 또는 Antigravity Cloud Code Assist project id. |
 | `location?` | `string` | Vertex location. 환경 변수 fallback은 `GOOGLE_CLOUD_LOCATION`. |
@@ -179,7 +179,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 ## Cursor 프로바이더 (`adapter: "cursor"`)
 
 Cursor bridge는 실험적입니다. `ocx login cursor`를 실행한 뒤
-`~/.opencodex/config.json`(Windows: `%USERPROFILE%\.opencodex\config.json`)의 `providers` 아래에
+`~/.OpenProvider/config.json`(Windows: `%USERPROFILE%\.OpenProvider\config.json`)의 `providers` 아래에
 `cursor` 항목을 추가하거나 편집하세요.
 
 Cursor 서버가 지시하는 네이티브 로컬 툴은 기본적으로 **꺼져 있습니다**. Codex는 자체 툴
@@ -248,7 +248,7 @@ OpenRouter에서 같은 모델을 제공하는 endpoint마다 prompt cache 지�
 일부 프로바이더는 실시간 모델 카탈로그가 매우 크거나 느립니다. Codex에 `models`로 고정한 모델만
 보이게 하려면 `liveModels`를 `false`로 설정하세요.
 
-`liveModels`가 `false`이고 `models`가 비어 있거나 생략되면 opencodex는 해당 프로바이더의 라우팅
+`liveModels`가 `false`이고 `models`가 비어 있거나 생략되면 OpenProvider는 해당 프로바이더의 라우팅
 모델을 하나도 노출하지 않습니다.
 
 `selectedModels`는 목적이 다릅니다. 모델 발견은 계속 실행하되 선택한 id만 Codex 카탈로그와
@@ -321,7 +321,7 @@ stall은 무활동 감시 장치이며 전체 생성 timeout이 아닙니다.
 요청은 `maxDescriptionsPerTurn` 한도를 쓰지 않습니다. 원격 `https:` 이미지와 실패하거나 빈 설명은
 캐시하지 않습니다.
 
-Anthropic OAuth 검색과 이미지 설명 요청은 opencodex에서 이미 사용 중인 Claude Code OAuth
+Anthropic OAuth 검색과 이미지 설명 요청은 OpenProvider에서 이미 사용 중인 Claude Code OAuth
 fingerprint 방식을 그대로 따릅니다. 저장소의 기존 OAuth 선례 안에 있지만, 실제로 사용할 계정과
 작업량으로 충분히 soak test하는 편이 좋습니다.
 
@@ -371,7 +371,9 @@ fingerprint 방식을 그대로 따릅니다. 저장소의 기존 OAuth 선례 �
 :::
 
 :::note[원자적 쓰기]
-모든 설정 및 카탈로그 파일(`config.toml`, `opencodex-catalog.json`)은 `atomicWriteFile`(임시 파일 +
+모든 설정 및 카탈로그 파일(`config.toml`, `OpenProvider-catalog.json`)은 `atomicWriteFile`(임시 파일 +
 이름 바꾸기)로 원자적으로 기록합니다. `ocx stop`과 프록시 자체 종료 handler처럼 여러 writer가
 동시에 Codex를 복원하더라도 파일이 반만 기록되는 일을 막습니다.
 :::
+
+

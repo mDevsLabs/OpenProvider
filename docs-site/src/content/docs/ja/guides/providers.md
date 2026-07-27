@@ -1,10 +1,10 @@
 ---
 title: プロバイダー
-description: opencodex が LLM プロバイダーを認証し通信するすべての方式 — OAuth、API キー、ChatGPT 転送、そしてローカル。
+description: OpenProvider が LLM プロバイダーを認証し通信するすべての方式 — OAuth、API キー、ChatGPT 転送、そしてローカル。
 ---
 
 **プロバイダー**は一つの上流 LLM エンドポイントとそこへの到達方法を合わせたものです: アダプター、ベース URL、認証
-モード、そしてオプションのモデル一覧で構成されます。プロバイダーは `~/.opencodex/config.json` の `providers` の下にあります。
+モード、そしてオプションのモデル一覧で構成されます。プロバイダーは `~/.OpenProvider/config.json` の `providers` の下にあります。
 
 ## OpenAI アカウントモード
 
@@ -21,8 +21,8 @@ max input 922,000 で `*-pro` virtual ID は公開状態を維持し、wire で�
 組み込み `openai` が欠落または無効な場合、ダッシュボードの Accounts ピッカーと Codex Auth から復元できます。欠落行は正規プリセットから作成され、正規の無効行は保存済みのモードやモデル設定を置き換えずに再有効化され、非正規の `openai` 行にはその復元経路は出ません。
 
 出荷版 v1 config は marker 2 の単一オプション行に自動移行されます。オリジナルは
-`~/.opencodex/config.json.pre-openai-tiers-v2.bak` に一度保存され、次のコマンドで復元します:
-`cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`。
+`~/.OpenProvider/config.json.pre-openai-tiers-v2.bak` に一度保存され、次のコマンドで復元します:
+`cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json`。
 
 ## 認証モード
 
@@ -61,7 +61,7 @@ ChatGPT パススルーカタログには GPT-5.6 Sol/Terra/Luna の名前空間
 ## 2. アカウントログイン(OAuth)
 
 OAuth ログインを使うプロバイダープリセットは 6 つです。認証情報は
-`~/.opencodex/auth.json` に保存され、自動更新されます。ログイン CLI は `chatgpt` も受け付けます。
+`~/.OpenProvider/auth.json` に保存され、自動更新されます。ログイン CLI は `chatgpt` も受け付けます。
 このコマンドは ChatGPT 認証情報を発行し `forward` モードのプロバイダーエントリを作成します。
 
 ```bash
@@ -91,12 +91,12 @@ ocx logout <provider>
 認証情報に固定アカウント ID やメールがある OAuth プロバイダーはログインを複数保持できます。
 Providers ページでアカウントを追加し、別アカウントをログアウトせずにアクティブアカウントだけを切り替えられます。
 アカウント識別情報がない Kimi と Kiro はアクティブスロットを差し替え、`chatgpt` は Codex アカウントプールに別の保存場所が
-あり常に単一スロットのみ書き込みます。トークンは `~/.opencodex/auth.json` に保存され、
+あり常に単一スロットのみ書き込みます。トークンは `~/.OpenProvider/auth.json` に保存され、
 `/api/oauth/accounts` はマスク済みメタデータのみを返します。
 
 ## 3. API キーカタログ
 
-opencodex v2.7.1 には組み込みプリセットが 50 個含まれています。キー方式 40、OAuth 6、ローカル 3、
+OpenProvider v2.7.1 には組み込みプリセットが 50 個含まれています。キー方式 40、OAuth 6、ローカル 3、
 デフォルト ChatGPT 転送プリセット 1 です。ダッシュボードの **Add provider** ピッカーはキー発行ページを開き、
 入力したキーを検証した後保存します。主な項目は以下のとおりです:
 
@@ -165,7 +165,7 @@ Sol/Terra/Luna をフォールバックリストに入れています。
 使います。4 経路すべてで実際の利用権は上流アカウントが決定し、Cursor はライブ探索結果に基づき現在のアカウントで使えるモデルのみ残します。
 
 :::note[ゲートウェイとサブスクリプションプロキシ]
-プロバイダー対応可否は「エージェント」製品かどうかではなく、opencodex に合う wire アダプターがあるかで
+プロバイダー対応可否は「エージェント」製品かどうかではなく、OpenProvider に合う wire アダプターがあるかで
 決まります。現在のアダプター ID は `openai-chat`、`openai-responses`、`anthropic`、`google`(AI Studio、
 Vertex、Antigravity/Cloud Code Assist モード)、`azure` / `azure-openai`、`kiro`、`cursor` です。
 Amazon Bedrock ネイティブ API のような、これらの実装のいずれにも合わない独自プロトコルは直接サポートしません。
@@ -178,12 +178,12 @@ Gateway** は URL にアカウント + ゲートウェイ ID を埋める必要�
 
 Cursor は別の実験的アダプターとして追跡します。`adapter: "cursor"` は `ocx init` とダッシュボード Add
 Provider ピッカーに実験的 local config 項目として表示され、Cursor の静的フォールバックモデルカタログ
-メタデータを保存します。Cursor アクセストークンを設定すると opencodex は Cursor ライブ HTTP/2 トランスポートを
+メタデータを保存します。Cursor アクセストークンを設定すると OpenProvider は Cursor ライブ HTTP/2 トランスポートを
 使います。v2.7.1 フォールバックリストには 1M コンテキストの `gpt-5.6-sol` / `terra` / `luna` と 500K コンテキストの
 `grok-4.5` / `grok-4.5-fast` が含まれ、ライブ探索結果に基づき現在のアカウントに表示するモデルを
 決定します。Cursor サーバーが直接送るネイティブ read/write/delete/ls/grep/shell/fetch 実行は Codex
 承認とサンドボックス経路をバイパスするためデフォルトで無効です。信頼できるローカル実験でのみ
-`~/.opencodex/config.json` の `providers.cursor` に `unsafeAllowNativeLocalExec: true` を設定してください。
+`~/.OpenProvider/config.json` の `providers.cursor` に `unsafeAllowNativeLocalExec: true` を設定してください。
 ダッシュボードからは **Providers → Cursor → Edit JSON** で設定できます。完全な例は
 [設定リファレンス](/ja/reference/configuration/#cursor-provider-adapter-cursor)を参照してください。
 MCP、画面録画、computer-use はエグゼキューターフックで開かれており、ローカル
@@ -195,7 +195,7 @@ MCP、画面録画、computer-use はエグゼキューターフックで開か�
 ### Ollama Cloud
 
 Ollama Cloud はホステッド型(ローカルではない)Ollama で、`https://ollama.com/v1` で OpenAI 互換、キーは
-[ollama.com/settings/keys](https://ollama.com/settings/keys) で発行されます。opencodex はクラウド
+[ollama.com/settings/keys](https://ollama.com/settings/keys) で発行されます。OpenProvider はクラウド
 ラインナップをビジョン機能で分類し、[ビジョンサイドカー](/ja/guides/sidecars/)がテキスト専用モデルにのみ
 動作するようにします。テキスト専用モデル(例: `glm-5.2`、`deepseek-v4-pro`、`gpt-oss`、`qwen3-coder`、
 `minimax-m2.x`、`nemotron-3-*`)は `noVisionModels` に列挙され、ビジョンネイティブモデル(例:
@@ -204,7 +204,7 @@ Ollama の `:size` タグに寛容なので `gpt-oss` は `gpt-oss:120b` と `gp
 
 ## 4. ローカルプロバイダー
 
-opencodex をローカルの OpenAI 互換サーバーに向けてください — 通常は空キーで使います:
+OpenProvider をローカルの OpenAI 互換サーバーに向けてください — 通常は空キーで使います:
 
 | プロバイダー | ベース URL |
  --- | --- |
@@ -218,3 +218,4 @@ opencodex をローカルの OpenAI 互換サーバーに向けてください �
 **Custom** を選ぶか `ocx init` で `custom` を選んだ後ベース URL を入力してください。すべてのプロバイダーフィールド
 (`headers`、`noReasoningModels`、`noVisionModels`、`models`、…)は
 [設定リファレンス](/ja/reference/configuration/)を参照してください。
+

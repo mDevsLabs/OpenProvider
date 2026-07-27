@@ -1,6 +1,6 @@
 ---
 title: 모델 라우팅
-description: opencodex가 주어진 모델 id를 어느 프로바이더가 처리할지 결정하는 방식.
+description: OpenProvider가 주어진 모델 id를 어느 프로바이더가 처리할지 결정하는 방식.
 ---
 
 Codex가 모델을 요청하면 `router.ts`가 이를 정확히 하나의 설정된 프로바이더로 해석합니다. 규칙은
@@ -90,3 +90,4 @@ Pool(기본, 메인+추가 계정) 또는 Direct(현재 caller/메인 bearer)를
   프로바이더가 실제로 설정되어 있을 때만 해석됩니다.
 
 이 규칙들이 읽는 프로바이더 필드는 [설정](/ko/reference/configuration/)을 참고하세요.
+

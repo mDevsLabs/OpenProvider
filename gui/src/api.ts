@@ -41,7 +41,7 @@ function clearLegacySessionToken(): void {
 
 function withToken(input: RequestInfo | URL, init: RequestInit | undefined, token: string): [RequestInfo | URL, RequestInit | undefined] {
   const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
-  headers.set("X-OpenCodex-API-Key", token);
+  headers.set("X-OpenProvider-API-Key", token);
   if (input instanceof Request) return [new Request(input, { headers }), init ? { ...init, headers } : undefined];
   return [input, { ...init, headers }];
 }
@@ -49,7 +49,7 @@ function withToken(input: RequestInfo | URL, init: RequestInit | undefined, toke
 async function promptForToken(): Promise<string | null> {
   if (promptInFlight) return promptInFlight;
   promptInFlight = Promise.resolve()
-    .then(() => window.prompt("OpenCodex API token")?.trim() || null)
+    .then(() => window.prompt("OpenProvider API token")?.trim() || null)
     .finally(() => { promptInFlight = null; });
   return promptInFlight;
 }
@@ -86,3 +86,5 @@ export function resetApiAuthFetchForTests(): void {
   memoryToken = null;
   promptInFlight = null;
 }
+
+

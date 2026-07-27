@@ -1,9 +1,9 @@
 ---
 title: Claude Code
-description: Use any routed model from Claude Code — opencodex serves the Anthropic Messages API and gateway model discovery on the same port.
+description: Use any routed model from Claude Code — OpenProvider serves the Anthropic Messages API and gateway model discovery on the same port.
 ---
 
-opencodex serves `POST /v1/messages` (plus `count_tokens`) alongside `/v1/responses`, so Claude
+OpenProvider serves `POST /v1/messages` (plus `count_tokens`) alongside `/v1/responses`, so Claude
 Code can use every routed provider — OAuth logins, account pools, key failover and sidecars
 included — with zero extra auth work.
 
@@ -32,9 +32,9 @@ Variables you export yourself always win. Extra arguments pass through: `ocx cla
 
 Claude Code needs a token in `ANTHROPIC_AUTH_TOKEN` to talk to a gateway, but setting that
 variable also disables your claude.ai login and its connectors. Which of the two you want
-depends on something opencodex can look up, so by default it does.
+depends on something OpenProvider can look up, so by default it does.
 
-Leave **Auth mode** on **Auto** (the default) in **Claude → Claude Code** and opencodex
+Leave **Auth mode** on **Auto** (the default) in **Claude → Claude Code** and OpenProvider
 decides at each launch:
 
 | What it finds | What it does |
@@ -99,7 +99,7 @@ New terminal windows and tabs therefore route plain `claude` commands through th
 requiring the `ocx claude` wrapper. Already-open shells are unaffected and must be reopened.
 
 `ocx stop` and proxy shutdown **unset the injected keys** (it does not restore previous values —
-only the keys opencodex injected are removed). The proxy also writes `~/.opencodex/claude-env.sh`;
+only the keys OpenProvider injected are removed). The proxy also writes `~/.OpenProvider/claude-env.sh`;
 `ocx start` installs a `.zshrc` source hook that loads it automatically.
 
 Disable with `claudeCode.systemEnv: false` in the configuration or with the GUI toggle. This
@@ -114,7 +114,7 @@ caching and billing identity stay fully native, and routed models keep working i
 via the picker aliases.
 
 **Header handling:** hop-by-hop headers plus `host`, `content-length`, `accept-encoding`,
-`x-opencodex-api-key`, and `origin` are stripped before forwarding. All other headers (including
+`x-OpenProvider-api-key`, and `origin` are stripped before forwarding. All other headers (including
 `anthropic-beta` and `anthropic-version`) pass through.
 
 The passthrough fires when **all four** conditions are met: `nativePassthrough` is not `false`;
@@ -129,7 +129,7 @@ Disable with `claudeCode.nativePassthrough: false`; point elsewhere with
 
 Claude Code 2.1.129+ discovers gateway models via `GET /v1/models?limit=1000` and lists them in
 the native `/model` picker labeled "From gateway". Because the picker only accepts ids beginning
-with `claude` or `anthropic`, opencodex exposes routed models as stable, reversible aliases:
+with `claude` or `anthropic`, OpenProvider exposes routed models as stable, reversible aliases:
 
 | Surface | Format | Example |
 | --- | --- | --- |
@@ -200,7 +200,7 @@ fall back to 350k.
 `ANTHROPIC_SMALL_FAST_MODEL`. The effective Haiku is `tierModels.haiku ?? smallFastModel`, fed
 to both Haiku variables.
 
-When both `tierModels.haiku` and `smallFastModel` are absent, OpenCodex leaves both helper variables unset; Claude Code then chooses its native helper model (currently Sonnet), which may incur native-provider charges.
+When both `tierModels.haiku` and `smallFastModel` are absent, OpenProvider leaves both helper variables unset; Claude Code then chooses its native helper model (currently Sonnet), which may incur native-provider charges.
 
 ## Roster agents (injectAgents)
 
@@ -213,7 +213,7 @@ up to 5 models) plus `ocx-self` into `~/.claude/agents/ocx-*.md`.
   pin the real route. The Agent tool's `model` argument is therefore inert; pass `"haiku"` as a
   placeholder.
 - Frontmatter carries the alias; routing is directive-driven.
-- Only marker-verified `ocx-*.md` files containing `generated-by: opencodex` are ever
+- Only marker-verified `ocx-*.md` files containing `generated-by: OpenProvider` are ever
   overwritten or pruned; your own agents are never touched.
 - Files are atomically synced per file (write + rename).
 - `enabled: false` or `injectAgents: false` prunes all verified-owned definitions.
@@ -225,7 +225,7 @@ Dispatch: `subagent_type: "ocx-gpt-5-6-sol"`. 1M-capable targets carry `[1m]` au
 
 Claude Code's bundled `claude-api` skill injects ~840KB (~136k tokens) of Anthropic documentation
 that auto-triggers on Claude model mentions. Routed models are not trained on that bundle, so by
-default opencodex replaces the skill's content with a short stub on **routed** requests. Native
+default OpenProvider replaces the skill's content with a short stub on **routed** requests. Native
 Anthropic passthrough is untouched.
 
 **Two carriers are handled:**
@@ -258,7 +258,7 @@ Lookup order: discovery alias → exact id → id with date suffix stripped (`-2
 
 ## Sidecar matrix: web search and image understanding
 
-Routed models do not all have the same hosted tools or image support. opencodex fills those gaps
+Routed models do not all have the same hosted tools or image support. OpenProvider fills those gaps
 before the main model answers:
 
 - The **web-search sidecar** runs the real hosted search, then gives the routed model the answer and
@@ -273,9 +273,9 @@ Both sidecars can use either backend:
 | `openai` | A small GPT model through the ChatGPT `forward` provider | A ChatGPT login and an enabled `authMode: "forward"` provider |
 | `anthropic` | Claude through stored Anthropic OAuth; web search uses `web_search_20250305` and vision sends the image to Claude for description | An enabled `adapter: "anthropic"`, `authMode: "oauth"` provider whose active stored account is not marked `needsReauth` |
 
-An explicit `backend` always wins. When it is omitted, opencodex selects `anthropic` if a usable
+An explicit `backend` always wins. When it is omitted, OpenProvider selects `anthropic` if a usable
 stored Anthropic OAuth account exists; otherwise it selects `openai`. Explicitly selecting
-`anthropic` without a usable credential **fails closed**: opencodex does not silently borrow
+`anthropic` without a usable credential **fails closed**: OpenProvider does not silently borrow
 ChatGPT credentials or switch backends. The OpenAI backend likewise stays off without both login
 auth and a forward provider.
 
@@ -418,7 +418,7 @@ fields; `null` resets context/blocklist/compact-window values.
 
 **Claude Code says "Did 0 searches"** — Current builds translate completed Responses
 `web_search_call` items into paired Anthropic `server_tool_use` and `web_search_tool_result` blocks,
-including `usage.server_tool_use.web_search_requests`. Update opencodex if an older build completed
+including `usage.server_tool_use.web_search_requests`. Update OpenProvider if an older build completed
 the search but Claude Code still counted zero.
 
 **A sidecar does not activate** — For `backend: "openai"`, confirm you are logged into ChatGPT and
@@ -442,9 +442,10 @@ auto-context (on by default). If the picker shows no `[1m]` row, the model's aut
 window may be below the auto-compact threshold.
 
 **High token count from skill loads** — The bundled `claude-api` skill (~136k tokens) auto-loads
-on Claude model mentions. This is normal for native passthrough; on routed models, opencodex stubs
+on Claude model mentions. This is normal for native passthrough; on routed models, OpenProvider stubs
 it by default (`blockedSkills: ["claude-api"]`).
 
 **Subagent dispatches to wrong model** — Roster agents (`ocx-*`) use `<!-- ocx-route: ... -->`
 directives, not the Agent tool's `model` argument. Make sure the directive matches the intended
 route. Pass `"haiku"` as the model placeholder.
+

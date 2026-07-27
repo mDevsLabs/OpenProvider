@@ -47,3 +47,4 @@ test("multi-agent guidance gates injection controls and Active badge on the enab
   expect(sections).toContain("multiAgentGuidanceEnabled &&");
   expect(head).toContain("models.v2Mode_");
 });
+

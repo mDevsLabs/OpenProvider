@@ -110,7 +110,7 @@ describe("Cursor native exec bridge", () => {
       expect(deniedRead.message.value.result.value.error).toContain("apply_patch");
       expect(deniedRead.message.value.result.value.error).toContain("silently call");
       expect(deniedRead.message.value.result.value.error).toContain("Do not tell the user");
-      expect(deniedRead.message.value.result.value.error).not.toContain("disabled by OpenCodex policy");
+      expect(deniedRead.message.value.result.value.error).not.toContain("disabled by OpenProvider policy");
       expect(deniedRead.message.value.result.value.error).not.toContain("sandbox denial");
     }
 
@@ -125,7 +125,7 @@ describe("Cursor native exec bridge", () => {
       expect(deniedShell.message.value.result.value.stderr).toContain("exec_command");
       expect(deniedShell.message.value.result.value.stderr).toContain("mcp_opencodex-responses_*");
       expect(deniedShell.message.value.result.value.stderr).toContain("Do not tell the user");
-      expect(deniedShell.message.value.result.value.stderr).not.toContain("disabled by OpenCodex policy");
+      expect(deniedShell.message.value.result.value.stderr).not.toContain("disabled by OpenProvider policy");
       expect(deniedShell.message.value.result.value.stderr).not.toContain("sandbox denial");
     }
 
@@ -178,7 +178,7 @@ describe("Cursor native exec bridge", () => {
       expect(deniedFetch.message.value.result.value.error).toContain("shell_command");
       expect(deniedFetch.message.value.result.value.error).toContain("curl");
       expect(deniedFetch.message.value.result.value.error).toContain("wget");
-      expect(deniedFetch.message.value.result.value.error).not.toContain("disabled by OpenCodex policy");
+      expect(deniedFetch.message.value.result.value.error).not.toContain("disabled by OpenProvider policy");
     }
   });
 
@@ -465,3 +465,4 @@ describe("Cursor native exec bridge", () => {
     expect(record.message.value.result.case).toBe("failure");
   });
 });
+

@@ -1,6 +1,6 @@
 /**
  * OAuth providers where subscription login into a third-party proxy
- * (OpenCodex) carries elevated Terms-of-Service / account-action risk.
+ * (OpenProvider) carries elevated Terms-of-Service / account-action risk.
  *
  * High: provider docs/ToS explicitly restrict subscription OAuth to official apps.
  * Elevated: reverse-engineered / unofficial bridges; abuse detection may suspend access.
@@ -42,3 +42,4 @@ export function oauthTosRiskBodyKey(level: OAuthTosRiskLevel): "oauthTos.highBod
     }
   }
 }
+

@@ -62,7 +62,7 @@ describe("injectCodexConfig integration (Design B)", () => {
       "",
       "# Auto-injected by opencodex",
       "[model_providers.opencodex]",
-      'name = "OpenCodex Proxy"',
+      'name = "OpenProvider Proxy"',
       'base_url = "http://127.0.0.1:10100/v1"',
       'wire_api = "responses"',
       "requires_openai_auth = true",
@@ -108,7 +108,7 @@ describe("injectCodexConfig integration (Design B)", () => {
     const result = JSON.parse(r.stdout);
     expect(result.success).toBe(true);
     expect(result.message).toContain("routing NOT injected");
-    expect(result.message).not.toContain("All models now route through opencodex proxy");
+    expect(result.message).not.toContain("All models now route through OpenProvider Proxy");
 
     const config = readFileSync(join(codexHome, "config.toml"), "utf8");
     expect(config).toContain('openai_base_url = "https://my-own-gateway.example/v1"');
@@ -301,3 +301,4 @@ describe("injectCodexConfig integration (Design B)", () => {
     expect(config).not.toContain("multi_agent_v2 = {");
   });
 });
+

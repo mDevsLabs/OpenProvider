@@ -4,24 +4,24 @@ Date: 2026-06-20
 
 > **Archive note.** This is a dated design-rationale record, not current behavior
 > documentation. For up-to-date behavior see the published docs at
-> [opencodex.me](https://opencodex.me/) and the
+> [OpenProvider.me](https://OpenProvider.me/) and the
 > maintainer source-of-truth under [`structure/`](../structure). The current injected
-> provider table name is `"OpenCodex Proxy"` (see `src/codex/inject.ts`).
+> provider table name is `"OpenProvider Proxy"` (see `src/codex/inject.ts`).
 
-This document records why opencodex routed models can appear in Codex App's model picker without
+This document records why OpenProvider routed models can appear in Codex App's model picker without
 patching Codex App itself.
 
 ## Summary
 
-Codex CLI, TUI, and App share the Codex home configuration surface. opencodex integrates by writing
+Codex CLI, TUI, and App share the Codex home configuration surface. OpenProvider integrates by writing
 Codex-native config and catalog files under the resolved `CODEX_HOME`:
 
 - `$CODEX_HOME/config.toml`
-- `$CODEX_HOME/opencodex.config.toml`
-- `$CODEX_HOME/opencodex-catalog.json`
+- `$CODEX_HOME/OpenProvider.config.toml`
+- `$CODEX_HOME/OpenProvider-catalog.json`
 - `$CODEX_HOME/models_cache.json`
 
-When Codex App reads the same config/catalog state, routed opencodex models are visible because they
+When Codex App reads the same config/catalog state, routed OpenProvider models are visible because they
 look like valid Codex catalog entries.
 
 ## Required config shape
@@ -29,7 +29,7 @@ look like valid Codex catalog entries.
 The global provider must be a root TOML key:
 
 ```toml
-model_provider = "opencodex"
+model_provider = "OpenProvider"
 ```
 
 It must not be appended under whichever TOML table happened to be last. TOML root keys after a table
@@ -38,14 +38,14 @@ header become part of that table, which makes Codex ignore the provider as a glo
 The custom model catalog path must also be a root TOML key:
 
 ```toml
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 ```
 
 The provider block must advertise a Responses-compatible provider:
 
 ```toml
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://localhost:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
@@ -57,20 +57,20 @@ hidden even when the user has ChatGPT auth.
 
 ## Catalog entry shape
 
-opencodex does not generate minimal JSON entries. It clones a native Codex model catalog entry and
+OpenProvider does not generate minimal JSON entries. It clones a native Codex model catalog entry and
 then changes the routed fields:
 
 ```text
 slug = "<provider>/<model>"
 display_name = "<provider>/<model>"
-description = "Routed via opencodex -> <provider> ..."
+description = "Routed via OpenProvider -> <provider> ..."
 priority = <picker priority>
 visibility = "list"
 ```
 
 Slash-containing native ids: some providers namespace their own model ids
 (zenmux `moonshotai/kimi-k3-free`, openrouter `anthropic/...`, nvidia `moonshotai/...`).
-Codex's models-manager metadata lookup tolerates exactly one "/", so opencodex aliases
+Codex's models-manager metadata lookup tolerates exactly one "/", so OpenProvider aliases
 inner slashes to "-" in the Codex-facing slug (`zenmux/moonshotai-kimi-k3-free`) and
 decodes back to the native id in the proxy via an exact known-id lookup
 (`src/providers/slug-codec.ts`). Raw full-slash selectors keep working; upstream
@@ -149,7 +149,7 @@ Codex caches models in:
 $CODEX_HOME/models_cache.json
 ```
 
-After changing providers, hidden models, featured models, or service-tier metadata, opencodex should
+After changing providers, hidden models, featured models, or service-tier metadata, OpenProvider should
 delete that cache so the next Codex process or model refresh sees the updated catalog.
 
 ## Native GPT enable/disable
@@ -181,8 +181,11 @@ ocx status
 
 Expected high-level result:
 
-- active model provider is `opencodex`
+- active model provider is `OpenProvider`
 - provider uses ChatGPT auth reachability semantics
 - native `gpt-*` entries keep fast support
 - routed `<provider>/<model>` entries are `visibility = "list"`
 - routed entries have no fast/service-tier metadata
+
+
+

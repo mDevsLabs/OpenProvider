@@ -84,7 +84,7 @@ export function corsHeaders(req?: Request, config?: OcxConfig): Record<string, s
     // ChatGPT-Account-Id is required for browser/Electron ChatGPT & Codex App voice preflights
     // (direct forward auth matches the bearer to this account id). The OpenAI-Alpha .. X-OAI-Attestation
     // block covers GPT-Live voice protocol headers relayed by the /v1/live call-create path.
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-OpenCodex-API-Key, X-Api-Key, Anthropic-Version, Anthropic-Beta, ChatGPT-Account-Id, OpenAI-Alpha, X-Session-Id, Session-Id, Thread-Id, Originator, X-OAI-Attestation",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-OpenProvider-API-Key, X-Api-Key, Anthropic-Version, Anthropic-Beta, ChatGPT-Account-Id, OpenAI-Alpha, X-Session-Id, Session-Id, Thread-Id, Originator, X-OAI-Attestation",
     "Vary": "Origin",
   };
 }
@@ -150,7 +150,7 @@ export function isProxyAdmissionSecret(token: string, config: OcxConfig): boolea
 
 export class ForwardAdmissionCredentialError extends Error {
   constructor() {
-    super("OpenCodex admission credentials cannot be forwarded upstream");
+    super("OpenProvider admission credentials cannot be forwarded upstream");
     this.name = "ForwardAdmissionCredentialError";
   }
 }
@@ -162,7 +162,7 @@ export function validateForwardAdmissionCredential(headers: Headers, config: Ocx
 
 export function hasValidApiAuth(req: Request, config: OcxConfig): boolean {
   if (!isApiAuthRequired(config)) return true;
-  const actual = req.headers.get("x-opencodex-api-key")?.trim()
+  const actual = req.headers.get("X-OpenProvider-API-Key")?.trim()
     || req.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim()
     // Anthropic-SDK clients (Claude Code with ANTHROPIC_API_KEY) authenticate via x-api-key.
     || req.headers.get("x-api-key")?.trim();
@@ -183,7 +183,7 @@ export function requireApiAuth(req: Request, config: OcxConfig, kind: "managemen
  */
 export function requireResponsesApiAuth(req: Request, config: OcxConfig): Response | null {
   if (!isApiAuthRequired(config)) return null;
-  const actual = req.headers.get("x-opencodex-api-key")?.trim();
+  const actual = req.headers.get("X-OpenProvider-API-Key")?.trim();
   if (actual && isProxyAdmissionSecret(actual, config)) return null;
   return formatErrorResponse(401, "authentication_error", "opencodex API key required");
 }
@@ -339,3 +339,4 @@ export function safeConfigDTO(config: OcxConfig): unknown {
     providers,
   };
 }
+

@@ -3,13 +3,13 @@ title: "Sidecars: Web Search & Vision"
 description: Give routed models real web search and text-only models image understanding through native ChatGPT sidecars.
 ---
 
-Routed models do not all expose hosted **web search** or native **image input**. opencodex backfills
+Routed models do not all expose hosted **web search** or native **image input**. OpenProvider backfills
 those capabilities with two sidecars. Each can run through a ChatGPT-login (`forward`) provider or a
 stored Anthropic OAuth provider. Sidecar errors become bounded tool results or image markers instead
 of failing the whole turn.
 
 :::note[Automatic backend selection]
-Explicit `backend` config wins. When unset, opencodex uses `anthropic` if an enabled Anthropic OAuth
+Explicit `backend` config wins. When unset, OpenProvider uses `anthropic` if an enabled Anthropic OAuth
 provider has an active account not marked `needsReauth`; otherwise it uses `openai`. Explicit
 `anthropic` without that credential fails closed. `openai` requires both ChatGPT login auth and an
 enabled `forward` provider.
@@ -17,11 +17,11 @@ enabled `forward` provider.
 
 ## Web-search sidecar
 
-When Codex requests hosted `web_search` for a non-passthrough routed model, opencodex:
+When Codex requests hosted `web_search` for a non-passthrough routed model, OpenProvider:
 
 1. **Drops** the hosted `web_search` tool and exposes a synthetic `web_search(query)` function tool
    to the routed model instead. The original hosted-tool options are retained for the sidecar call.
-2. Runs the routed model in a small **agentic loop**. When it calls `web_search`, opencodex uses the
+2. Runs the routed model in a small **agentic loop**. When it calls `web_search`, OpenProvider uses the
    selected sidecar backend: OpenAI runs hosted `web_search` with `gpt-5.6-luna` by default;
    Anthropic runs `web_search_20250305` with `claude-sonnet-5` by default. The streamed answer and
    citations become a tool result.
@@ -29,7 +29,7 @@ When Codex requests hosted `web_search` for a non-passthrough routed model, open
    (default 3), then removes the search tool and forces a final answer. Real client tools such as
    `apply_patch` or shell finalize the turn so those calls reach Codex.
 
-Every routed-model iteration requests upstream `stream: true`, but opencodex fully buffers semantic
+Every routed-model iteration requests upstream `stream: true`, but OpenProvider fully buffers semantic
 events internally before deciding whether to search or return the final answer. Only the first
 iteration's final headers/status and 429 key rotations are acquired eagerly. Thus synthetic search
 calls and preliminary output are never exposed as client-visible model output.
@@ -70,7 +70,7 @@ failures after response headers have started are delivered as `response.failed` 
 ## Vision sidecar
 
 When the routed model is listed in its provider's `noVisionModels` and a request carries an image,
-opencodex describes each image **before** the main call and replaces it with text. The Dashboard and
+OpenProvider describes each image **before** the main call and replaces it with text. The Dashboard and
 management API present `gpt-5.6-luna` as the current default, and startup migrates an explicitly
 persisted legacy `gpt-5.4-mini` value to Luna. If the `visionSidecar.model` field is entirely absent,
 the vision execution path still has a `gpt-5.4-mini` code fallback.
@@ -127,3 +127,4 @@ disable it. Anthropic-OAuth search and image description reuse the existing Clau
 fingerprint precedent, but should be soak-tested with the intended account and workload.
 
 See the [Configuration reference](/reference/configuration/#sidecars) for every field.
+

@@ -108,7 +108,7 @@ export function buildProviderTableBlock(port: number, supportsWebsockets = false
     "",
     OCX_SECTION_MARKER,
     "[model_providers.opencodex]",
-    'name = "OpenCodex Proxy"',
+    'name = "OpenProvider Proxy"',
     `base_url = "http://${host}:${port}/v1"`,
     'wire_api = "responses"',
     "requires_openai_auth = true",
@@ -426,7 +426,7 @@ export function buildProfileFile(port: number, catalogPath?: string | null, supp
   // the x-opencodex-api-key env header).
   if (!includeApiAuthHeader) {
     const lines = [
-      "# OpenCodex proxy fallback config (Design B)",
+      "# OpenProvider proxy fallback config (Design B)",
       `# Root override that points Codex's built-in openai provider at the proxy on ${host}:${port}.`,
       "# Merge these root keys into ~/.codex/config.toml manually if auto-injection was removed.",
       buildOpenaiBaseUrlLine(port, hostname),
@@ -436,8 +436,8 @@ export function buildProfileFile(port: number, catalogPath?: string | null, supp
     return lines.join("\n");
   }
   const lines = [
-    "# OpenCodex proxy profile — use with: codex --profile opencodex",
-    `# Routes all model requests through the opencodex proxy at ${host}:${port}`,
+    "# OpenProvider proxy profile — use with: codex --profile opencodex",
+    `# Routes all model requests through the OpenProvider Proxy at ${host}:${port}`,
     'model_provider = "opencodex"',
   ];
   if (catalogPath) lines.push(`model_catalog_json = ${tomlString(catalogPath)}`);
@@ -472,7 +472,7 @@ export async function injectCodexConfig(port: number, config?: OcxConfig, option
     return {
       success: true,
       message: `⚠️ Codex routing NOT injected: config.toml selects the external model_provider ${tomlString(activeProvider)}.\n` +
-        `  OpenCodex preserves external provider configuration so existing ${tomlString(activeProvider)} session history stays visible.\n` +
+        `  OpenProvider preserves external provider configuration so existing ${tomlString(activeProvider)} session history stays visible.\n` +
         `  Configure that provider for Responses passthrough at http://${providerBaseHost(config?.hostname)}:${port}/v1` +
         `${shouldInjectApiAuthHeader(config) ? ` with x-opencodex-api-key from OPENCODEX_API_AUTH_TOKEN` : ""}.\n` +
         `  For direct injection, switch to the built-in openai provider, remove any user-owned root openai_base_url, and rerun 'ocx start'.`,
@@ -569,13 +569,13 @@ export async function injectCodexConfig(port: number, config?: OcxConfig, option
   }
   const headline = legacyMode
     ? `Injected opencodex as default provider into Codex config.\n`
-    : `Pointed Codex's built-in openai provider at the opencodex proxy (openai_base_url).\n`;
+    : `Pointed Codex's built-in openai provider at the OpenProvider Proxy (openai_base_url).\n`;
   return {
     success: true,
     message: headline +
       catalogMessage +
       historyMessage +
-      `  All models now route through opencodex proxy (like OpenRouter).\n` +
+      `  All models now route through OpenProvider Proxy (like OpenRouter).\n` +
       `  OpenAI models (gpt-5.5, etc.) are passed through to OpenAI.\n` +
       `  Custom models route to their configured providers.\n` +
       (legacyMode
@@ -697,3 +697,5 @@ export function restoreNativeCodex(): { success: boolean; message: string } {
 export function getCodexConfigPath(): string {
   return CODEX_CONFIG_PATH;
 }
+
+

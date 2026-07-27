@@ -3,7 +3,7 @@ title: Adapters
 description: 七个 provider adapter 的目标、请求构建方式与各自特性。
 ---
 
-**adapter** 负责在 opencodex 的内部请求/响应模型与某个 provider 的 wire 格式之间转换。每个
+**adapter** 负责在 OpenProvider 的内部请求/响应模型与某个 provider 的 wire 格式之间转换。每个
 adapter 都实现 `ProviderAdapter` 接口（`src/adapters/base.ts`）：
 
 ```ts
@@ -94,7 +94,7 @@ Kiro 的 assistant 文本本身没有可靠的回合结束标记，但终止的 
 错误，内容过滤或 guardrail 停止表现为 filtered incomplete。没有真实工具调用却出现的 `TOOL_USE` 被视为
 矛盾而非进展。
 
-只有完全没有 stop reason 时，opencodex 才添加私有的 `codex_kiro_final_answer` 工具并做一次续写。
+只有完全没有 stop reason 时，OpenProvider 才添加私有的 `codex_kiro_final_answer` 工具并做一次续写。
 重复抑制严格限定为空白归一化后的完全一致：改写过的状态更新可能改变本回合的结果（从"仍在进行"变成"已完成"），
 丢掉那句话比显示一次表面重复更糟糕。
 
@@ -137,3 +137,4 @@ Kiro 的 assistant 文本本身没有可靠的回合结束标记，但终止的 
   Anthropic/Google image block 使用。
 - `contentPartsToText(content)` —— 为纯文本工具消息把 content part 扁平化成文本。未描述的图像
   会变成简短的 `[image]` marker，而不是导致 token 暴涨的 base64 blob。
+

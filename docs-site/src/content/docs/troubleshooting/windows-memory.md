@@ -1,16 +1,16 @@
 ---
 title: Windows Memory Growth
-description: Why the bun process can grow to many gigabytes of RAM on Windows, what opencodex does about it today, and your options until the upstream Bun fixes ship.
+description: Why the bun process can grow to many gigabytes of RAM on Windows, what OpenProvider does about it today, and your options until the upstream Bun fixes ship.
 ---
 
-Some Windows users see the `bun` process behind opencodex grow to many
+Some Windows users see the `bun` process behind OpenProvider grow to many
 gigabytes of RSS during long streaming sessions (reported as issue
-[#314](https://github.com/lidge-jun/opencodex/issues/314)). This page explains
+[#314](https://github.com/mDevsLabs/OpenProvider/issues/314)). This page explains
 what is actually happening and what you can do about it, honestly.
 
 ## Root cause: upstream Bun runtime issues
 
-opencodex bundles the Bun runtime (currently **1.3.14**). The memory growth is
+OpenProvider bundles the Bun runtime (currently **1.3.14**). The memory growth is
 driven by known upstream Bun issues, not by JavaScript-level leaks in the
 proxy:
 
@@ -20,12 +20,12 @@ proxy:
 | [#32111](https://github.com/oven-sh/bun/issues/32111) — crash when a client aborts an async-pull stream | Fix [PR #32120](https://github.com/oven-sh/bun/pull/32120) merged 2026-06-21; not assumed present in 1.3.14. Note: this crash is **not Windows-specific** (it also reproduced on macOS/Linux) |
 | [PR #31654](https://github.com/oven-sh/bun/pull/31654) — `node:net` socket handle leak | Still **open** upstream |
 
-On Windows, opencodex must keep streaming responses on a conservative code
+On Windows, OpenProvider must keep streaming responses on a conservative code
 path to avoid the #32111 crash, and that path is the one most exposed to the
 backpressure issue: a slow or stalled client can leave the runtime buffering
 upstream data in native memory that JavaScript cannot bound.
 
-## What opencodex does today
+## What OpenProvider does today
 
 Bounded mitigation and visibility — **not a fix**. On the bundled 1.3.14
 runtime the leak itself remains an upstream problem:
@@ -35,7 +35,7 @@ runtime the leak itself remains an upstream problem:
 - **`ocx doctor`** — a "Memory / runtime" section shows the *service*
   process's Bun version, RSS, JS-heap share, and stream-mode decision, and
   tells you whether growth looks native-side (the upstream issue) or JS-side
-  (an opencodex bug you should report).
+  (an OpenProvider bug you should report).
 - **`GET /api/system/memory`** — the same data over the authenticated
   management API for dashboards or scripts. Alongside the RSS/heap numbers it
   reports a scalar `responseState` block (entry count, total/largest serialized
@@ -63,11 +63,11 @@ restart it.
 ## Your options
 
 1. **Wait for a bundled runtime update.** Once a Bun release verifiably
-   carries the fixes, opencodex will bump the bundled runtime and the safer
+   carries the fixes, OpenProvider will bump the bundled runtime and the safer
    stream path turns on automatically.
 
-2. **Run a Bun runtime you trust with `OPENCODEX_BUN_PATH`.** This is
-   unvalidated territory — you are running opencodex on a runtime we have not
+2. **Run a Bun runtime you trust with `OpenProvider_BUN_PATH`.** This is
+   unvalidated territory — you are running OpenProvider on a runtime we have not
    tested; at your own risk. Important for service installs: the override is
    read **when the service artifact is generated**, not at service start. Set
    the environment variable, then re-run `ocx service install` from that same
@@ -85,5 +85,7 @@ restart it.
 
 If you try any of these on a real Windows workload, please report the before
 and after `ocx doctor` memory sections on
-[#314](https://github.com/lidge-jun/opencodex/issues/314) — that is exactly
+[#314](https://github.com/mDevsLabs/OpenProvider/issues/314) — that is exactly
 the verification this mitigation is waiting on.
+
+

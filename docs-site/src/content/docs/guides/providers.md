@@ -1,10 +1,10 @@
 ---
 title: Providers
-description: Every way opencodex authenticates and talks to an LLM provider — OAuth, API key, ChatGPT forward, and local.
+description: Every way OpenProvider authenticates and talks to an LLM provider — OAuth, API key, ChatGPT forward, and local.
 ---
 
 A **provider** is one upstream LLM endpoint plus how to reach it: an adapter, a base URL, an auth
-mode, and an optional model list. Providers live under `providers` in `~/.opencodex/config.json`.
+mode, and an optional model list. Providers live under `providers` in `~/.OpenProvider/config.json`.
 
 ## OpenAI account modes
 
@@ -25,8 +25,8 @@ rows are re-enabled without replacing saved mode or model settings, and noncanon
 rows are not offered that recovery path.
 
 Shipped v1 configs migrate automatically to marker 2 and one option-aware row. The original config
-is retained once at `~/.opencodex/config.json.pre-openai-tiers-v2.bak`; restore it with
-`cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`.
+is retained once at `~/.OpenProvider/config.json.pre-openai-tiers-v2.bak`; restore it with
+`cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json`.
 
 ## Auth modes
 
@@ -64,8 +64,8 @@ The ChatGPT passthrough catalog also layers in the bare GPT-5.6 Sol/Terra/Luna s
 ## 2. Account login (OAuth)
 
 Six provider presets use OAuth login — plus GitHub Copilot via an experimental unofficial
-device-flow bridge. opencodex stores their credentials in
-`~/.opencodex/auth.json` and refreshes them automatically. `chatgpt` is also accepted by the login
+device-flow bridge. OpenProvider stores their credentials in
+`~/.OpenProvider/auth.json` and refreshes them automatically. `chatgpt` is also accepted by the login
 CLI; it acquires a ChatGPT credential while creating a `forward`-mode provider entry.
 
 ```bash
@@ -98,11 +98,11 @@ OAuth providers whose credentials include a stable account id or email can keep 
 login. The Providers page shows those accounts in a dropdown, lets you add another, and switches the
 active account without logging the others out. Identity-less Kimi and Kiro credentials replace their
 active slot, while `chatgpt` is always single-slot because Codex pool accounts have a separate ledger.
-Tokens stay in `~/.opencodex/auth.json`; `/api/oauth/accounts` returns masked metadata only.
+Tokens stay in `~/.OpenProvider/auth.json`; `/api/oauth/accounts` returns masked metadata only.
 
 ### OAuth reliability
 
-opencodex coordinates token refresh and Codex pool routing so concurrent requests do not race the
+OpenProvider coordinates token refresh and Codex pool routing so concurrent requests do not race the
 credential store. This is reliability and diagnostics work — it does **not** guarantee protection
 from provider enforcement, rate limits, or account actions.
 
@@ -129,7 +129,7 @@ are cleared, and pool selection may rotate — threads are not pinned through a 
 **Codex client metadata.** The ChatGPT forward path passes through the curated `FORWARD_HEADERS`
 allowlist (authorization, `chatgpt-account-id`, originator, session/thread ids, and related Codex
 headers — see [Adapters](/reference/adapters/)). Pool mode overwrites only auth and
-`chatgpt-account-id` to match the selected credential. opencodex does **not** fabricate official
+`chatgpt-account-id` to match the selected credential. OpenProvider does **not** fabricate official
 client identity (for example `originator`, session, or thread headers) when the caller did not send
 them.
 
@@ -147,10 +147,10 @@ and sign in with `kiro-cli login` first. Without a kiro-cli session, `ocx login 
 back to a pasted access token or the `KIRO_ACCESS_TOKEN` environment variable.
 
 `ocx login kiro` searches the platform Kiro CLI stores and opens SQLite databases read-only. Two
-environment variables make selection explicit without copying credentials into opencodex:
+environment variables make selection explicit without copying credentials into OpenProvider:
 
 - `KIROCLI_DB_PATH` selects a nonstandard Kiro CLI SQLite database. The path must already exist;
-  opencodex does not create it or modify the database, WAL, or SHM files.
+  OpenProvider does not create it or modify the database, WAL, or SHM files.
 - `KIROCLI_TOKEN_KEY` selects the exact `auth_kv` token key when a database contains multiple
   otherwise ambiguous token rows. A missing selection fails login instead of guessing.
 
@@ -159,7 +159,7 @@ diagnostics to bug reports.
 
 ## 3. API-key catalog
 
-opencodex ships 53 built-in presets: 42 key-based, seven OAuth, three local, and the default
+OpenProvider ships 53 built-in presets: 42 key-based, seven OAuth, three local, and the default
 ChatGPT-forward preset. The dashboard's **Add provider** picker opens a key provider's dashboard,
 validates the key, and stores it. Notable entries:
 
@@ -230,7 +230,7 @@ paths remain upstream-gated; Cursor's live discovery additionally filters its st
 the logged-in account can use.
 
 :::note[Gateways & subscription proxies]
-A provider is included when opencodex has a matching wire adapter, **not** based on whether it is an
+A provider is included when OpenProvider has a matching wire adapter, **not** based on whether it is an
 "agent" product. The current adapter ids are `openai-chat`, `openai-responses`, `anthropic`, `google`
 (AI Studio, Vertex, and Antigravity/Cloud Code Assist modes), `azure` / `azure-openai`, `kiro`, and
 `cursor`. A proprietary API without one of these implementations, such as native Amazon Bedrock,
@@ -242,16 +242,16 @@ Gateway** needs your account + gateway ids filled into the URL.
 
 Cursor is tracked separately as an experimental adapter. `adapter: "cursor"` appears in `ocx init`
 and the dashboard Add Provider picker as an experimental local config entry with Cursor's static
-fallback model catalog metadata. When a Cursor access token is configured, opencodex uses Cursor's
+fallback model catalog metadata. When a Cursor access token is configured, OpenProvider uses Cursor's
 live HTTP/2 transport. Its v2.7.1 fallback seed includes `gpt-5.6-sol` / `terra` / `luna` (1M context)
 plus `grok-4.5` / `grok-4.5-fast` (500K); live discovery decides which remain visible for the
 account. Cursor server-driven native read/write/delete/ls/grep/shell/fetch execution
 is disabled by default because it bypasses Codex's approval and sandbox path; set
-`unsafeAllowNativeLocalExec: true` on the `providers.cursor` object in `~/.opencodex/config.json`
+`unsafeAllowNativeLocalExec: true` on the `providers.cursor` object in `~/.OpenProvider/config.json`
 only for trusted local experiments (or via **Providers → Cursor → Edit JSON** in the dashboard).
 See the [Configuration reference](/reference/configuration/#cursor-provider-adapter-cursor)
 for a full example. MCP, screen recording, and computer-use are available as executor hooks; without a
-configured local executor, opencodex returns typed no-executor results instead of policy-blocking
+configured local executor, OpenProvider returns typed no-executor results instead of policy-blocking
 the request. Cursor OAuth and live model discovery are enabled for this experimental adapter;
 Cursor is still not shown in key-login lists.
 :::
@@ -259,7 +259,7 @@ Cursor is still not shown in key-login lists.
 ### Ollama Cloud
 
 Ollama Cloud is a hosted (not local) Ollama, OpenAI-compatible at `https://ollama.com/v1` with a key
-from [ollama.com/settings/keys](https://ollama.com/settings/keys). opencodex classifies its cloud
+from [ollama.com/settings/keys](https://ollama.com/settings/keys). OpenProvider classifies its cloud
 lineup by vision capability so the [vision sidecar](/guides/sidecars/) only kicks in for
 text-only models. Text-only models (e.g. `glm-5.2`, `deepseek-v4-pro`, `gpt-oss`, `qwen3-coder`,
 `minimax-m2.x`, `nemotron-3-*`) are listed in `noVisionModels`; vision-native models (e.g.
@@ -268,7 +268,7 @@ tolerant of Ollama's `:size` tags, so `gpt-oss` covers `gpt-oss:120b` and `gpt-o
 
 ## 4. Local providers
 
-Point opencodex at a local OpenAI-compatible server — usually with a blank key:
+Point OpenProvider at a local OpenAI-compatible server — usually with a blank key:
 
 | Provider | Base URL |
 | --- | --- |
@@ -282,3 +282,4 @@ If a provider speaks Chat Completions, the `openai-chat` adapter handles it — 
 dashboard or `custom` in `ocx init` and enter the base URL. See the
 [Configuration reference](/reference/configuration/) for every provider field
 (`headers`, `noReasoningModels`, `noVisionModels`, `models`, …).
+

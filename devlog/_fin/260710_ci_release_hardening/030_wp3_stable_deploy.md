@@ -31,7 +31,7 @@ Work class: C4. Archetype: spec-satisfaction.
 
 ## Verification (C)
 
-- `npm view @bitkyc08/opencodex@2.7.5 version` == 2.7.5; dist-tag `latest`
+- `npm view @mdevs/openprovider@2.7.5 version` == 2.7.5; dist-tag `latest`
   == 2.7.5; preview tag unchanged.
 - Tag `v2.7.5` SHA == 893f202b; `gh release view v2.7.5` exists, not
   prerelease, previous tag v2.7.4 installable as rollback.
@@ -48,3 +48,4 @@ Work class: C4. Archetype: spec-satisfaction.
   re-running only the metadata steps via the same workflow semantics, never
   by hand-editing published metadata.
 - Wall bound: 40 minutes for WP3.
+

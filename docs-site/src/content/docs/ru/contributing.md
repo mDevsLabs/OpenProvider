@@ -1,13 +1,13 @@
 ---
 title: Участие в разработке
-description: Разработка opencodex — настройка окружения, структура, конвенции и добавление провайдера или адаптера.
+description: Разработка OpenProvider — настройка окружения, структура, конвенции и добавление провайдера или адаптера.
 ---
 
 ## Настройка окружения
 
 ```bash
-git clone https://github.com/lidge-jun/opencodex.git
-cd opencodex
+git clone https://github.com/mDevsLabs/OpenProvider.git
+cd OpenProvider
 bun install
 bun run dev:proxy    # прокси-API в режиме разработки
 bun run dev:gui      # dev-сервер дашборда (другой терминал)
@@ -45,7 +45,7 @@ cd docs-site && bun install && bun dev
 
 ## Публикация документации
 
-Публичная документация публикуется на GitHub Pages по адресу <https://opencodex.me/ru/>.
+Публичная документация публикуется на GitHub Pages по адресу <https://OpenProvider.me/ru/>.
 Воркфлоу `.github/workflows/deploy-docs.yml` запускается на push в `main`, затрагивающих
 `docs-site/**` или сам воркфлоу, собирает `docs-site` и разворачивает сгенерированный сайт. Перед
 push изменений документации выполните:
@@ -128,5 +128,7 @@ bun run release:watch               # наблюдение за последни
 
 Запускайте самую узкую команду, которая доказывает ваше изменение: `bun run typecheck` для типов,
 сфокусированный `bun test tests/<name>.test.ts` или runtime-проверку для поведения, а затем более
-широкие проверки, соответствующие затронутой области. opencodex предпочитает небольшие проверяемые
+широкие проверки, соответствующие затронутой области. OpenProvider предпочитает небольшие проверяемые
 коммиты крупным пачкам изменений.
+
+

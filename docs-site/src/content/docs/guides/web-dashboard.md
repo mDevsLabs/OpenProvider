@@ -1,9 +1,9 @@
 ---
 title: Web Dashboard
-description: The opencodex GUI for proxy health, providers, models, delegation guidance, auth pools, usage, and logs.
+description: The OpenProvider GUI for proxy health, providers, models, delegation guidance, auth pools, usage, and logs.
 ---
 
-opencodex ships a local web dashboard (a Vite/React app under `gui/`) served from the proxy. It is the
+OpenProvider ships a local web dashboard (a Vite/React app under `gui/`) served from the proxy. It is the
 shortest path to managing providers, Codex/ChatGPT accounts, catalog models, sidecars, sub-agent
 settings, and request traffic.
 
@@ -60,7 +60,7 @@ The **Models** switches show final Codex visibility: a routed model is on only w
 ## Delegation picker vs spawn routing
 
 The Dashboard's **Sub-agent delegation** picker stores `injectionModel` and, optionally,
-`injectionEffort`. On a v1 turn, opencodex injects guidance telling the parent agent which exact
+`injectionEffort`. On a v1 turn, OpenProvider injects guidance telling the parent agent which exact
 model and reasoning effort to pass to `spawn_agent`. Choosing a model enables that guidance at any
 parent reasoning effort; clearing the model also clears the stored effort.
 
@@ -125,3 +125,4 @@ Adding **Ollama Cloud** or another catalog provider from the dashboard copies it
 classification into the saved provider config, so the [vision sidecar](/guides/sidecars/)
 is gated correctly without manual classification.
 :::
+

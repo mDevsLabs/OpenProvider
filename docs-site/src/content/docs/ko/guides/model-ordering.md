@@ -1,9 +1,9 @@
 ---
 title: 모델 정렬에 관하여
-description: opencodex가 Codex 모델 선택기와 spawn_agent 모델 override의 순서를 정하는 방식.
+description: OpenProvider가 Codex 모델 선택기와 spawn_agent 모델 override의 순서를 정하는 방식.
 ---
 
-Codex 모델 선택기는 opencodex 설정에 적힌 프로바이더 선언 순서나 모델 배열 순서를 보존하지
+Codex 모델 선택기는 OpenProvider 설정에 적힌 프로바이더 선언 순서나 모델 배열 순서를 보존하지
 않습니다. 최종 순서는 카탈로그 priority로 정해지며, 같은 priority를 가진 라우팅 모델에는 결정적인
 알파벳순 정렬이 적용됩니다.
 
@@ -13,7 +13,7 @@ Codex의 models-manager는 선택기에 표시되는 카탈로그 항목을 `pri
 카탈로그 배열 순서는 버리므로 생성된 JSON 배열에서 항목을 앞으로 옮겨도 선택기에서는 앞으로
 이동하지 않습니다. 이 제약은 `src/codex/catalog/sync.ts`에 직접 기록되어 있습니다.
 
-따라서 opencodex는 배열 위치가 아니라 더 낮은 priority를 부여해 featured 위치를 제어합니다.
+따라서 OpenProvider는 배열 위치가 아니라 더 낮은 priority를 부여해 featured 위치를 제어합니다.
 관련 priority는 다음과 같습니다.
 
 | 카탈로그 항목 | Priority | 근거 |
@@ -61,7 +61,7 @@ featured 목록이 비어 있지 않을 때 최종 순서는 다음과 같습니
 3. 카탈로그 병합 과정에서 featured 블록 아래로 밀린 선택되지 않은 네이티브 모델
 
 `subagentModels`가 없으면 라우팅 모델은 priority `5`를 유지하고, 네이티브 GPT 항목은 정상 priority
-(opencodex가 만든 항목은 보통 `9`)를 사용합니다. 라우팅 그룹 내부는 계속 프로바이더/id
+(OpenProvider가 만든 항목은 보통 `9`)를 사용합니다. 라우팅 그룹 내부는 계속 프로바이더/id
 알파벳순입니다.
 
 ## 예시
@@ -96,10 +96,11 @@ subagentModels = [
 ## 순서를 바꾸는 방법
 
 선두 모델 순서를 사용자가 바꿀 수 있는 유일한 지원 수단은 `subagentModels`를 재정렬하는 것입니다.
-대시보드의 **Sub-agents** 페이지 또는 opencodex 설정에서 바꿀 수 있습니다. 목록은 최대 5개 모델을
+대시보드의 **Sub-agents** 페이지 또는 OpenProvider 설정에서 바꿀 수 있습니다. 목록은 최대 5개 모델을
 받으며 배열 순서에 의미가 있습니다.
 
 현재 `OcxConfig`에는 일반 `modelOrder`, `providerOrder`, priority map 설정이 없습니다. 지원되는 정렬
 필드는 `subagentModels`입니다(`src/types.ts:238-246`). `disabledModels`와 각 프로바이더의
 `selectedModels`는 노출 필드입니다(`src/types.ts:276-282`, `src/types.ts:439-446`). 따라서 나머지
 선택기 순서를 바꾸려면 설정 수정이 아니라 코드 동작 변경이 필요합니다.
+

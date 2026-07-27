@@ -1,9 +1,9 @@
 ---
 title: Claude Code 指南
-description: 在 Claude Code 中使用任意已路由模型——opencodex 在同一端口提供 Anthropic Messages API 和网关模型发现功能。
+description: 在 Claude Code 中使用任意已路由模型——OpenProvider 在同一端口提供 Anthropic Messages API 和网关模型发现功能。
 ---
 
-opencodex 在 `/v1/responses` 之外还提供 `POST /v1/messages`（以及 `count_tokens`），因此 Claude
+OpenProvider 在 `/v1/responses` 之外还提供 `POST /v1/messages`（以及 `count_tokens`），因此 Claude
 Code 可以使用每一个已路由的提供商——包括 OAuth 登录、账户池、密钥故障转移和 sidecar——
 而无需进行任何额外的身份验证配置。
 
@@ -35,8 +35,8 @@ ocx claude
 标签页可以直接通过代理路由普通的 `claude` 命令，无需使用 `ocx claude` 包装器。已经打开的
 shell 不受影响，必须重新打开。
 
-`ocx stop` 和代理关闭操作会**取消设置已注入的键**（不会恢复之前的值——只会移除 opencodex
-注入的键）。代理还会写入 `~/.opencodex/claude-env.sh`；`ocx start` 会安装一个 `.zshrc`
+`ocx stop` 和代理关闭操作会**取消设置已注入的键**（不会恢复之前的值——只会移除 OpenProvider
+注入的键）。代理还会写入 `~/.OpenProvider/claude-env.sh`；`ocx start` 会安装一个 `.zshrc`
 source hook，以自动加载该文件。
 
 可以在配置中设置 `claudeCode.systemEnv: false`，或使用 GUI 开关来禁用。此功能仅适用于
@@ -50,7 +50,7 @@ macOS；在其他平台上，请使用 `ocx claude`。
 而已路由模型仍可在同一会话中通过选择器别名使用。
 
 **请求头处理：**转发前会移除逐跳请求头以及 `host`、`content-length`、`accept-encoding`、
-`x-opencodex-api-key` 和 `origin`。其他所有请求头（包括 `anthropic-beta` 和
+`x-OpenProvider-api-key` 和 `origin`。其他所有请求头（包括 `anthropic-beta` 和
 `anthropic-version`）都会透传。
 
 只有同时满足以下**四个**条件时才会触发透传：`nativePassthrough` 不为 `false`；模型以
@@ -73,7 +73,7 @@ UI。真实 Anthropic 模型保留其原始 id。合成的 2026 日期是内部�
 
 Claude Code 2.1.129+ 通过 `GET /v1/models?limit=1000` 发现网关模型，并在原生 `/model`
 选择器中以“From gateway”标签列出。由于选择器只接受以 `claude` 或 `anthropic` 开头的 ID，
-opencodex 会将已路由模型公开为稳定且可逆的别名：
+OpenProvider 会将已路由模型公开为稳定且可逆的别名：
 
 | 界面 | 格式 | 示例 |
 | --- | --- | --- |
@@ -129,7 +129,7 @@ user-agent 会获得易读的 CLI 形式，其他客户端会获得 Desktop 哈�
 `ANTHROPIC_SMALL_FAST_MODEL`。有效 Haiku 值为 `tierModels.haiku ?? smallFastModel`，并会
 提供给两个 Haiku 变量。
 
-当 `tierModels.haiku` 和 `smallFastModel` 均未设置时，OpenCodex 会让两个辅助模型变量保持未设置；随后 Claude Code 会选择其原生辅助模型（目前为 Sonnet），并可能产生原生提供方费用。
+当 `tierModels.haiku` 和 `smallFastModel` 均未设置时，OpenProvider 会让两个辅助模型变量保持未设置；随后 Claude Code 会选择其原生辅助模型（目前为 Sonnet），并可能产生原生提供方费用。
 
 ## 名册代理（injectAgents）
 
@@ -141,7 +141,7 @@ user-agent 会获得易读的 CLI 形式，其他客户端会获得 Desktop 哈�
 - 每个代理正文都包含一条 `<!-- ocx-route: <model> -->` 指令——代理使用该指令固定实际路由。
   因此 Agent 工具的 `model` 参数不起作用；请传入 `"haiku"` 作为占位符。
 - Frontmatter 携带别名；路由由指令驱动。
-- 只有包含 `generated-by: opencodex` 且通过标记验证的 `ocx-*.md` 文件才会被覆盖或清理；
+- 只有包含 `generated-by: OpenProvider` 且通过标记验证的 `ocx-*.md` 文件才会被覆盖或清理；
   你自己的代理绝不会被改动。
 - 文件按单个文件进行原子同步（写入 + 重命名）。
 - `enabled: false` 或 `injectAgents: false` 会清理所有经验证归属的定义。
@@ -153,7 +153,7 @@ user-agent 会获得易读的 CLI 形式，其他客户端会获得 Desktop 哈�
 
 Claude Code 内置的 `claude-api` 技能会注入约 840KB（约 136k token）的 Anthropic 文档，
 并在提及 Claude 模型时自动触发。已路由模型并未针对该文档包进行训练，因此默认情况下，
-opencodex 会在**已路由**请求中将该技能内容替换为一个短占位说明。原生 Anthropic 透传不受影响。
+OpenProvider 会在**已路由**请求中将该技能内容替换为一个短占位说明。原生 Anthropic 透传不受影响。
 
 **会处理两种载体：**
 
@@ -184,7 +184,7 @@ opencodex 会在**已路由**请求中将该技能内容替换为一个短占位
 
 ## Sidecar 矩阵：Web Search 与图像理解
 
-不同路由模型拥有的托管工具和图像能力并不相同。opencodex 会在主模型回答前补齐这些能力：
+不同路由模型拥有的托管工具和图像能力并不相同。OpenProvider 会在主模型回答前补齐这些能力：
 
 - **Web-search sidecar** 执行真实的托管搜索，再把答案和来源作为工具结果交给路由模型。
 - **Vision sidecar** 在调用 `noVisionModels` 中的模型前描述附件图像，并用文字描述替换图像。
@@ -336,7 +336,7 @@ context/blocklist/compact-window 值。
 **Claude Code 显示“Did 0 searches”**——当前版本会把已完成的 Responses
 `web_search_call` 转换成配对的 Anthropic `server_tool_use` 和 `web_search_tool_result` block，
 并写入 `usage.server_tool_use.web_search_requests`。如果旧版本已经完成搜索却仍计为 0，请更新
-opencodex。
+OpenProvider。
 
 **Sidecar 未启用**——使用 `backend: "openai"` 时，请确认已登录 ChatGPT，并存在已启用的
 `authMode: "forward"` provider。使用 `backend: "anthropic"` 时，请确认已存储的 Anthropic
@@ -358,8 +358,9 @@ OAuth 活动账户未标记 `needsReauth`。显式选择 Anthropic 却没有可�
 （默认开启）。如果选择器中没有 `[1m]` 条目，该模型的权威上下文窗口可能低于自动压缩阈值。
 
 **技能加载导致 token 数量过高**——内置的 `claude-api` 技能（约 136k token）会在提及
-Claude 模型时自动加载。对于原生透传，这是正常现象；对于已路由模型，opencodex 默认会将其
+Claude 模型时自动加载。对于原生透传，这是正常现象；对于已路由模型，OpenProvider 默认会将其
 替换为占位说明（`blockedSkills: ["claude-api"]`）。
 
 **子代理派发到错误模型**——名册代理（`ocx-*`）使用 `<!-- ocx-route: ... -->` 指令，
 而不是 Agent 工具的 `model` 参数。请确保指令与预期路由一致。传入 `"haiku"` 作为模型占位符。
+

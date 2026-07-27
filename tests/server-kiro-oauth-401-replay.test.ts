@@ -16,7 +16,7 @@ const REFRESH_ENDPOINT = "https://prod.us-east-1.auth.desktop.kiro.dev/refreshTo
 
 let testDir = "";
 let emptyHome = "";
-let previousOpenCodexHome: string | undefined;
+let previousOpenProviderHome: string | undefined;
 let previousHome: string | undefined;
 let previousRegion: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
@@ -24,21 +24,21 @@ let originalFetch: typeof fetch;
 
 beforeEach(() => {
   originalFetch = globalThis.fetch;
-  previousOpenCodexHome = process.env.OPENCODEX_HOME;
+  previousOpenProviderHome = process.env.OpenProvider_HOME;
   previousHome = process.env.HOME;
   previousRegion = process.env.KIRO_REGION;
   isolatedCodexHome = installIsolatedCodexHome("ocx-kiro-401-codex-");
   testDir = mkdtempSync(join(tmpdir(), "ocx-kiro-401-"));
   emptyHome = mkdtempSync(join(tmpdir(), "ocx-kiro-401-home-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OpenProvider_HOME = testDir;
   process.env.HOME = emptyHome;
   process.env.KIRO_REGION = "us-east-1";
 });
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
-  if (previousOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpenCodexHome;
+  if (previousOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+  else process.env.OpenProvider_HOME = previousOpenProviderHome;
   if (previousHome === undefined) delete process.env.HOME;
   else process.env.HOME = previousHome;
   if (previousRegion === undefined) delete process.env.KIRO_REGION;
@@ -219,3 +219,4 @@ describe("Kiro OAuth upstream 401 replay", () => {
     }
   });
 });
+

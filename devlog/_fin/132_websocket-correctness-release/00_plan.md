@@ -165,14 +165,14 @@ Plan:
 - Run release flow for `1.9.0 --publish` from clean `main`.
 - Watch GitHub Release workflow to completion.
 - Verify npm registry:
-  - `npm view @bitkyc08/opencodex@1.9.0 version`
-  - `npm dist-tag ls @bitkyc08/opencodex`
+  - `npm view @mdevs/openprovider@1.9.0 version`
+  - `npm dist-tag ls @mdevs/openprovider`
 
 Acceptance:
 
 - `origin/main` contains the 1.9.0 release commit.
 - GitHub Release workflow passes.
-- npm shows `@bitkyc08/opencodex@1.9.0`.
+- npm shows `@mdevs/openprovider@1.9.0`.
 - Local `ocx status` is not running.
 
 ## Non-Goals
@@ -183,3 +183,4 @@ Acceptance:
   HTTP Responses upstream as long as Codex-facing WS protocol behavior is correct.
 - Non-representable provider modalities outside the current opencodex/jawcode type model are out of
   scope.
+

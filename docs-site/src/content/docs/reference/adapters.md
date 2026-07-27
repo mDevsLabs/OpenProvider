@@ -3,7 +3,7 @@ title: Adapters
 description: The seven provider adapters — what each targets, how it builds requests, and its quirks.
 ---
 
-An **adapter** translates between opencodex's internal request/response model and one provider wire
+An **adapter** translates between OpenProvider's internal request/response model and one provider wire
 format. Every adapter implements the `ProviderAdapter` interface (`src/adapters/base.ts`):
 
 ```ts
@@ -96,7 +96,7 @@ streams the response back **untranslated**.
   signature, DNS, or connection failure.
 - Owns replay-safe connection-reset recovery, that single eligible endpoint fallback, and one OAuth
   refresh/replay after HTTP 401. The client owns throttling, timeout, and ordinary service retries;
-  opencodex does not multiply those policies inside the adapter.
+  OpenProvider does not multiply those policies inside the adapter.
 - Its non-streaming parser drains the same event stream for the web-search loop.
 
 ### Completion semantics
@@ -114,7 +114,7 @@ output. Filtering and guardrail stops surface as filtered incomplete output, and
 that arrives without an actual tool call is reported as a contradiction rather than treated as
 progress. `STOP_SEQUENCE` is an ordinary completion alongside `END_TURN`.
 
-When no stop reason is present and an ordinary client tool exists, opencodex adds a private
+When no stop reason is present and an ordinary client tool exists, OpenProvider adds a private
 `codex_kiro_final_answer` tool to the upstream request; progress text streams as commentary and
 cannot terminate the turn. The adapter consumes the private call, emits its answer as final text,
 and never exposes the private tool to Codex or Claude Code. Because the stop reason only arrives at
@@ -140,7 +140,7 @@ behavior.
 the request field differently. A selected `low`, `medium`, `high`, `xhigh`, or `max` value is sent
 as `additionalModelRequestFields.reasoning.effort` for `gpt-5.6-sol` and as
 `additionalModelRequestFields.output_config.effort` for `claude-opus-5`. Other Kiro models currently
-use emulated reasoning: opencodex converts the selected level into bounded thinking instructions in
+use emulated reasoning: OpenProvider converts the selected level into bounded thinking instructions in
 the user content because their native effort field has not been verified. Do not interpret an
 advertised effort control on those models as proof of upstream-native reasoning support.
 
@@ -180,3 +180,4 @@ Shared helpers used by the vision-aware adapters:
   Anthropic/Google image blocks.
 - `contentPartsToText(content)` — flatten content parts to text for text-only tool messages
   (an undescribed image becomes a short `[image]` marker, never a token-exploding base64 blob).
+

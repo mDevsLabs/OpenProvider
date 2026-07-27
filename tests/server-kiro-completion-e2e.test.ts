@@ -13,24 +13,24 @@ const enc = new TextEncoder();
 const originalFetch = globalThis.fetch;
 
 let testDir = "";
-let previousOpenCodexHome: string | undefined;
+let previousOpenProviderHome: string | undefined;
 let previousRegion: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
-  previousOpenCodexHome = process.env.OPENCODEX_HOME;
+  previousOpenProviderHome = process.env.OpenProvider_HOME;
   previousRegion = process.env.KIRO_REGION;
   isolatedCodexHome = installIsolatedCodexHome("ocx-kiro-completion-codex-");
   testDir = mkdtempSync(join(tmpdir(), "ocx-kiro-completion-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OpenProvider_HOME = testDir;
   process.env.KIRO_REGION = "us-east-1";
   globalThis.fetch = originalFetch;
 });
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
-  if (previousOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousOpenCodexHome;
+  if (previousOpenProviderHome === undefined) delete process.env.OpenProvider_HOME;
+  else process.env.OpenProvider_HOME = previousOpenProviderHome;
   if (previousRegion === undefined) delete process.env.KIRO_REGION;
   else process.env.KIRO_REGION = previousRegion;
   isolatedCodexHome?.restore();
@@ -217,3 +217,4 @@ describe("Kiro completion through public server endpoints", () => {
     }
   });
 });
+

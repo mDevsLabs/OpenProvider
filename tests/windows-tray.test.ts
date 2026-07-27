@@ -21,7 +21,7 @@ const entry: WindowsTrayEntry = {
   cli: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\src\\cli\\index.ts",
   script: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\src\\tray\\windows-tray.ps1",
   codexHome: "C:\\사용자 공간\\.codex",
-  opencodexHome: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\.opencodex",
+  OpenProviderHome: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\.opencodex",
 };
 
 describe("Windows tray packaging and command safety", () => {
@@ -40,29 +40,29 @@ describe("Windows tray packaging and command safety", () => {
   test("quotes metacharacter and Unicode paths without shell interpolation", () => {
     const powershellCommand = buildWindowsTrayRunCommand(entry, "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe");
     expect(powershellCommand).toContain(`-File "${entry.script}"`);
-    expect(powershellCommand).toContain(`-OpenCodexHome "${entry.opencodexHome}"`);
+    expect(powershellCommand).toContain(`-OpenProviderHome "${entry.OpenProviderHome}"`);
     expect(powershellCommand).not.toContain("cmd /c");
     expect(powershellCommand).not.toContain("-Command");
   });
 
   test("rejects quote and control-character path injection", () => {
-    expect(() => windowsTrayProcessArgs({ ...entry, opencodexHome: 'C:\\bad" -Command whoami' })).toThrow();
+    expect(() => windowsTrayProcessArgs({ ...entry, OpenProviderHome: 'C:\\bad" -Command whoami' })).toThrow();
     expect(() => windowsTrayProcessArgs({ ...entry, cli: "C:\\bad\r\nwhoami" })).toThrow();
   });
 
   test("never trusts state-selected executable or deletion paths", () => {
     const home = "C:\\Users\\Test\\.opencodex";
     expect(windowsTrayStatePathsOwned({
-      opencodexHome: home,
+      OpenProviderHome: home,
       script: join(home, "opencodex-tray.ps1"),
       launcherPath: join(home, "opencodex-tray.vbs"),
     }, home)).toBe(true);
     expect(windowsTrayStatePathsOwned({
-      opencodexHome: home,
+      OpenProviderHome: home,
       script: "C:\\attacker\\payload.ps1",
     }, home)).toBe(false);
     expect(windowsTrayStatePathsOwned({
-      opencodexHome: home,
+      OpenProviderHome: home,
       script: join(home, "opencodex-tray.ps1"),
       launcherPath: "C:\\victim\\document.txt",
     }, home)).toBe(false);
@@ -89,7 +89,7 @@ describe("Windows tray packaging and command safety", () => {
   });
 
   test("treats an unexpected registry type or unreadable value as foreign", () => {
-    const value = "OpenCodexTray-test";
+    const value = "OpenProviderTray-test";
     const command = '"C:\\Windows\\powershell.exe" -File "C:\\tray.ps1"';
     expect(parseWindowsTrayRunValue(`    ${value}    REG_SZ    ${command}`, value)).toBe(command);
     expect(parseWindowsTrayRunValue(`    ${value}    REG_EXPAND_SZ    ${command}`, value)).not.toBe(command);
@@ -107,7 +107,7 @@ describe("Windows tray packaging and command safety", () => {
   });
 
   test("fails closed when registry absence cannot be proven", async () => {
-    const value = "OpenCodexTray-test";
+    const value = "OpenProviderTray-test";
     const statusError = (status: number) => Object.assign(new Error(`reg exit ${status}`), { status });
     const codeError = (code: number) => Object.assign(new Error(`reg exit ${code}`), { code });
 
@@ -137,7 +137,7 @@ describe("Windows tray packaging and command safety", () => {
   });
 
   test("proves a missing Run key only through the readable parent path", async () => {
-    const value = "OpenCodexTray-test";
+    const value = "OpenProviderTray-test";
     const syncCalls: string[][] = [];
     const syncResult = readWindowsTrayRunValueWithRunner(value, args => {
       syncCalls.push(args);
@@ -275,3 +275,4 @@ describe("Windows tray packaging and command safety", () => {
     }
   });
 });
+

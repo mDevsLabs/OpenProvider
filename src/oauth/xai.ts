@@ -13,7 +13,7 @@ const XAI_OAUTH_REFRESH_SKEW_MS = 2 * 60 * 1000;
 const TOKEN_REQUEST_TIMEOUT_MS = 30_000;
 
 export const XAI_LOCAL_CLI_DETACH_WARNING =
-  "[oauth:xai] Grok CLI credential was stale; refreshed into OpenCodex ownership. Grok CLI may require login again.";
+  "[oauth:xai] Grok CLI credential was stale; refreshed into OpenProvider ownership. Grok CLI may require login again.";
 
 interface XaiDiscovery {
   authorizationEndpoint: string;
@@ -239,3 +239,4 @@ export async function refreshXaiToken(refreshToken: string, signal?: AbortSignal
   );
   return credentialsFromTokenPayload(tokenPayload, refreshToken);
 }
+

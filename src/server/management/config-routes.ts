@@ -103,11 +103,11 @@ export async function handleConfigRoutes(ctx: ManagementContext): Promise<Respon
     if (clampActive) {
       const clampVersion = lastClamp?.runtimeVersion ?? resolved.runtime.version ?? "an older binary";
       warningParts.push(
-        `Some reasoning effort options were hidden because OpenCodex used Codex ${clampVersion}.${resolved.newerAvailable ? " A newer Codex installation is available." : ""}`,
+        `Some reasoning effort options were hidden because OpenProvider used Codex ${clampVersion}.${resolved.newerAvailable ? " A newer Codex installation is available." : ""}`,
       );
     } else if (resolved.newerAvailable) {
       warningParts.push(
-        `OpenCodex is using an older Codex binary (${resolved.runtime.version ?? "unknown"}). A newer Codex installation is available.`,
+        `OpenProvider is using an older Codex binary (${resolved.runtime.version ?? "unknown"}). A newer Codex installation is available.`,
       );
     }
     return jsonResponse({
@@ -376,3 +376,4 @@ export async function handleConfigRoutes(ctx: ManagementContext): Promise<Respon
   }
   return null;
 }
+

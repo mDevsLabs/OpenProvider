@@ -1,9 +1,9 @@
 ---
 title: Claude Code の使い方
-description: Claude Code でルーティングされたすべてのモデルを使います。opencodex は同じポートで Anthropic Messages API とゲートウェイモデル検索を提供します。
+description: Claude Code でルーティングされたすべてのモデルを使います。OpenProvider は同じポートで Anthropic Messages API とゲートウェイモデル検索を提供します。
 ---
 
-opencodex は `/v1/responses` と共に `POST /v1/messages`(`count_tokens` も)を提供します。そのため Claude
+OpenProvider は `/v1/responses` と共に `POST /v1/messages`(`count_tokens` も)を提供します。そのため Claude
 Code から OAuth ログイン、アカウントプール、キーフェイルオーバー、サイドカーを含むすべてのルーティングプロバイダーを別途の
 認証作業なしで使えます。
 
@@ -35,8 +35,8 @@ ocx claude
 ターミナルのウィンドウとタブでは `ocx claude` ラッパーなしでも通常の `claude` コマンドがプロキシを経由します。すでに開いている
 シェルには適用されないので開き直す必要があります。
 
-`ocx stop` とプロキシ終了は**注入されたキーを解除します**。以前の値を復元せず、opencodex が
-注入したキーのみ削除します。プロキシは `~/.opencodex/claude-env.sh` も書き出し、`ocx start` はこのファイルを
+`ocx stop` とプロキシ終了は**注入されたキーを解除します**。以前の値を復元せず、OpenProvider が
+注入したキーのみ削除します。プロキシは `~/.OpenProvider/claude-env.sh` も書き出し、`ocx start` はこのファイルを
 自動で読み込む `.zshrc` source hook をインストールします。
 
 設定で `claudeCode.systemEnv: false` に指定するか GUI トグルでオフにできます。この機能は macOS
@@ -50,7 +50,7 @@ ocx claude
 ネイティブ状態で維持され、同じセッションでピッカーエイリアスを使ってルーティングモデルも引き続き使えます。
 
 **ヘッダー処理:** hop-by-hop ヘッダーと `host`、`content-length`、`accept-encoding`、
-`x-opencodex-api-key`、`origin` は転送前に削除します。それ以外のヘッダー(`anthropic-beta`、
+`x-OpenProvider-api-key`、`origin` は転送前に削除します。それ以外のヘッダー(`anthropic-beta`、
 `anthropic-version` を含む)はそのまま転送します。
 
 次の 4 つの条件を**すべて**満たすとパススルーが動作します。`nativePassthrough` が `false` でなく、
@@ -65,7 +65,7 @@ ocx claude
 
 Claude Code 2.1.129 以降は `GET /v1/models?limit=1000` でゲートウェイモデルを探し、デフォルトの `/model`
 ピッカーの "From gateway" 項目に表示します。ピッカーは `claude` または `anthropic` で始まる ID のみ
-受け付けるため、opencodex はルーティングモデルを安定で元に戻せるエイリアスとして公開します。
+受け付けるため、OpenProvider はルーティングモデルを安定で元に戻せるエイリアスとして公開します。
 
 | 画面 | 形式 | 例 |
  --- | --- | --- |
@@ -124,7 +124,7 @@ Claude ページで圧縮値を調整できます。**警告:** モデルの実�
 `ANTHROPIC_SMALL_FAST_MODEL` です。実際の Haiku 値は `tierModels.haiku ?? smallFastModel` で、
 両 Haiku 変数に入ります。
 
-`tierModels.haiku` と `smallFastModel` の両方がない場合、OpenCodex は 2 つのヘルパーモデル変数を未設定のままにします。その後 Claude Code がネイティブのヘルパーモデル（現在は Sonnet）を選択し、ネイティブプロバイダーで料金が発生する可能性があります。
+`tierModels.haiku` と `smallFastModel` の両方がない場合、OpenProvider は 2 つのヘルパーモデル変数を未設定のままにします。その後 Claude Code がネイティブのヘルパーモデル（現在は Sonnet）を選択し、ネイティブプロバイダーで料金が発生する可能性があります。
 
 ## ロスターエージェント(injectAgents)
 
@@ -137,7 +137,7 @@ Claude ページで圧縮値を調整できます。**警告:** モデルの実�
   実際のルートを固定します。そのため Agent ツールの `model` 引数は機能せず、プレースホルダとして
   `"haiku"` を渡してください。
 - frontmatter にはエイリアスが入り、ルーティングはディレクティブに従います。
-- `generated-by: opencodex` が含まれる標識検証済み `ocx-*.md` ファイルのみ上書きまたは整理します。
+- `generated-by: OpenProvider` が含まれる標識検証済み `ocx-*.md` ファイルのみ上書きまたは整理します。
   ユーザー作成のエージェントは触りません。
 - ファイルごとに原子的に同期します(write + rename)。
 - `enabled: false` または `injectAgents: false` を設定すると所有権確認済みの定義をすべて整理します。
@@ -150,7 +150,7 @@ Claude ページで圧縮値を調整できます。**警告:** モデルの実�
 
 Claude Code のバンドル `claude-api` スキルは Anthropic ドキュメント約 840KB(約 136k トークン)を注入し、
 Claude モデルに言及すると自動実行されます。ルーティングモデルはこのバンドルで学習されていないため、
-opencodex はデフォルトで**ルーティングされた**リクエストのスキル内容を短いスタブに差し替えます。ネイティブ
+OpenProvider はデフォルトで**ルーティングされた**リクエストのスキル内容を短いスタブに差し替えます。ネイティブ
 Anthropic パススルーはそのまま維持します。
 
 **2 つの配信形式を処理します。**
@@ -182,7 +182,7 @@ Anthropic パススルーはそのまま維持します。
 
 ## サイドカーマトリクス: ウェブ検索と画像理解
 
-ルーティングモデルごとに使えるホスト型ツールと画像サポート範囲が異なります。opencodex はメインモデルが
+ルーティングモデルごとに使えるホスト型ツールと画像サポート範囲が異なります。OpenProvider はメインモデルが
 応答する前に不足機能を次の 2 つのサイドカーで補います。
 
 - **ウェブ検索サイドカー**は実際のホスト型検索を実行した後、回答と出典をツール結果としてルーティングモデルに
@@ -340,7 +340,7 @@ ID、エイリアス、ポートを返します。`PUT /api/claude-code` は部�
 **Claude Code に "Did 0 searches" と表示される** — 現在バージョンは完了した Responses
 `web_search_call` を Anthropic の `server_tool_use` と `web_search_tool_result` ブロック対に変換し、
 `usage.server_tool_use.web_search_requests` も同時に記録します。検索は行われたのに 0 回と表示される古い
-バージョンを使っている場合は opencodex を更新してください。
+バージョンを使っている場合は OpenProvider を更新してください。
 
 **サイドカーが起動しない** — `backend: "openai"` の場合 ChatGPT ログインと有効化された
 `authMode: "forward"` プロバイダーが両方あるか確認してください。`backend: "anthropic"` の場合保存された
@@ -366,9 +366,10 @@ Anthropic バックエンドを明示すると意図的に失敗後停止しま�
 自動圧縮しきい値より小さい可能性があります。
 
 **スキル呼び出し時のトークン数が多い** — バンドル `claude-api` スキル(約 136k トークン)は Claude モデルに
-言及すると自動で読み込まれます。ネイティブパススルーでは正常で、ルーティングモデルでは opencodex が
+言及すると自動で読み込まれます。ネイティブパススルーでは正常で、ルーティングモデルでは OpenProvider が
 デフォルトでスタブに差し替えます(`blockedSkills: ["claude-api"]`)。
 
 **サブエージェントが誤ったモデルにディスパッチされる** — ロスターエージェント(`ocx-*`)は Agent ツールの `model`
 引数ではなく `<!-- ocx-route: ... -->` ディレクティブを使います。ディレクティブが希望ルートと一致するか確認し、
 モデルプレースホルダとして `"haiku"` を渡してください。
+

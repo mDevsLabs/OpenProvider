@@ -33,8 +33,8 @@ Close out the two "actionable-now" findings from the 2026-07-18 Sol review sweep
 - #146 root cause: `package.json` deps `bun@1.3.14`; bun's `postinstall: node install.js`
   replaces a placeholder binary; `bin/ocx.mjs` lazy retry cannot write a root-owned
   global prefix. Correct commands (npm 11.18 dry-run verified):
-  - `npm install -g --allow-scripts=bun @bitkyc08/opencodex` (user-owned prefix)
-  - `sudo npm install -g --allow-scripts=bun @bitkyc08/opencodex` (sudo-installed prefix)
+  - `npm install -g --allow-scripts=bun @mdevs/openprovider` (user-owned prefix)
+  - `sudo npm install -g --allow-scripts=bun @mdevs/openprovider` (sudo-installed prefix)
   - npm's own warning omits the package argument, which reinstalls the CWD — never
     echo npm's abbreviated suggestion verbatim.
 - #92 reproduction on dev HEAD: routed child receives
@@ -86,3 +86,4 @@ One work-phase = one full PABCD cycle.
 - DC-4 (review comments): post the four Sol review verdicts as PR/issue comments.
 - DC-5 (#144 draft): product placement (docs-site vs GUI lazy-load) — feedback to
   Wibias only, no local work planned.
+

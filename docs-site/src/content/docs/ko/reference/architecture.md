@@ -1,9 +1,9 @@
 ---
 title: 아키텍처
-description: opencodex 내부 구조 — 모듈 맵, AdapterEvent 브리지, 요청 파서, 그리고 캐싱.
+description: OpenProvider 내부 구조 — 모듈 맵, AdapterEvent 브리지, 요청 파서, 그리고 캐싱.
 ---
 
-opencodex는 단일 Bun 프로세스입니다. 요청은 OpenAI Responses로 들어와 내부 모델로 정규화되고,
+OpenProvider는 단일 Bun 프로세스입니다. 요청은 OpenAI Responses로 들어와 내부 모델로 정규화되고,
 라우팅된 뒤, 어댑터를 통해 프로바이더로 전송되고, 다시 Responses SSE로 브리징됩니다. 엔드투엔드
 플로우는 [동작 원리](/ko/getting-started/how-it-works/)를 참조하세요.
 
@@ -21,7 +21,7 @@ src/
 ├── lib/                # runtime, process, retry, privacy, token estimate helpers
 ├── web-search/         # web-search sidecar (synthetic tool, loop, executor, parser)
 ├── vision/             # vision sidecar (describe + plan)
-├── config.ts           # ~/.opencodex/config.json, defaults, PID, env resolution
+├── config.ts           # ~/.OpenProvider/config.json, defaults, PID, env resolution
 ├── router.ts           # model id → provider + adapter
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
@@ -113,7 +113,7 @@ Responses 항목 타입으로 구분됩니다 — 따라서 MCP 네임스페이�
 ## 전송과 compaction
 
 `server/index.ts`는 기본적으로 `/v1/responses`를 HTTP/SSE로 제공합니다. `websockets`가 `false`인
-상태에서 Codex가 Responses WebSocket 업그레이드를 시도하면 opencodex는 `426 upgrade_required`를
+상태에서 Codex가 Responses WebSocket 업그레이드를 시도하면 OpenProvider는 `426 upgrade_required`를
 반환하고, Codex는 해당 세션에서 HTTP로 폴백합니다. `"websockets": true`가 설정되면 같은
 엔드포인트가 업그레이드를 받아들이고 WebSocket 브리지를 사용합니다.
 
@@ -149,3 +149,4 @@ Codex 카탈로그는 Codex가 수용하는 레이블(`low` / `medium` / `high` 
 `OcxContentPart`(text / image), `OcxToolCall`, `OcxTool`, `AdapterEvent`, 그리고 설정 타입
 (`OcxConfig`, `OcxProviderConfig`). 두 가지 헬퍼가 널리 사용됩니다: `namespacedToolName()`과
 `modelInList()`(`noVisionModels` / `noReasoningModels`에 대한 관대한 `:size` 태그 매칭).
+

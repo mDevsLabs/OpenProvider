@@ -1,6 +1,6 @@
 ---
 title: 模型路由
-description: opencodex 如何决定由哪个提供商来服务给定的模型 id。
+description: OpenProvider 如何决定由哪个提供商来服务给定的模型 id。
 ---
 
 当 Codex 请求某个模型时，`router.ts` 会将其解析为唯一一个已配置的提供商。规则**按顺序**检查；第一个匹配者胜出。
@@ -76,3 +76,4 @@ OpenAI 的 bare `gpt-*` 使用单一 `openai` provider。`codexAccountMode` 在 
 - **前缀模式只是一种便利**，而非保证：只有当确实配置了同名（例如 `anthropic`、`openai`、`groq`）的提供商时，它们才会解析成功。
 
 这些规则读取的提供商字段请参见 [配置](/zh-cn/reference/configuration/)。
+

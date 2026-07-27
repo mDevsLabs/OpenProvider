@@ -88,7 +88,7 @@ describe("doctor", () => {
       appCodexHome: appHome,
     });
     expect(mismatch.mismatch).toBe(true);
-    expect(mismatch.warning).toContain("OpenCodex injection will not reach that app");
+    expect(mismatch.warning).toContain("OpenProvider injection will not reach that app");
     expect(mismatch.effectiveCodexHome).toContain("C:\\Users\\[USER]\\");
     expect(mismatch.effectiveCodexHome).not.toContain("alice");
     expect(mismatch.action).toContain("ocx service uninstall");
@@ -434,3 +434,4 @@ describe("service memory section (#314 WP4)", () => {
     expect(hint).not.toContain("ocx service install");
   });
 });
+

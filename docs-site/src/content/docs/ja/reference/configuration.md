@@ -1,9 +1,9 @@
 ---
 title: 設定リファレンス
-description: ~/.opencodex/config.json のすべてのフィールド — 最上位オプション、プロバイダー、サイドカー。
+description: ~/.OpenProvider/config.json のすべてのフィールド — 最上位オプション、プロバイダー、サイドカー。
 ---
 
-opencodex は `~/.opencodex/config.json` から設定を読みます。`ocx init` とダッシュボードがこのファイルを
+OpenProvider は `~/.OpenProvider/config.json` から設定を読みます。`ocx init` とダッシュボードがこのファイルを
 書きますが、直接編集しても構いません。プロキシは起動時に再読み込みします。途切れた、または正しい JSON でないなど
 ファイルをパースできない場合は `config.json.invalid-<timestamp>` にバックアップし、コンソールに警告したのちデフォルト値で
 起動します。ファイルがなくてもデフォルト設定（単一の `openai` forward プロバイダー）を使います。
@@ -25,7 +25,7 @@ namespaced selected id を bare id に変えます。
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `port` | `number` | `10100` | プロキシがリッスンするポート。 |
-| `hostname?` | `string` | `"127.0.0.1"` | バインドアドレス。LAN に公開するには `"0.0.0.0"` に設定します（`OPENCODEX_API_AUTH_TOKEN` が必要、下記 [リモートアクセス](#リモートアクセス) 参照）。 |
+| `hostname?` | `string` | `"127.0.0.1"` | バインドアドレス。LAN に公開するには `"0.0.0.0"` に設定します（`OpenProvider_API_AUTH_TOKEN` が必要、下記 [リモートアクセス](#リモートアクセス) 参照）。 |
 | `proxy?` | `string` | — | 外向きの HTTP(S) プロキシ URL または `${ENV_VAR}` 参照。該当環境変数が空のとき `HTTP_PROXY` / `HTTPS_PROXY` に適用し、loopback は `NO_PROXY` に維持します。 |
 | `providers` | `Record<string, OcxProviderConfig>` | — | プロバイダー名 → 設定 map。 |
 | `openaiProviderTierVersion?` | `2` | 移行設定 | 単一の省略可能 OpenAI projection 完了マーカー。 |
@@ -36,7 +36,7 @@ namespaced selected id を bare id に変えます。
 | `effortCap?` | `string` | — | reasoning effort にリクエストごとに適用する強制上限。マルチエージェント V2 専用機能で、自身のツールリストに V2 協調 surface を持つメインターンと、`x-openai-subagent: collab_spawn` ヘッダーまたは `x-codex-turn-metadata` の `"subagent_kind": "thread_spawn"` 標識が正確に一致する spawn された子ターンに適用されます（標識のついた子は自身のツール surface と無関係に適用対象です）。通常のメインターンと V1 surface メインターンは触れず、コンパクションターンは常に上限をバイパスし、`multiAgentMode: "v1"` は上限機能全体を無効化します（ダッシュボードもパネルを隠します）。`low` から `ultra` を許可し、値を上げずに下げるだけです。上限以下でモデルがサポートする最も高い段階に下げます。モデルが effort 制御を公開しない、または上限以下にサポート段階がない場合は effort フィールドを削除しプロバイダーのデフォルトを適用します。`max` と `ultra` も許可しますが、より低いランク上限を作りません（クライアントが `ultra` を `max` に変換するためリクエストは `low` から `max` で入ります）。ただし、既知のモデル effort ラダーに従い段階が下がるかフィールドが削除される可能性があります。ダッシュボードセレクターは `low` から `xhigh` まで提供します。`GET /api/effort-caps` と `PUT /api/effort-caps` で管理します。 |
 | `subagentEffortCap?` | `string` | — | 同じ強制上限を codex-rs 標識が正確に一致する spawn された子ターンにだけ適用します: `x-openai-subagent: collab_spawn` または `x-codex-turn-metadata` の `"subagent_kind": "thread_spawn"`。それ以外の内部サブエージェントカテゴリ（レビュー、コンパクション、メモリ整理）はこの上限にかからず、`multiAgentMode: "v1"` は機能全体を無効化します。`low` から `ultra` を許可し両方の上限が設定されていればより低い値を適用し、値を上げずに下げるだけです。上限以下でモデルがサポートする最も高い段階に下げます。モデルが effort 制御を公開しない、または上限以下にサポート段階がない場合は effort フィールドを削除しプロバイダーのデフォルトを適用します。`max` と `ultra` も許可しますが、より低いランク上限を作りません（クライアントが `ultra` を `max` に変換するためリクエストは `low` から `max` で入ります）。ただし、既知のモデル effort ラダーに従い段階が下がるかフィールドが削除される可能性があります。ダッシュボードセレクターは `low` から `xhigh` まで提供します。`GET /api/effort-caps` と `PUT /api/effort-caps` で管理します。 |
 | `injectionPrompt?` | `string` | — | 注入される v2 案内本文を丸ごと差し替えるカスタムテキスト。`{{model}}`、`{{effort}}`、`{{roster}}` placeholder が置換され、発火条件はそのままです。`PUT /api/injection-model` の `prompt` キーでも設定できます。 |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenCodex が作成する multi-agent developer ガイダンスだけを制御します。未設定/`true` は v1/v2 ガイダンスを維持し、`false` は collaboration surface、`subagentModels`、routing、effort cap を変えずに両方を抑止します。`GET/PUT /api/injection-model` は有効値を返し、PUT は部分更新です。 |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenProvider が作成する multi-agent developer ガイダンスだけを制御します。未設定/`true` は v1/v2 ガイダンスを維持し、`false` は collaboration surface、`subagentModels`、routing、effort cap を変えずに両方を抑止します。`GET/PUT /api/injection-model` は有効値を返し、PUT は部分更新です。 |
 | `disabledModels?` | `string[]` | — | Codex で隠すモデル。ルーティングされた `provider/model` id はカタログと `/v1/models` から除外します。`gpt-5.4` のような通常のネイティブ GPT slug はカタログ項目を `visibility: "hide"` に変え、通常の `/v1/models` 一覧から外します。ダッシュボードの Models ページでモデルごとに切り替えできます。 |
 | `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3 段階 multi-agent surface override。`"v1"` は上流 pin より優先してすべてのモデルを v1 に、`"default"` は上流 model pin（sol/terra=v2、luna=v1）に従い、`"v2"` はすべてを v2 に強制します。ダッシュボードの Models ページまたは `ocx v2 mode` で設定します。 |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | プロバイダー別の Codex 表示 context cap。既知の context window を下げるだけです。 |
@@ -47,8 +47,8 @@ namespaced selected id を bare id に変えます。
 | `websockets?` | `boolean` | `false` | `supports_websockets` を知らせ Codex が Responses WebSocket 経路を使うようにします。省略または `false` なら HTTP/SSE を維持します。 |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | 非 loopback バインドで管理 API とデータプレーン認証に追加で許可する生成型 `ocx_…` 認証情報。ダッシュボードが管理し、項目フィールドは下で説明します。 |
 | `codexAutoStart?` | `boolean` | `true` | Codex shim が Codex 実行前に `ocx ensure` を実行するようにします。`false` なら `ocx ensure` は何もしません。 |
-| `codexShimAutoRestore?` | `boolean` | `true` | 完了した外部 Codex 更新で以前にインストールした shim が置換された場合に復元します。無効にするには `false`、またはプロセスで `OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0` を設定します。 |
-| `syncResumeHistory?` | `boolean` | `true` | 戻せる Codex App 履歴互換モード。opencodex は元の Codex thread metadata をバックアップし、旧 OpenAI interactive row を `opencodex` に再マッピングし、opencodex が作成した `exec` row を App に見えるソースとして一時的に昇格します。`ocx stop` / `ocx restore` はバックアップした OpenAI row を復元し、残った opencodex user thread を OpenAI に戻し、ネイティブ Codex が `config.toml` からプロキシを削除した後でも開き続けられるようにします。オフにするには `false` に設定します。 |
+| `codexShimAutoRestore?` | `boolean` | `true` | 完了した外部 Codex 更新で以前にインストールした shim が置換された場合に復元します。無効にするには `false`、またはプロセスで `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` を設定します。 |
+| `syncResumeHistory?` | `boolean` | `true` | 戻せる Codex App 履歴互換モード。OpenProvider は元の Codex thread metadata をバックアップし、旧 OpenAI interactive row を `OpenProvider` に再マッピングし、OpenProvider が作成した `exec` row を App に見えるソースとして一時的に昇格します。`ocx stop` / `ocx restore` はバックアップした OpenAI row を復元し、残った OpenProvider user thread を OpenAI に戻し、ネイティブ Codex が `config.toml` からプロキシを削除した後でも開き続けられるようにします。オフにするには `false` に設定します。 |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | Codex Auth ダッシュボードが管理する ChatGPT/Codex pool アカウント metadata。secret は `codex-accounts.json` に別途置きます。 |
 | `activeCodexAccountId?` | `string` | — | 手動選択した pool アカウント。既存 thread affinity を消去して次のリクエストから適用し、処理中のリクエストは現在のアカウントを維持します。 |
 | `autoSwitchThreshold?` | `number` | `80` | 新しいセッション自動切替用の使用量百分率 threshold。既知の 5 時間、週次、30 日 quota window のうち最も高いスコアを使います。`0` なら quota 自動切替をオフにします。 |
@@ -97,24 +97,24 @@ pool アカウントの追加と quota 更新はダッシュボードの **Codex
 
 ## リモートアクセス
 
-opencodex はデフォルトで `127.0.0.1`（loopback 専用）にバインドします。`hostname` を `0.0.0.0` のような
+OpenProvider はデフォルトで `127.0.0.1`（loopback 専用）にバインドします。`hostname` を `0.0.0.0` のような
 非 loopback アドレスに設定すると管理 API（`/api/*`）とデータプレーン（`/v1/responses`）の **両方** に token
 認証を強制します。
 
-起動前に `OPENCODEX_API_AUTH_TOKEN` 環境変数を設定してください。
+起動前に `OpenProvider_API_AUTH_TOKEN` 環境変数を設定してください。
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+export OpenProvider_API_AUTH_TOKEN="your-secret-token"
 ocx start
 ```
 
 非 loopback バインドではこの変数がないとプロキシは起動しません。LAN アクセス用のバックグラウンド
 サービスをインストールするときも同じ変数を先に export したのち `ocx service install` を実行し、launchd、
-systemd、Task Scheduler に渡す必要があります。クライアントはすべてのリクエストの `x-opencodex-api-key` ヘッダーに
+systemd、Task Scheduler に渡す必要があります。クライアントはすべてのリクエストの `x-OpenProvider-api-key` ヘッダーに
 token を入れる必要があります。
 
 ```
-x-opencodex-api-key: your-secret-token
+x-OpenProvider-api-key: your-secret-token
 ```
 
 `Authorization: Bearer …` ヘッダーも許可します。起動後はダッシュボードで生成した `apiKeys` を環境変数
@@ -123,7 +123,7 @@ token の代わりに使えます。すべての候補は timing side channel �
 
 :::caution[LAN 公開]
 `0.0.0.0` にバインドするとプロキシと設定されたすべてのプロバイダー認証情報がローカルネットワークにさらされます。
-信頼できるネットワークでのみ使い、強力な `OPENCODEX_API_AUTH_TOKEN` を必ず設定してください。
+信頼できるネットワークでのみ使い、強力な `OpenProvider_API_AUTH_TOKEN` を必ず設定してください。
 :::
 
 ## プロバイダー（`OcxProviderConfig`）
@@ -162,7 +162,7 @@ token の代わりに使えます。すべての候補は timing side channel �
 | `thinkingToggleModels?` | `string[]` | effort 段階の代わりに vendor `thinking.enabled` toggle を使う chat モデル。 |
 | `thinkingBudgetModels?` | `string[]` | 整数 `thinking_budget` を使う chat モデル。effort を budget 比率にマッピングします。 |
 | `noVisionModels?` | `string[]` | テキスト専用モデル。[ビジョンサイドカー](/ja/guides/sidecars/) が画像を説明します。Ollama の `:size` タグも一致させます。 |
-| `escapeBuiltinToolNames?` | `boolean` | Umans のような Anthropic 互換 gateway が wire でツール名 escaping を要求するときに使います。opencodex はツール呼び出しを Codex に戻す前に prefix を削除します。 |
+| `escapeBuiltinToolNames?` | `boolean` | Umans のような Anthropic 互換 gateway が wire でツール名 escaping を要求するときに使います。OpenProvider はツール呼び出しを Codex に戻す前に prefix を削除します。 |
 | `googleMode?` | `"ai-studio" \| "vertex" \| "cloud-code-assist"` | Google 伝送/認証モード。デフォルト `ai-studio`。 |
 | `project?` | `string` | Vertex project id または Antigravity Cloud Code Assist project id。 |
 | `location?` | `string` | Vertex location。環境変数 fallback は `GOOGLE_CLOUD_LOCATION`。 |
@@ -173,7 +173,7 @@ token の代わりに使えます。すべての候補は timing side channel �
 ## Cursor プロバイダー（`adapter: "cursor"`）
 
 Cursor bridge は実験的です。`ocx login cursor` を実行したのち
-`~/.opencodex/config.json`（Windows: `%USERPROFILE%\.opencodex\config.json`）の `providers` 以下に
+`~/.OpenProvider/config.json`（Windows: `%USERPROFILE%\.OpenProvider\config.json`）の `providers` 以下に
 `cursor` 項目を追加または編集してください。
 
 Cursor サーバーが指示するネイティブローカルツールはデフォルトで **オフ** です。Codex は自身のツール
@@ -225,7 +225,7 @@ Codex の承認と sandbox ルールを迂回する Cursor ネイティブロー
 一部のプロバイダーはリアルタイムモデルカタログが非常に大きいか遅いです。Codex に `models` で固定したモデルだけ
 見せるには `liveModels` を `false` に設定してください。
 
-`liveModels` が `false` で `models` が空または省略されると opencodex はそのプロバイダーのルーティング
+`liveModels` が `false` で `models` が空または省略されると OpenProvider はそのプロバイダーのルーティング
 モデルを 1 つも公開しません。
 
 `selectedModels` は目的が異なります。モデル発見は引き続き実行しますが選択した id だけを Codex カタログと
@@ -296,7 +296,7 @@ stall は無活動監視装置で全体生成 timeout ではありません。
 リクエストは `maxDescriptionsPerTurn` の枠を使いません。リモート `https:` 画像と失敗または空の説明は
 キャッシュしません。
 
-Anthropic OAuth 検出と画像説明リクエストは opencodex で既に使っている Claude Code OAuth
+Anthropic OAuth 検出と画像説明リクエストは OpenProvider で既に使っている Claude Code OAuth
 fingerprint 方式をそのまま踏襲します。保存所の既存 OAuth 先例の中にありますが、実際に使うアカウントと
 作業量で十分に soak test するのがよいでしょう。
 
@@ -346,7 +346,9 @@ fingerprint 方式をそのまま踏襲します。保存所の既存 OAuth 先�
 :::
 
 :::note[アトミック書き込み]
-すべての設定・カタログファイル（`config.toml`、`opencodex-catalog.json`）は `atomicWriteFile`（一時ファイル +
+すべての設定・カタログファイル（`config.toml`、`OpenProvider-catalog.json`）は `atomicWriteFile`（一時ファイル +
 名前変更）でアトミックに書き込みます。`ocx stop` とプロキシ自身の終了 handler のように複数 writer が
 同時に Codex を復元しても、ファイルが半分だけ書かれるのを防ぎます。
 :::
+
+

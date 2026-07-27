@@ -91,7 +91,7 @@ function currentEntry(): WindowsTrayEntry {
 
 export function windowsTrayRunValue(opencodexHome: string): string {
   const normalized = resolve(opencodexHome).replace(/[\\/](?:\.)?[\\/]*$/, "").toLowerCase();
-  return `OpenCodexTray-${createHash("sha256").update(normalized).digest("hex").slice(0, 12)}`;
+  return `OpenProviderTray-${createHash("sha256").update(normalized).digest("hex").slice(0, 12)}`;
 }
 
 export function windowsPowerShellPath(systemRoot = process.env.SystemRoot): string {
@@ -137,7 +137,7 @@ export function windowsTrayProcessArgs(entry: WindowsTrayEntry, mode: "Run" | "S
     "-BunPath", safePath(entry.bun),
     "-CliPath", safePath(entry.cli),
     "-CodexHome", safePath(entry.codexHome),
-    "-OpenCodexHome", safePath(entry.opencodexHome),
+    "-OpenProviderHome", safePath(entry.opencodexHome),
     "-Mode", mode,
   ];
   if (Number.isSafeInteger(hostPid) && (hostPid ?? 0) > 0) args.push("-HostPid", String(hostPid));
@@ -163,7 +163,7 @@ export function buildWindowsTrayRunCommand(entry: WindowsTrayEntry, powershell =
     "-BunPath", quoteRunValue(entry.bun),
     "-CliPath", quoteRunValue(entry.cli),
     "-CodexHome", quoteRunValue(entry.codexHome),
-    "-OpenCodexHome", quoteRunValue(entry.opencodexHome),
+    "-OpenProviderHome", quoteRunValue(entry.opencodexHome),
     "-Mode", "Run",
   ].join(" ");
 }
@@ -626,3 +626,4 @@ export async function windowsTrayCommand(args: string[]): Promise<void> {
     process.exitCode = 1;
   }
 }
+

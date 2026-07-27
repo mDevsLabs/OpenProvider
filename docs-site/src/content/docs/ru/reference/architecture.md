@@ -1,9 +1,9 @@
 ---
 title: Архитектура
-description: Внутреннее устройство opencodex — карта модулей, мост AdapterEvent, парсер запросов и кэширование.
+description: Внутреннее устройство OpenProvider — карта модулей, мост AdapterEvent, парсер запросов и кэширование.
 ---
 
-opencodex — это один процесс Bun. Запрос приходит как OpenAI Responses, нормализуется во
+OpenProvider — это один процесс Bun. Запрос приходит как OpenAI Responses, нормализуется во
 внутреннюю модель, маршрутизируется, отправляется провайдеру через адаптер и мостом
 преобразуется обратно в Responses SSE. Сквозной поток описан в разделе
 [Как это работает](/ru/getting-started/how-it-works/).
@@ -22,7 +22,7 @@ src/
 ├── lib/                # runtime, process, retry, privacy, token estimate helpers
 ├── web-search/         # web-search sidecar (synthetic tool, loop, executor, parser)
 ├── vision/             # vision sidecar (describe + plan)
-├── config.ts           # ~/.opencodex/config.json, defaults, PID, env resolution
+├── config.ts           # ~/.OpenProvider/config.json, defaults, PID, env resolution
 ├── router.ts           # model id → provider + adapter
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
@@ -132,7 +132,7 @@ src/
 v2, синхронизацию каталога, диагностику и отладочные логи, использование и квоты, настройки
 сайдкаров, обновления, сгенерированные клиентские API-ключи, вход/статус/выход OAuth и выбор
 аккаунта, управление аккаунтами Codex и корректную остановку. `server/auth-cors.ts` требует
-`OPENCODEX_API_AUTH_TOKEN` и для `/api/*`, и для `/v1/*`, когда прокси привязан за пределами
+`OpenProvider_API_AUTH_TOKEN` и для `/api/*`, и для `/v1/*`, когда прокси привязан за пределами
 loopback; настроенные записи `corsAllowOrigins` расширяют allowlist локальных origin.
 
 Реализации OAuth живут в `oauth/`; access-токены загружаются или обновляются непосредственно
@@ -145,7 +145,7 @@ loopback; настроенные записи `corsAllowOrigins` расширя�
 ## Транспорт и compaction
 
 `server/index.ts` по умолчанию обслуживает HTTP/SSE на `/v1/responses`. Если Codex пытается
-выполнить WebSocket-апгрейд Responses, пока `websockets` равно `false`, opencodex возвращает
+выполнить WebSocket-апгрейд Responses, пока `websockets` равно `false`, OpenProvider возвращает
 `426 upgrade_required`; Codex тогда откатывается на HTTP для этой сессии. Когда установлено
 `"websockets": true`, та же конечная точка принимает апгрейд и использует WebSocket-мост.
 
@@ -188,3 +188,4 @@ Compaction контекста Codex работает для маршрутизи
 (`OcxConfig`, `OcxProviderConfig`). Широко используются два хелпера: `namespacedToolName()` и
 `modelInList()` (толерантное сопоставление с тегом `:size` для `noVisionModels` /
 `noReasoningModels`).
+

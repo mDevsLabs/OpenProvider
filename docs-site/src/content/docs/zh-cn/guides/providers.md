@@ -1,9 +1,9 @@
 ---
 title: 提供商
-description: opencodex 进行身份验证并与 LLM 提供商通信的所有方式——OAuth、API 密钥、ChatGPT 转发以及本地。
+description: OpenProvider 进行身份验证并与 LLM 提供商通信的所有方式——OAuth、API 密钥、ChatGPT 转发以及本地。
 ---
 
-**提供商（provider）** 是一个上游 LLM 端点，加上访问它的方式：一个 adapter、一个基础 URL、一种认证模式，以及一个可选的模型列表。提供商配置位于 `~/.opencodex/config.json` 的 `providers` 下。
+**提供商（provider）** 是一个上游 LLM 端点，加上访问它的方式：一个 adapter、一个基础 URL、一种认证模式，以及一个可选的模型列表。提供商配置位于 `~/.OpenProvider/config.json` 的 `providers` 下。
 
 ## OpenAI 账户模式
 
@@ -20,8 +20,8 @@ bare `gpt-5.6-sol` 遵循 Providers 页面中的 Pool/Direct 选项，
 若内置 `openai` 提供商缺失或已禁用，可在仪表盘 Accounts 选择器或 Codex Auth 页面恢复：缺失行会从规范预设创建，已禁用的规范行会在不替换已保存模式/模型设置的情况下重新启用，非规范的 `openai` 行不会提供该恢复路径。
 
 shipped v1 配置自动迁移到 marker 2 的单一选项行。原配置只保留一次到
-`~/.opencodex/config.json.pre-openai-tiers-v2.bak`；恢复命令：
-`cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`。
+`~/.OpenProvider/config.json.pre-openai-tiers-v2.bak`；恢复命令：
+`cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json`。
 
 ## 认证模式
 
@@ -55,7 +55,7 @@ ChatGPT 透传目录也会加入 GPT-5.6 Sol/Terra/Luna 的裸 slug（`gpt-5.6-s
 
 ## 2. 账号登录（OAuth）
 
-有六个提供商预设使用 OAuth 登录。opencodex 会把凭据存入 `~/.opencodex/auth.json` 并自动刷新。
+有六个提供商预设使用 OAuth 登录。OpenProvider 会把凭据存入 `~/.OpenProvider/auth.json` 并自动刷新。
 登录 CLI 也接受 `chatgpt`：它会获取一份 ChatGPT 凭据，并创建一个 `forward` 模式的提供商条目。
 
 ```bash
@@ -85,11 +85,11 @@ ocx logout <provider>
 OAuth 凭据中带有稳定账号 id 或邮箱的提供商可以保存多个登录。Providers 页面会在下拉列表中显示这些
 账号，允许继续添加，并在不登出其他账号的情况下切换当前账号。没有身份信息的 Kimi 和 Kiro 会替换
 当前 active slot；`chatgpt` 始终只有一个 slot，因为 Codex 账号池使用独立存储。令牌仍保存在
-`~/.opencodex/auth.json` 中；`/api/oauth/accounts` 只返回脱敏后的 metadata。
+`~/.OpenProvider/auth.json` 中；`/api/oauth/accounts` 只返回脱敏后的 metadata。
 
 ## 3. API 密钥目录
 
-opencodex v2.7.1 内置 50 个预设：40 个密钥预设、6 个 OAuth 预设、3 个本地预设，以及默认的
+OpenProvider v2.7.1 内置 50 个预设：40 个密钥预设、6 个 OAuth 预设、3 个本地预设，以及默认的
 ChatGPT 转发预设。仪表盘的 **Add provider** 选择器会打开密钥提供商的控制台，验证并保存密钥。
 主要条目包括：
 
@@ -155,7 +155,7 @@ GPT-5.6 Sol/Terra/Luna 会预置在提供商的回退列表中，因此即使实
 发现结果，仅保留当前账号可用的模型。
 
 :::note[gateway 与订阅 proxy]
-是否支持某个提供商，取决于 opencodex 是否有匹配的 wire adapter，而**不取决于**它是否属于
+是否支持某个提供商，取决于 OpenProvider 是否有匹配的 wire adapter，而**不取决于**它是否属于
 “agent”产品。当前 adapter id 包括 `openai-chat`、`openai-responses`、`anthropic`、`google`
 （AI Studio、Vertex、Antigravity/Cloud Code Assist 模式）、`azure` / `azure-openai`、`kiro` 和
 `cursor`。原生 Amazon Bedrock 这类无法匹配上述实现的专有 API 暂不直接支持。**GitHub Copilot** 和
@@ -167,25 +167,25 @@ GPT-5.6 Sol/Terra/Luna 会预置在提供商的回退列表中，因此即使实
 
 Cursor 作为单独的实验性 adapter 进行跟踪。`adapter: "cursor"` 会作为实验性本地配置出现在
 `ocx init` 和 dashboard Add Provider picker 中，并保存 Cursor 的静态回退模型目录 metadata。配置
-Cursor access token 后，opencodex 会使用 Cursor live HTTP/2 transport。v2.7.1 回退列表包含上下文为
+Cursor access token 后，OpenProvider 会使用 Cursor live HTTP/2 transport。v2.7.1 回退列表包含上下文为
 1M 的 `gpt-5.6-sol` / `terra` / `luna`，以及上下文为 500K 的
 `grok-4.5` / `grok-4.5-fast`；最终显示哪些模型由账号的实时发现结果决定。Cursor 服务器直接发起的
 native read/write/delete/ls/grep/shell/fetch 执行默认禁用，因为它会绕过 Codex 的 approval 和
-sandbox 路径；只有在可信本地实验中，才应在 `~/.opencodex/config.json` 的 `providers.cursor`
+sandbox 路径；只有在可信本地实验中，才应在 `~/.OpenProvider/config.json` 的 `providers.cursor`
 对象上设置 `unsafeAllowNativeLocalExec: true`，也可以在仪表盘的 **Providers → Cursor → Edit JSON**
 中设置。完整示例参见 [配置参考](/zh-cn/reference/configuration/#cursor-provider-adapter-cursor)。MCP、屏幕录制和 computer-use
-通过 executor hook 暴露；没有配置本地 executor 时，opencodex 会返回 typed no-executor 结果。
+通过 executor hook 暴露；没有配置本地 executor 时，OpenProvider 会返回 typed no-executor 结果。
 Cursor OAuth 和 live model discovery 已在这个实验性 adapter 中启用；Cursor 仍不会出现在 key-login
 列表中。
 :::
 
 ### Ollama Cloud
 
-Ollama Cloud 是托管（而非本地）的 Ollama，在 `https://ollama.com/v1` 上兼容 OpenAI，密钥来自 [ollama.com/settings/keys](https://ollama.com/settings/keys)。opencodex 按视觉能力对其云端阵容进行分类，使 [vision sidecar](/zh-cn/guides/sidecars/) 仅对纯文本模型生效。纯文本模型（例如 `glm-5.2`、`deepseek-v4-pro`、`gpt-oss`、`qwen3-coder`、`minimax-m2.x`、`nemotron-3-*`）列在 `noVisionModels` 中；原生支持视觉的模型（例如 `kimi-k2.6`、`minimax-m3`、`gemma4`、`qwen3.5`、`gemini-3-flash-preview`）则不在其中。匹配能容忍 Ollama 的 `:size` 标签，因此 `gpt-oss` 涵盖 `gpt-oss:120b` 和 `gpt-oss:20b`。
+Ollama Cloud 是托管（而非本地）的 Ollama，在 `https://ollama.com/v1` 上兼容 OpenAI，密钥来自 [ollama.com/settings/keys](https://ollama.com/settings/keys)。OpenProvider 按视觉能力对其云端阵容进行分类，使 [vision sidecar](/zh-cn/guides/sidecars/) 仅对纯文本模型生效。纯文本模型（例如 `glm-5.2`、`deepseek-v4-pro`、`gpt-oss`、`qwen3-coder`、`minimax-m2.x`、`nemotron-3-*`）列在 `noVisionModels` 中；原生支持视觉的模型（例如 `kimi-k2.6`、`minimax-m3`、`gemma4`、`qwen3.5`、`gemini-3-flash-preview`）则不在其中。匹配能容忍 Ollama 的 `:size` 标签，因此 `gpt-oss` 涵盖 `gpt-oss:120b` 和 `gpt-oss:20b`。
 
 ## 4. 本地提供商
 
-让 opencodex 指向本地的 OpenAI 兼容服务器——通常使用空密钥：
+让 OpenProvider 指向本地的 OpenAI 兼容服务器——通常使用空密钥：
 
 | 提供商 | 基础 URL |
 | --- | --- |
@@ -196,3 +196,4 @@ Ollama Cloud 是托管（而非本地）的 Ollama，在 `https://ollama.com/v1`
 ## 任意 OpenAI 兼容端点
 
 如果某个提供商使用 Chat Completions，`openai-chat` adapter 即可处理它——在仪表盘中选择 **Custom**，或在 `ocx init` 中选择 `custom` 并输入基础 URL。每个提供商字段（`headers`、`noReasoningModels`、`noVisionModels`、`models`……）请参见 [配置参考](/zh-cn/reference/configuration/)。
+

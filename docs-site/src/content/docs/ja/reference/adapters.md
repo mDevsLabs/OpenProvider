@@ -3,7 +3,7 @@ title: アダプター
 description: 7つのプロバイダーアダプターの対象、リクエスト構成方式、固有の動作。
 ---
 
-**アダプター**は opencodex の内部リクエスト/レスポンスモデルとプロバイダーの wire 形式の間を変換します。すべてのアダプターは `ProviderAdapter` インターフェース（`src/adapters/base.ts`）を実装します。
+**アダプター**は OpenProvider の内部リクエスト/レスポンスモデルとプロバイダーの wire 形式の間を変換します。すべてのアダプターは `ProviderAdapter` インターフェース（`src/adapters/base.ts`）を実装します。
 
 ```ts
 interface ProviderAdapter {
@@ -84,7 +84,7 @@ Kiro のアシスタントテキストには、それ自体で end-turn を示�
 コンテキストウィンドウの枯渇は再試行不可の context-length エラー、フィルタリングやガードレールによる停止は
 filtered incomplete になります。実際のツール呼び出しを伴わない `TOOL_USE` は進捗ではなく矛盾として扱います。
 
-stop reason がまったく無い場合のみ、opencodex は非公開の `codex_kiro_final_answer` ツールを追加して
+stop reason がまったく無い場合のみ、OpenProvider は非公開の `codex_kiro_final_answer` ツールを追加して
 一度だけ継続します。重複抑制は空白を正規化した完全一致に限定します。言い換えられた状態更新は結果そのものを
 変えることがあり（「保留中」から「完了」へ）、その一文を失うほうが、体裁上の繰り返しを表示するより有害です。
 
@@ -119,3 +119,4 @@ stop reason がまったく無い場合のみ、opencodex は非公開の `codex
 - `parseDataUrl(url)` — `data:<type>;base64,<data>` URL を `{ mediaType, base64 }` に分け、Anthropic/Google の画像 block に使います。
 - `contentPartsToText(content)` — テキスト専用ツールメッセージのために content part をテキストに
   平坦化します。説明のない画像はトークンを増やす base64 blob の代わりに短い `[image]` marker になります。
+

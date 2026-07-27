@@ -1,9 +1,9 @@
 ---
 title: Интеграция с Codex
-description: Как opencodex внедряется в Codex, синхронизирует каталог моделей, управляет селектором подагентов и аккуратно восстанавливает исходное состояние.
+description: Как OpenProvider внедряется в Codex, синхронизирует каталог моделей, управляет селектором подагентов и аккуратно восстанавливает исходное состояние.
 ---
 
-opencodex заставляет Codex работать через прокси, редактируя две вещи, которые читает Codex: его
+OpenProvider заставляет Codex работать через прокси, редактируя две вещи, которые читает Codex: его
 конфигурацию (`$CODEX_HOME/config.toml`, по умолчанию `~/.codex/config.toml`) и каталог моделей.
 Каждая правка идемпотентна и обратима.
 
@@ -16,12 +16,12 @@ opencodex заставляет Codex работать через прокси, �
 ## Внедрение конфигурации
 
 `ocx init`, `ocx start` и `ocx sync` вызывают инжектор. При привязке к loopback по умолчанию он
-сохраняет встроенный id провайдера Codex `openai` и направляет этого провайдера на opencodex:
+сохраняет встроенный id провайдера Codex `openai` и направляет этого провайдера на OpenProvider:
 
 ```toml
 # root keys, before the first table
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
-# Auto-injected by opencodex
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
+# Auto-injected by OpenProvider
 openai_base_url = "http://127.0.0.1:10100/v1"
 
 [features]
@@ -37,7 +37,7 @@ fast_mode = true
 Встроенный инструмент Codex `image_gen` не проходит через `/v1/responses` — расширение codex-rs
 напрямую отправляет POST на `{base_url}/images/generations` (или `/images/edits`, когда
 приложены референсные изображения) с той же bearer-аутентификацией ChatGPT, что и для чата.
-Поскольку внедрённый `base_url` указывает на opencodex, прокси ретранслирует эти вызовы
+Поскольку внедрённый `base_url` указывает на OpenProvider, прокси ретранслирует эти вызовы
 вышестоящему OpenAI:
 
 - **Один forward-кандидат с учётом режима:** Pool выбирает подходящий основной/добавленный
@@ -57,22 +57,22 @@ API-аутентификации. Поэтому инжектор в этом с
 
 ```toml
 # root keys
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_provider = "OpenProvider"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 
 # appended at the end of the file
-# Auto-injected by opencodex
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+# Auto-injected by OpenProvider
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 # supports_websockets = true   # only when config.websockets is true
 ```
 
-Когда маршрутизацией управляет OpenCodex, в обоих режимах он записывает
-`$CODEX_HOME/opencodex.config.toml` как справочную и резервную конфигурацию. На loopback в ней
+Когда маршрутизацией управляет OpenProvider, в обоих режимах он записывает
+`$CODEX_HOME/OpenProvider.config.toml` как справочную и резервную конфигурацию. На loopback в ней
 лежат корневые ключи, которые можно объединить вручную, если автоматическое внедрение было удалено;
 вне loopback — форма с выделенным провайдером. В режиме внешнего провайдера этот профиль остается
 без изменений.
@@ -87,17 +87,17 @@ env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
 
 ## Общий каталог моделей
 
-Codex CLI, TUI, App и SDK читают один и тот же домашний каталог Codex. opencodex определяет его
+Codex CLI, TUI, App и SDK читают один и тот же домашний каталог Codex. OpenProvider определяет его
 из `CODEX_HOME`, с откатом на `~/.codex`, и управляет файлами:
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
-В WSL, если `CODEX_HOME` не задан и Linux-файл `~/.codex/config.toml` отсутствует, opencodex
+В WSL, если `CODEX_HOME` не задан и Linux-файл `~/.codex/config.toml` отсутствует, OpenProvider
 дополнительно ищет единственный домашний каталог Windows Codex Desktop по пути
 `/mnt/c/Users/*/.codex/config.toml`. Когда кандидат ровно один, используется именно этот
 каталог, чтобы режим app-server в WSL и Windows Codex Desktop разделяли одни и те же файлы
@@ -111,7 +111,7 @@ Orca, тогда как ChatGPT/Codex App по-прежнему читает `%U
 установите службу заново.
 
 В режиме выделенного провайдера `requires_openai_auth = true` сохраняет поведение зависящих от
-аккаунта интерфейсов Codex App/TUI таким же, как в нативном Codex. opencodex также обслуживает
+аккаунта интерфейсов Codex App/TUI таким же, как в нативном Codex. OpenProvider также обслуживает
 `/v1/responses` по WebSocket. Выделенный провайдер объявляет `supports_websockets = true` только
 при `"websockets": true`; на loopback встроенный провайдер Codex может сначала попробовать
 WebSocket, и прокси с выключенной функцией вернёт `426`, после чего Codex откатится на HTTP/SSE.
@@ -120,18 +120,18 @@ WebSocket, и прокси с выключенной функцией вернё
 
 Форма loopback по умолчанию помечает новые треды нативным провайдером Codex `openai`, поэтому
 обычная история возобновления не требует перепривязки. При первой синхронизации треды,
-помеченные старыми сборками opencodex, также возвращаются к `openai`. Режим выделенного
-провайдера вне loopback, пока активен, зеркалирует историю под провайдером `opencodex` и при
+помеченные старыми сборками OpenProvider, также возвращаются к `openai`. Режим выделенного
+провайдера вне loopback, пока активен, зеркалирует историю под провайдером `OpenProvider` и при
 выходе восстанавливает метаданные из резервной копии. Чтобы вообще не трогать историю, задайте
 `syncResumeHistory: false`.
 
 ## Синхронизация каталога моделей
 
-Codex показывает модели из каталога на диске (по умолчанию `$CODEX_HOME/opencodex-catalog.json`).
-При запуске и при `ocx sync` opencodex:
+Codex показывает модели из каталога на диске (по умолчанию `$CODEX_HOME/OpenProvider-catalog.json`).
+При запуске и при `ocx sync` OpenProvider:
 
 1. **Создаёт резервную копию** нетронутого каталога — один раз, в
-   `~/.opencodex/catalog-backup.json` (чтобы выделение избранных было обратимым).
+   `~/.OpenProvider/catalog-backup.json` (чтобы выделение избранных было обратимым).
 2. **Загружает** актуальные каталоги моделей подходящих провайдеров (кеш ~5 минут; при сбое
    используется последний удачный список, затем настроенный `models[]`). У forward-аутентификации
    нет конечной точки моделей, а Cursor использует свой RPC `GetUsableModels` вместо `/models`.
@@ -151,7 +151,7 @@ Codex показывает модели из каталога на диске (�
 
 Если Codex после повторных попыток падает с ошибкой вида
 `stream disconnected before completion: error sending request for url (http://127.0.0.1:10100/v1/responses)`
-(или Claude Code показывает похожий сбой подключения), прокси opencodex не запущен:
+(или Claude Code показывает похожий сбой подключения), прокси OpenProvider не запущен:
 на настроенном порту никто не слушает, и клиент показывает сырую ошибку подключения.
 Перезапустите прокси:
 
@@ -187,7 +187,7 @@ ocx service install    # постоянно: автозапуск при вхо�
 
 ## Прогрев аккаунтов Codex
 
-Когда аккаунт ChatGPT добавляется в пул аккаунтов Codex, opencodex проверяет его перед
+Когда аккаунт ChatGPT добавляется в пул аккаунтов Codex, OpenProvider проверяет его перед
 сохранением небольшим потоковым запросом к бэкенду Codex Responses. Запрос использует настоящий
 массив элементов Responses (`input: [{ type: "message", ... }]`), дожидается
 `response.completed` и по умолчанию использует `gpt-5.4-mini`. Если эта модель возвращает HTTP
@@ -198,10 +198,10 @@ ocx service install    # постоянно: автозапуск при вхо�
 
 ## Восстановление нативного Codex
 
-opencodex никогда не запирает вас. **`ocx stop` — единственная команда, полностью возвращающая
+OpenProvider никогда не запирает вас. **`ocx stop` — единственная команда, полностью возвращающая
 нативный Codex**: она останавливает прокси, останавливает фоновый сервис, если он установлен, и
 убирает каждую внедрённую строку и каждую маршрутизируемую запись каталога, так что обычный
-`codex` работает ровно так, как будто opencodex никогда не существовал:
+`codex` работает ровно так, как будто OpenProvider никогда не существовал:
 
 ```bash
 ocx stop       # stop the proxy + service, restore native Codex
@@ -209,6 +209,7 @@ ocx restore    # restore without stopping  (alias: ocx eject)
 ocx restore back # point plain Codex at the running proxy again
 ```
 
-Когда opencodex работает как управляемый [фоновый сервис](/ru/reference/cli/#ocx-service),
+Когда OpenProvider работает как управляемый [фоновый сервис](/ru/reference/cli/#ocx-service),
 он устанавливает `OCX_SERVICE=1`, поэтому перезапуск, инициированный сервисом, **не** дёргает
 конфигурацию Codex — нативный Codex восстанавливают только явные `ocx stop` / `ocx service stop`.
+

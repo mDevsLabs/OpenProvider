@@ -1,9 +1,9 @@
 ---
 title: Codex App モデルピッカー
-description: 共有 Codex カタログ経由で opencodex モデルが Codex App、Codex CLI、Codex TUI に表示される方式。
+description: 共有 Codex カタログ経由で OpenProvider モデルが Codex App、Codex CLI、Codex TUI に表示される方式。
 ---
 
-opencodex は Codex App にパッチを当てません。Codex CLI/TUI が既に使う設定とモデルカタログを
+OpenProvider は Codex App にパッチを当てません。Codex CLI/TUI が既に使う設定とモデルカタログを
 同じ位置に書き込みます。Codex App もこの状態を共有するため、ルーティングモデルが通常の Codex カタログ
 項目のように App のモデルピッカーに現れます。
 
@@ -18,29 +18,29 @@ ID は変わりません。API GPT-5.6 は context 1,050,000 / max input 922,000
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
 デフォルトのループバックバインドでは Codex の組み込み `openai` プロバイダー ID をそのまま残します。代わりに次のルート
-キーでプロバイダーとモデルカタログを opencodex につなぎます。
+キーでプロバイダーとモデルカタログを OpenProvider につなぎます。
 
 ```toml
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 openai_base_url = "http://127.0.0.1:10100/v1"
 ```
 
 ループバック以外の hostname を使うと Codex が生成された API 認証ヘッダーも送る必要があります。このときルートの
-`model_provider = "opencodex"` と Responses 互換専用プロバイダーを使います。
+`model_provider = "OpenProvider"` と Responses 互換専用プロバイダーを使います。
 
 ```toml
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://your-host:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
-env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }
+env_http_headers = { "x-OpenProvider-api-key" = "OpenProvider_API_AUTH_TOKEN" }
 ```
 
 `websockets` はデフォルトでオフです。専用プロバイダーとカタログ項目は
@@ -51,7 +51,7 @@ HTTP/SSE にフォールバックさせます。注入と復元の全体流は
 
 ## ルーティングモデルが表示される理由
 
-Codex モデルピッカーは Codex 形式のカタログ項目を要求します。opencodex はネイティブ Codex モデル
+Codex モデルピッカーは Codex 形式のカタログ項目を要求します。OpenProvider はネイティブ Codex モデル
 テンプレートを複製した後、ルーティングモデルの識別情報を差し替えます。
 
 ```text
@@ -99,7 +99,7 @@ Codex カタログのより豊富なライブ項目を保ち、欠けている�
 
 ## マルチエージェントサーフェスモード
 
-opencodex は全カタログ項目の `multi_agent_version` を制御する 3 段階 override を提供します。
+OpenProvider は全カタログ項目の `multi_agent_version` を制御する 3 段階 override を提供します。
 
 | モード | 動作 |
  --- | --- |
@@ -140,7 +140,7 @@ service_tier = "fast"
 fast_mode = true
 ```
 
-一方モデルカタログとランタイムリクエストの tier ID は `priority` です。opencodex はこの差を維持します。
+一方モデルカタログとランタイムリクエストの tier ID は `priority` です。OpenProvider はこの差を維持します。
 ネイティブ OpenAI パススルーモデルは fast サポートを保存し、ルーティングされた非 OpenAI モデルでは service-tier
 メタデータを消して処理できない fast オプションが表示されないようにします。
 
@@ -148,7 +148,7 @@ fast_mode = true
 
 Codex はピッカーに表示されるカタログ項目を `priority` 昇順でソートした後、最初の 5 つを
 `spawn_agent` モデルオーバーライドとして公開します。`subagentModels` やダッシュボード Subagents ページで
-ネイティブ ID または `provider/model` ID を最大 5 つ選ぶと opencodex が選択順に priority 0-4 を
+ネイティブ ID または `provider/model` ID を最大 5 つ選ぶと OpenProvider が選択順に priority 0-4 を
 付与します。残りのモデルも正確な ID で直接呼び出し可能です。
 
 フィーチャー済みモデル一覧はダッシュボードの **Sub-agent delegation** ガイダンスとは別物です。特にフィーチャー済みモデル
@@ -162,5 +162,6 @@ Codex はピッカーに表示されるカタログ項目を `priority` 昇順�
 ocx sync
 ```
 
-opencodex はカタログの表示可否、priority、メタデータが変わるたびに `models_cache.json` を意図的に
+OpenProvider はカタログの表示可否、priority、メタデータが変わるたびに `models_cache.json` を意図的に
 古いキャッシュラッパーで書き直します。次回の Codex モデルリフレッシュが新しいカタログを読むようにするためです。
+

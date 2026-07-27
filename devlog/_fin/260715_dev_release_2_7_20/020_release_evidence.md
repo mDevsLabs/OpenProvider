@@ -23,7 +23,7 @@
 - Release commit: `ee5f6ad2245f1b044a519a341747c8c1d78781b7` (`release: v2.7.20`).
 - Release-commit Cross-platform CI: `https://github.com/lidge-jun/opencodex/actions/runs/29422617075` — success.
 - OIDC Release workflow: `https://github.com/lidge-jun/opencodex/actions/runs/29422979926` — success; publish, registry smoke, and GitHub Release creation all passed.
-- npm: `@bitkyc08/opencodex@2.7.20`; `latest=2.7.20`.
+- npm: `@mdevs/openprovider@2.7.20`; `latest=2.7.20`.
 - npm shasum: `90ffe369130589fdd97ebd61126ed67f5e06c1e1`.
 - npm integrity: `sha512-tgjJQe7qOg7kfUkJrQCZBuKIJiNNoiYhA0hVExP+uEfbm9adeebP98hMNFT4VeLargdOvoLJ9QUyUUweH5G8Cg==`.
 - Git tag `v2.7.20` resolves to the release commit.
@@ -36,3 +36,4 @@
 - Final aligned `dev` Cross-platform CI: `https://github.com/lidge-jun/opencodex/actions/runs/29423131436` — success.
 - Final aligned `preview` Cross-platform CI: `https://github.com/lidge-jun/opencodex/actions/runs/29423207507` — success.
 - No force-push, tag rewrite, unpublish, or history deletion was used.
+

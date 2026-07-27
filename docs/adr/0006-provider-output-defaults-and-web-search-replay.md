@@ -34,3 +34,5 @@ adapter can replay safely.
 - Registry defaults can be added later without changing adapter behavior.
 - The active web-search sidecar still emits real `web_search_call` cells only
   when a sidecar executes a search.
+
+

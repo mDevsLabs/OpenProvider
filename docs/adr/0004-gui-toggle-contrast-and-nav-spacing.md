@@ -26,3 +26,5 @@ full click target while separating adjacent hover and active surfaces.
 - Both switch implementations share one enabled-state color rule.
 - Sidebar hover and active states remain visually separate without adding divider noise.
 - No component API or dependency changes are required.
+
+

@@ -1,13 +1,13 @@
 ---
 title: 贡献指南
-description: opencodex 的开发环境、结构、约定，以及添加 provider 或 adapter 的方法。
+description: OpenProvider 的开发环境、结构、约定，以及添加 provider 或 adapter 的方法。
 ---
 
 ## 环境搭建
 
 ```bash
-git clone https://github.com/lidge-jun/opencodex.git
-cd opencodex
+git clone https://github.com/mDevsLabs/OpenProvider.git
+cd OpenProvider
 bun install
 bun run dev:proxy    # 开发模式代理 API
 bun run dev:gui      # 仪表盘 dev 服务器（另一个终端）
@@ -44,7 +44,7 @@ cd docs-site && bun install && bun dev
 
 ## 文档发布
 
-公开文档发布到 GitHub Pages：<https://opencodex.me/zh-cn/>。
+公开文档发布到 GitHub Pages：<https://OpenProvider.me/zh-cn/>。
 `.github/workflows/deploy-docs.yml` 会在 `main` push 中 `docs-site/**` 或 workflow 本身发生变化时
 运行，构建 `docs-site` 并部署生成的网站。推送文档变更前请运行：
 
@@ -121,4 +121,6 @@ package API，还要从 `src/index.ts` export。
 
 先运行能证明改动的最小命令：类型检查用 `bun run typecheck`，行为检查用聚焦的
 `bun test tests/<name>.test.ts` 或 runtime probe，然后再执行适合影响范围的更宽 gate。
-opencodex 倾向于小而可验证的 commit，而不是大批量改动。
+OpenProvider 倾向于小而可验证的 commit，而不是大批量改动。
+
+

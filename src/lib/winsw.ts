@@ -96,8 +96,8 @@ export function buildWinswXml(entry: WinswEntry, env: NodeJS.ProcessEnv = proces
   return `<?xml version="1.0" encoding="UTF-8"?>
 <service>
   <id>${WINSW_SERVICE_ID}</id>
-  <name>OpenCodex Proxy (native)</name>
-  <description>OpenCodex proxy running as a native Windows service (windowless, starts at boot).</description>
+  <name>OpenProvider Proxy (native)</name>
+  <description>OpenProvider proxy running as a native Windows service (windowless, starts at boot).</description>
   <executable>${xmlEscape(entry.bun)}</executable>
   <arguments>${xmlEscape(`"${entry.cli}" start --port ${safeListenPort}`)}</arguments>
 ${envLines.join("\n")}
@@ -358,3 +358,4 @@ export function winswStatusSummary(): string {
 export function defaultWinswEntry(cliDir: string): WinswEntry {
   return { bun: durableBunPath(), cli: join(cliDir, "cli", "index.ts") };
 }
+

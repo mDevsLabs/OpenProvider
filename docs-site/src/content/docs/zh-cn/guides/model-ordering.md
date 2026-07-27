@@ -1,9 +1,9 @@
 ---
 title: 模型排序
-description: opencodex 如何确定 Codex 模型选择器和 spawn_agent 模型 override 的顺序。
+description: OpenProvider 如何确定 Codex 模型选择器和 spawn_agent 模型 override 的顺序。
 ---
 
-Codex 模型选择器不会保留 opencodex 配置中 provider 的声明顺序或模型数组顺序。最终顺序由目录
+Codex 模型选择器不会保留 OpenProvider 配置中 provider 的声明顺序或模型数组顺序。最终顺序由目录
 priority 决定；priority 相同的路由模型则使用确定性的字母顺序。
 
 ## Codex 应用的规则
@@ -12,7 +12,7 @@ Codex 的 models-manager 按 `priority` 升序排列选择器中可见的目录�
 丢弃，因此在生成的 JSON 数组中把某个条目前移，并不会让它在选择器中前移。该约束直接记录在
 `src/codex/catalog/sync.ts` 中。
 
-因此，opencodex 通过分配更低的 priority 控制置顶位置，而不依赖数组位置。相关 priority 如下：
+因此，OpenProvider 通过分配更低的 priority 控制置顶位置，而不依赖数组位置。相关 priority 如下：
 
 | 目录条目 | Priority | 来源 |
 | --- | ---: | --- |
@@ -59,7 +59,7 @@ featured 列表非空时，最终顺序为：
 3. 在目录合并过程中被移到 featured 区块之后的未选中原生模型。
 
 如果没有 `subagentModels`，路由模型保持 priority `5`，原生 GPT 条目使用正常 priority
-（opencodex 创建的条目通常为 `9`），路由组内部仍按 provider/id 字母排序。
+（OpenProvider 创建的条目通常为 `9`），路由组内部仍按 provider/id 字母排序。
 
 ## 示例
 
@@ -93,9 +93,10 @@ subagentModels = [
 ## 更改顺序
 
 自定义开头模型顺序的唯一受支持方式是重新排列 `subagentModels`。你可以在仪表盘的
-**Sub-agents** 页面或 opencodex 配置中修改它。该列表最多接受五个模型，其数组顺序有实际意义。
+**Sub-agents** 页面或 OpenProvider 配置中修改它。该列表最多接受五个模型，其数组顺序有实际意义。
 
 目前 `OcxConfig` 中没有通用的 `modelOrder`、`providerOrder` 或 priority map 设置。受支持的排序
 字段是 `subagentModels`（`src/types.ts:238-246`）；`disabledModels` 和各 provider 的
 `selectedModels` 都是可见性字段（`src/types.ts:276-282`、`src/types.ts:439-446`）。因此，要更改
 选择器其余部分的顺序，需要修改代码行为，而不是调整配置。
+

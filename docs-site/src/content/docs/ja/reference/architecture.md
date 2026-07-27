@@ -1,9 +1,9 @@
 ---
 title: アーキテクチャ
-description: opencodex の内部構造 — モジュールマップ、AdapterEvent ブリッジ、リクエストパーサー、そしてキャッシュ。
+description: OpenProvider の内部構造 — モジュールマップ、AdapterEvent ブリッジ、リクエストパーサー、そしてキャッシュ。
 ---
 
-opencodex は単一の Bun プロセスです。リクエストは OpenAI Responses として入り、内部モデルに正規化され、ルーティングされたのち、アダプターを経由してプロバイダーに送信され、再び Responses SSE にブリッジされます。エンドツーエンドのフローは [動作の仕組み](/ja/getting-started/how-it-works/) を参照してください。
+OpenProvider は単一の Bun プロセスです。リクエストは OpenAI Responses として入り、内部モデルに正規化され、ルーティングされたのち、アダプターを経由してプロバイダーに送信され、再び Responses SSE にブリッジされます。エンドツーエンドのフローは [動作の仕組み](/ja/getting-started/how-it-works/) を参照してください。
 
 ## モジュールマップ
 
@@ -19,7 +19,7 @@ src/
 ├── lib/                # runtime, process, retry, privacy, token estimate helpers
 ├── web-search/         # web-search sidecar (synthetic tool, loop, executor, parser)
 ├── vision/             # vision sidecar (describe + plan)
-├── config.ts           # ~/.opencodex/config.json, defaults, PID, env resolution
+├── config.ts           # ~/.OpenProvider/config.json, defaults, PID, env resolution
 ├── router.ts           # model id → provider + adapter
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
@@ -95,7 +95,7 @@ HTTP の境界は `server/index.ts` が担い、Responses データプレーン�
 
 ## 伝送と compaction
 
-`server/index.ts` はデフォルトで `/v1/responses` を HTTP/SSE で提供します。`websockets` が `false` の状態で Codex が Responses WebSocket アップグレードを試みると、opencodex は `426 upgrade_required` を返し、Codex はそのセッションで HTTP にフォールバックします。`"websockets": true` を設定すると同じエンドポイントがアップグレードを受け入れ WebSocket ブリッジを使います。
+`server/index.ts` はデフォルトで `/v1/responses` を HTTP/SSE で提供します。`websockets` が `false` の状態で Codex が Responses WebSocket アップグレードを試みると、OpenProvider は `426 upgrade_required` を返し、Codex はそのセッションで HTTP にフォールバックします。`"websockets": true` を設定すると同じエンドポイントがアップグレードを受け入れ WebSocket ブリッジを使います。
 
 Codex コンテキスト compaction はルーティングされたモデルでも動作します。`server/responses/compact.ts` は
 `POST /v1/responses/compact` を内部ルーティング要約ターンとして扱い、圧縮されたヒストリーを返します。
@@ -122,3 +122,4 @@ Codex カタログは Codex が受け入れるラベル（`low` / `medium` / `hi
 `OcxContentPart`（text / image）、`OcxToolCall`、`OcxTool`、`AdapterEvent`、そして設定型
 （`OcxConfig`、`OcxProviderConfig`）。2 つのヘルパーが広く使われます: `namespacedToolName()` と
 `modelInList()`（`noVisionModels` / `noReasoningModels` に対する寛容な `:size` タグマッチング）。
+

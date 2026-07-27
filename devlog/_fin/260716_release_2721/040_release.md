@@ -35,7 +35,7 @@ preview). Version regex gate: `*-preview.*` ✓.
 ## Post-publish verification
 
 ```sh
-npm view @bitkyc08/opencodex dist-tags   # expect latest:2.7.21, preview:2.7.21-preview.20260716
+npm view @mdevs/openprovider dist-tags   # expect latest:2.7.21, preview:2.7.21-preview.20260716
 gh pr view 136 --json state; gh pr view 137 --json state   # expect MERGED
 gh run list --branch main --limit 3; gh run list --branch preview --limit 3
 ```
@@ -80,3 +80,4 @@ gh run list --branch main --limit 3; gh run list --branch preview --limit 3
 - npm dist-tags after: `{ preview: '2.7.21-preview.20260716', latest: '2.7.21' }`.
 - PRs: #136 MERGED, #137 MERGED (2026-07-15T23:54:07Z, authors credited via preserved head SHAs).
 - Final branch state: dev == origin/dev == origin/main == b5e76038; origin/preview == 0c64ce9d; tags v2.7.21 + v2.7.21-preview.20260716.
+

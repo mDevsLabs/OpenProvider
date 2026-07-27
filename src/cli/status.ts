@@ -187,7 +187,7 @@ export async function collectStatus(): Promise<CliStatusView> {
     );
   }
   if (resolvedRuntime.newerAvailable) {
-    warningParts.push("OpenCodex is using an older Codex binary. Run ocx doctor for diagnosis and recovery.");
+    warningParts.push("OpenProvider is using an older Codex binary. Run ocx doctor for diagnosis and recovery.");
   }
   if (clampActive) {
     warningParts.push(
@@ -263,3 +263,4 @@ export async function collectStatus(): Promise<CliStatusView> {
     },
   };
 }
+

@@ -163,7 +163,7 @@ export const WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER =
 
 /**
  * Reserved elevated-scheduler protocol exit codes.
- * These are OpenCodex-owned values returned by the elevated PowerShell transaction.
+ * These are OpenProvider-owned values returned by the elevated PowerShell transaction.
  * They must never collide with UAC cancellation (1223).
  *
  * The elevated script never exits with raw schtasks codes — only these protocol values —
@@ -529,7 +529,7 @@ export function runWindowsElevated(file: string, args: string[]): Promise<number
 
 /**
  * Build the elevated (post-UAC) script: create → run → optional delete rollback.
- * Returns only OpenCodex protocol exit codes (never raw schtasks codes, never 1223).
+ * Returns only OpenProvider protocol exit codes (never raw schtasks codes, never 1223).
  * Does not write through any user-controlled pathname.
  */
 export function buildElevatedSchtasksCreateAndRunScript(
@@ -625,3 +625,4 @@ export function runElevatedSchtasksCreateAndRun(
 ): Promise<ElevatedSchtasksCreateAndRunResult> {
   return startElevatedSchtasksCreateAndRun(schtasksPath, createArgs, runArgs, deleteArgs).completion;
 }
+

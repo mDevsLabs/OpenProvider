@@ -2,14 +2,14 @@
 
 ## Objective
 
-Release the PR #16/#22 integration from `dev` to `main` as `@bitkyc08/opencodex@2.1.8`.
+Release the PR #16/#22 integration from `dev` to `main` as `@mdevs/openprovider@2.1.8`.
 
 The release must:
 
 - Re-verify `dev` after the PR #16/#22 integration.
 - Fast-forward or merge `dev` into `main`.
 - Use the repository release helper, not ad-hoc publish commands.
-- Publish `@bitkyc08/opencodex@2.1.8` with npm trusted publishing via GitHub Actions.
+- Publish `@mdevs/openprovider@2.1.8` with npm trusted publishing via GitHub Actions.
 - Verify npm, Git tag, GitHub Release, CI, and branch synchronization.
 - Resync `dev` to the release commit after the release helper creates `release: v2.1.8`.
 
@@ -25,7 +25,7 @@ The release must:
 - `package.json` version: `2.1.7`
 - Next release version: `2.1.8`
 - Preflight metadata:
-  - `npm view @bitkyc08/opencodex@2.1.8 version`: not found.
+  - `npm view @mdevs/openprovider@2.1.8 version`: not found.
   - `git ls-remote origin refs/tags/v2.1.8`: no tag output.
   - `gh release view v2.1.8`: release not found.
 - Open PR list: empty after PR #16 and #22 closeout.
@@ -69,7 +69,7 @@ Dispatch a read-only plan auditor to verify:
    - Run `bun scripts/release.ts 2.1.8 --publish` from clean `main`.
    - Let the helper bump `package.json`, commit `release: v2.1.8`, push `main`, wait for CI, dispatch release workflow, and watch the workflow.
 5. Verify release metadata:
-   - `npm view @bitkyc08/opencodex@2.1.8 version`
+   - `npm view @mdevs/openprovider@2.1.8 version`
    - `git ls-remote origin refs/tags/v2.1.8`
    - `gh release view v2.1.8 --json tagName,targetCommitish,url`
 6. Resync `dev`:
@@ -84,7 +84,7 @@ Final checks:
 - `git rev-parse main origin/main dev origin/dev`
 - `gh run list` for release commit CI success.
 - `gh run list --workflow release.yml` for publish workflow success.
-- `npm view @bitkyc08/opencodex version` returns `2.1.8`.
+- `npm view @mdevs/openprovider version` returns `2.1.8`.
 - `gh release view v2.1.8` exists.
 
 ### D: Done
@@ -124,9 +124,10 @@ after an independent final objective review returns DONE.
 
 - `origin/main` includes PR #16/#22 integration and `release: v2.1.8`.
 - `origin/dev` is synchronized to the same release commit.
-- npm latest resolves to `@bitkyc08/opencodex@2.1.8`.
+- npm latest resolves to `@mdevs/openprovider@2.1.8`.
 - Git tag `v2.1.8` exists.
 - GitHub Release `v2.1.8` exists.
 - Cross-platform CI succeeded for the release commit.
 - Release workflow succeeded.
 - PABCD reaches D and independent final reviewer returns DONE.
+

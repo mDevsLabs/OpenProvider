@@ -190,7 +190,7 @@ describe("oauth refresh hardening", () => {
     expect(getCredential("xai")?.expires).toBe(diskExpires);
   });
 
-  test("stale Grok generation refreshes once and detaches to OpenCodex ownership", async () => {
+  test("stale Grok generation refreshes once and detaches to OpenProvider ownership", async () => {
     await saveCredential("xai", {
       access: "xai-old", refresh: "rt-old", expires: Date.now() - 1, accountId: "user-1", source: "local-cli",
     });
@@ -212,7 +212,7 @@ describe("oauth refresh hardening", () => {
     expect(mock.discoveryCount()).toBe(1);
     expect(mock.tokenCount()).toBe(1);
     expect(warnings).toEqual([[
-      "[oauth:xai] Grok CLI credential was stale; refreshed into OpenCodex ownership. Grok CLI may require login again.",
+      "[oauth:xai] Grok CLI credential was stale; refreshed into OpenProvider ownership. Grok CLI may require login again.",
     ]]);
     expect(getCredential("xai")?.refresh).toBe("rt-fresh");
     expect(getCredential("xai")?.source).toBe("oauth");
@@ -406,3 +406,4 @@ describe("oauth refresh hardening", () => {
     expect(getAccountSet("anthropic")!.accounts[0]!.needsReauth).toBeUndefined();
   });
 });
+

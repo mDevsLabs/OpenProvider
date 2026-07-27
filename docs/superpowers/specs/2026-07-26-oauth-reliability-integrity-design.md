@@ -111,3 +111,5 @@ Cover: concurrent refresh → one IdP call; shared result; failed refresh clears
 - Codex metadata integrity tests green
 - `bun run typecheck`, targeted OAuth tests, and full `bun run test` pass
 - No impersonation / fingerprint spoofing / limit-bypass behaviour added
+
+

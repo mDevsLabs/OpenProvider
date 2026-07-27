@@ -14,7 +14,7 @@ Push + deploy pre-approved by the user in the kickoff message.
 
 - `dev` == `main` == `preview` == `a50e1470` (`release: v2.7.18`). Promotion will be
   fast-forward if nothing else lands on main meanwhile.
-- Current npm version: `@bitkyc08/opencodex 2.7.18`.
+- Current npm version: `@mdevs/openprovider 2.7.18`.
 - Release path: bump on main + `bun run release <version>` -> GitHub Actions
   `release.yml` workflow_dispatch (dry-run default false via script), OIDC trusted publishing.
 
@@ -158,3 +158,4 @@ conflicts in provider-registry-parity (3 expected arrays) + server-auth tests.
 Landing order: #128 first (based on current main a50e147; #129 based on older
 16bef043), then #129 dropping duplicate hunks. Registry order: OpenCode before Xiaomi;
 MiMo after Kilo. Both PRs drop the openai-chat.ts:445 precedence reversal.
+

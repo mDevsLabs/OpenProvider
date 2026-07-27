@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: 첫 프로바이더를 설정하고 명령어 세 개로 OpenAI Codex를 opencodex로 라우팅합니다.
+description: 첫 프로바이더를 설정하고 명령어 세 개로 OpenAI Codex를 OpenProvider로 라우팅합니다.
 ---
 
 이 가이드는 새로 설치한 상태에서 OpenAI가 아닌 모델로 Codex를 실행하기까지의 과정을 안내합니다.
@@ -24,7 +24,7 @@ ocx init
    구성에서는 API 인증 헤더가 포함된 전용 프로바이더 항목을 대신 사용합니다.
 6. **자동 시작 shim을 설치할까요?** — 켜 두면 `codex`를 실행할 때 먼저 `ocx ensure`가 실행됩니다.
 
-결과는 `$OPENCODEX_HOME/config.json`(기본값 `~/.opencodex/config.json`)에 저장됩니다.
+결과는 `$OpenProvider_HOME/config.json`(기본값 `~/.OpenProvider/config.json`)에 저장됩니다.
 
 :::note[GPT-5.6 배포 준비 항목]
 안정화 버전 v2.7.1은 ChatGPT 패스스루, OpenAI API 키, OpenRouter, 실험 단계의 Cursor adapter에
@@ -40,9 +40,9 @@ ocx start            # 기본 포트 10100
 ocx start --port 8080
 ```
 
-시작 시 opencodex는:
+시작 시 OpenProvider는:
 
-- PID를 `~/.opencodex/ocx.pid`에 기록하고(두 번 실행되는 것을 거부),
+- PID를 `~/.OpenProvider/ocx.pid`에 기록하고(두 번 실행되는 것을 거부),
 - 지원하는 프로바이더에서는 실시간 모델을 조회하고, 네이티브 및 라우팅 항목을 **Codex 모델
   카탈로그에 동기화**하며,
 - `http://localhost:<port>/v1`에서 수신 대기합니다.
@@ -59,7 +59,7 @@ ocx gui       # 현재 포트에서 대시보드 열기
 
 ## 3. Codex 사용
 
-이제 Codex는 opencodex와 투명하게 통신합니다:
+이제 Codex는 OpenProvider와 투명하게 통신합니다:
 
 ```bash
 codex "Refactor this function for readability"
@@ -86,7 +86,7 @@ codex -m "openrouter/openai/gpt-5.6-luna" "Summarize this trace"
 새 구성에는 `gpt-5.5`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-5.4-mini`가
 Codex의 sub-agent 선택기에 기본으로 표시됩니다. `ocx gui`에서 네이티브 모델과 라우팅 모델을
 합쳐 최대 다섯 개까지 바꾸거나 순서를 조정할 수 있습니다. 선호하는 sub-agent 모델과 reasoning
-effort도 지정할 수 있으며, opencodex는 이 값을 v1 협업 요청의 안내 메시지에 반영합니다.
+effort도 지정할 수 있으며, OpenProvider는 이 값을 v1 협업 요청의 안내 메시지에 반영합니다.
 
 ## 키를 붙여넣는 대신 로그인하기
 
@@ -115,3 +115,4 @@ ocx restore back  # 실행 중인 프록시로 Codex를 다시 연결
 - [작동 방식](/ko/getting-started/how-it-works/) — 각 요청에 무슨 일이 일어나는지.
 - [프로바이더](/ko/guides/providers/) — 인증하는 모든 방법.
 - [구성](/ko/reference/configuration/) — 전체 `config.json` 레퍼런스.
+

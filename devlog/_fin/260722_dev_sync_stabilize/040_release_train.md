@@ -24,7 +24,7 @@ preview package.json이 이미 2.7.32-preview.20260722라 같은 버전으로 `n
    (preflight → bump commit → push → ci.yml+service-lifecycle.yml 대기 → release.yml dispatch → watch).
 3. main을 preview tip으로 ff 후 `bun scripts/release.ts 2.7.33 --publish` on main.
 4. dev를 main tip으로 ff + push, 로컬 HEAD=dev로 복귀.
-5. `npm view @bitkyc08/opencodex dist-tags --json` 검증 + 브랜치 tip 수렴 확인.
+5. `npm view @mdevs/openprovider dist-tags --json` 검증 + 브랜치 tip 수렴 확인.
 
 ## 결과
 
@@ -38,3 +38,4 @@ preview package.json이 이미 2.7.32-preview.20260722라 같은 버전으로 `n
 - npm dist-tags 최종: latest=2.7.33, preview=2.7.33-preview.20260722.
 - dev push 후 CI: 6d6bef8b dev-branch run 결과는 아래 검증 로그 참조 (동일 SHA가
   main에서 이미 그린이나 규약대로 dev run도 확인).
+

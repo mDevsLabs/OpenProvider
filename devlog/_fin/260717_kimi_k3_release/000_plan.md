@@ -15,7 +15,7 @@ and `main` and publish npm `latest` as `2.7.23`.
   official upstream model id `k3`.
 - `origin/main` is `b3731377` (`release: v2.7.22`), while `origin/preview` is
   `88e96e71`; those public branches diverge from the new local K3 work.
-- npm `latest` is `2.7.22`; `@bitkyc08/opencodex@2.7.23` and remote tag
+- npm `latest` is `2.7.22`; `@mdevs/openprovider@2.7.23` and remote tag
   `v2.7.23` are unused. GitHub's release lookup was temporarily unavailable,
   so the release helper must repeat all three freshness checks before mutation.
 - A live request reached Kimi's coding endpoint but returned membership
@@ -63,3 +63,4 @@ and `main` and publish npm `latest` as `2.7.23`.
 - `UNSAFE`: completing the release would require rewriting published history.
 - `NEEDS_HUMAN`: npm, tag, or GitHub metadata is partially consumed in a way
   that cannot be safely bypassed with the next unused version.
+

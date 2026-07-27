@@ -26,7 +26,7 @@ const MIN_POLL_MS = 1000;
 const TERMINAL_OAUTH_ERROR_CODES = new Set(["invalid_grant", "access_denied", "expired_token"]);
 const IDENTITY_RETRY_DELAY_MS = 500;
 
-/** Honest OpenCodex client fingerprint; VS Code-shaped values only if API requires them later. */
+/** Honest OpenProvider client fingerprint; VS Code-shaped values only if API requires them later. */
 export const GITHUB_COPILOT_EDITOR_HEADERS: Readonly<Record<string, string>> = {
   "Editor-Version": "opencodex/0.1.0",
   "Editor-Plugin-Version": "opencodex/0.1.0",
@@ -426,3 +426,4 @@ export async function refreshGithubCopilotToken(
   }
   return credentialsFromGithubAccess(refreshToken, refreshToken, signal);
 }
+

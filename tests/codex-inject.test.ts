@@ -139,7 +139,7 @@ describe("Codex config injection", () => {
   test("non-loopback fallback profile keeps the legacy provider-table shape with the injected host", () => {
     const profile = buildProfileFile(10100, null, false, true, "192.168.1.20");
 
-    expect(profile).toContain("proxy at 192.168.1.20:10100");
+    expect(profile).toContain("OpenProvider Proxy at 192.168.1.20:10100");
     expect(profile).toContain('base_url = "http://192.168.1.20:10100/v1"');
     expect(profile).toContain('model_provider = "opencodex"');
     expect(profile).toContain("[model_providers.opencodex]");
@@ -165,7 +165,7 @@ describe("Codex config injection", () => {
       "",
       "# Auto-injected by opencodex",
       " [model_providers.opencodex]",
-      'name = "OpenCodex Proxy"',
+      'name = "OpenProvider Proxy"',
       'base_url = "http://localhost:10100/v1"',
       " [plugins.safe]",
       "enabled = true",
@@ -273,7 +273,7 @@ describe("Design B openai_base_url injection", () => {
       "",
       "# Auto-injected by opencodex",
       "[model_providers.opencodex]",
-      'name = "OpenCodex Proxy"',
+      'name = "OpenProvider Proxy"',
       'base_url = "http://127.0.0.1:10100/v1"',
       "",
     ].join("\n");
@@ -293,7 +293,7 @@ describe("Design B openai_base_url injection", () => {
       "",
       "# Auto-injected by opencodex",
       "[model_providers.opencodex]",
-      'name = "OpenCodex Proxy"',
+      'name = "OpenProvider Proxy"',
       'base_url = "http://127.0.0.1:10100/v1"',
       'wire_api = "responses"',
       "",
@@ -330,3 +330,5 @@ describe("EOL boundary helpers (Windows CRLF configs)", () => {
     expect(applyEol(crlf, "\r\n")).toBe(crlf);
   });
 });
+
+

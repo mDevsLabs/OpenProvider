@@ -7,19 +7,19 @@
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/opencodex.config.toml
-$CODEX_HOME/opencodex-catalog.json
+$CODEX_HOME/OpenProvider.config.toml
+$CODEX_HOME/OpenProvider-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
 Never assume macOS-only paths. Windows, service installs, and app-launched Codex can all depend on
 the resolved `CODEX_HOME`.
 
-OpenCodex never overrides an explicit `CODEX_HOME`. On Windows, `ocx doctor` and `ocx status`
+OpenProvider never overrides an explicit `CODEX_HOME`. On Windows, `ocx doctor` and `ocx status`
 nevertheless diagnose the high-confidence Orca dual-home case: both `CODEX_HOME` and
 `ORCA_CODEX_HOME` select Orca's `orca/codex-runtime-home/home`, while the ChatGPT/Codex app uses the
 default `%USERPROFILE%\\.codex`. Sync and restore output always prints the exact target Codex home;
-display and JSON paths redact the OS username. The diagnostic tells users to invoke OpenCodex with
+display and JSON paths redact the OS username. The diagnostic tells users to invoke OpenProvider with
 the app home explicitly rather than silently claiming that an unrelated app was configured. If a
 service was installed under the Orca home, it must first be uninstalled from that original Orca
 environment and then reinstalled under the app home; changing only the current shell cannot migrate
@@ -55,23 +55,23 @@ are consumed incrementally and at most 512 stale files are attempted per process
 
 ## Config injection
 
-`src/codex/inject.ts` inserts root-level keys and an opencodex provider table:
+`src/codex/inject.ts` inserts root-level keys and an OpenProvider provider table:
 
 ```toml
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_provider = "OpenProvider"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://127.0.0.1:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
 ```
 
-Root TOML keys must be written before the first `[table]`. Re-injection strips stale opencodex
-blocks, stale root context-window overrides, and stale opencodex catalog paths before rewriting.
+Root TOML keys must be written before the first `[table]`. Re-injection strips stale OpenProvider
+blocks, stale root context-window overrides, and stale OpenProvider catalog paths before rewriting.
 
-If the root config selects a provider other than `openai` or `opencodex`, injection must leave the
+If the root config selects a provider other than `openai` or `OpenProvider`, injection must leave the
 config byte-for-byte unchanged and skip profile creation/updates and history migration. External
 provider managers own that routing configuration, and replacing their provider id can hide
 otherwise intact Codex sessions. This ownership check must run before catalog/cache refresh,
@@ -81,7 +81,7 @@ journal creation, and the background history migration guardian.
 
 ## Profile and fast tier
 
-When opencodex owns routing, it also writes `$CODEX_HOME/opencodex.config.toml` as an explicit profile
+When OpenProvider owns routing, it also writes `$CODEX_HOME/OpenProvider.config.toml` as an explicit profile
 target. Codex config uses `service_tier = "fast"` and `[features].fast_mode = true`;
 catalog/request tier metadata may use `priority`. Do not collapse these spellings into one value.
 
@@ -99,4 +99,5 @@ and `routeModel`, but user config overrides registry defaults per field/key.
 ## Restore
 
 `ocx stop`, `ocx restore` / `ocx eject`, `ocx service stop`, and `ocx service uninstall` must strip
-opencodex config and routed catalog entries without damaging native Codex state.
+OpenProvider config and routed catalog entries without damaging native Codex state.
+

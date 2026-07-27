@@ -27,7 +27,7 @@ function withoutUserOverridden(
 }
 
 /**
- * Copilot chat requires editor fingerprint headers. Defaults are honest OpenCodex values
+ * Copilot chat requires editor fingerprint headers. Defaults are honest OpenProvider values
  * with Copilot-Integration-Id set to the vscode-chat integration id the public client uses.
  * User-configured headers always win.
  */
@@ -54,3 +54,4 @@ export function resolveGithubCopilotTransport(
     headers,
   };
 }
+

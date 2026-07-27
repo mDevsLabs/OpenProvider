@@ -5,32 +5,32 @@ Date: 2026-06-19
 > **Archive note.** This is a dated investigation record, not current behavior
 > documentation. Some details (e.g. the referenced Codex version) reflect the state
 > at the time of writing. For current behavior see
-> [opencodex.me](https://opencodex.me/) and the
+> [OpenProvider.me](https://OpenProvider.me/) and the
 > maintainer source-of-truth under [`structure/`](../structure).
 
-This note records the web/source investigation behind opencodex's Codex path
+This note records the web/source investigation behind OpenProvider's Codex path
 handling. The short version is that modern Codex resolves almost all durable
-local state through `CODEX_HOME`, not a platform-specific opencodex guess. If
+local state through `CODEX_HOME`, not a platform-specific OpenProvider guess. If
 `CODEX_HOME` is unset, Codex falls back to `~/.codex`.
 
 ## Primary conclusion
 
-opencodex should treat Codex's home directory exactly as Codex does:
+OpenProvider should treat Codex's home directory exactly as Codex does:
 
 1. If `CODEX_HOME` is set and non-empty, it must already exist and be a
    directory.
 2. That directory is canonicalized.
 3. If `CODEX_HOME` is not set, the default is `<user home>/.codex`.
-4. All opencodex-managed Codex files should be written under that resolved root:
+4. All OpenProvider-managed Codex files should be written under that resolved root:
    - `$CODEX_HOME/config.toml`
-   - `$CODEX_HOME/opencodex.config.toml`
-   - `$CODEX_HOME/opencodex-catalog.json`
+   - `$CODEX_HOME/OpenProvider.config.toml`
+   - `$CODEX_HOME/OpenProvider-catalog.json`
    - `$CODEX_HOME/models_cache.json`
 
-The old opencodex behavior assumed `homedir()/.codex` everywhere. That happened
-to work on many macOS setups because Codex and opencodex both landed on the same
+The old OpenProvider behavior assumed `homedir()/.codex` everywhere. That happened
+to work on many macOS setups because Codex and OpenProvider both landed on the same
 default. It breaks when Codex is launched with a different `CODEX_HOME`, when
-the Desktop/App host injects one, or when a service manager starts opencodex
+the Desktop/App host injects one, or when a service manager starts OpenProvider
 without the same shell environment.
 
 ## Web findings
@@ -84,19 +84,19 @@ reads `[profiles.profile-name]` from `config.toml`, and the top-level
 Source:
 https://developers.openai.com/codex/config-advanced
 
-For opencodex this means:
+For OpenProvider this means:
 
 ```toml
-# $CODEX_HOME/opencodex.config.toml
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+# $CODEX_HOME/OpenProvider.config.toml
+model_provider = "OpenProvider"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 ```
 
 Do not write this as:
 
 ```toml
-[profiles.opencodex]
-model_provider = "opencodex"
+[profiles.OpenProvider]
+model_provider = "OpenProvider"
 ```
 
 ### `model_catalog_json`
@@ -118,7 +118,7 @@ https://github.com/openai/codex/blob/main/codex-rs/config/src/config_toml.rs
 https://github.com/openai/codex/blob/main/codex-rs/config/src/profile_toml.rs
 
 The source comments say this catalog is applied on startup only. Practically,
-opencodex must write or update the catalog before the target Codex process
+OpenProvider must write or update the catalog before the target Codex process
 starts or must ask the user/process to restart. Editing the catalog while Codex
 is already running is not enough for all surfaces.
 
@@ -132,7 +132,7 @@ as 300 seconds.
 Source:
 https://github.com/openai/codex/blob/main/codex-rs/models-manager/src/manager.rs
 
-For opencodex this means invalidation must target:
+For OpenProvider this means invalidation must target:
 
 ```text
 $CODEX_HOME/models_cache.json
@@ -163,9 +163,9 @@ override machine-local provider/auth/profile/telemetry keys such as
 Source:
 https://developers.openai.com/codex/config-advanced
 
-Therefore opencodex provider injection must remain user-level/profile-level. It
+Therefore OpenProvider provider injection must remain user-level/profile-level. It
 should not rely on a project-local `.codex/config.toml` to install
-`model_provider` or `[model_providers.opencodex]`.
+`model_provider` or `[model_providers.OpenProvider]`.
 
 ### Global instructions under Codex home
 
@@ -192,21 +192,21 @@ Default path when `CODEX_HOME` is unset:
 Why the old code often worked on macOS:
 
 - Terminal-launched Codex usually had no `CODEX_HOME`.
-- opencodex used `os.homedir()/.codex`.
+- OpenProvider used `os.homedir()/.codex`.
 - Codex also fell back to `~/.codex`.
 
 So both processes touched the same files by coincidence. The implementation was
 still wrong because it ignored the official override.
 
 For launchd services, the plist must explicitly carry the same environment if
-opencodex was installed under a custom `CODEX_HOME`. The `launchd.plist` man
+OpenProvider was installed under a custom `CODEX_HOME`. The `launchd.plist` man
 page defines `ProgramArguments` and `EnvironmentVariables`; the latter sets
 additional environment variables before running the job.
 
 Source:
 https://www.manpagez.com/man/5/launchd.plist/
 
-opencodex service plist should include:
+OpenProvider service plist should include:
 
 ```xml
 <key>EnvironmentVariables</key>
@@ -229,7 +229,7 @@ Default path when `CODEX_HOME` is unset:
 
 The direct `ocx start` path works if the shell environment matches the shell
 that later launches Codex. The service path is different: `systemd --user`
-starts opencodex from a unit file, not necessarily from the same interactive
+starts OpenProvider from a unit file, not necessarily from the same interactive
 shell environment.
 
 The systemd docs define `Environment=` for variables passed to executed
@@ -240,18 +240,18 @@ Sources:
 https://www.man7.org/linux/man-pages/man5/systemd.exec.5.html
 https://www.flatcar.org/docs/latest/setup/systemd/environment-variables/
 
-opencodex systemd units should pin the resolved install-time variables:
+OpenProvider systemd units should pin the resolved install-time variables:
 
 ```ini
 [Service]
 Environment="OCX_SERVICE=1"
 Environment="PATH=/usr/local/bin:/usr/bin:/bin"
 Environment="CODEX_HOME=/home/me/.codex-custom"
-StandardOutput="append:/home/me/.opencodex/service.log"
-StandardError="append:/home/me/.opencodex/service.log"
+StandardOutput="append:/home/me/.OpenProvider/service.log"
+StandardError="append:/home/me/.OpenProvider/service.log"
 ```
 
-If `CODEX_HOME` is omitted from the unit, opencodex can inject one Codex home
+If `CODEX_HOME` is omitted from the unit, OpenProvider can inject one Codex home
 while Codex reads another. That recreates the "model list only shows native
 models" bug on Linux service installs.
 
@@ -265,7 +265,7 @@ C:\Users\<user>\.codex
 
 This follows from Codex's `~/.codex` fallback plus Windows home-directory
 resolution. Node's `os.homedir()` uses `USERPROFILE` first on Windows, but again
-opencodex must prefer `CODEX_HOME` before touching `homedir()`.
+OpenProvider must prefer `CODEX_HOME` before touching `homedir()`.
 
 OpenAI's Windows Codex docs also refer to diagnostics under `CODEX_HOME`, for
 example:
@@ -278,21 +278,21 @@ CODEX_HOME/.sandbox-secrets/
 Source:
 https://developers.openai.com/codex/windows
 
-For Windows services, opencodex currently uses Task Scheduler. Microsoft's
+For Windows services, OpenProvider currently uses Task Scheduler. Microsoft's
 `schtasks /create` documentation says `/tr` is the program or command to run
 and `/sc onlogon` schedules a task whenever a user logs on. This means the
-registered task should run the opencodex command with paths fully quoted.
+registered task should run the OpenProvider command with paths fully quoted.
 
 Source:
 https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks-create
 
-Because Task Scheduler does not automatically encode opencodex-specific
-environment overrides into the command the way a shell session does, opencodex
-service install writes a small `.cmd` wrapper under `~/.opencodex/`. That wrapper
+Because Task Scheduler does not automatically encode OpenProvider-specific
+environment overrides into the command the way a shell session does, OpenProvider
+service install writes a small `.cmd` wrapper under `~/.OpenProvider/`. That wrapper
 sets `OCX_SERVICE=1`, preserves `PATH`, preserves `CODEX_HOME` when present, and
-then starts opencodex.
+then starts OpenProvider.
 
-## Required opencodex behavior
+## Required OpenProvider behavior
 
 ### Resolve paths once, from Codex rules
 
@@ -312,8 +312,8 @@ Then derive:
 
 ```text
 CODEX_CONFIG_PATH       = $CODEX_HOME/config.toml
-CODEX_PROFILE_PATH      = $CODEX_HOME/opencodex.config.toml
-DEFAULT_CATALOG_PATH    = $CODEX_HOME/opencodex-catalog.json
+CODEX_PROFILE_PATH      = $CODEX_HOME/OpenProvider.config.toml
+DEFAULT_CATALOG_PATH    = $CODEX_HOME/OpenProvider-catalog.json
 CODEX_MODELS_CACHE_PATH = $CODEX_HOME/models_cache.json
 ```
 
@@ -322,11 +322,11 @@ CODEX_MODELS_CACHE_PATH = $CODEX_HOME/models_cache.json
 Root `$CODEX_HOME/config.toml` should contain:
 
 ```toml
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_provider = "OpenProvider"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.OpenProvider]
+name = "OpenProvider Proxy"
 base_url = "http://127.0.0.1:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
@@ -337,17 +337,17 @@ project-local config.
 
 ### Inject profile config
 
-`$CODEX_HOME/opencodex.config.toml` should use top-level keys:
+`$CODEX_HOME/OpenProvider.config.toml` should use top-level keys:
 
 ```toml
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_provider = "OpenProvider"
+model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
 ```
 
 This is the supported shape for:
 
 ```shell
-codex --profile opencodex
+codex --profile OpenProvider
 ```
 
 ### Remove legacy profile tables
@@ -355,20 +355,20 @@ codex --profile opencodex
 Remove old blocks from `$CODEX_HOME/config.toml`:
 
 ```toml
-[profiles.opencodex]
+[profiles.OpenProvider]
 ```
 
 and avoid writing:
 
 ```toml
-profile = "opencodex"
+profile = "OpenProvider"
 ```
 
 for modern Codex.
 
 ### Keep catalog startup behavior in mind
 
-`model_catalog_json` is startup-loaded. After catalog changes, opencodex should:
+`model_catalog_json` is startup-loaded. After catalog changes, OpenProvider should:
 
 - invalidate `$CODEX_HOME/models_cache.json` when appropriate;
 - ensure the catalog exists before Codex starts;
@@ -392,11 +392,11 @@ On a typical macOS terminal:
 
 ```text
 Codex default     -> /Users/<user>/.codex
-opencodex old     -> /Users/<user>/.codex
+OpenProvider old     -> /Users/<user>/.codex
 ```
 
 So model catalog/profile files landed where Codex read them. Windows exposed the
-bug because the active Codex process and opencodex could disagree on the Codex
+bug because the active Codex process and OpenProvider could disagree on the Codex
 home, and because modern Codex requires the new profile file plus startup model
 catalog path.
 
@@ -407,8 +407,8 @@ Run these cases before release:
 1. Windows default home:
    - unset `CODEX_HOME`
    - run `ocx sync`
-   - verify `$USERPROFILE\.codex\opencodex.config.toml`
-   - verify `$USERPROFILE\.codex\opencodex-catalog.json`
+   - verify `$USERPROFILE\.codex\OpenProvider.config.toml`
+   - verify `$USERPROFILE\.codex\OpenProvider-catalog.json`
    - verify `codex debug models` includes routed models
 
 2. Windows custom home:
@@ -421,23 +421,23 @@ Run these cases before release:
 3. macOS default home:
    - unset `CODEX_HOME`
    - run `ocx sync`
-   - verify `~/.codex/opencodex.config.toml`
+   - verify `~/.codex/OpenProvider.config.toml`
 
 4. macOS custom home:
    - set `CODEX_HOME` to an existing directory
    - run `ocx service install`
-   - inspect `~/Library/LaunchAgents/com.opencodex.proxy.plist`
+   - inspect `~/Library/LaunchAgents/com.OpenProvider.proxy.plist`
    - verify `CODEX_HOME` appears in `EnvironmentVariables`
 
 5. Linux default home:
    - unset `CODEX_HOME`
    - run `ocx sync`
-   - verify `~/.codex/opencodex.config.toml`
+   - verify `~/.codex/OpenProvider.config.toml`
 
 6. Linux custom home with service:
    - set `CODEX_HOME` to an existing directory
    - run `ocx service install`
-   - inspect `~/.config/systemd/user/opencodex-proxy.service`
+   - inspect `~/.config/systemd/user/OpenProvider-proxy.service`
    - verify `Environment="CODEX_HOME=..."`
 
 7. Catalog refresh:
@@ -477,3 +477,6 @@ Run these cases before release:
   https://www.manpagez.com/man/5/launchd.plist/
 - Microsoft Task Scheduler `schtasks /create`:
   https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks-create
+
+
+

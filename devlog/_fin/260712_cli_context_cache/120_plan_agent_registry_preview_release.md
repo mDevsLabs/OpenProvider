@@ -45,6 +45,7 @@
 - `bun test tests`: 0 fail, 실제 `~/.claude/agents` 6개 전후 동일.
 - `bun run privacy:scan`: exit 0.
 - GitHub Cross-platform CI: 새 preview release SHA 성공.
-- `npm view @bitkyc08/opencodex dist-tags version --json`: preview가
+- `npm view @mdevs/openprovider dist-tags version --json`: preview가
   `2.7.9-preview.20260712.1`, latest는 `2.7.8`.
 - GitHub prerelease `v2.7.9-preview.20260712.1` 존재.
+

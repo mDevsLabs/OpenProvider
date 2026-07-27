@@ -1,7 +1,7 @@
 # Codex warmup preview release
 
 Date: 2026-07-10
-Target: `@bitkyc08/opencodex@2.7.1-preview.20260710`
+Target: `@mdevs/openprovider@2.7.1-preview.20260710`
 
 ## Loop specification
 
@@ -76,8 +76,8 @@ Target: `@bitkyc08/opencodex@2.7.1-preview.20260710`
 - Injection-model API tests prove model/effort roundtrip, clearing, and atomic rejection of invalid effort; prompt tests prove effort is injected only alongside a model.
 - The GUI build passes and the Dashboard's model/effort controls render without clipping or overlap at desktop, tablet, and mobile widths.
 - The Release workflow completes successfully for that same HEAD with `dry-run=false`, tag `preview`, and the target version.
-- `npm view @bitkyc08/opencodex@2.7.1-preview.20260710 version` returns the target version.
-- `npm dist-tag ls @bitkyc08/opencodex` reports `preview: 2.7.1-preview.20260710` and `latest: 2.7.0`.
+- `npm view @mdevs/openprovider@2.7.1-preview.20260710 version` returns the target version.
+- `npm dist-tag ls @mdevs/openprovider` reports `preview: 2.7.1-preview.20260710` and `latest: 2.7.0`.
 - Remote tag `v2.7.1-preview.20260710` resolves to the release HEAD.
 - The GitHub Release for that tag exists and is marked prerelease.
 - The working tree is clean after the closure-record commit and push.
@@ -85,3 +85,4 @@ Target: `@bitkyc08/opencodex@2.7.1-preview.20260710`
 ## Evidence ledger
 
 Preflight evidence is recorded above. Final CI, workflow, registry, tag, and release evidence is appended during the D phase before this unit is archived.
+

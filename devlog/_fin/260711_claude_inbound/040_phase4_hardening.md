@@ -78,7 +78,7 @@ observability, deprecate ccs-wrapper, and ship a release with docs/changelog.
    with evidence, not assumptions.
 2. Fresh full-gate run green; release artifacts verified; ccs-wrapper banner
    committed in its own repo.
-3. Post-release smoke: `npm i -g @bitkyc08/opencodex && ocx claude` on a clean
+3. Post-release smoke: `npm i -g @mdevs/openprovider && ocx claude` on a clean
    machine/profile completes a routed turn.
 
 ## Risks
@@ -87,3 +87,4 @@ observability, deprecate ccs-wrapper, and ship a release with docs/changelog.
   speculatively build.
 - Release + protocol edges in one cycle is wide; if 1-3 produce big diffs,
   split release into its own mini-cycle (blast-radius rule).
+

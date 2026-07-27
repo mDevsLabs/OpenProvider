@@ -15,8 +15,8 @@
 
 Publish:
 
-1. `@bitkyc08/opencodex@2.5.6` from `main` with npm dist-tag `latest`.
-2. `@bitkyc08/opencodex@2.5.7-preview.20260627` from `preview` with npm dist-tag `preview`.
+1. `@mdevs/openprovider@2.5.6` from `main` with npm dist-tag `latest`.
+2. `@mdevs/openprovider@2.5.7-preview.20260627` from `preview` with npm dist-tag `preview`.
 
 If `2.5.7-preview.20260627` is already occupied, use the next unused suffix with the same base,
 for example `2.5.7-preview.20260627.1`.
@@ -43,8 +43,8 @@ for example `2.5.7-preview.20260627.1`.
   - `dry-run=false`
 - Monitor release workflow to success.
 - Verify npm registry:
-  - `npm view @bitkyc08/opencodex@2.5.6 version`
-  - `npm dist-tag ls @bitkyc08/opencodex`
+  - `npm view @mdevs/openprovider@2.5.6 version`
+  - `npm dist-tag ls @mdevs/openprovider`
 - Verify GitHub release/tag `v2.5.6`.
 
 ### Phase 2: Preview prerelease
@@ -62,8 +62,8 @@ for example `2.5.7-preview.20260627.1`.
   - `dry-run=false`
 - Monitor release workflow to success.
 - Verify npm registry:
-  - `npm view @bitkyc08/opencodex@2.5.7-preview.20260627 version`
-  - `npm dist-tag ls @bitkyc08/opencodex`
+  - `npm view @mdevs/openprovider@2.5.7-preview.20260627 version`
+  - `npm dist-tag ls @mdevs/openprovider`
 - Verify GitHub release/tag `v2.5.7-preview.20260627`.
 
 ## Constraints
@@ -81,3 +81,4 @@ for example `2.5.7-preview.20260627.1`.
 - npm `latest` points to `2.5.6`.
 - npm `preview` points to `2.5.7-preview.20260627`.
 - Cursor branches remain unchanged from their isolated state.
+

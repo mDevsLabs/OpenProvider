@@ -1,13 +1,13 @@
 ---
 title: 기여하기
-description: opencodex 개발 환경, 구조, 컨벤션, 프로바이더와 어댑터 추가 방법.
+description: OpenProvider 개발 환경, 구조, 컨벤션, 프로바이더와 어댑터 추가 방법.
 ---
 
 ## 설정
 
 ```bash
-git clone https://github.com/lidge-jun/opencodex.git
-cd opencodex
+git clone https://github.com/mDevsLabs/OpenProvider.git
+cd OpenProvider
 bun install
 bun run dev:proxy    # 개발 모드 프록시 API
 bun run dev:gui      # 대시보드 dev 서버(다른 터미널)
@@ -46,7 +46,7 @@ cd docs-site && bun install && bun dev
 
 ## 문서 배포
 
-공개 문서는 GitHub Pages의 <https://opencodex.me/ko/>에 게시됩니다.
+공개 문서는 GitHub Pages의 <https://OpenProvider.me/ko/>에 게시됩니다.
 `.github/workflows/deploy-docs.yml`은 `main` push에서 `docs-site/**`나 워크플로 자체가 바뀌면
 실행됩니다. `docs-site`를 빌드한 뒤 생성된 사이트를 배포합니다. 문서 변경을 push하기 전에 다음을
 실행하세요.
@@ -126,4 +126,6 @@ factory라면 `src/index.ts`에서도 export합니다.
 
 변경을 증명하는 가장 좁은 명령부터 실행하세요. 타입은 `bun run typecheck`, 동작은 집중된
 `bun test tests/<name>.test.ts` 또는 런타임 probe로 확인한 뒤 영향 범위에 맞는 넓은 gate를
-실행합니다. opencodex는 큰 batch보다 작고 검증 가능한 commit을 선호합니다.
+실행합니다. OpenProvider는 큰 batch보다 작고 검증 가능한 commit을 선호합니다.
+
+

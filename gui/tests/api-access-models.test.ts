@@ -52,3 +52,4 @@ describe("gatewayInboundProtocols", () => {
     expect(gatewayInboundProtocols(false)).toEqual(["responses", "chat"]);
   });
 });
+

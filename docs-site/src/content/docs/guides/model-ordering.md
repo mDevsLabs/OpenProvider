@@ -1,10 +1,10 @@
 ---
 title: Model Ordering
-description: How opencodex determines model order in the Codex picker and spawn_agent model overrides.
+description: How OpenProvider determines model order in the Codex picker and spawn_agent model overrides.
 ---
 
 The Codex model picker does not preserve the order of provider declarations or model arrays in the
-opencodex configuration. Its final order comes from catalog priorities, with a deterministic
+OpenProvider configuration. Its final order comes from catalog priorities, with a deterministic
 alphabetical order for routed models that share the same priority.
 
 ## The rule Codex applies
@@ -14,7 +14,7 @@ discards the catalog array order, so moving an entry earlier in a generated JSON
 it earlier in the picker. The implementation records this constraint directly in
 `src/codex/catalog/sync.ts`.
 
-opencodex therefore controls featured placement by assigning lower priorities, not by relying on
+OpenProvider therefore controls featured placement by assigning lower priorities, not by relying on
 array position. The relevant priorities are:
 
 | Catalog entry | Priority | Source |
@@ -64,7 +64,7 @@ With a non-empty featured list, the resulting order is:
 3. Unselected native models, pushed below the featured block during catalog merge.
 
 Without `subagentModels`, routed models remain at priority `5`, native GPT entries use their normal
-priority (normally `9` for entries built by opencodex), and the routed group remains provider/id
+priority (normally `9` for entries built by OpenProvider), and the routed group remains provider/id
 alphabetical.
 
 ## Example
@@ -100,7 +100,7 @@ normal picker order.
 ## Changing the order
 
 The only supported way to customize leading model order is to reorder `subagentModels`. You can do
-that on the dashboard's **Sub-agents** page or in the opencodex configuration. The list accepts at
+that on the dashboard's **Sub-agents** page or in the OpenProvider configuration. The list accepts at
 most five models, and its order is significant.
 
 There is currently no general `modelOrder`, `providerOrder`, or priority-map setting in `OcxConfig`.
@@ -108,3 +108,4 @@ The supported ordering field is `subagentModels` (`src/types.ts:238-246`); `disa
 provider's `selectedModels` are visibility fields (`src/types.ts:276-282` and
 `src/types.ts:439-446`). To change the rest of the picker order would require a code-level behavior
 change rather than a configuration edit.
+
