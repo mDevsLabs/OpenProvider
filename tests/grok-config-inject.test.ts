@@ -3,6 +3,9 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildGrokManagedBlock, injectGrokConfig, stripGrokConfig } from "../src/grok/inject";
+import { setIcaclsRunnerForTests } from "../src/lib/windows-secret-acl";
+
+setIcaclsRunnerForTests(() => ({ success: true, exitCode: 0, timedOut: false, stdout: "" }));
 
 const BEGIN_MARKER = "# >>> openprovider managed block — do not edit (removed by `opr stop`) >>>";
 const END_MARKER = "# <<< openprovider managed block <<<";
@@ -118,7 +121,7 @@ describe("Grok config injection", () => {
   test("decodes TOML unicode escapes in user model headers", () => {
     const configPath = join(grokHome, "config.toml");
     // \U0000006F and \u006F are both "o" — these headers canonically define model.opr-esc*.
-    const userContent = '[model."\\U0000006Fcx-esc"]\nmodel = "user/esc"\n[model."\\u006Fcx-esc4"]\nmodel = "user/esc4"\n';
+    const userContent = '[model."\\U0000006Fpr-esc"]\nmodel = "user/esc"\n[model."\\u006Fpr-esc4"]\nmodel = "user/esc4"\n';
     writeFileSync(configPath, userContent, "utf8");
 
     injectGrokConfig(10100, [{ id: "esc" }, { id: "esc4" }], { grokHome });

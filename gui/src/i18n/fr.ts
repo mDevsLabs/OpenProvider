@@ -1352,5 +1352,3 @@ export const fr = {
   "claudeDesktop.effort.supported": "effort",
   "claudeDesktop.effort.displayOnly": "effort (affichage uniquement)",
 } as const;
-
-export type TKey = keyof typeof en;
