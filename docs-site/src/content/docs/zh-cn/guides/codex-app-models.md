@@ -14,7 +14,7 @@ context / 922,000 max input；`*-pro` picker id 保持公开身份，线上使�
 
 ## 集成路径
 
-`ocx init`、`ocx start` 和 `ocx sync` 会保持解析后的 `CODEX_HOME` 目录下这些文件一致：
+`opr init`、`opr start` 和 `opr sync` 会保持解析后的 `CODEX_HOME` 目录下这些文件一致：
 
 ```text
 $CODEX_HOME/config.toml
@@ -104,7 +104,7 @@ OpenProvider 为每个目录条目的 `multi_agent_version` 提供三态 overrid
 | **base**（安装默认值） | 恢复上游固定值：Sol/Terra 使用 v2，Luna 使用 v1；未固定的模型遵循 Codex 的 `multi_agent_v2` 功能开关。 |
 | **v2** | 强制所有模型使用 v2 multi-agent surface，并覆盖上游固定值（包括 Luna）。 |
 
-可从 Dashboard 或 Models 页面、`ocx v2 mode v1|default|v2`，或通过带
+可从 Dashboard 或 Models 页面、`opr v2 mode v1|default|v2`，或通过带
 `{ "multiAgentMode": "v1" }` 的 `PUT /api/v2` 设置该模式。变更从新的 Codex session 开始生效。
 
 :::caution
@@ -153,7 +153,7 @@ override 不能绕过 v2 的父模型继承规则。
 如果选择器仍显示旧条目，请刷新目录并重新打开目标 Codex 界面：
 
 ```bash
-ocx sync
+opr sync
 ```
 
 当目录的可见性、priority 或元数据发生变化时，OpenProvider 会用一个刻意标记为过期的缓存 wrapper

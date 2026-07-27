@@ -2,7 +2,7 @@
 
 ## Problem
 Gateway (network_errors.py) classifies 403/429/5xx as retryable and retries.
-opencodex kiro has no retry: a transient 429/503 fails the whole turn.
+openprovider kiro has no retry: a transient 429/503 fails the whole turn.
 
 ## Plan (to be finalized in this phase's P)
 - Decide layer: adapter-level wrapper around the upstream fetch vs shared

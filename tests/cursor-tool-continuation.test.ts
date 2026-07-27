@@ -104,7 +104,7 @@ function execMcpArgs(opts: { provider?: string; toolName?: string; toolCallId?: 
         name: opts.toolName ?? "mcp__fs__read_file",
         toolName: opts.toolName ?? "mcp__fs__read_file",
         toolCallId: opts.toolCallId ?? "call_1",
-        providerIdentifier: opts.provider ?? "opencodex-responses",
+        providerIdentifier: opts.provider ?? "openprovider-responses",
         ...(opts.args ? { args: opts.args } : {}),
       }),
     },

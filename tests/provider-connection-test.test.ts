@@ -6,7 +6,7 @@ import { handleManagementAPI } from "../src/server/management-api";
 import { saveConfig } from "../src/config";
 import type { OcxConfig } from "../src/types";
 
-const TEST_DIR = join(tmpdir(), "ocx-conn-test");
+const TEST_DIR = join(tmpdir(), "opr-conn-test");
 const previousHome = process.env.OPENCODEX_HOME;
 const originalFetch = globalThis.fetch;
 

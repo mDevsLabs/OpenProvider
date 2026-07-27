@@ -5,14 +5,14 @@ Owner: Boss (Claude main session), PABCD P phase. Research done directly by main
 (codex delegation aborted after 12m with no output; main session investigated code + web itself).
 Status: IMPLEMENTED. Phase 0 (design) + Phases 1–4 (code) all executed heuristically across
 multiple PABCD cycles (user goal: "run multiple PABCD cycles and finish the implementation").
-tsc --noEmit green; opencodex own suite 1354 pass / 0 fail; new token-guardian suite 6 pass.
+tsc --noEmit green; openprovider own suite 1354 pass / 0 fail; new token-guardian suite 6 pass.
 See "Implementation record" at the bottom.
 Work class: C4-lite (cross-provider architecture + background scheduler + persistence +
 ToS/security implications). Full PABCD plan.
 
 ## Request (verbatim intent)
 
-1. Multi-account auth tokens keep expiring. Root-caused (loop 1 of this session): opencodex
+1. Multi-account auth tokens keep expiring. Root-caused (loop 1 of this session): openprovider
    only refreshes a token **lazily**, at the moment a request is routed to that account
    (`getValidCodexToken` / `getValidAccessToken`). Idle pool accounts' **refresh tokens age out
    server-side** and die (`refresh_token_expired` / `refresh_token_reused` / `invalid_grant`)
@@ -36,7 +36,7 @@ high-risk providers to lazy-only.
 
 | Provider | Grade | Basis (cited in 30_tos-account-safety.md) |
 |---|---|---|
-| **Anthropic (Claude Pro/Max OAuth)** | **20** | Feb 2026 terms explicitly **prohibit** subscription OAuth tokens in any third-party tool; Anthropic deployed **server-side blocking** Feb–Mar 2026. Using Claude OAuth in opencodex is a live, enforced ToS violation. Proactive refresh makes it worse. |
+| **Anthropic (Claude Pro/Max OAuth)** | **20** | Feb 2026 terms explicitly **prohibit** subscription OAuth tokens in any third-party tool; Anthropic deployed **server-side blocking** Feb–Mar 2026. Using Claude OAuth in openprovider is a live, enforced ToS violation. Proactive refresh makes it worse. |
 | **OpenAI (ChatGPT/Codex OAuth)** | **35** | ToS prohibits sharing credentials and **circumventing rate limits**; switching accounts to bypass limits risks flag/ban. One-real-user-per-account is grayer, but pooling to aggregate quota is squarely in the prohibited zone. |
 | **Cursor** | **35** | Account-bound usage + behavior monitoring (rapid location switching, overlapping sessions trigger abuse checks/forced logout). Many accounts behind one proxy IP is a strong detection signal. |
 | **Google (Antigravity/Gemini)** | **45** | Could not fully verify a pooling-specific clause — flagged uncertain. General Google ToS bars automated abuse/limit circumvention. |

@@ -4,7 +4,7 @@
 mapModelId (kiro.ts 56-58) only strips a "kiro-" prefix. Gateway
 (model_resolver.py normalize_model_name) maps versioned/dashed slugs
 (claude-sonnet-4-5-20250929, claude-3-7-sonnet, claude-4.5-sonnet-high) to
-canonical Kiro model ids. opencodex can mis-route versioned slugs.
+canonical Kiro model ids. openprovider can mis-route versioned slugs.
 
 ## Plan (finalized in this phase's P)
 - Add normalizeKiroModelId covering: date-suffix stripping (-YYYYMMDD),

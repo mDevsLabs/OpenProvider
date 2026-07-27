@@ -18,10 +18,10 @@ Synthesized terminal status changed `"completed"` → `"incomplete"`. Codex can 
 `sendResponsesJsonAsEvents()` now preserves `failed`/`incomplete` status from the upstream JSON response. Event type switches to `response.failed` for failed responses.
 
 ### #10 Windows service restart (service.ts)
-Batch script now has `:loop` + `goto loop` on non-zero exit. Clean exit (exit code 0 from `ocx stop`) ends the loop. Parity with macOS `KeepAlive` and Linux `Restart=on-failure`.
+Batch script now has `:loop` + `goto loop` on non-zero exit. Clean exit (exit code 0 from `opr stop`) ends the loop. Parity with macOS `KeepAlive` and Linux `Restart=on-failure`.
 
 ### #11 atomicWriteFile race (config.ts)
-Temp filename now includes `process.pid` and a per-process sequence counter: `${path}.ocx.${pid}.${seq}.tmp`. Eliminates concurrent-writer collision.
+Temp filename now includes `process.pid` and a per-process sequence counter: `${path}.opr.${pid}.${seq}.tmp`. Eliminates concurrent-writer collision.
 
 ## Invalid findings documented
 

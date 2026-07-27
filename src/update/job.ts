@@ -180,7 +180,7 @@ export function restartCommand(
     return { mode, bin, args, display: formatCommand(bin, args) };
   }
   // bun/source installs: restart via the current runtime executable + package launcher (both real
-  // .exe files), NOT the `ocx.cmd` shim. Spawning a `.cmd` shell-less throws EINVAL on Windows
+  // .exe files), NOT the `opr.cmd` shim. Spawning a `.cmd` shell-less throws EINVAL on Windows
   // Node/Bun ≥18.20/20.12 (CVE-2024-27980 hardening) — the same class the npm path (nodeBin) avoids.
   const bin = process.execPath;
   const args = svcArgs;
@@ -360,8 +360,8 @@ async function restartAfterUpdate(
         // updated from the GUI or a normal terminal fails here with access denied.
         // Falling back to a direct proxy start keeps the update from leaving the proxy
         // stopped; the stale service manager can be refreshed later with an admin
-        // `ocx service install`.
-        updateJob(job, {}, `Service reinstall failed (exit ${result.status ?? "?"}); falling back to a direct proxy start. Run 'ocx service install' as administrator to refresh the background service manager.`);
+        // `opr service install`.
+        updateJob(job, {}, `Service reinstall failed (exit ${result.status ?? "?"}); falling back to a direct proxy start. Run 'opr service install' as administrator to refresh the background service manager.`);
       }
     } finally {
       if (prevBake === undefined) delete process.env.OCX_BAKE_PORT;
@@ -379,10 +379,10 @@ async function restartAfterUpdate(
   }
   // Reclaim the captured port before the pinned start. Spawning `--port` while the old
   // socket is still busy is how Windows updates used to fail health checks (or hop).
-  // Only the trusted pre-update PID may be killed; never an arbitrary ocx listener.
+  // Only the trusted pre-update PID may be killed; never an arbitrary opr listener.
   const freed = await waitFn(port, hostname, reclaimOpts);
   if (!freed) {
-    updateJob(job, {}, `Port ${port} still busy after ${Math.trunc(RESTART_PORT_RECLAIM_MS / 1000)}s (reclaim could not free the socket); not starting on another port. Retry 'ocx start --port ${port}'.`);
+    updateJob(job, {}, `Port ${port} still busy after ${Math.trunc(RESTART_PORT_RECLAIM_MS / 1000)}s (reclaim could not free the socket); not starting on another port. Retry 'opr start --port ${port}'.`);
     return;
   }
   (io.spawnStart ?? spawnDetachedStart)(job, job.installer, port);
@@ -399,7 +399,7 @@ export function restartAfterUpdateForTests(
 
 function restartFailureHint(port: number): string {
   return `Update installed, but the restarted proxy did not stay healthy on port ${port}. `
-    + `Try 'ocx start --port ${port}'. `
+    + `Try 'opr start --port ${port}'. `
     + "If the update log shows bun postinstall or EPERM warnings, "
     + "reinstall with 'npm install -g --allow-scripts=bun @mdevs/openprovider'.";
 }
@@ -583,7 +583,7 @@ export async function runGuiUpdateWorker(jobId: string, channel: Channel, restar
       const trayArgs = [process.argv[1], ...planWindowsTrayUpdate({ installed: trayWasInstalled, running: trayWasRunning }).installArgs];
       const tray = runLoggedCommand(job, process.execPath, trayArgs, 20_000);
       if (tray.status !== 0) {
-        updateJob(job, {}, "Windows tray refresh failed; run 'ocx tray install'.");
+        updateJob(job, {}, "Windows tray refresh failed; run 'opr tray install'.");
         if (trayWasRunning) runLoggedCommand(job, process.execPath, [process.argv[1], "tray", "start"], 15_000);
       }
     }

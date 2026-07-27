@@ -243,12 +243,12 @@ function probeVersion(
   const execFile = deps.execFileSync ?? (execFileSync as unknown as RuntimeExecFile);
   // Sandbox the probe's CODEX_HOME: a real Codex CLI creates state (tmp/, logs) under
   // CODEX_HOME even for `--version`, and the probe inherits the caller's env — so a
-  // read-only `ocx status` would dirty the user's CODEX_HOME. Redirect it to a
+  // read-only `opr status` would dirty the user's CODEX_HOME. Redirect it to a
   // throwaway dir; if the sandbox cannot be created, skip the probe rather than
   // probe with the inherited env (keeps probeVersion total: it never throws).
   let probeHome: string | undefined;
   try {
-    probeHome = mkdtempSync(join(tmpdir(), "ocx-codex-probe-"));
+    probeHome = mkdtempSync(join(tmpdir(), "opr-codex-probe-"));
     const invocation = codexExecInvocation(command, ["--version"], platform, {
       env: deps.env,
       exists: deps.existsSync,
@@ -508,7 +508,7 @@ export function resolveAndPersistCodexRuntime(
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const persistError = redactUserPath(redactSecretString(message)).slice(0, 200);
-      console.warn(`[opencodex] Failed to persist Codex runtime selection: ${persistError}`);
+      console.warn(`[openprovider] Failed to persist Codex runtime selection: ${persistError}`);
       return { ...result, persistError };
     }
   }
@@ -517,14 +517,14 @@ export function resolveAndPersistCodexRuntime(
 
 export function formatRuntimeLogLine(runtime: ResolvedCodexRuntime): string {
   const path = displayCodexRuntimePath(runtime.command);
-  return `[opencodex] Codex runtime: ${path} (version=${runtime.version ?? "unknown"}, source=${runtime.source})`;
+  return `[openprovider] Codex runtime: ${path} (version=${runtime.version ?? "unknown"}, source=${runtime.source})`;
 }
 
 export function formatClampLogLines(diagnostic: EffortClampDiagnostic): string[] {
   const efforts = diagnostic.removedEfforts.join(", ");
   return [
-    `[opencodex] Removed unsupported reasoning efforts: ${efforts}`,
-    "[opencodex] Run ocx doctor for diagnosis and recovery.",
+    `[openprovider] Removed unsupported reasoning efforts: ${efforts}`,
+    "[openprovider] Run opr doctor for diagnosis and recovery.",
   ];
 }
 

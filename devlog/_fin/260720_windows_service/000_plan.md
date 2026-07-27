@@ -2,7 +2,7 @@
 
 ## Objective
 
-`ocx service install`이 Windows에서 만드는 Task Scheduler 태스크가 사용자 세션에
+`opr service install`이 Windows에서 만드는 Task Scheduler 태스크가 사용자 세션에
 콘솔 창을 띄우고, 사용자가 그 창을 닫으면 프록시가 죽어 Codex의 모든 모델(GPT 포함)
 연결이 끊기는 문제를 문서화하고, 조사 결과를 근거로 GitHub 이슈를 버그/개선 2건으로
 분리 등록한다. 이 유닛은 문서화+이슈 등록까지만 다룬다 (코드 수정은 후속 유닛).
@@ -29,7 +29,7 @@ make every model (even gpt models) disconnect". 댓글 스레드에서 원인 �
 
 ## Scope boundary
 
-- IN: devlog 문서 4건, `gh issue create` 2건 (lidge-jun/opencodex), 로컬 커밋.
+- IN: devlog 문서 4건, `gh issue create` 2건 (lidge-jun/openprovider), 로컬 커밋.
 - OUT: `src/service.ts` 등 코드 수정, git push, 릴리스. 워크트리의 기존 dirty
   변경(`gui/src/pages/Models.tsx`)은 건드리지 않는다.
 
@@ -37,7 +37,7 @@ make every model (even gpt models) disconnect". 댓글 스레드에서 원인 �
 
 ### 001_research.md
 
-1. **증상과 재현 경로** — `ocx service install` → `opencodex-service.cmd` 콘솔 창
+1. **증상과 재현 경로** — `opr service install` → `openprovider-service.cmd` 콘솔 창
    노출 → 창 닫기(대표 재현; logoff/작업관리자 종료도 같은 계열의 강제 종료) →
    Windows가 콘솔의 모든 프로세스에 `CTRL_CLOSE_EVENT` 전달, 기본 핸들러가 프로세스
    종료(MS Learn HandlerRoutine) → 래퍼가 Bun을 동기 실행하므로(src/service.ts:320
@@ -56,7 +56,7 @@ make every model (even gpt models) disconnect". 댓글 스레드에서 원인 �
    는 `schtasks.exe` 관리 호출에만 적용되고 등록된 태스크 실행에는 영향 없음.
    래퍼의 "runs in its own hidden console" 주석(src/service.ts:298)은 실제 동작과
    모순 — 문서에 명시.
-3. **`ocx stop`과의 대비** — stop 경로(src/cli/index.ts:267 이후 handleStop)는
+3. **`opr stop`과의 대비** — stop 경로(src/cli/index.ts:267 이후 handleStop)는
    `stopServiceIfInstalled()` → graceful drain(`stopProxy`) → 네이티브 Codex 복원
    순서로 수행하므로 문제가 없다. 대표 문제 경로는 콘솔 창 닫기류의 강제 종료.
 4. **대안 비교** — (A) LogonType S4U: 비대화형 실행이라 창이 뜨지 않음. 단 "확정
@@ -86,7 +86,7 @@ make every model (even gpt models) disconnect". 댓글 스레드에서 원인 �
 ## OS / ## Config shape / ## Checks (issue #160과 동일 골격). 내용: 증상 → 근본
 원인 조합(InteractiveToken + 콘솔 배치 직접 실행 + hidden-launch 부재, 코드 참조)
 → 재현 절차 → RestartOnFailure 발동 여부는 needs-verification으로 관측 항목 명시
-→ `ocx stop` 대비 → 기대 동작(창 미노출 또는 강제 종료에도 프록시 생존/재시작).
+→ `opr stop` 대비 → 기대 동작(창 미노출 또는 강제 종료에도 프록시 생존/재시작).
 Bug 이슈는 관측 증상·재현·사용자 영향만 소유; 설계 선택은 020 이슈로 링크만.
 
 ### 020_issue_feature_windowless_service.md
@@ -117,7 +117,7 @@ logon trigger(src/service.ts:345-348)와 불일치 — Windows 한정 known limi
 ## Verifier
 
 `ls devlog/_plan/260720_windows_service/`, 리뷰어 verdict 원문,
-`gh issue view <n> -R lidge-jun/opencodex --json url,title`, `git log -1`.
+`gh issue view <n> -R lidge-jun/openprovider --json url,title`, `git log -1`.
 
 ## SoT sync target
 

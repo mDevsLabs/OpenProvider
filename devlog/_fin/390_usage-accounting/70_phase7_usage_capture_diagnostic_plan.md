@@ -4,7 +4,7 @@
 
 Phase 5's tests proved the request-log surface end-to-end with synthetic data. Real Codex
 CLI traffic against the chatgpt backend lands as `usageStatus: "unreported"` for **all**
-148 entries in `~/.opencodex/usage.jsonl` (147 `chatgpt` + 2 `chatgpt-p104398`). Every
+148 entries in `~/.openprovider/usage.jsonl` (147 `chatgpt` + 2 `chatgpt-p104398`). Every
 entry shows `closeReason: "non_stream"`, so neither the SSE path nor `applyResponseLogMetadata`
 on the JSON body extracted token counts.
 
@@ -21,7 +21,7 @@ Phase 7 ships two layers so we can diagnose without another full goal cycle:
    cached/reasoning details under either `_tokens_details` naming. This may
    already fix the bug for some clients.
 2. **Diagnostic capture** — when `OPENCODEX_USAGE_DEBUG=1` is set, append a
-   rolling debug record per finalized request to `~/.opencodex/usage-debug.jsonl`
+   rolling debug record per finalized request to `~/.openprovider/usage-debug.jsonl`
    so we can see what the upstream actually returns and act on Phase 8 with
    evidence instead of guesses. (SSE inspection accumulates block payloads into
    a single capped sample on `logCtx`; the final record is emitted once per
@@ -149,7 +149,7 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
 - Append a one-line note to the existing usage section in
   `structure/05_gui-and-management-api.md` (where `usage.jsonl` and `/api/usage`
   are already documented) pointing at `OPENCODEX_USAGE_DEBUG=1` and
-  `~/.opencodex/usage-debug.jsonl` as the debug capture for upstream response
+  `~/.openprovider/usage-debug.jsonl` as the debug capture for upstream response
   shape investigations. No new file.
 
 ## Verification
@@ -157,7 +157,7 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
 - `npx bun test tests/usage-debug.test.ts tests/usage-shape-extraction.test.ts tests/request-log.test.ts tests/usage-summary.test.ts tests/usage-log.test.ts`
 - `npx tsc --noEmit -p tsconfig.json`
 - Manual: restart proxy with `OPENCODEX_USAGE_DEBUG=1`, make one Codex CLI call to
-  `gpt-5.5`, inspect `~/.opencodex/usage-debug.jsonl` head — confirm the body sample
+  `gpt-5.5`, inspect `~/.openprovider/usage-debug.jsonl` head — confirm the body sample
   shows the real shape from the chatgpt backend.
 
 ## Atomic commits

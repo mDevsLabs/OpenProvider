@@ -2,19 +2,19 @@
 
 ## Goal
 
-Make `ocx` feel friendly to both humans and command-line agents without changing core runtime behavior in the first pass.
+Make `opr` feel friendly to both humans and command-line agents without changing core runtime behavior in the first pass.
 
 This document records the current CLI state, comparison notes from `cli-jaw` and `agbrowse`, and the patch map for later PABCD passes.
 
 ## Repository Context
 
-- Project root: `/Users/jun/Developer/new/700_projects/opencodex`
+- Project root: `/Users/jun/Developer/new/700_projects/openprovider`
 - Current CLI owner: `src/cli.ts`
 - Current CLI tests: `tests/cli-help.test.ts`
 - Public CLI docs: `README.md`, `README.ko.md`, `README.zh-CN.md`, `docs-site/src/content/docs/reference/cli.md`
 - Structure source of truth: `structure/01_runtime.md`, `structure/06_docs-and-release.md`
 
-## Current `ocx` Behavior
+## Current `opr` Behavior
 
 Captured commands:
 
@@ -29,12 +29,12 @@ bun run src/cli.ts version
 Findings:
 
 - `--help`, `-h`, and `help` print the same top-level usage.
-- `ocx help <command>` currently prints top-level help, not command-specific help.
+- `opr help <command>` currently prints top-level help, not command-specific help.
 - `restore --help` and `recover-history --help` are safe and do not mutate Codex state.
 - Unknown commands print `Unknown command: <name>` and the full help, then exit 1.
-- Unknown commands with a trailing help flag, such as `ocx restart --help`, print top-level help and exit 0.
+- Unknown commands with a trailing help flag, such as `opr restart --help`, print top-level help and exit 0.
 - `-v`, `--version`, and `version` are not supported; `-v` and `version` are treated as unknown commands.
-- `ocx status --json` exits 0 but prints human status text; there is no JSON contract yet.
+- `opr status --json` exits 0 but prints human status text; there is no JSON contract yet.
 - Help is compact but not task-oriented. It lists commands, but it does not answer "what should I run first?", "how do I diagnose a problem?", or "what is safe to run in scripts?".
 - There is no `--json` contract for status/diagnostics, so agents must parse human text.
 - `src/cli.ts` is doing command parsing, help text, runtime behavior, and dispatch in one file.
@@ -42,7 +42,7 @@ Findings:
 Detailed matrix:
 
 ```path
-/Users/jun/Developer/new/700_projects/opencodex/devlog/370_cli-human-friendly/11_help_surface_matrix.md
+/Users/jun/Developer/new/700_projects/openprovider/devlog/370_cli-human-friendly/11_help_surface_matrix.md
 ```
 
 ## Reference CLI Patterns
@@ -70,7 +70,7 @@ Useful patterns:
 
 Do not copy:
 
-- `cli-jaw` is broader than `ocx`; `ocx` should stay focused on Codex proxy setup, status, auth, service, and recovery.
+- `cli-jaw` is broader than `opr`; `opr` should stay focused on Codex proxy setup, status, auth, service, and recovery.
 
 ### `agbrowse`
 
@@ -92,12 +92,12 @@ Useful patterns:
 
 Do not copy:
 
-- In the observed install, `agbrowse --version` printed full help instead of a short version line. `ocx` should not copy this; version should be stable and script-friendly.
+- In the observed install, `agbrowse --version` printed full help instead of a short version line. `opr` should not copy this; version should be stable and script-friendly.
 
-## UX Principles For `ocx`
+## UX Principles For `opr`
 
 1. First screen answers the first-run path:
-   - install done -> `ocx init` -> `ocx start` or `ocx codex-shim install` -> use `codex`.
+   - install done -> `opr init` -> `opr start` or `opr codex-shim install` -> use `codex`.
 2. Human help and agent help are related but not identical:
    - human help should explain workflows and recovery;
    - agent help should expose stable commands and `--json` availability.
@@ -109,9 +109,9 @@ Do not copy:
 4. Diagnostics should avoid hidden side effects:
    - help, version, and dry-run diagnostics must not touch Codex config.
 5. Errors should teach the next command:
-   - unknown command should suggest `ocx help`;
+   - unknown command should suggest `opr help`;
    - service/shim bad subcommands should suggest their exact usage;
-   - troubleshooting should point to `ocx status`, `ocx doctor` once implemented, and docs.
+   - troubleshooting should point to `opr status`, `opr doctor` once implemented, and docs.
 6. Public docs should match actual CLI behavior.
 
 ## Proposed Work-Phase Map
@@ -120,8 +120,8 @@ Do not copy:
 
 Documentation-only investigation pass.
 
-- Enumerate every current `ocx` top-level command and nested `service` / `codex-shim` command.
-- Capture `--help`, `-h`, and `ocx help <command>` behavior.
+- Enumerate every current `opr` top-level command and nested `service` / `codex-shim` command.
+- Capture `--help`, `-h`, and `opr help <command>` behavior.
 - Explicitly probe missing or empty candidate commands such as `restart`, `doctor`, `logs`, `commands`, `--json`, and `--version`.
 - Compare actual behavior against README, docs-site, and `structure/` documentation.
 - Produce a command matrix before any implementation patch.
@@ -139,14 +139,14 @@ Implementation planning pass after Phase 1 evidence exists.
 
 Public contract planning pass.
 
-- Add `ocx status --json`.
-- Consider `ocx doctor` as a read-only aggregate diagnostic command.
+- Add `opr status --json`.
+- Consider `opr doctor` as a read-only aggregate diagnostic command.
 - Document machine-readable output schema in docs-site.
 - Add tests that JSON output is valid and does not include secrets.
 
 ## Open Questions For Later Phases
 
-- Should `ocx doctor` be implemented as a new command, or should `ocx status --verbose` cover the same need?
+- Should `opr doctor` be implemented as a new command, or should `opr status --verbose` cover the same need?
 - Should all commands eventually support `--json`, or only read-only diagnostics?
 - Should help output use color when TTY is present, or stay plain for copy/paste and CI logs?
-- Should `ocx help <command>` be an alias for `ocx <command> --help`?
+- Should `opr help <command>` be an alias for `opr <command> --help`?

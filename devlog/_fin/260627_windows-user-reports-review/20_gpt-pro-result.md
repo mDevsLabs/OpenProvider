@@ -10,7 +10,7 @@
 
 The pushed lifecycle patch is necessary but not sufficient.
 
-- It plausibly fixes the narrow explicit lifecycle bug: direct `ocx service stop` / `ocx service uninstall` now stop the Task Scheduler wrapper and kill the tracked proxy PID before restoring native Codex or deleting service assets.
+- It plausibly fixes the narrow explicit lifecycle bug: direct `opr service stop` / `opr service uninstall` now stop the Task Scheduler wrapper and kill the tracked proxy PID before restoring native Codex or deleting service assets.
 - It should not be treated as the fix for the new community report: "the proxy keeps stopping while I use it, very frequently, on any PC". That report is likely about runtime streaming/WebSocket lifetime, Bun crash behavior, scheduler restart settings, or missing diagnostics.
 
 ## Release-blocking Windows hotfix items
@@ -27,7 +27,7 @@ The pushed lifecycle patch is necessary but not sufficient.
 
 3. Bun runtime diagnostics / mitigation
    - Current dependency is Bun 1.3.14.
-   - GPT Pro found external evidence of an opencodex Windows 11 Bun 1.3.14 native crash class and noted the repo already has a Bun Windows streaming-crash workaround comment.
+   - GPT Pro found external evidence of an openprovider Windows 11 Bun 1.3.14 native crash class and noted the repo already has a Bun Windows streaming-crash workaround comment.
    - Add Windows startup diagnostics for Bun path/version and a supported runtime override. Do not silently switch all users to canary without Windows smoke validation.
 
 ## Strongly recommended
@@ -38,7 +38,7 @@ The pushed lifecycle patch is necessary but not sufficient.
    - Keep strict identity checks for status/reporting, but make explicit stop/uninstall attempt safe best-effort cleanup when the PID file exists and identity inspection is unavailable.
 
 5. Better Windows service diagnostics
-   - Print or expose the service log path from `ocx service status`.
+   - Print or expose the service log path from `opr service status`.
    - Log child exit code, restart decision, Bun path/version, and config/CODEX_HOME.
 
 ## Docs/dev-experience items

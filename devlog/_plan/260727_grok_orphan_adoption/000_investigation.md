@@ -4,34 +4,34 @@
 
 Grok Build's TUI shows a 200k context window for models that are far larger:
 `gpt-5.6-sol` is 372k, `xai/grok-4.5` and `cursor/grok-4.5` are 500k. 200k is not a
-value opencodex ever writes — it is Grok's OWN fallback, used whenever a model entry
+value openprovider ever writes — it is Grok's OWN fallback, used whenever a model entry
 carries no `context_window` key.
 
 ## Live evidence (this machine, `~/.grok/config.toml`)
 
-The file contains 46 `[model.*]` tables. The opencodex managed block runs from line
+The file contains 46 `[model.*]` tables. The openprovider managed block runs from line
 196 to line 397. Everything ABOVE line 196 is outside our fence:
 
 ```toml
 [models]
-default = "ocx-gpt-5-6-sol"        # line 13 — points at the ORPHAN
+default = "opr-gpt-5-6-sol"        # line 13 — points at the ORPHAN
 
-[model.ocx-gpt-5-6-sol]            # line 23, OUTSIDE the fence
+[model.opr-gpt-5-6-sol]            # line 23, OUTSIDE the fence
 model = "gpt-5.6-sol"
 base_url = "http://127.0.0.1:10100/v1"
 api_backend = "chat_completions"
-api_key = "opencodex-loopback"
+api_key = "openprovider-loopback"
 name = "OCX gpt-5.6-sol"
                                    # <- NO context_window: Grok falls back to 200k
 
-# >>> opencodex managed block — do not edit (removed by `ocx stop`) >>>   # line 196
-[model.ocx-gpt-5-6-sol-2]          # line 197, INSIDE the fence
+# >>> openprovider managed block — do not edit (removed by `opr stop`) >>>   # line 196
+[model.opr-gpt-5-6-sol-2]          # line 197, INSIDE the fence
 model = "gpt-5.6-sol"
-api_key = "opencodex-loopback"
+api_key = "openprovider-loopback"
 name = "OCX gpt-5.6-sol"
-extra_headers = { "x-opencodex-grok" = "1" }
+extra_headers = { "x-openprovider-grok" = "1" }
 context_window = 372000            # <- correct, but nothing selects this alias
-# <<< opencodex managed block <<<                                        # line 397
+# <<< openprovider managed block <<<                                        # line 397
 ```
 
 The same doubling exists for `terra` (372k), `luna` (372k), and every other model that
@@ -51,9 +51,9 @@ content.slice(region.end)`. `stripGrokConfig` does the same in reverse. Anything
 `userModelAliases` (`src/grok/inject.ts:93-103`) scans the content outside the managed
 region and reserves EVERY `[model.<alias>]` header it finds. `buildGrokManagedBlock`
 then routes around those reserved aliases, which is why the regenerated entry is
-`ocx-gpt-5-6-sol-2` rather than `ocx-gpt-5-6-sol`.
+`opr-gpt-5-6-sol-2` rather than `opr-gpt-5-6-sol`.
 
-Together these produce a stable, self-perpetuating wrong state: each `ocx sync` writes
+Together these produce a stable, self-perpetuating wrong state: each `opr sync` writes
 a CORRECT duplicate beside the stale original, and never removes the original. The sync
 reports success, the managed block is genuinely perfect, and the user still sees 200k —
 because `[models] default` and the model picker resolve the un-suffixed alias.
@@ -64,7 +64,7 @@ The suffix logic exists for a real hazard, documented at `src/grok/inject.ts:64-
 `[[model.x]]` array-of-table colliding with a generated `[model.x]` makes Grok reject
 the ENTIRE config layer with a duplicate-key error, taking every unrelated user setting
 with it. Reserving user aliases is correct. The defect is that the reservation cannot
-tell an actual hand-written model from opencodex's own escaped output.
+tell an actual hand-written model from openprovider's own escaped output.
 
 ## Ownership signals available on an orphan
 
@@ -72,10 +72,10 @@ Every orphan on this machine carries all three:
 
 | Signal | Strength | Note |
 |---|---|---|
-| `api_key = "opencodex-loopback"` | strong | a literal we own; no reason for a human to type it |
+| `api_key = "openprovider-loopback"` | strong | a literal we own; no reason for a human to type it |
 | `base_url = "http://127.0.0.1:<port>/v1"` | medium | a user CAN legitimately point at the local proxy |
-| `name = "OCX <id>"` / alias prefix `ocx-` | weak | a human could name a model this way |
-| `extra_headers = { "x-opencodex-grok" = "1" }` | strong | present on newer writes only — absent on the oldest orphans |
+| `name = "OCX <id>"` / alias prefix `opr-` | weak | a human could name a model this way |
+| `extra_headers = { "x-openprovider-grok" = "1" }` | strong | present on newer writes only — absent on the oldest orphans |
 
 The oldest orphans predate `extra_headers`, so the header alone is insufficient as the
 sole adoption key; it would leave exactly the entries causing this bug unadopted.
@@ -83,7 +83,7 @@ sole adoption key; it would leave exactly the entries causing this bug unadopted
 ## Blast radius of getting adoption wrong
 
 - **False positive** (adopting a genuine user model): we delete a hand-written entry.
-  Unrecoverable from the user's point of view, though `config.toml.bak-opencodex`
+  Unrecoverable from the user's point of view, though `config.toml.bak-openprovider`
   exists. This is the failure to design against.
 - **Dangling reference:** removing an orphan that `[models] default` or
   `[ui] fork_secondary_model` names leaves Grok pointing at a nonexistent alias. On

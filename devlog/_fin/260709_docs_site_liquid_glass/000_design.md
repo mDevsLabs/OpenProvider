@@ -12,7 +12,7 @@ Session: 019f46e2-0902-7190-9dac-7815a139b99c / goalplan: docs-site-liquid-glass
 
 ## Design Read
 
-Reading as: developer docs for an infra proxy (opencodex), audience = Codex power
+Reading as: developer docs for an infra proxy (openprovider), audience = Codex power
 users. Language: the GUI's OpenAI product grammar — white/near-black monochrome,
 hairline borders, pill controls, glass ONLY on chrome (header / sidebar rail /
 dropdowns / search modal), solid content, single ambient tri-radial wash per

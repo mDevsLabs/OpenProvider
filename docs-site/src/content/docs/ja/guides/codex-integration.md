@@ -13,7 +13,7 @@ OpenAI は bare モデル用の単一 `openai` 経路と `openai-apikey/<model>`
 
 ## 設定の注入
 
-`ocx init`、`ocx start`、`ocx sync` はすべてインジェクターを呼び出します。デフォルトのループバックバインドでは Codex の
+`opr init`、`opr start`、`opr sync` はすべてインジェクターを呼び出します。デフォルトのループバックバインドでは Codex の
 組み込み `openai` プロバイダー ID を維持したまま、そのプロバイダーが OpenProvider を見るようにします。
 
 ```toml
@@ -96,7 +96,7 @@ auth ファイルを共有します。この検出を上書きするには `CODE
 
 Windows の Orca シェルは `CODEX_HOME` と `ORCA_CODEX_HOME` を Orca のバンドル runtime home に
 設定することがありますが、ChatGPT/Codex App は引き続き `%USERPROFILE%\\.codex` を読みます。
-`ocx status` と `ocx doctor` はこの正確な不一致を検出し、ユーザーパスをマスクして対象 home を表示します。
+`opr status` と `opr doctor` はこの正確な不一致を検出し、ユーザーパスをマスクして対象 home を表示します。
 その Orca シェルからバックグラウンドサービスをインストールした場合は、まず元のシェルでサービスを削除し、
 App home を `CODEX_HOME` に設定して `ORCA_CODEX_HOME` を解除した後、同期/復元とサービスインストールをやり直してください。
 
@@ -116,7 +116,7 @@ Codex の組み込みプロバイダーが先に WebSocket を試みる可能性
 ## モデルカタログの同期
 
 Codex はディスクのカタログ(デフォルト `$CODEX_HOME/OpenProvider-catalog.json`)にあるモデルを表示します。起動時と
-`ocx sync` 時、OpenProvider は:
+`opr sync` 時、OpenProvider は:
 
 1. オリジナルカタログを `~/.OpenProvider/catalog-backup.json` に一度**バックアップ**します(フィーチャリングを元に戻せるように)。
 2. 対応プロバイダーのライブモデルカタログを**取得**します(約 5 分間キャッシュ; 最後の正常一覧、
@@ -138,12 +138,12 @@ Codex がリトライの末に `stream disconnected before completion: error sen
 設定ポートにリスナーがないため、クライアントが生の接続エラーをそのまま表示します。プロキシを再起動してください:
 
 ```bash
-ocx start              # フォアグラウンド
-ocx service install    # 常駐: ログイン時に自動起動し、クラッシュ時に自動再起動
+opr start              # フォアグラウンド
+opr service install    # 常駐: ログイン時に自動起動し、クラッシュ時に自動再起動
 ```
 
-`ocx status` はプロキシの稼働状態を表示し、停止時には同じ再起動ヒントも表示します。
-`ocx doctor` は再起動の安全性(サービス/シムのカバレッジ)を報告します。
+`opr status` はプロキシの稼働状態を表示し、停止時には同じ再起動ヒントも表示します。
+`opr doctor` は再起動の安全性(サービス/シムのカバレッジ)を報告します。
 
 ## サブエージェントピッカー
 
@@ -178,17 +178,17 @@ Token Guardian が有効で、`chatgpt` の更新ポリシーが `proactive` で
 
 ## ネイティブ Codex への復元
 
-OpenProvider は決してあなたを閉じ込めません。**`ocx stop` はネイティブ Codex に完全に戻す単一コマンドです** —
+OpenProvider は決してあなたを閉じ込めません。**`opr stop` はネイティブ Codex に完全に戻す単一コマンドです** —
 プロキシを停止し、インストールされたバックグラウンドサービスを停止した後、注入されたすべての行とルーティングされたカタログ項目を削除し
 OpenProvider が最初からなかったかのように通常の `codex` が正確に動作します:
 
 ```bash
-ocx stop       # プロキシ + サービス停止、ネイティブ Codex を復元
-ocx restore    # 停止せずに復元  (エイリアス: ocx eject)
-ocx restore back # 実行中のプロキシに通常 Codex を再接続
+opr stop       # プロキシ + サービス停止、ネイティブ Codex を復元
+opr restore    # 停止せずに復元  (エイリアス: opr eject)
+opr restore back # 実行中のプロキシに通常 Codex を再接続
 ```
 
-OpenProvider が管理対象[バックグラウンドサービス](/ja/reference/cli/#ocx-service)として実行されるときは
+OpenProvider が管理対象[バックグラウンドサービス](/ja/reference/cli/#opr-service)として実行されるときは
 `OCX_SERVICE=1` を設定するため、サービス主導の再起動が Codex 設定を揺るがすことは**ありません** — 明示的な
-`ocx stop` / `ocx service stop` のみがネイティブ Codex を復元します。
+`opr stop` / `opr service stop` のみがネイティブ Codex を復元します。
 

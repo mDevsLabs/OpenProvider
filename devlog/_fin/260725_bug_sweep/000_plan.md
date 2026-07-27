@@ -47,9 +47,9 @@ GUI·enhancement를 제외한 미해결 버그 이슈를 `codex/260725-bug-sweep
 직접 수정한다. 각 이슈는 독립 work-phase = 독립 PABCD 사이클이며, work-phase마다
 로컬 커밋을 쌓아 올린다.
 
-- 워크트리: `/Users/jun/.codex/worktrees/404d/opencodex`
+- 워크트리: `/Users/jun/.codex/worktrees/404d/openprovider`
 - 브랜치: `codex/260725-bug-sweep` (`origin/dev` = `f77e3963` 기준)
-- goalplan: `.codexclaw/goalplans/opencodex-codex-260725-bug-sweep-gui-enhancement/`
+- goalplan: `.codexclaw/goalplans/openprovider-codex-260725-bug-sweep-gui-enhancement/`
 
 ## 제약
 
@@ -70,7 +70,7 @@ GUI·enhancement를 제외한 미해결 버그 이슈를 `codex/260725-bug-sweep
 | #435 | malformed content block 크래시 | 배제 — PR #436이 이미 커버, CI green |
 | #420 | Anthropic 400 `text.text` Field required | 배제 — PR #430이 이미 커버 |
 | #418 | V2 custom→custom 위임 실패 | 배제 — 제보자가 provider 비공개, 재현·귀속 미증명 |
-| #417 #241 | 한국어 realtime U+FFFD, Desktop model picker | 배제 — upstream-tracking, ocx 밖 원인 |
+| #417 #241 | 한국어 realtime U+FFFD, Desktop model picker | 배제 — upstream-tracking, opr 밖 원인 |
 
 ## 의존성 순 work-phase 맵
 

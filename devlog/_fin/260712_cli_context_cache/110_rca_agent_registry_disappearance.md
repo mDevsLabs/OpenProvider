@@ -1,17 +1,17 @@
-# 110 - RCA: 워크플로우 이후 ocx 에이전트 레지스트리 소실
+# 110 - RCA: 워크플로우 이후 opr 에이전트 레지스트리 소실
 
 ## 증상
 
-- `ocx-gpt-5-6-sol` 파견이 처음에는 성공했지만, 저장소 평가 Agent가 테스트를 실행한 뒤
-  같은 Claude Code 세션에서 `Agent type 'ocx-gpt-5-6-sol' not found`가 발생했다.
-- 세션 JSONL에는 `ocx-*` 6개가 초기 등록된 뒤 모두 `removedTypes`로 내려간 기록이 남았다.
+- `opr-gpt-5-6-sol` 파견이 처음에는 성공했지만, 저장소 평가 Agent가 테스트를 실행한 뒤
+  같은 Claude Code 세션에서 `Agent type 'opr-gpt-5-6-sol' not found`가 발생했다.
+- 세션 JSONL에는 `opr-*` 6개가 초기 등록된 뒤 모두 `removedTypes`로 내려간 기록이 남았다.
 
 ## 원인
 
 - 평가 Agent가 `bun test tests`를 실행했다.
 - `tests/claude-management-api.test.ts`는 `enabled: false` 저장을 검증하면서
   `CLAUDE_CONFIG_DIR`를 격리하지 않았다.
-- production 코드의 즉시 prune이 테스트 프로세스의 실제 `~/.claude/agents/ocx-*.md`를
+- production 코드의 즉시 prune이 테스트 프로세스의 실제 `~/.claude/agents/opr-*.md`를
   삭제했고, Claude Code 파일 감시가 이를 감지해 실행 중 레지스트리에서도 제거했다.
 - Workflow/Agent 레지스트리 자체의 모델 필터 문제가 아니었다.
 

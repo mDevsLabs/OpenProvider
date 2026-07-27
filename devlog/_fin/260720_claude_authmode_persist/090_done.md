@@ -8,7 +8,7 @@
   PUT에 `authMode` 파싱/검증(proxy 저장, subscription 키 삭제, 그 외 400),
   live-apply 트리거를 `systemEnv || authMode` 변경으로 확장.
 - `src/server/system-env.ts` — 재주입 시 proxy가 아니고, injectedKeys가 토큰을
-  추적 중이며, launchctl 값이 정확히 `opencodex-proxy`일 때만 unsetenv + tracking
+  추적 중이며, launchctl 값이 정확히 `openprovider-proxy`일 때만 unsetenv + tracking
   갱신 (사용자 토큰 이중 가드로 보존).
 - 테스트 6건 추가: 왕복/400 테이블/live-apply spy (claude-management-api),
   전환 unset + 값 가드 대조군 + 소유권 가드 대조군 (system-env).
@@ -30,7 +30,7 @@ systemEnv 사용자는 Subscription 복귀 시 잔류 더미 토큰이 자동 �
 
 - 죽은 가설: "GUI 저장 로직 결함" — GUI는 처음부터 올바르게 보내고 있었다.
   서버 왕복 계약 누락이 단독 원인.
-- 개선 안 된 것: `ocx claude` 직접 실행 경로는 config 재읽기 기반이라 원래
+- 개선 안 된 것: `opr claude` 직접 실행 경로는 config 재읽기 기반이라 원래
   정상 (persist만 되면 즉시 반영) — 별도 수리 불필요 확인.
 - 반증 시나리오: 실사용에서 재시작 후에도 구독으로 복귀한다면 GUI가 다른
   포트의 구버전 프록시에 붙어 있는지부터 볼 것.

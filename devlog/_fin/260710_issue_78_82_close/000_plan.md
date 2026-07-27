@@ -3,12 +3,12 @@
 ## Loop-spec
 - Archetype: spec-satisfaction (each issue closes pass/fail: root cause proven, fix or upstream verdict, comment posted, issue CLOSED).
 - Trigger: user request 2026-07-10 — run cxc-loop, solve, comment, close. Subagents unlimited (sol medium; terra low for small lanes).
-- Goal: #78 and #82 both CLOSED with substantive root-cause comments; any opencodex-side fix implemented with regression tests; bun test + tsc green.
+- Goal: #78 and #82 both CLOSED with substantive root-cause comments; any openprovider-side fix implemented with regression tests; bun test + tsc green.
 - Non-goals: gui/docs-site work; version bumps/publishing; reverting user's dirty worktree (.github/workflows/*, src/codex/catalog.ts, tests/* are user-owned).
 - Verifier: `bun test ./tests/` (0 fail) + `bun x tsc --noEmit` (exit 0); `gh issue view {78,82} --json state` == CLOSED.
 - Stop: DONE / BLOCKED (upstream unprovable or gh perms) / NEEDS_HUMAN (fix conflicts with other providers) / BUDGET_EXHAUSTED (>6 work-phases or ~2h).
-- Memory: this unit + `.codexclaw/goalplans/fix-and-close-opencodex-issues-78-opencode-go-de/`.
-- Resource bounds: repo-local writes + gh API on lidge-jun/opencodex; read-only explorers; workers scoped to src/ + tests/.
+- Memory: this unit + `.codexclaw/goalplans/fix-and-close-openprovider-issues-78-opencode-go-de/`.
+- Resource bounds: repo-local writes + gh API on lidge-jun/openprovider; read-only explorers; workers scoped to src/ + tests/.
 
 ## Context (evidence)
 - #78: DeepSeek via opencode-go → `Provider error 400: Error from provider (Console Go): Upstream request failed`. Other opencode-go models fine. One contributor says it works for them; owner comment (WP4 of 260710_pr_triage) reproduced a 200 on deepseek-v4-flash high — intermittent or config/flow-dependent.
@@ -42,6 +42,6 @@
 - A-gate: heuristic light audit by main (user requested heuristic mode) — plan matches direct-deepseek precedent, scoped, test-covered.
 
 ## D close-out (DONE)
-- #78: fix 8942c7c3 (preserveReasoningContentModels + effort map for deepseek-v4-* on opencode-go) + tests/opencode-go-deepseek.test.ts. Comment https://github.com/lidge-jun/opencodex/issues/78#issuecomment-4932494922 — CLOSED.
-- #82: NOOP on HEAD (8d69372d) + negative regression assertion in tests/codex-catalog.test.ts. Comment https://github.com/lidge-jun/opencodex/issues/82#issuecomment-4932494919 — CLOSED.
+- #78: fix 8942c7c3 (preserveReasoningContentModels + effort map for deepseek-v4-* on opencode-go) + tests/opencode-go-deepseek.test.ts. Comment https://github.com/lidge-jun/openprovider/issues/78#issuecomment-4932494922 — CLOSED.
+- #82: NOOP on HEAD (8d69372d) + negative regression assertion in tests/codex-catalog.test.ts. Comment https://github.com/lidge-jun/openprovider/issues/82#issuecomment-4932494919 — CLOSED.
 - Gates: bun test 1929/0, tsc exit 0, pushed origin/dev. Goalplan E8 validate OK. Terminal outcome: DONE.

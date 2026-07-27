@@ -1,9 +1,9 @@
 ---
 title: インストール
-description: OpenProvider(ocx)プロキシと前提条件をインストールし、正常に実行できるか確認します。
+description: OpenProvider(opr)プロキシと前提条件をインストールし、正常に実行できるか確認します。
 ---
 
-OpenProvider をインストールすると同じ実行ファイルを指す `ocx` と `OpenProvider` コマンドが一緒に提供されます。
+OpenProvider をインストールすると同じ実行ファイルを指す `opr` と `OpenProvider` コマンドが一緒に提供されます。
 どちらも Bun ベースの小さなローカル HTTP サーバーを実行します。モデルリクエストはルーティングで選ばれたプロバイダーに
 転送され、必要に応じて vision とウェブ検索のサイドカーが ChatGPT ログインを使うこともあります。
 
@@ -11,7 +11,7 @@ OpenProvider をインストールすると同じ実行ファイルを指す `oc
 
 | 要件 | 理由 |
  --- | --- |
-| **[Node](https://nodejs.org) ≥ 18** | `ocx` は Bun ランタイムで実行されますが、ランタイムは `npm install` 時に自動でバンドルされるため、Bun を自分でインストールする必要は**ありません**。 |
+| **[Node](https://nodejs.org) ≥ 18** | `opr` は Bun ランタイムで実行されますが、ランタイムは `npm install` 時に自動でバンドルされるため、Bun を自分でインストールする必要は**ありません**。 |
 | **[OpenAI Codex](https://openai.com/codex)**(CLI、App、または SDK) | OpenProvider が前に立つクライアントです。OpenProvider は `$CODEX_HOME/config.toml`(デフォルト `~/.codex/config.toml`)に書き込みます。 |
 | プロバイダーアカウントまたは API キー | Anthropic、xAI、Kimi、Ollama Cloud、OpenRouter、OpenAI API キー、OpenAI 互換エンドポイント、または ChatGPT ログイン。 |
 
@@ -39,7 +39,7 @@ sudo npm install -g --allow-scripts=bun @bitkyc08/OpenProvider
 両方のコマンドが `PATH` にあることを確認します:
 
 ```bash
-ocx --version
+opr --version
 OpenProvider --version
 ```
 
@@ -51,7 +51,7 @@ GPT-5.6 Sol/Terra/Luna カタログ情報がすでに含まれています。た
 
 ```bash
 npm install -g @bitkyc08/OpenProvider@preview
-ocx update --tag preview
+opr update --tag preview
 ```
 
 ## ソースから実行
@@ -79,17 +79,17 @@ OpenProvider の状態ファイルは `$OpenProvider_HOME`(デフォルト `~/.O
 | パス | 用途 |
  --- | --- |
 | `$OpenProvider_HOME/config.json` | プロバイダー、デフォルトプロバイダー、ポート、オプション。 |
-| `$OpenProvider_HOME/ocx.pid` | 実行中のプロキシの PID(単一インスタンスガード)。 |
+| `$OpenProvider_HOME/opr.pid` | 実行中のプロキシの PID(単一インスタンスガード)。 |
 | `$OpenProvider_HOME/runtime-port.json` | 自動で選んだ代替ポートを含む現在の PID、ホスト名、ポート。 |
-| `$OpenProvider_HOME/auth.json` | 保存された OAuth 認証情報(`ocx login` 時)。 |
+| `$OpenProvider_HOME/auth.json` | 保存された OAuth 認証情報(`opr login` 時)。 |
 | `$OpenProvider_HOME/catalog-backup*.json` | OpenProvider が変更する前に作成した Codex モデルカタログのバックアップ。 |
 | `$CODEX_HOME/config.toml` | ローカル専用構成では OpenProvider が管理するルート `openai_base_url` を追加します。ローカル以外のアドレスにバインドする場合は Codex が API 認証ヘッダーを送れるよう `model_provider = "OpenProvider"` と `[model_providers.OpenProvider]` を使います。 |
 | `$CODEX_HOME/OpenProvider.config.toml` | デフォルト Codex 設定と一緒に生成される参考用 fallback プロファイル。 |
 | `$CODEX_HOME/OpenProvider-catalog.json` | Codex が使うネイティブおよびルーティングモデルカタログ。 |
 
 :::note
-OpenProvider は決して Codex 設定を削除しません。すべての注入は元に戻せます — `ocx stop`、`ocx restore`、
-または `ocx eject` は OpenProvider が追加した行だけを正確に削除し、ネイティブ Codex を復元します。
+OpenProvider は決して Codex 設定を削除しません。すべての注入は元に戻せます — `opr stop`、`opr restore`、
+または `opr eject` は OpenProvider が追加した行だけを正確に削除し、ネイティブ Codex を復元します。
 :::
 
 ## 次へ

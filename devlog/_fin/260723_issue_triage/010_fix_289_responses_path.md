@@ -286,7 +286,7 @@ resolution would introduce different normalization semantics from the explicit s
 ### 4. MODIFY `tests/config.test.ts`
 
 Add one small writer beside the existing `writeConfig` helper, then add three tests in
-`describe("opencodex config defaults", ...)` immediately after the current
+`describe("openprovider config defaults", ...)` immediately after the current
 `responsesItemIdRepair` config-shape test.
 
 #### 4a. Add the focused config fixture writer
@@ -302,7 +302,7 @@ function writeConfig(content: unknown): void {
   );
 }
 
-describe("opencodex config defaults", () => {
+describe("openprovider config defaults", () => {
 ```
 
 After:
@@ -330,7 +330,7 @@ function writeResponsesPathConfig(responsesPath: string): void {
   });
 }
 
-describe("opencodex config defaults", () => {
+describe("openprovider config defaults", () => {
 ```
 
 #### 4b. Add three persisted-config tests

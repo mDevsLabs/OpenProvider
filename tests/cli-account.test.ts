@@ -353,7 +353,7 @@ afterEach(() => {
   console.error = originalError;
 });
 
-describe("ocx account CLI (issue #180 matrix)", () => {
+describe("opr account CLI (issue #180 matrix)", () => {
   test("1: list renders all three account families, main alias, and padded columns", async () => {
     const result = await run(["list"]);
 
@@ -445,7 +445,7 @@ describe("ocx account CLI (issue #180 matrix)", () => {
     expect(result.stderr).toContain("anthropic account nope was not found");
   });
 
-  test("10: proxy-down exits one with ocx start and ensure guidance", async () => {
+  test("10: proxy-down exits one with opr start and ensure guidance", async () => {
     const result = await run(
       ["list"],
       {
@@ -456,8 +456,8 @@ describe("ocx account CLI (issue #180 matrix)", () => {
     );
 
     expect(result.code).toBe(1);
-    expect(result.stderr).toContain("ocx start");
-    expect(result.stderr).toContain("ocx ensure");
+    expect(result.stderr).toContain("opr start");
+    expect(result.stderr).toContain("opr ensure");
   });
 
   test("11: list projects only masked API-key DTO fields", async () => {
@@ -487,10 +487,10 @@ describe("ocx account CLI (issue #180 matrix)", () => {
 
     expect(bare.code).toBe(1);
     expect(bare.stderr).toContain("Usage:");
-    expect(bare.stderr).toContain("ocx account list");
+    expect(bare.stderr).toContain("opr account list");
     expect(missingId.code).toBe(1);
     expect(missingId.stderr).toContain("Usage:");
-    expect(missingId.stderr).toContain("ocx account use");
+    expect(missingId.stderr).toContain("opr account use");
   });
 
   test("14: fan-out skips local/forward providers while explicit ollama errors", async () => {
@@ -687,7 +687,7 @@ describe("ocx account CLI (issue #180 matrix)", () => {
     );
 
     expect(result.code).toBe(1);
-    expect(result.stderr).toContain("ocx account remove openai chatgpt_1 --yes");
+    expect(result.stderr).toContain("opr account remove openai chatgpt_1 --yes");
     expect(calls).toHaveLength(0);
   });
 

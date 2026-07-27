@@ -6,10 +6,10 @@ Accepted
 
 ## Context
 
-`ocx doctor` used to show only the proxy variables visible to the `ocx doctor`
+`opr doctor` used to show only the proxy variables visible to the `opr doctor`
 process. That is accurate for the current shell, but misleading when a user
-started `ocx start` or a service from a different environment and then ran
-`ocx doctor` in a new terminal.
+started `opr start` or a service from a different environment and then ran
+`opr doctor` in a new terminal.
 
 Environment variables are inherited by child processes, not shared globally
 between existing shells. A new terminal can therefore show `HTTP_PROXY` as unset
@@ -17,7 +17,7 @@ while the already-running OpenProvider proxy process still has it set.
 
 ## Decision
 
-`ocx doctor` reports three separate proxy surfaces:
+`opr doctor` reports three separate proxy surfaces:
 
 - the current doctor process environment
 - the effective `config.proxy` state, with the value hidden

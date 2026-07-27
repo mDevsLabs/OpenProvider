@@ -202,7 +202,7 @@ describe("Claude Desktop 3P models", () => {
   });
 
   test("backs up owned config and preserves old bytes when atomic replacement fails", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-desktop-atomic-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-desktop-atomic-"));
     const path = join(dir, "owned.json");
     try {
       writeFileSync(path, "old bytes\n");

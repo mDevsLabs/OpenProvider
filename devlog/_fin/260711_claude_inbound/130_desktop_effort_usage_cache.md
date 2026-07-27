@@ -2,7 +2,7 @@
 
 ## 문제 (사용자 보고, 2026-07-12 00:35~00:46 라이브 로그)
 
-1. **추론 강도**: CLI(`ocx claude`)에서는 모든 effort가 작동하는데, Claude Desktop 3P에서는
+1. **추론 강도**: CLI(`opr claude`)에서는 모든 effort가 작동하는데, Claude Desktop 3P에서는
    라우팅 모델의 effort 변경이 반영되지 않는 것으로 보인다.
 2. **usage/캐시 불투명**: Claude 표면(luna 등) 요청의 로그에 캐시 토큰이 전혀 없고,
    누적 합산(입력+캐시) 표기가 비어 있다. **cursor 한정이 아니다** — native/openai 경로로
@@ -12,7 +12,7 @@
 
 - Claude 표면 effort 분포: `gpt-5.6-luna high×12 / xhigh×5`, `claude-haiku-4-5 None/high`.
   Desktop 슬라이더에서 high/xhigh는 도달. low/medium/max 도달 여부 미확인(캡처 수단 없음).
-- `ocx-mrgj5jwp-15` (Claude 표면 → openai-pb51d9b, sol): `in:7 out:95 cachedIn:0` — 캐시 0.
+- `opr-mrgj5jwp-15` (Claude 표면 → openai-pb51d9b, sol): `in:7 out:95 cachedIn:0` — 캐시 0.
 - cursor(luna) 행: `cachedIn/read/write = None` 전부. 컨텍스트 체크포인트 없는 턴은 `in: 0, out: 7~211`.
 - 비교: 같은 시각 codex 표면 sol 행은 `9.5만 c 9.4만` — 캐시 정상. 차이는 표면(Claude inbound)이다.
 - anthropic 라우팅(haiku)은 `write: 10047` — 캐시 write 정상 동작.
@@ -49,9 +49,9 @@
   패스스루가 죽는다. 활성화 시나리오: 레지스트리 빌드 후
   `resolveDesktop3pAlias("claude-opus-4-8") === null` + `resolveInboundModel` 항등 단언 테스트.
 - 하위호환: 레지스트리에 구형 `claude-opus-4-{code}` 키도 함께 등록(디코드만) — 사용자가
-  `ocx claude desktop` 재실행 전이어도 404 안 나게.
+  `opr claude desktop` 재실행 전이어도 404 안 나게.
   활성화 시나리오: 구형/신형 별칭 각각 decode 테스트 + 신구 키 상호 충돌 검사.
-- `ocx claude desktop` 재실행 시 config 재작성으로 새 별칭 반영.
+- `opr claude desktop` 재실행 시 config 재작성으로 새 별칭 반영.
 
 ### B4b — /v1/models(anthropic flavor)를 ModelInfo 전체 형태로 승격 (131 근거)
 - `src/server/index.ts` wantsAnthropicList 분기: 항목을 `{ id, display_name, type:"model",
@@ -60,16 +60,16 @@
   `modelDiscoveryEnabled: true` + `inferenceModels` 제거(discovery 모드)로 전환 —
   정적 목록은 capabilities를 실을 수 없으므로 discovery가 유일한 소비 경로.
   별칭이 전부 `claude-opus-4-8-*`라 "recognizably Claude" 필터도 통과.
-  안전판: `ocx claude desktop --static` 플래그로 기존 정적(inferenceModels) 모드 유지 가능.
-  **(R2 #4, Low)** `--static` 활성화 시나리오: CLI 인자 파싱(`ocx claude desktop --static`) →
+  안전판: `opr claude desktop --static` 플래그로 기존 정적(inferenceModels) 모드 유지 가능.
+  **(R2 #4, Low)** `--static` 활성화 시나리오: CLI 인자 파싱(`opr claude desktop --static`) →
   정적 config shape(inferenceModels 존재 + modelDiscoveryEnabled:false) 단언 + 동일
   프로세스에서 신·구 별칭 decode 단언까지 한 테스트로 커버.
   활성화 시나리오: 사용자 Desktop 재시작 → picker가 /v1/models에서 채워지는지 +
   effort UI 노출 여부 + B1 캡처에서 `output_config.effort` 도달 확인 (실험 게이트).
 - **(감사 #4 참고)** Claude Code CLI 2.1.207은 추가 필드를 strip함을 리뷰어가 재현 확인 —
   CLI 호환성 리스크 없음. **(사용자 지시 "모든 aliases")** anthropic-flavor 목록의 id 자체를
-  기존 `claude-ocx-*`에서 `claude-opus-4-8-{code}`로 교체(display_name은 실모델명 유지),
-  `resolveAlias`(claude-ocx-*) 디코드는 하위호환으로 존치.
+  기존 `claude-opr-*`에서 `claude-opus-4-8-{code}`로 교체(display_name은 실모델명 유지),
+  `resolveAlias`(claude-opr-*) 디코드는 하위호환으로 존치.
 - **(감사 #3 → R2 #1, High) effort 소스 확정**: 합성 catalog의 routed 키는 ladder를
   기본화/증강(max·ultra 인위 추가)하므로 capability 진실원으로 쓰지 않는다.
   - native 슬러그: `catalogModelEfforts([slug])`에서 시작하되 **(R3 #2 → R4 #1)** 합성

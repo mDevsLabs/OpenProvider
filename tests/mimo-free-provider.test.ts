@@ -95,7 +95,7 @@ describe("mimo-free client id", () => {
   const { join: joinPath } = require("node:path") as typeof import("node:path");
 
   test("random UUID persisted under OPENCODEX_HOME and stable across cache resets", () => {
-    const home = mkdtempSync(joinPath(tmpdir(), "ocx-mimo-id-"));
+    const home = mkdtempSync(joinPath(tmpdir(), "opr-mimo-id-"));
     const prevHome = process.env["OPENCODEX_HOME"];
     process.env["OPENCODEX_HOME"] = home;
     resetMimoClientIdCache();
@@ -119,8 +119,8 @@ describe("mimo-free client id", () => {
   });
 
   test("client id is not derived from machine attributes (two homes differ)", () => {
-    const homeA = mkdtempSync(joinPath(tmpdir(), "ocx-mimo-a-"));
-    const homeB = mkdtempSync(joinPath(tmpdir(), "ocx-mimo-b-"));
+    const homeA = mkdtempSync(joinPath(tmpdir(), "opr-mimo-a-"));
+    const homeB = mkdtempSync(joinPath(tmpdir(), "opr-mimo-b-"));
     const prevHome = process.env["OPENCODEX_HOME"];
     try {
       process.env["OPENCODEX_HOME"] = homeA;

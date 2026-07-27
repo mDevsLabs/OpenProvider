@@ -8,7 +8,7 @@ Both accepted PRs are MERGEABLE/CLEAN against their preview base.
 2. #69: `gh pr merge 69 --merge` (into preview). Cherry-pick onto dev; expected single conflict in
    tests/provider-registry-parity.test.ts (~L108 note assertions region): resolution = keep our
    >=38 / grok-4.5 / kimi-k2.7-code assertions AND take the PR's three note assertions
-   (unsafeAllowNativeLocalExec, ~/.opencodex/config.json, Providers → Cursor → Edit JSON) —
+   (unsafeAllowNativeLocalExec, ~/.openprovider/config.json, Providers → Cursor → Edit JSON) —
    registry.ts note hunk comes with the same cherry-pick so assertions align. Gate again.
 3. Push dev to origin. Landing comments on #67/#69 (merged into preview + landed on dev@sha).
 4. Rollback rule: any gate failure -> git cherry-pick --abort / revert landing commit, flip verdict

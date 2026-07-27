@@ -46,5 +46,5 @@ resetAt까지 남은 시간을 `clampCooldownMs()`(24h)로만 자른다.
 
 ## 범위 밖
 
-이슈 제안 3·4번(`ocx account clear-cooldown` CLI, cooldown 상태 가시화)은 CLI/GUI 표면이라
+이슈 제안 3·4번(`opr account clear-cooldown` CLI, cooldown 상태 가시화)은 CLI/GUI 표면이라
 별도 유닛에서 다룬다.

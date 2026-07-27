@@ -800,8 +800,8 @@ describe("Codex catalog routed normalization", () => {
   });
 
   test("materializes bundled Codex catalog when no on-disk source exists", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-catalog-"));
-    const path = join(dir, "nested", "opencodex-catalog.json");
+    const dir = mkdtempSync(join(tmpdir(), "opr-catalog-"));
+    const path = join(dir, "nested", "openprovider-catalog.json");
     try {
       const catalog = materializeBundledCodexCatalog(path, {
         commandCandidates: () => ["codex"],
@@ -967,7 +967,7 @@ describe("Codex catalog routed normalization", () => {
     expect(terra?.multi_agent_version).toBe("v2");
     expect(luna?.multi_agent_version).toBe("v1");
 
-    // ocx adaptations: client-version gate stripped; ws preference gated off by default.
+    // opr adaptations: client-version gate stripped; ws preference gated off by default.
     for (const e of [sol, terra, luna]) {
       expect(e).not.toHaveProperty("minimal_client_version");
       expect(e).not.toHaveProperty("prefer_websockets");
@@ -986,8 +986,8 @@ describe("Codex catalog routed normalization", () => {
   });
 
   test("catalog sync upgrades fallback-quality gpt-5.6 entries but preserves genuine ones", () => {
-    // Fallback-quality: display_name stamped with the bare slug (ocx synthesis signature),
-    // wrong ladder (ultra on luna) left by an older ocx version.
+    // Fallback-quality: display_name stamped with the bare slug (opr synthesis signature),
+    // wrong ladder (ultra on luna) left by an older opr version.
     const synthesizedLuna = {
       ...nativeTemplate(),
       slug: "gpt-5.6-luna",
@@ -2046,7 +2046,7 @@ describe("Codex catalog routed normalization", () => {
     expect(models).toEqual([]);
   });
 
-  test("anthropic sonnet 4.6 uses the 200k opencodex catalog cap", () => {
+  test("anthropic sonnet 4.6 uses the 200k openprovider catalog cap", () => {
     const entries = buildCatalogEntries(nativeTemplate(), [], [
       { provider: "anthropic", id: "claude-sonnet-4-6" },
     ]);

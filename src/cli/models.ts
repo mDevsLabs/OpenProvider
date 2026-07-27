@@ -1,5 +1,5 @@
 /**
- * `ocx models` subcommand — list configured models and manage custom models.
+ * `opr models` subcommand — list configured models and manage custom models.
  */
 import { randomUUID } from "node:crypto";
 import { createInterface } from "node:readline/promises";
@@ -9,9 +9,9 @@ import { routedSlug } from "../providers/slug-codec";
 import { findLiveProxy } from "../server/proxy-liveness";
 import type { OcxConfig, OcxCustomModel } from "../types";
 
-const ADD_USAGE = "Usage: ocx models add <provider> <modelId> [--display-name <name>] [--context-window <tokens>] [--modalities text,image,audio]";
-const REMOVE_USAGE = "Usage: ocx models remove <customId|provider/modelId> [--yes]";
-const LIST_CUSTOM_USAGE = "Usage: ocx models list-custom [--json]";
+const ADD_USAGE = "Usage: opr models add <provider> <modelId> [--display-name <name>] [--context-window <tokens>] [--modalities text,image,audio]";
+const REMOVE_USAGE = "Usage: opr models remove <customId|provider/modelId> [--yes]";
+const LIST_CUSTOM_USAGE = "Usage: opr models list-custom [--json]";
 const ALLOWED_MODALITIES = new Set(["text", "image", "audio"]);
 
 interface ModelEntry {
@@ -122,7 +122,7 @@ async function handleCustomAdd(args: string[]): Promise<void> {
 
   const config = loadConfig();
   if (!hasOwnProvider(config.providers, provider)) {
-    fail(`provider "${provider}" is not configured. See: ocx provider list`);
+    fail(`provider "${provider}" is not configured. See: opr provider list`);
   }
 
   const displayName = displayNameValue?.trim() || undefined;
@@ -262,14 +262,14 @@ function handleConfiguredModels(args: string[]): void {
     } else {
       console.error(`Unexpected argument(s): ${restArgs.join(", ")}`);
     }
-    console.error("Usage: ocx models [--provider <name>] [--json]");
+    console.error("Usage: opr models [--provider <name>] [--json]");
     process.exit(1);
   }
 
   const config = loadConfig();
 
   if (providerFilter && !hasOwnProvider(config.providers, providerFilter)) {
-    console.error(`Provider "${providerFilter}" is not configured. See: ocx provider list`);
+    console.error(`Provider "${providerFilter}" is not configured. See: opr provider list`);
     process.exit(1);
   }
 

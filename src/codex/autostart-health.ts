@@ -53,15 +53,15 @@ export interface StartupHealth {
 }
 
 const COMMANDS = {
-  installService: "ocx service install",
-  installShim: "ocx codex-shim install",
-  restoreNative: "ocx restore",
+  installService: "opr service install",
+  installShim: "opr codex-shim install",
+  restoreNative: "opr restore",
 } as const;
 
 export function deriveStartupHealth(inputs: StartupHealthInputs): StartupHealth {
   const shimEffective = inputs.autostartEnabled && inputs.shimHealthy;
-  const routingInjected = inputs.routingKind === "opencodex-local";
-  const localRoutingDependency = inputs.routingKind === "opencodex-local"
+  const routingInjected = inputs.routingKind === "openprovider-local";
+  const localRoutingDependency = inputs.routingKind === "openprovider-local"
     || inputs.routingKind === "custom-local"
     || inputs.routingKind === "unknown";
   // Script launchers never cover Codex Desktop/app-server surfaces. This is
@@ -69,9 +69,9 @@ export function deriveStartupHealth(inputs: StartupHealthInputs): StartupHealth 
   const shimCoverage: ShimCoverage = !shimEffective
     ? "none"
     : "cli-only";
-  // We can only credit an opencodex service/shim for routing that opencodex owns.
+  // We can only credit an openprovider service/shim for routing that openprovider owns.
   // An arbitrary localhost gateway has an independent lifecycle that OCX cannot repair.
-  const ownsLocalRouting = inputs.routingKind === "opencodex-local";
+  const ownsLocalRouting = inputs.routingKind === "openprovider-local";
   const protection: StartupProtection = ownsLocalRouting && inputs.serviceViable
     ? "service"
     : ownsLocalRouting && shimEffective
@@ -136,11 +136,11 @@ export function collectStartupHealth(
 export function startupHealthSummary(health: StartupHealth): string {
   if (health.status === "native") return health.routingKind === "custom-remote"
     ? "custom remote Codex routing (no local restart dependency)"
-    : "native Codex routing (no opencodex restart dependency)";
+    : "native Codex routing (no openprovider restart dependency)";
   if (health.protection === "service") return "protected by background service";
   const command = health.recommendedCommand ?? health.commands.restoreNative;
   if (health.routingKind === "unknown") return `AT RISK after restart (Codex routing could not be verified; run '${command}')`;
-  if (health.routingKind === "custom-local") return `AT RISK after restart (custom local gateway lifecycle is not managed by opencodex; run '${command}')`;
+  if (health.routingKind === "custom-local") return `AT RISK after restart (custom local gateway lifecycle is not managed by openprovider; run '${command}')`;
   if (health.shimCoverage === "cli-only") return `AT RISK for Codex Desktop after restart (launcher shim covers CLI scripts only; run '${command}')`;
   if (health.serviceConflict) return `AT RISK after restart (background service managers conflict; run '${command}')`;
   if (health.serviceStale) return `AT RISK after restart (background service files are stale; run '${command}')`;

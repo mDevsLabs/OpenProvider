@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add the smallest useful CI surface for opencodex:
+Add the smallest useful CI surface for openprovider:
 
 - run typecheck and the existing Bun test suite on Linux and Windows;
 - keep the Release workflow manual and publish-focused;

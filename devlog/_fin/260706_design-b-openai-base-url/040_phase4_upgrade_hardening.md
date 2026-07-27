@@ -1,8 +1,8 @@
 # Phase 4 — upgrade-path hardening (migration certainty)
 
-Most users update FROM a re-tag install, so the one-time opencodex→openai migration
+Most users update FROM a re-tag install, so the one-time openprovider→openai migration
 must succeed even when the first attempt hits a locked `state_5.sqlite` (Codex app
-open during `ocx start` — the common case). Today a failed migration only prints a
+open during `opr start` — the common case). Today a failed migration only prints a
 warning; threads stay invisible until the user manually reruns start.
 
 ## Files
@@ -15,7 +15,7 @@ warning; threads stay invisible until the user manually reruns start.
   `syncCodexHistoryProvider("openai")` (2 attempts / 500ms — unchanged today). Patience lives
   ONLY in the daemon guardian: 60s unref ticks, `{attempts: 1}` per tick.
 - **(blocker 2) pending-count predicate mirrors eject exactly:**
-  `WHERE model_provider = 'opencodex' AND trim(coalesce(first_user_message, '')) != ''`
+  `WHERE model_provider = 'openprovider' AND trim(coalesce(first_user_message, '')) != ''`
   (no source filter, no RESUMABLE_SOURCES — eject handles exec→cli itself).
 - Count probe opens sqlite `{ readonly: true }` (repo precedent kiro-credentials.ts:186)
   with a SHORT busy_timeout (100ms) so a locked DB cannot stall a daemon tick or doctor.
@@ -34,7 +34,7 @@ warning; threads stay invisible until the user manually reruns start.
   `CodexHistorySyncResult`.
 - NEW `countPendingOpencodexHistory(stateDbPath?, backupPath?)`: read-only
   `{ pendingRows, backupEntries, failed? }` — COUNT of threads still tagged
-  `opencodex` + backup manifest entry count. Cheap; used by guardian + doctor.
+  `openprovider` + backup manifest entry count. Cheap; used by guardian + doctor.
 
 **NEW `src/history-migration-guardian.ts`**
 - `startHistoryMigrationGuardian(deps?)`: unref'd setTimeout loop (default 60s,

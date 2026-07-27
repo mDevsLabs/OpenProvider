@@ -138,7 +138,7 @@ curl -s localhost:10100/api/codex-auth/accounts | jq '.accounts[].hasCredential'
 
 **5.2 File Permissions**
 ```bash
-stat -f "%Lp" ~/.opencodex/codex-accounts.json
+stat -f "%Lp" ~/.openprovider/codex-accounts.json
 # 600 (owner read/write only)
 ```
 

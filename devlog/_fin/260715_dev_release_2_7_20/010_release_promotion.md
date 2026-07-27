@@ -58,7 +58,7 @@ OUT:
 - Token contract: run the design-system contribution scans and classify each remaining literal as token definition or algorithmic/layout exception.
 - CI: Cross-platform CI success for exact `dev`, promoted `main`, and release commit SHAs; relevant docs/service workflows reported but not substituted for runtime CI.
 - Public artifact: `npm view @mdevs/openprovider@2.7.20 version dist-tags --json`; `git ls-remote origin refs/tags/v2.7.20`; `gh release view v2.7.20`; compare all SHAs.
-- Install smoke: pack/install through the published npm package in a fresh temporary prefix and run `ocx help` without relying on a globally installed Bun.
+- Install smoke: pack/install through the published npm package in a fresh temporary prefix and run `opr help` without relying on a globally installed Bun.
 - Rollback proof: before publish, rollback is branch reset by revert commit only. After npm publish, npm versions are immutable; rollback is a new patch release, never unpublish/tag rewrite.
 
 ## Acceptance criteria

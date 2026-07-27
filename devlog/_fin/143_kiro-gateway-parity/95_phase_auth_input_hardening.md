@@ -142,7 +142,7 @@ Add regression coverage for:
 
 ## Explicit non-goals
 
-- No opencodex Kiro account pool.
+- No openprovider Kiro account pool.
 - No account circuit breaker.
 - No sticky account routing.
 - No write-back to Kiro CLI SQLite in this phase.

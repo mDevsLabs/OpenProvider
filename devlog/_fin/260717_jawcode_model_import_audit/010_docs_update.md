@@ -2,7 +2,7 @@
 
 ## `006_jawcode_import_matrix.md`
 
-- One row per candidate, with exact jawcode source, OpenCodex owner, decision, rationale, and implementation gate.
+- One row per candidate, with exact jawcode source, OpenProvider owner, decision, rationale, and implementation gate.
 - Required decisions: Cursor version, bounded 429, GPT-5.6 tiers, Antigravity retired model, OpenCode Go Kimi, Anthropic thinking, Google tool-argument/header behavior, Anthropic organization identity, safety/invalid-prompt behavior, LiteLLM metadata, Z.AI weekly limit, Fugu/Sakana, floating model hub semantics.
 - A decision is not permission to implement; `IMPORT` and `ADAPT` still carry their required proof.
 - Every row must name `local-source`, `chase-only`, or `live-unverified`; the latter two cannot exceed `RESEARCH`.

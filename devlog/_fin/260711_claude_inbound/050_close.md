@@ -10,7 +10,7 @@ closed DONE except the one NEEDS_HUMAN item below.
 |---|---|
 | 953fb5b9 | (pre-unit) model-ordering docs + v2 thread-limit work, committed on dev before branching |
 | bb9da3ae | WP2 — core inbound: src/claude/{inbound,outbound}.ts, src/server/claude-messages.ts, routes, x-api-key auth, 19 tests |
-| 103310a8 | WP3 — src/claude/alias.ts, discovery /v1/models branch, ocx claude launcher + help, 12 tests |
+| 103310a8 | WP3 — src/claude/alias.ts, discovery /v1/models branch, opr claude launcher + help, 12 tests |
 | 12e82239 | WP4 — GUI (Claude ON toggle + Claude page), /api/claude-code, i18n x4, docs-site x3, README x3, 3 tests |
 
 ## Deviations from the P docs (recorded, all deliberate)
@@ -62,11 +62,11 @@ was reproduced locally against the REAL ChatGPT backend and fixed:
 |---|---|---|---|
 | 1 | `400 unsupported message role: system` | Claude Code sends `role:"system"` entries in `messages` despite the published API having no system role | inbound folds system-role messages into `instructions` (with top-level `system`, in order) |
 | 2 | `400 upstream error (400)` (opaque) | native ChatGPT backend: `{"detail":"Unsupported parameter: max_output_tokens"}` — codex-shaped bodies only | claude-messages strips `max_output_tokens/temperature/top_p/stop/user` on `openai-responses` routes; error reshaping now surfaces upstream body text |
-| 3 | (would-be) `401 {"detail":"Unauthorized"}` for pool-less installs | `ocx claude` placeholder Bearer was forwarded upstream as ChatGPT auth | internal replay strips `authorization`; native routes inject the main codex login (`getMainAccountToken`); pool rotation still overrides |
+| 3 | (would-be) `401 {"detail":"Unauthorized"}` for pool-less installs | `opr claude` placeholder Bearer was forwarded upstream as ChatGPT auth | internal replay strips `authorization`; native routes inject the main codex login (`getMainAccountToken`); pool rotation still overrides |
 | 3b | `400 {"detail":"System messages are not allowed"}` | first fix for #1 mapped system-role to system message ITEMS — native backend rejects those | superseded by the instructions-folding fix |
 
-Local live proof (isolated OPENCODEX_HOME, real backend): `claude-ocx-native--gpt-5.5`
-and `claude-ocx-native--gpt-5.6-sol` with placeholder Bearer + system-role message ->
+Local live proof (isolated OPENCODEX_HOME, real backend): `claude-opr-native--gpt-5.5`
+and `claude-opr-native--gpt-5.6-sol` with placeholder Bearer + system-role message ->
 full `message_start .. text_delta("Hi"/" there"/", friend") .. message_delta(end_turn)
 .. message_stop` sequence.
 

@@ -69,7 +69,7 @@ export async function handleImages(
       400,
       "invalid_request_error",
       "Built-in image generation needs an OpenAI upstream (ChatGPT login or an OpenAI API-key provider), "
-      + "but none is configured in opencodex. Routed providers cannot serve /v1/images/* — "
+      + "but none is configured in openprovider. Routed providers cannot serve /v1/images/* — "
       + "add an OpenAI provider or disable the tool with `codex features disable image_generation`.",
     );
   }

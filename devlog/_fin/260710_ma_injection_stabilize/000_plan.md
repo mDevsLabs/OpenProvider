@@ -1,7 +1,7 @@
 # 260710 Multi-agent injection stabilization — plan (WP1-3)
 
 Session: 019f49f3-c213-7942-8651-f4f2710daf65 (HOTL goal loop, goalplan slug
-`stabilize-opencodex-product-surface-docs-after-m`). Subagents: gpt-5.6-sol,
+`stabilize-openprovider-product-surface-docs-after-m`). Subagents: gpt-5.6-sol,
 reasoning high (user chat instruction overrides configured xhigh).
 
 ## Objective
@@ -41,7 +41,7 @@ work, then commit atomically. Three work-phases, dependency-ordered.
   hints so alias-keyed contextWindow overrides win). Genuinely-missing ids
   still drop.
 - `warnDroppedConfiguredIdsOnce`: per-provider signature dedupe kills the
-  4x-repeated warn spam observed in `ocx start`.
+  4x-repeated warn spam observed in `opr start`.
 - Live-verified: claude-haiku-4-5 back in the routed catalog.
 
 ### Tests (+129 lines across 3 files)
@@ -57,7 +57,7 @@ work, then commit atomically. Three work-phases, dependency-ordered.
 G1. management-api PUT /api/injection-model does not resync or ensure the
     hide flag; a user setting injectionModel via GUI on a v2 thread may still
     have `model` hidden until next sync. (Mitigated by sync-on-start; verify.)
-G2. `ocx v2 status` does not report hide_spawn_agent_metadata state.
+G2. `opr v2 status` does not report hide_spawn_agent_metadata state.
 G3. v2 injection text asserts "Model overrides are rejected on a full-history
     fork" — verify wording stays true for agent_type/service_tier too (spec
     says service_tier is NOT fork-gated).

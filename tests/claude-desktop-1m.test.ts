@@ -24,7 +24,7 @@ test("the DTO and the writer share one threshold constant", () => {
 });
 
 test("supports1m is true at and above the threshold, false below it", async () => {
-  const home = mkdtempSync(join(tmpdir(), "ocx-desktop-1m-"));
+  const home = mkdtempSync(join(tmpdir(), "opr-desktop-1m-"));
   const prev = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
   process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = home;
   try {

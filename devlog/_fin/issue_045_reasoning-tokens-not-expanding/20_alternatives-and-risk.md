@@ -7,7 +7,7 @@ Send reasoning_content through the existing summary path; retire/skip the raw
 content emission for this producer.
 - Pros: single channel, no dedupe ambiguity, reuses proven thinking path + tests.
 - Cons: if some consumer specifically wanted the raw `content` channel, it no
-  longer receives it (no known opencodex consumer relies on it).
+  longer receives it (no known openprovider consumer relies on it).
 
 ### B. Mirror into BOTH summary[] and content[] (00_review Approach 1)
 Keep `content` and ALSO populate `summary` with the same text.

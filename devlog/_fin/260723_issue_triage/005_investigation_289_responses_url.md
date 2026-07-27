@@ -1,13 +1,13 @@
 # 005 — Investigation: issue #289, Volcengine Ark Responses URL
 
-Issue: https://github.com/lidge-jun/opencodex/issues/289  
+Issue: https://github.com/lidge-jun/openprovider/issues/289  
 Scope: current `codex/issue-triage-260723` tree (`origin/dev` at delegation time); source and tests were read-only.
 
 ## Reporter claim and upstream evidence
 
 The reporter configures the key-auth `openai-responses` adapter with
 `https://ark.cn-beijing.volces.com/api/plan/v3` and reports that Ark accepts
-`/api/plan/v3/responses`, while OpenCodex sends `/api/plan/v3/v1/responses` and
+`/api/plan/v3/responses`, while OpenProvider sends `/api/plan/v3/v1/responses` and
 gets 404. No credentialed upstream request was made in this investigation.
 
 The linked official Responses documentation currently demonstrates the same
@@ -290,7 +290,7 @@ provider in the end-to-end suite:
 
 ## Verdict
 
-**OpenCodex bug.** The key-auth `openai-responses` adapter deterministically
+**OpenProvider bug.** The key-auth `openai-responses` adapter deterministically
 injects `/v1` into a configured non-`/v1` versioned API base. The configurable
 fix adds a small capability, but the issue should remain classified as a bug,
 not be reclassified as a feature request.

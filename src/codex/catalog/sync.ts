@@ -170,7 +170,7 @@ export function deriveEntry(
       // alias (`provider/vendor-model`); the model object carries the native id.
       const modelName = model?.id ?? slug.slice(slug.indexOf("/") + 1);
       if (typeof e.base_instructions === "string") {
-        // Proxy-neutral: keep the GPT-5/OpenAI disclaimer but never advertise the opencodex proxy
+        // Proxy-neutral: keep the GPT-5/OpenAI disclaimer but never advertise the openprovider proxy
         // (leaking that into base_instructions is a non-first-party signature → ToS risk).
         e.base_instructions = e.base_instructions.replace(
           CODEX_GPT5_IDENTITY_LINE,
@@ -261,7 +261,7 @@ export function buildCatalogEntries(
     const e = deriveEntry(
       template,
       slug,
-      `Routed via opencodex → ${m.provider} (${m.owned_by ?? m.provider}).`,
+      `Routed via openprovider → ${m.provider} (${m.owned_by ?? m.provider}).`,
       5,
       m,
       exactComboSlugs,
@@ -279,7 +279,7 @@ export function buildCatalogEntries(
     else {
       delete entry.supports_websockets;
       // Snapshot-backed native entries carry prefer_websockets: never advertise a preference
-      // for an endpoint ocx has disabled.
+      // for an endpoint opr has disabled.
       delete entry.prefer_websockets;
     }
   }
@@ -345,7 +345,7 @@ export function mergeCatalogEntriesForSync(
         : featured.length > 0
           ? Math.max(typeof baselinePriority === "number" ? baselinePriority : 9, featured.length + 100)
           : baselinePriority;
-      // Fallback-quality entries (ocx synthesis / codex-rs model_info fallback: display_name
+      // Fallback-quality entries (opr synthesis / codex-rs model_info fallback: display_name
       // stamped with the bare slug) are upgraded to the pinned upstream snapshot entry so a
       // previously synthesized ladder (e.g. luna advertising ultra) self-heals on sync. A
       // genuine catalog entry (real display name) is preserved untouched.
@@ -415,7 +415,7 @@ export function mergeCatalogEntriesForSync(
     typeof entry.slug !== "string" || !isRoutedModelCompatibilityExcluded(entry.slug)
   );
   if (preservingExistingRouted) {
-    console.warn(`[opencodex] catalog sync: routed model fetch returned empty; preserving ${finalRoutedEntries.length} existing routed entr${finalRoutedEntries.length === 1 ? "y" : "ies"} on disk.`);
+    console.warn(`[openprovider] catalog sync: routed model fetch returned empty; preserving ${finalRoutedEntries.length} existing routed entr${finalRoutedEntries.length === 1 ? "y" : "ies"} on disk.`);
   }
 
   const mergedEntries = [...native, ...finalRoutedEntries].map(m => {
@@ -461,7 +461,7 @@ export async function syncCatalogModels(config: OcxConfig): Promise<{ added: num
 
   const goModels = await gatherRoutedModels(config);
   try {
-    // Once-only: preserve the PRISTINE pre-opencodex catalog as the native-priority baseline
+    // Once-only: preserve the PRISTINE pre-openprovider catalog as the native-priority baseline
     // (later syncs would otherwise overwrite it with featured-modified priorities).
     ensureCatalogBackup(catalogPath, catalog);
   } catch { /* backup best-effort */ }

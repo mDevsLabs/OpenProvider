@@ -172,7 +172,7 @@ export function requestLogEntryFromPersistedUsage(entry: PersistedUsageEntry): R
 
 /**
  * Seed the in-memory Logs ring buffer from usage.jsonl so GUI /api/logs survives
- * `ocx stop` / `ocx start` (process restart). Idempotent per process; no-ops when
+ * `opr stop` / `opr start` (process restart). Idempotent per process; no-ops when
  * the buffer already has live entries. Read failures are non-fatal (same as /api/usage).
  */
 export function hydrateRequestLogsFromDisk(
@@ -249,7 +249,7 @@ export function addRequestLog(entry: RequestLogEntry) {
 
 export function nextRequestLogId(timestamp = Date.now()): string {
   requestLogSeq = (requestLogSeq % 1_000_000) + 1;
-  return `ocx-${timestamp.toString(36)}-${requestLogSeq.toString(36)}`;
+  return `opr-${timestamp.toString(36)}-${requestLogSeq.toString(36)}`;
 }
 
 /**

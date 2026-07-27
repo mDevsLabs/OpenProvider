@@ -43,7 +43,7 @@
 preview 머지(→ v2.7.32-preview 갱신) 및 main 머지+release는 즉시 실행 가능한 수준.
 실행은 이 goal 범위 외 — 사용자 지시 대기. 릴리즈 시 scripts/release.ts 경유,
 release SHA에 ci.yml + service-lifecycle.yml 그린 확인 후 npm dist-tags 검증
-(skills/opencodex-release-train 규약).
+(skills/openprovider-release-train 규약).
 
 Deferred 항목(머지 전 필수 아님): MAJOR OAuth cancel race — 별도 이슈 권장,
 MINOR ja 부분 번역.

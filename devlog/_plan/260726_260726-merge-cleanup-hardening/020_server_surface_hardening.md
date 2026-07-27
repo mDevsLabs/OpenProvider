@@ -3,7 +3,7 @@
 Scope: the server-side code this session's two merges actually touched, reviewed
 against the current tree rather than against the merge diff.
 
-## Finding 1 (REAL DEFECT) — `ocx stop` swallows the ownership refusal
+## Finding 1 (REAL DEFECT) — `opr stop` swallows the ownership refusal
 
 **Where.** `src/cli/index.ts:436-439` and `:452-455`.
 

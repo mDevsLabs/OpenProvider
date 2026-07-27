@@ -22,8 +22,8 @@ const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-vision-e2e-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-vision-e2e-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-vision-e2e-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-vision-e2e-"));
   process.env.OPENCODEX_HOME = testDir;
   globalThis.fetch = originalFetch;
 });

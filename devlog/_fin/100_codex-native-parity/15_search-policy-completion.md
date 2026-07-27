@@ -7,9 +7,9 @@ Phase 100.2 implemented explicit routed search metadata and request-time sidecar
 Primary files:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/web-search.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/web-search.test.ts
 ```
 
 ## Implemented Behavior
@@ -25,7 +25,7 @@ This is deliberate policy, not native-template inheritance.
 
 Meaning:
 
-- `web_search_tool_type = "text_and_image"` advertises the capability opencodex can actually provide
+- `web_search_tool_type = "text_and_image"` advertises the capability openprovider can actually provide
   through the default `gpt-5.4-mini` sidecar. The routed upstream model does not run OpenAI hosted
   image search directly; the sidecar runs it and verbalizes image results when the downstream model is
   text-only.
@@ -48,8 +48,8 @@ the routed upstream model.
 Added or extended tests:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/web-search.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/web-search.test.ts
 ```
 
 Covered assertions:

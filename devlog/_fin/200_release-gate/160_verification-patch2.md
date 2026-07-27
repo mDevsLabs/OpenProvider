@@ -64,8 +64,8 @@ After:  configurable stallTimeoutSec (default 90s, min 1s), options object (no c
 **테스트**: Platform-specific (Windows 필요) — macOS에서 코드 경로 확인, 실행은 win32 조건 분기
 
 ```
-Before: ocx update → npm/bun install → done (shim may be overwritten)
-After:  ocx update → npm/bun install → installCodexShim() on Windows → done
+Before: opr update → npm/bun install → done (shim may be overwritten)
+After:  opr update → npm/bun install → installCodexShim() on Windows → done
 ```
 
 ## 감사 audit 피드백 반영

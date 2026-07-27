@@ -26,7 +26,7 @@ preserving author `0disoft`.
 | 43 | 0disoft | Diagnose stale Codex bundled plugin marketplace after app updates |
 | 42 | 0disoft | Add Storage page for Codex session usage and cleanup policy |
 | 41 | DomineYH | glm-5.2[1m] upstream 400 "Unknown Model" — bracketed 1M suffix forwarded |
-| 17 | 0disoft | Mobile-created Codex threads may bypass local opencodex proxy |
+| 17 | 0disoft | Mobile-created Codex threads may bypass local openprovider proxy |
 
 ## Method per issue
 1. Read the full issue body + comments via `gh issue view`.

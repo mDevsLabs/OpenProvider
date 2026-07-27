@@ -1,4 +1,4 @@
-# Scope `bun test` discovery to opencodex's own suite.
+# Scope `bun test` discovery to openprovider's own suite.
 #
 # Vendored trees under devlog/ (opencode-cursor, _chase/_litellm, _cca …) ship their own
 # *.test.ts / *.spec.ts files with deps we don't install (react/jsx-dev-runtime, @playwright/test),

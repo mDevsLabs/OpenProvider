@@ -4,7 +4,7 @@ Status: public contract plan only, no implementation in this cycle.
 
 ## Objective
 
-Design the first machine-readable diagnostics contract for agents and scripts so they do not need to scrape human text from `ocx status`.
+Design the first machine-readable diagnostics contract for agents and scripts so they do not need to scrape human text from `opr status`.
 
 This phase should start only after Phase 2 has made help/version routing predictable.
 
@@ -13,21 +13,21 @@ This phase should start only after Phase 2 has made help/version routing predict
 Authoritative matrix:
 
 ```path
-/Users/jun/Developer/new/700_projects/opencodex/devlog/370_cli-human-friendly/11_help_surface_matrix.md
+/Users/jun/Developer/new/700_projects/openprovider/devlog/370_cli-human-friendly/11_help_surface_matrix.md
 ```
 
 Relevant findings:
 
-- `ocx status --json` currently exits 0 but prints human text, because extra args are ignored by `status`.
-- `ocx doctor` and `ocx doctor --json` are unknown commands.
-- `ocx logs` and `ocx service logs` are unknown/unsupported, but service diagnostics already expose a log path.
+- `opr status --json` currently exits 0 but prints human text, because extra args are ignored by `status`.
+- `opr doctor` and `opr doctor --json` are unknown commands.
+- `opr logs` and `opr service logs` are unknown/unsupported, but service diagnostics already expose a log path.
 - README/docs-site do not promise any JSON status contract.
 
 ## Contract Boundary
 
 ### Included
 
-- `ocx status --json` as the first stable JSON surface.
+- `opr status --json` as the first stable JSON surface.
 - Additive-only schema policy for future fields.
 - Token/secret redaction requirements.
 - Tests that JSON output is valid, read-only, and secret-safe.
@@ -42,13 +42,13 @@ Relevant findings:
 
 ## Planned Files
 
-### MODIFY `/Users/jun/Developer/new/700_projects/opencodex/src/cli.ts`
+### MODIFY `/Users/jun/Developer/new/700_projects/openprovider/src/cli.ts`
 
 Planned changes:
 
 1. Parse `status --json` before human status output.
 2. Refactor status collection into a data object that both human and JSON output can use.
-3. Keep `ocx status` human output stable unless tests require a minimal adaptation.
+3. Keep `opr status` human output stable unless tests require a minimal adaptation.
 4. Reject unknown status flags explicitly once `--json` is supported.
 
 Candidate type:
@@ -92,11 +92,11 @@ Do not include:
 - raw request/response bodies;
 - emails or account names unless a later auth-specific contract explicitly permits redacted labels.
 
-### ADD `/Users/jun/Developer/new/700_projects/opencodex/tests/cli-status-json.test.ts`
+### ADD `/Users/jun/Developer/new/700_projects/openprovider/tests/cli-status-json.test.ts`
 
 Planned tests:
 
-- `ocx status --json` exits 0 and parses as JSON.
+- `opr status --json` exits 0 and parses as JSON.
 - `schemaVersion` is present.
 - proxy health/url/path fields are present.
 - no known secret-like keys appear in JSON:
@@ -107,23 +107,23 @@ Planned tests:
   - `email`
 - command does not start the proxy or write PID/config files in a temp home unless those files already exist.
 
-### MODIFY `/Users/jun/Developer/new/700_projects/opencodex/docs-site/src/content/docs/reference/cli.md`
+### MODIFY `/Users/jun/Developer/new/700_projects/openprovider/docs-site/src/content/docs/reference/cli.md`
 
 Planned documentation:
 
-- Add `ocx status --json`.
+- Add `opr status --json`.
 - Include an example output with placeholder paths.
 - State additive-only schema policy.
 - State that JSON is intended for agents/scripts and excludes secrets.
 
-### OPTIONAL MODIFY `/Users/jun/Developer/new/700_projects/opencodex/structure/01_runtime.md`
+### OPTIONAL MODIFY `/Users/jun/Developer/new/700_projects/openprovider/structure/01_runtime.md`
 
 Only if implementation refactors status collection enough to alter runtime ownership docs. If added, document that `src/cli.ts` owns both human and JSON status formatting.
 
 ## Acceptance Criteria
 
-- `ocx status --json` exits 0 with valid JSON.
-- `ocx status` human output remains usable.
+- `opr status --json` exits 0 with valid JSON.
+- `opr status` human output remains usable.
 - JSON status does not start/stop proxy, service, or shim.
 - JSON status does not include secrets or raw account identity.
 - Unknown `status` flags do not silently produce human output once JSON support exists.

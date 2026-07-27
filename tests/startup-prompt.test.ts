@@ -17,7 +17,7 @@ describe("startup star prompt", () => {
     expect(pkg.files ?? []).not.toContain("scripts/postinstall.mjs");
   });
 
-  test("ocx start waits for the interactive prompt before sync/injection", async () => {
+  test("opr start waits for the interactive prompt before sync/injection", async () => {
     const cli = await readText("src/cli/index.ts");
     const promptIndex = cli.indexOf("await maybeShowStarPrompt()");
     const syncIndex = cli.indexOf("await syncModelsToCodex(port)");
@@ -28,7 +28,7 @@ describe("startup star prompt", () => {
     expect(promptIndex).toBeLessThan(syncIndex);
   });
 
-  test("ocx init offers the Codex autostart shim by default", async () => {
+  test("opr init offers the Codex autostart shim by default", async () => {
     const init = await readText("src/cli/init.ts");
 
     expect(init).toContain("Install Codex autostart shim? [Y/n]");

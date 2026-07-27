@@ -1,10 +1,10 @@
-# 120.00 — Overview: Responses WebSocket Parity for opencodex
+# 120.00 — Overview: Responses WebSocket Parity for openprovider
 
 ## What this phase is
 
-Make the opencodex provider able to speak the Codex **Responses WebSocket** protocol, so that
-Codex's native WS-first transport works *through* `ocx` — reaching transport parity with the
-native OpenAI provider. Today opencodex serves only HTTP `POST /v1/responses` (SSE); it has no
+Make the openprovider provider able to speak the Codex **Responses WebSocket** protocol, so that
+Codex's native WS-first transport works *through* `opr` — reaching transport parity with the
+native OpenAI provider. Today openprovider serves only HTTP `POST /v1/responses` (SSE); it has no
 WebSocket endpoint. This phase designs and plans that endpoint.
 
 This is a **foundation cycle** (research + decision). It produces three docs (00–02) and does
@@ -14,8 +14,8 @@ This is a **foundation cycle** (research + decision). It produces three docs (00
 
 Codex chooses the WS path purely on the provider capability flag
 `Provider.supports_websockets` (`/Users/jun/Developer/codex/codex-cli/codex-rs/core/src/client.rs:772`).
-**The catalog opencodex serves advertises that flag on no entry today** — verified against the
-live served catalog `/Users/jun/.codex/opencodex-catalog.json` (zero `supports_websockets`
+**The catalog openprovider serves advertises that flag on no entry today** — verified against the
+live served catalog `/Users/jun/.codex/openprovider-catalog.json` (zero `supports_websockets`
 occurrences, native or routed). The mechanism differs by entry class, which matters for the
 rollout in `12_`:
 
@@ -25,10 +25,10 @@ rollout in `12_`:
   (`codex-catalog.ts:145-154`) **without** a strip — they simply inherit no flag because the
   current installed template carries none. **Latent risk:** if a future Codex template adds
   `supports_websockets` to native entries, `deriveEntry` would leak it and Codex would start
-  attempting WS against `ocx` with no endpoint → a new handshake-failure error ("RC6"). `12_`
+  attempting WS against `opr` with no endpoint → a new handshake-failure error ("RC6"). `12_`
   must guard the native path, not only manage the routed strip.
 
-So today Codex **never attempts a WS first-hop** against `ocx` (no current error). Two consequences:
+So today Codex **never attempts a WS first-hop** against `opr` (no current error). Two consequences:
 
 1. The absence of WS causes **zero** current stream errors — which is exactly why phase
    `110/20_transport-evaluation.md` correctly concluded "WebSockets do not help" for routed
@@ -75,4 +75,4 @@ routed *reliability*; native *transport parity* is tracked in phase 120."
 | `10_` | 120.2 WS endpoint MVP | Bun WS upgrade on `/v1/responses`; parse `response.create`; reuse the existing route/adapter/bridge pipeline; emit Responses events as WS Text frames; `response.processed` no-op; close→abort upstream |
 | `11_` | 120.3 native upstream WS | native `gpt-*` → connect to upstream ChatGPT backend WS (true end-to-end parity) |
 | `12_` | 120.4 metadata enable + fallback | selectively re-advertise `supports_websockets`; verify Codex HTTP fallback; terminal/heartbeat parity on WS |
-| `13_` | 120.5 live E2E | Codex CLI over WS against `ocx` (native + routed), interrupts/stalls/tools |
+| `13_` | 120.5 live E2E | Codex CLI over WS against `opr` (native + routed), interrupts/stalls/tools |

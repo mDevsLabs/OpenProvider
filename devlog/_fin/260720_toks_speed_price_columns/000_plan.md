@@ -44,7 +44,7 @@
   (`src/server/request-log.ts:510-535`) — `outputTokens=0`/unreported/unsupported/estimated를
   tok/s에서 어떻게 표시(생략? "—"? "~" 접두?)할지 정책을 결론에 포함.
 - (감사 blocker #6 fold) jawcode stats DB에 이미 `ttft` + tok/s 집계 필드가 존재
-  (`jawcode/packages/stats/src/db.ts:426-465`) — jawcode의 측정 정의를 OpenCodex 안과 대조.
+  (`jawcode/packages/stats/src/db.ts:426-465`) — jawcode의 측정 정의를 OpenProvider 안과 대조.
 - 표시: Logs 탭 열 추가 지점, i18n 키(`logs.col.*`), /api/logs 필드 추가 하위호환.
 
 ### Q2 — 비용/toks/$ (002 문서)
@@ -57,12 +57,12 @@
         + cacheCreation × cacheWrite단가 + outputTokens × output단가` — jawcode/OpenAI/Anthropic
   usage 필드 의미 차이(OpenAI `cachedInputTokens`은 input에 포함, Anthropic
   `cacheReadInputTokens`은 별도) 정리 필요.
-  (감사 blocker #2 fold — HIGH) OpenCodex `OcxUsage.inputTokens`는 캐시 포함 총 prompt 토큰
+  (감사 blocker #2 fold — HIGH) OpenProvider `OcxUsage.inputTokens`는 캐시 포함 총 prompt 토큰
   (`src/types.ts:227-244`)인 반면 jawcode 계산(`db.ts:214-228`)은 `tokens.input`에 input 단가를
   그대로 곱하고 cacheRead/cacheWrite를 별도 가산 — `cachedInputTokens`/`cacheReadInputTokens`/
   `cacheCreationInputTokens` → jawcode `input/cacheRead/cacheWrite`로의 정확한 변환 규칙
   (프로바이더 계열별: OpenAI형 vs Anthropic형)을 002의 필수 산출물로 강제.
-- (감사 blocker #1 fold — HIGH) 모델ID 매칭 경로 정의: OpenCodex는 slash 모델을 alias/decode
+- (감사 blocker #1 fold — HIGH) 모델ID 매칭 경로 정의: OpenProvider는 slash 모델을 alias/decode
   (`src/providers/slug-codec.ts:13-19`, `src/router.ts:256-258`)하는 반면 jawcode 룩업은 exact
   `Map.get()` (`jawcode/packages/ai/src/models.ts:37-50`, `stats/src/db.ts:193-215`).
   로그 엔트리의 `provider`/`model`/`resolvedModel`/`requestedModel`/`wireModelId` 중 무엇으로
@@ -72,7 +72,7 @@
   비용 합산 방식 또는 표시 제외를 002에서 명시적으로 결정.
 - (감사 blocker #3 fold) usage 부재/estimated/output=0 요청을 `$0`나 무한 toks/$로 표시하지
   않기 위한 표시 정책을 002 결론에 포함.
-- 커버리지: OpenCodex 카탈로그 모델 중 jawcode cost가 있는 비율, cost=0(구독/OAuth 계열)
+- 커버리지: OpenProvider 카탈로그 모델 중 jawcode cost가 있는 비율, cost=0(구독/OAuth 계열)
   모델 처리(표시 생략? "구독" 라벨?).
 - 메타데이터 파이프라인: `generate-jawcode-metadata.ts`에 cost 4필드 추가 시 생성물 크기/형태.
 - 표시: `$0.0123` + `toks/$` 2열 구성안, 어느 열이 유의미한지 (총토큰/$? 출력토큰/$?).
@@ -81,7 +81,7 @@
 
 - B 단계: `gpt-5.6-terra` (reasoning medium, priority tier) 서브에이전트 **2개 병렬** 디스패치
   — lane 1 = Q1 (쓰기: `001_tok_speed_research.md`), lane 2 = Q2 (쓰기: `002_price_toks_per_dollar_research.md`).
-  읽기 범위: opencodex `src/`, `gui/`, `scripts/`, jawcode `packages/ai/`, `packages/stats/` (읽기 전용).
+  읽기 범위: openprovider `src/`, `gui/`, `scripts/`, jawcode `packages/ai/`, `packages/stats/` (읽기 전용).
   쓰기 범위: 본 유닛 폴더의 자기 문서 1건씩 (disjoint).
 - C 단계: 메인이 두 문서의 경로/라인/수치 앵커를 스팟체크.
 - D 단계: 요약 + 로컬 커밋. push 없음.
@@ -102,7 +102,7 @@
 # 260720 v2 — 구현 로드맵 (사용자 결정 확정 후)
 
 조사(000-002) 완료 후 사용자와 확정한 정책. 이 섹션이 구현 사이클의 SSOT다.
-작업 장소: 워크트리 `/Users/jun/Developer/new/700_projects/opencodex-toksdev`
+작업 장소: 워크트리 `/Users/jun/Developer/new/700_projects/openprovider-toksdev`
 (브랜치 `codex/toksdev`, dev 기반). goalplan slug:
 `toksdev-tok-s-luna-usage-workspace-ttft-docs-fir`.
 

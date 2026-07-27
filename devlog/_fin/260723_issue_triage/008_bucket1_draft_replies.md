@@ -7,13 +7,13 @@ approval; nothing here has been sent.
 ## #280 —出现了codex无法通信的问题 → close after reply
 
 Evidence: reporter confirmed 2026-07-22 11:20Z that after
-`ocx provider add openai --sync` + restart, new and existing threads work.
+`opr provider add openai --sync` + restart, new and existing threads work.
 
 Draft (Chinese, matching thread language):
 
-> 是的，这是配置问题，不是 proxy 的 bug：你的 OpenAI(ChatGPT)登录凭据存在，但路由配置里没有启用 `openai` provider，所以 bare 模型（如 `gpt-5.6-sol`）按设计 fail closed。执行 `ocx provider add openai --sync` 后两个 provider 并存，问题即解决。
+> 是的，这是配置问题，不是 proxy 的 bug：你的 OpenAI(ChatGPT)登录凭据存在，但路由配置里没有启用 `openai` provider，所以 bare 模型（如 `gpt-5.6-sol`）按设计 fail closed。执行 `opr provider add openai --sync` 后两个 provider 并存，问题即解决。
 >
-> 一个后续建议：`ocx init` 会生成全新的单 provider 配置，已有自定义 provider 时请改用 `ocx provider add <name> --sync`，避免覆盖现有配置。
+> 一个后续建议：`opr init` 会生成全新的单 provider 配置，已有自定义 provider 时请改用 `opr provider add <name> --sync`，避免覆盖现有配置。
 >
 > 既然已确认恢复，我将关闭此 issue。如果之后在新 thread + native 模型下仍出现 `encrypted content ... could not be decrypted`，请按 #92 的链路灯塔重新打开或留言。
 

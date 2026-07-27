@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { isRealBunBinary, bundledBunPath, durableBunPath, durableBunRuntime, overrideBunPath } from "../src/lib/bun-runtime";
 
-const tmp = mkdtempSync(join(tmpdir(), "ocx-bun-runtime-"));
+const tmp = mkdtempSync(join(tmpdir(), "opr-bun-runtime-"));
 const previousOverride = process.env.OPENCODEX_BUN_PATH;
 afterAll(() => {
   if (previousOverride === undefined) delete process.env.OPENCODEX_BUN_PATH;

@@ -19,19 +19,19 @@ discovery protocol.** CCR's comma-hack is the legacy workaround, not the ceiling
 | 5 | Discovery caveat: picker ignores discovered ids unless they start with `claude` or `anthropic` — so expose a claude-/anthropic-prefixed ALIAS id and map it to the real upstream model in the proxy; `display_name` can show the honest routed name | code.claude.com/docs/en/llm-gateway-protocol | T1 |
 | 6 | Manual alternative without discovery: `ANTHROPIC_CUSTOM_MODEL_OPTION` adds individual picker entries; LiteLLM tutorial demonstrates the same alias->upstream mapping pattern | docs.litellm.ai/docs/tutorials/claude_non_anthropic_models | T1 |
 
-## What this means for opencodex (design delta to 000_plan.md)
+## What this means for openprovider (design delta to 000_plan.md)
 
-1. **D6 (new): implement Anthropic-visible model discovery.** opencodex already
+1. **D6 (new): implement Anthropic-visible model discovery.** openprovider already
    serves `GET /v1/models` (OpenAI list shape, `src/server/index.ts`). Add an
    Anthropic-facing variant (or shape-detect) that returns routed models as
    discovery entries with:
    - `id`: alias `anthropic-<provider>-<model-slug>` or `claude-<...>` (constraint
      from claim 5 — bare "google/gemini-3-pro" would be ignored by the picker),
-   - `display_name`: the honest routed name, e.g. "gemini-3-pro (google) — opencodex".
+   - `display_name`: the honest routed name, e.g. "gemini-3-pro (google) — openprovider".
    Inbound `/v1/messages` resolves the alias back through the same mapping before
    `routeModel` (extends the D5 modelMap: alias generation must be deterministic
    and reversible).
-2. **`ocx claude` injects `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1`** next to
+2. **`opr claude` injects `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1`** next to
    ANTHROPIC_BASE_URL/AUTH_TOKEN, gated by a Claude Code version check (>= 2.1.129)
    with the env-var fallback documented.
 3. **Statusline is optional garnish**, not the mechanism (CCR needed it because it

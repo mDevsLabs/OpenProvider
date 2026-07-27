@@ -4,8 +4,8 @@
 
 - What does `supports_search_tool` do?
 - What does `web_search_tool_type` do?
-- If opencodex omits or inherits these fields, what fallback does Codex use?
-- Does this map to opencodex's current web-search sidecar correctly?
+- If openprovider omits or inherits these fields, what fallback does Codex use?
+- Does this map to openprovider's current web-search sidecar correctly?
 
 ## Codex RS Behavior
 
@@ -17,10 +17,10 @@ tool plan.
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:408
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:328
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:941
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:992
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:408
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:328
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:941
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:992
 ```
 
 `web_search_tool_type` controls the hosted web-search tool shape. The default is text-only. A
@@ -29,12 +29,12 @@ Relevant upstream paths:
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:279
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/hosted_spec.rs:20
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/hosted_spec.rs:28
-/tmp/opencodex-codex-src/codex-rs/core/src/config/mod.rs:2403
-/tmp/opencodex-codex-src/codex-rs/core/src/config/mod.rs:3283
-/tmp/opencodex-codex-src/codex-rs/tools/src/tool_spec.rs:36
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:279
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/hosted_spec.rs:20
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/hosted_spec.rs:28
+/tmp/openprovider-codex-src/codex-rs/core/src/config/mod.rs:2403
+/tmp/openprovider-codex-src/codex-rs/core/src/config/mod.rs:3283
+/tmp/openprovider-codex-src/codex-rs/tools/src/tool_spec.rs:36
 ```
 
 ## Fallbacks
@@ -47,12 +47,12 @@ If metadata is missing or unknown:
   mode.
 - unknown model fallback metadata does not enable deferred tool discovery.
 
-## Current opencodex Behavior
+## Current openprovider Behavior
 
-opencodex clones a native Codex catalog template in:
+openprovider clones a native Codex catalog template in:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
 ```
 
 The routed entries currently do not explicitly remove or override:
@@ -62,7 +62,7 @@ The routed entries currently do not explicitly remove or override:
 
 That means routed models can inherit native OpenAI search/tool-discovery capability hints.
 
-For hosted web search, opencodex mitigates at request time:
+For hosted web search, openprovider mitigates at request time:
 
 - the Responses parser recognizes hosted `web_search` tools;
 - routed-model translation drops hosted OpenAI web-search from upstream tool calls;
@@ -71,19 +71,19 @@ For hosted web search, opencodex mitigates at request time:
 Relevant local paths:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts:134
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts:141
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts:142
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts:380
-/Users/jun/Developer/new/700_projects/opencodex/src/web-search/index.ts:30
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:159
-/Users/jun/Developer/new/700_projects/opencodex/src/web-search/synthetic-tool.ts:11
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts:134
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts:141
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts:142
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts:380
+/Users/jun/Developer/new/700_projects/openprovider/src/web-search/index.ts:30
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:159
+/Users/jun/Developer/new/700_projects/openprovider/src/web-search/synthetic-tool.ts:11
 ```
 
 ## Gap
 
 The catalog may advertise native hosted search semantics even when the routed upstream provider
-does not have native OpenAI-hosted search. opencodex's sidecar makes this partially usable, but the
+does not have native OpenAI-hosted search. openprovider's sidecar makes this partially usable, but the
 metadata is still not explicit.
 
 If sidecar prerequisites are missing, Codex may plan around a capability that gets removed before
@@ -93,14 +93,14 @@ the routed provider sees the request.
 
 Keep the two search concepts separate:
 
-1. `supports_search_tool`: preserve only if opencodex intentionally wants routed models to use
+1. `supports_search_tool`: preserve only if openprovider intentionally wants routed models to use
    Codex deferred tool discovery.
-2. `web_search_tool_type`: set based on opencodex sidecar capability, not native template
+2. `web_search_tool_type`: set based on openprovider sidecar capability, not native template
    inheritance.
 3. Add regression tests proving hosted `web_search` is either translated to the synthetic sidecar
    tool or suppressed with predictable behavior.
 4. Document that native OpenAI passthrough can keep hosted search metadata, while non-OpenAI routed
-   models depend on opencodex sidecar search.
+   models depend on openprovider sidecar search.
 
 See `11_search-defaults-and-inherited-state.md` for the concrete native model defaults and current
-observed opencodex catalog state.
+observed openprovider catalog state.

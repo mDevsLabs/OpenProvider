@@ -34,7 +34,7 @@ issue text. Three classes emerged.
 
 | Issue | Disposition |
 |-------|-------------|
-| #476 | Feature request (`ocx sync --restart-codex`): killing another process's app-server is a product/safety decision, not a bug fix. |
+| #476 | Feature request (`opr sync --restart-codex`): killing another process's app-server is a product/safety decision, not a bug fix. |
 | #488 | Four UX paper cuts; the reporter offered to send a PR. Item 1 (config overwrite on shutdown) is the only one with a concrete failure mode, and it overlaps this unit's journal work conceptually but touches a different file (`src/config.ts`). |
 | #462, #418, #92, #241, #401, #417 | Upstream-tracking or reproduction-blocked. |
 | #415, #414, #386, #330, #294, #201, #178, #177, #95, #42 | Roadmap/enhancement, not defects. |
@@ -51,7 +51,7 @@ Ordering is dependency-driven (PHASE-SPLIT-01), not effort-bucketed.
 | WP3 | `030_wp3_alibaba_region_migration_457.md` | The Alibaba projection, backup, and startup wiring | WP2 |
 
 WP1 is independent of WP2/WP3: it owns the Codex-side `~/.codex/config.toml`
-transaction while they own the proxy-side `~/.opencodex/config.json` migration,
+transaction while they own the proxy-side `~/.openprovider/config.json` migration,
 and neither consumes the other's output. An early draft claimed WP1 gated the
 migration; the audit correctly called that an invented dependency.
 
@@ -91,7 +91,7 @@ Research and implementation are separate documents (LEXICO-SPLIT-01): `001` and
   demonstrated failing on the pre-change tree.
 - **Stop condition:** every implementation work-phase's criteria (WP1, WP2, WP3)
   met with captured evidence, or a terminal outcome recorded with evidence.
-- **Memory artifact:** this unit plus `.codexclaw/goalplans/opencodex-pr-dev-hotl-pabcd-wp0-docs-only-devlog/`.
+- **Memory artifact:** this unit plus `.codexclaw/goalplans/openprovider-pr-dev-hotl-pabcd-wp0-docs-only-devlog/`.
 - **Escalation:** a fix that would require deciding product identity (which
   provider a migrated config belongs to) escalates to the user rather than
   guessing.
@@ -127,7 +127,7 @@ implementation started.
 | Blocker | Disposition |
 |---------|-------------|
 | `currentStateIsNative` only gated replacement, not creation — an injected config with no journal was still captured | Folded: the classification now governs creation too, with test 3 in `010` |
-| PID-based transaction ownership is wrong across `ocx sync` / `ocx ensure` | Rebutted and removed: `markJournalInjectedState` is left unchanged, because a refreshed journal carries no hash to protect. Test 4 in `010` guards the rejection |
+| PID-based transaction ownership is wrong across `opr sync` / `opr ensure` | Rebutted and removed: `markJournalInjectedState` is left unchanged, because a refreshed journal carries no hash to protect. Test 4 in `010` guards the rejection |
 | TOCTOU between classification and snapshot | Folded: the caller passes the exact bytes it classified, and the redundant `cli/index.ts:201` snapshot is deleted |
 | WP2 missed most provider references; a stale combo target invalidates the whole config | Folded: `provider-id-rewrite.ts` mirrors the `openai-tiers` inventory plus combos, custom models and desktop-profile routes |
 | `providerContextCaps` is keyed by provider id, not by route | Folded: key move, asserted through `providerContextCap()` rather than by shape |

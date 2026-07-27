@@ -10,7 +10,7 @@ Official model pages:
 - <https://developers.openai.com/api/docs/models/gpt-5.6-terra>
 - <https://developers.openai.com/api/docs/models/gpt-5.6-luna>
 
-Verified shared metadata used by OpenCodex:
+Verified shared metadata used by OpenProvider:
 
 | Model | Context | Max input | Max output | Input | Output |
 |---|---:|---:|---:|---|---|
@@ -18,7 +18,7 @@ Verified shared metadata used by OpenCodex:
 | `gpt-5.6-terra` | 1,050,000 | 922,000 | 128,000 | text, image | text |
 | `gpt-5.6-luna` | 1,050,000 | 922,000 | 128,000 | text, image | text |
 
-The current OpenCodex catalog computes routed auto-compaction at 90% of context.
+The current OpenProvider catalog computes routed auto-compaction at 90% of context.
 For 1,050,000 that is 945,000, which exceeds the official 922,000 maximum input.
 This unit therefore carries the max-input limit narrowly into catalog metadata and
 caps auto-compaction at `min(90% of context, max input)`. Max output is recorded
@@ -38,7 +38,7 @@ The documented GPT-5.6 effort ladder is:
 
 `none`, `low`, `medium`, `high`, `xhigh`, `max`
 
-OpenCodex's current Codex picker contract represents `low` through `max`; it does
+OpenProvider's current Codex picker contract represents `low` through `max`; it does
 not define `none` as a selectable Codex effort. This unit therefore advertises the
 supported intersection (`low`, `medium`, `high`, `xhigh`, `max`) and leaves an
 omitted effort to the API default (`medium`). Adding a global `none` tier would be
@@ -53,7 +53,7 @@ Pro is selected on a base model with:
 }
 ```
 
-Therefore OpenCodex must not send `gpt-5.6-sol-pro` as an upstream model slug.
+Therefore OpenProvider must not send `gpt-5.6-sol-pro` as an upstream model slug.
 The same rule applies to Terra and Luna.
 
 Official guidance states that reasoning mode and effort are independent. A Pro
@@ -83,7 +83,7 @@ was applied without logging credentials or request content.
 
 The official `POST /v1/responses/compact` OpenAPI schema and current official SDK
 `ResponseCompactParams` do not include a `reasoning` field. For a Pro virtual
-selection, OpenCodex sends the base model id to compact and no mode/effort member.
+selection, OpenProvider sends the base model id to compact and no mode/effort member.
 This does not downgrade the next generated answer: the following normal Responses
 request resolves the same virtual selection and reapplies `reasoning.mode: "pro"`.
 

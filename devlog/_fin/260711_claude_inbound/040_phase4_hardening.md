@@ -53,7 +53,7 @@ observability, deprecate ccs-wrapper, and ship a release with docs/changelog.
 
 ### 5. Deprecation + release (C4 care)
 
-- ../010_2025/ccs-wrapper: README banner "superseded by opencodex `ocx claude`"
+- ../010_2025/ccs-wrapper: README banner "superseded by openprovider `opr claude`"
   + pointer; no code changes there.
 - Release: version bump, CHANGELOG/release notes (repo release convention:
   `release: vX.Y.Z` commits), README rows already shipped in 030; npm publish
@@ -78,7 +78,7 @@ observability, deprecate ccs-wrapper, and ship a release with docs/changelog.
    with evidence, not assumptions.
 2. Fresh full-gate run green; release artifacts verified; ccs-wrapper banner
    committed in its own repo.
-3. Post-release smoke: `npm i -g @mdevs/openprovider && ocx claude` on a clean
+3. Post-release smoke: `npm i -g @mdevs/openprovider && opr claude` on a clean
    machine/profile completes a routed turn.
 
 ## Risks

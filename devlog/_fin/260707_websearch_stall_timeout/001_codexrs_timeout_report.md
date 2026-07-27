@@ -18,6 +18,6 @@ Clone: /Users/jun/Developer/codex/120_codex-cli/codex-rs (HEAD 2026-07-01 129ea2
    → "Reconnecting... n/max" retries up to stream_max_retries (core/src/responses_retry.rs:48),
    then the turn fails.
 
-Conclusion: with heartbeats flowing, ONLY opencodex's own bridge stall deadline can kill a long
+Conclusion: with heartbeats flowing, ONLY openprovider's own bridge stall deadline can kill a long
 web-search turn; Codex then burns stream retries re-submitting, which re-runs the whole
 web-search loop and can repeat the kill — matching the user-observed "time limit termination".

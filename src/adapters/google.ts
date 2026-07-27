@@ -282,12 +282,12 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
       if (provider.googleMode === "cloud-code-assist") {
         // Google Antigravity (Cloud Code Assist): wrap the flat Gemini body in the CCA envelope.
         const token = provider.apiKey?.trim();
-        if (!token) throw new Error("google-antigravity oauth token missing — run ocx login google-antigravity");
+        if (!token) throw new Error("google-antigravity oauth token missing — run opr login google-antigravity");
         const base = provider.baseUrl?.trim();
         if (!base) throw new Error("google-antigravity requires a non-empty baseUrl");
         const url = `${base}/v1internal:${method}${streamParam}`;
         const project = provider.project;
-        if (!project) throw new Error("Antigravity requires a discovered Cloud Code Assist project id (re-run `ocx login google-antigravity`).");
+        if (!project) throw new Error("Antigravity requires a discovered Cloud Code Assist project id (re-run `opr login google-antigravity`).");
         const sessionId = antigravitySessionId(parsed);
         const mappedEffort = mapReasoningEffort(provider, parsed.modelId, parsed.options.reasoning);
         const { wireModelId, thinkingLevel } = resolveAntigravityEffortWireModel(parsed.modelId, mappedEffort);

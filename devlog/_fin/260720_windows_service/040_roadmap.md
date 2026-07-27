@@ -4,14 +4,14 @@
 
 ## 확정 방향 (sol 검토 결론 채택)
 
-1. **기본값 유지+수리**: `ocx service install`은 Task Scheduler + `InteractiveToken`을
+1. **기본값 유지+수리**: `opr service install`은 Task Scheduler + `InteractiveToken`을
    유지하되, 콘솔 창이 생기지 않는 hidden 런처로 실행한다. 자격증명 불요 —
    passwordless Microsoft 계정 호환성 유지. #165의 두 증상(창 노출, 창 닫기 사망) 중
    창 자체를 제거해 둘 다 해소.
-2. **옵트인 네이티브**: `ocx service install --native`가 WinSW 2.12.0(NET461 빌드)로
+2. **옵트인 네이티브**: `opr service install --native`가 WinSW 2.12.0(NET461 빌드)로
    진짜 SCM 서비스를 사용자 계정으로 등록. LocalSystem 금지(ACL hardening이 사용자
    SID에만 grant — SYSTEM ACE 없음). `--scheduler`는 명시적 기본 backend 지정.
-3. **영속화**: service-state.json v2에 backend 선택을 기록하고 `ocx update`의 서비스
+3. **영속화**: service-state.json v2에 backend 선택을 기록하고 `opr update`의 서비스
    재설치가 그 backend를 보존한다. UAC 거부 시 조용한 다운그레이드 금지.
 4. **승격 보류**: WinSW를 기본값으로 승격하는 것은 Windows 실측 매트릭스 통과 후의
    별도 결정 — 이 루프의 범위 밖.

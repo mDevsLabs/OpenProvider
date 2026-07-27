@@ -5,12 +5,12 @@ Status: research recorded; no implementation applied in this doc.
 
 ## Question
 
-Can opencodex sidecars make routed providers look native in Codex UI, instead
+Can openprovider sidecars make routed providers look native in Codex UI, instead
 of only feeding sidecar output back to the routed model as plain text?
 
 ## Web search sidecar
 
-### Current opencodex behavior
+### Current openprovider behavior
 
 - `src/web-search/loop.ts` intercepts the synthetic `web_search` tool call.
 - `src/web-search/executor.ts` runs a real hosted `web_search` through the
@@ -74,7 +74,7 @@ Done:
 
 ### Feasibility
 
-Feasible as an opencodex-only bridge change. Preserve sidecar search executions
+Feasible as an openprovider-only bridge change. Preserve sidecar search executions
 in `runWithWebSearch`, then emit `web_search_call` output items before the final
 assistant text. codex-rs should parse and render them without client changes.
 
@@ -86,7 +86,7 @@ Risk is mostly sequencing and truthfulness:
 
 ## Vision / image-read sidecar
 
-### Current opencodex behavior
+### Current openprovider behavior
 
 - `src/server.ts` plans the vision sidecar before the main provider request.
 - `src/vision/index.ts` activates only when the routed model is classified as
@@ -124,7 +124,7 @@ For view_image tool results:
 
 - Native-like UI is already produced by codex-rs when the local `view_image`
   tool runs.
-- opencodex receives the follow-up `function_call_output` with an `input_image`.
+- openprovider receives the follow-up `function_call_output` with an `input_image`.
 - For text-only routed models, the vision sidecar describes that image and
   replaces it with text.
 - No extra native UI event is needed; adding one would duplicate the existing
@@ -149,7 +149,7 @@ For user-attached images:
   - user attachments already render as user message images.
   - sidecar description is an internal preprocessing step, not a native Codex
     event.
-- If visibility is needed, add a transparent opencodex diagnostic/status event
+- If visibility is needed, add a transparent openprovider diagnostic/status event
   later rather than pretending the model or Codex ran a local image-view tool.
 
 ## Bottom line

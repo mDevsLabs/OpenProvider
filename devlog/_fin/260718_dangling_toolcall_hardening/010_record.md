@@ -8,7 +8,7 @@
   - `pendingToolCalls: {id,name}[]` occurrence 큐(Map 금지 — 중복 id 보존).
   - `deferredBarrierMessages`: 열린 툴 라운드 동안 user/developer 메시지 보관.
   - 진짜 결과는 원래 호출 occurrence에 재부착 → 라운드 닫히면 deferred 해제.
-  - 진짜 결과 없을 때만 합성 결과: `[ocx] no tool result was recorded for "<name>";
+  - 진짜 결과 없을 때만 합성 결과: `[opr] no tool result was recorded for "<name>";
     execution status unknown — do not treat this as success, failure, or user-provided input.`
   - 빈 call id는 `call_ocx_minted_<n>` 발급(충돌 검사).
   - orphan result(매칭 호출 없음)는 기존 가짜 assistant 보정 유지, 단 열린 라운드 먼저

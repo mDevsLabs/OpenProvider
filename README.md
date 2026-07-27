@@ -1,391 +1,636 @@
-<h3 align="center">make codex open!</h3>
-<p align="center"><b>Universal provider proxy for OpenAI Codex, Claude Code, Claude Desktop &amp; Grok Build</b><br>
-Two commands, and every one of them runs any LLM you point it at.</p>
+<h3 align="center">Rendez Codex ouvert !</h3>
+
+<p align="center"><b>Proxy universel de fournisseurs pour OpenAI Codex, Claude Code, Claude Desktop et Grok Build</b><br>
+Deux commandes suffisent pour utiliser n’importe quel LLM avec chacun de ces outils.</p>
 
 <p align="center">
-  <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="Follow @claudeebum on X"></a>
-  <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="npm version"></a>
-  <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="license"></a>
-  <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="node version">
+  <a href="https://x.com/claudeebum"><img src="https://img.shields.io/badge/%40claudeebum-000000?logo=x&logoColor=white" alt="Suivre @claudeebum sur X"></a>
+  <a href="https://www.npmjs.com/package/@mdevs/openprovider"><img src="https://img.shields.io/npm/v/@mdevs/openprovider?color=cb3837&label=npm&logo=npm" alt="Version npm"></a>
+  <a href="https://github.com/mDevsLabs/OpenProvider/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@mdevs/openprovider?color=blue" alt="Licence"></a>
+  <img src="https://img.shields.io/node/v/@mdevs/openprovider?logo=node.js&label=node" alt="Version de Node.js">
 </p>
 
 ```bash
 npm install -g @mdevs/openprovider
-ocx start        # proxy + dashboard on localhost:10100
+opr start        # Proxy + tableau de bord sur localhost:10100
 ```
 
 <table align="center">
   <tr>
     <td width="50%" align="center">
-      <img src="assets/claude-code-models.gif" alt="Claude Code running a routed model through opencodex — the status bar shows gpt-5.6-luna-medium as the active model" width="410"><br>
-      <sub><b>Claude Code, running any model.</b><br>The picker is stock Claude Code. The brain behind it isn't.</sub>
+      <img src="assets/claude-code-models.gif" alt="Claude Code utilisant un modèle routé par OpenProvider" width="410"><br>
+      <sub><b>Claude Code avec n’importe quel modèle.</b><br>Le sélecteur reste celui de Claude Code, mais le modèle derrière peut changer.</sub>
     </td>
     <td width="50%" align="center">
-      <img src="assets/demo.gif" alt="opencodex demo — running a task in the Codex app on a routed non-OpenAI model" width="410"><br>
-      <sub><b>Codex, running any model.</b><br>Pick a provider and go — same workflow, different brain.</sub>
+      <img src="assets/demo.gif" alt="Codex utilisant un modèle non-OpenAI routé par OpenProvider" width="410"><br>
+      <sub><b>Codex avec n’importe quel modèle.</b><br>Choisissez un fournisseur et commencez : même workflow, autre cerveau.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <img src="assets/claude-desktop-subagent.gif" alt="Claude Desktop answering as Claude Opus 4.8, then dispatching a GPT-5.6 Sol subagent through opencodex" width="410"><br>
-      <sub><b>Claude Desktop, running any model.</b><br>Opus answers, then hands the task to a GPT-5.6 Sol subagent.</sub>
+      <img src="assets/claude-desktop-subagent.gif" alt="Claude Desktop délègue une tâche à un sous-agent GPT-5.6 Sol via OpenProvider" width="410"><br>
+      <sub><b>Claude Desktop avec n’importe quel modèle.</b><br>Opus répond, puis transmet la tâche à un sous-agent GPT-5.6 Sol.</sub>
     </td>
     <td width="50%" align="center">
-      <img src="assets/grok-build-subagent.gif" alt="Grok Build running GPT-5.6 Sol through opencodex and calling a Kimi K3 subagent" width="410"><br>
-      <sub><b>Grok Build, running any model.</b><br>Sol drives the session and calls a Kimi K3 subagent.</sub>
+      <img src="assets/grok-build-subagent.gif" alt="Grok Build utilise GPT-5.6 Sol et appelle un sous-agent Kimi K3" width="410"><br>
+      <sub><b>Grok Build avec n’importe quel modèle.</b><br>Sol pilote la session et appelle un sous-agent Kimi K3.</sub>
     </td>
   </tr>
 </table>
 
 <p align="center">
-  <a href="README.md">English</a> · <a href="readme/README.ko.md">한국어</a> · <a href="readme/README.zh-CN.md">简体中文</a> · <a href="readme/README.ru.md">Русский</a> · <a href="readme/README.ja.md">日本語</a> · 📖 <a href="https://opencodex.me/"><b>Full documentation →</b></a>
+  <a href="README.md">English</a> · <b>Français</b> · <a href="readme/README.ko.md">한국어</a> · <a href="readme/README.zh-CN.md">简体中文</a> · <a href="readme/README.ru.md">Русский</a> · <a href="readme/README.ja.md">日本語</a> · 📖 <a href="https://openprovider.me/"><b>Documentation complète →</b></a>
 </p>
 
 <p align="center">
-  <img src="assets/architecture.png" alt="opencodex architecture — Codex CLI routes through opencodex proxy to any LLM provider" width="820">
+  <img src="assets/architecture.png" alt="Architecture d’OpenProvider" width="820">
 </p>
 
-Use Claude, Gemini, Grok, GLM, DeepSeek, Kimi, Qwen, Ollama, or any other LLM with Codex — and with **Claude Code**, **Claude Desktop**, and **Grok Build** — without waiting for anyone to add support.
+Utilisez Claude, Gemini, Grok, GLM, DeepSeek, Kimi, Qwen, Ollama ou tout autre LLM avec Codex — ainsi qu’avec **Claude Code**, **Claude Desktop** et **Grok Build** — sans attendre l’ajout d’une intégration officielle.
 
-Subagents cross the boundary too: Claude Desktop can answer as Opus and hand the next step to a
-GPT-5.6 Sol subagent, and Grok Build can drive a session on Sol while calling Kimi K3 — each side
-keeping its own native UI.
+Les sous-agents peuvent eux aussi fonctionner entre plusieurs fournisseurs. Claude Desktop peut répondre avec Opus, puis transmettre l’étape suivante à un sous-agent GPT-5.6 Sol. Grok Build peut piloter une session avec Sol tout en appelant Kimi K3, chaque outil conservant son interface native.
 
-opencodex is a lightweight local proxy that translates Codex's Responses API into whatever your provider speaks. Streaming, tool calls, reasoning tokens, images — everything works, in both directions.
+OpenProvider est un proxy local léger qui traduit l’API Responses de Codex vers le protocole utilisé par votre fournisseur. Streaming, appels d’outils, jetons de raisonnement et images : tout fonctionne dans les deux sens.
 
-It can also manage a **ChatGPT account pool** for Codex auth. Add multiple ChatGPT / Codex accounts,
-refresh their 5h / weekly / 30d quota in the dashboard, and let new sessions auto-route to the
-lowest-usage healthy account. Existing Codex threads stay pinned to the account that started them,
-so long SSH, tmux, or mobile-connected sessions do not jump accounts mid-conversation.
+Il peut également gérer un **pool de comptes ChatGPT** pour l’authentification Codex. Ajoutez plusieurs comptes ChatGPT ou Codex, actualisez leurs quotas sur 5 heures, 7 jours ou 30 jours depuis le tableau de bord, puis laissez les nouvelles sessions être automatiquement dirigées vers le compte sain le moins utilisé.
 
-```
-Codex CLI / App / SDK ──/v1/responses──▶ opencodex ──▶ Any provider
-                                              │
-              Anthropic · Google · xAI · Kimi · Ollama Cloud · Groq
-              OpenRouter · Azure · DeepSeek · GLM · …and OpenAI itself
+Les conversations Codex existantes restent associées au compte qui les a démarrées. Les longues sessions SSH, tmux ou mobiles ne changent donc pas de compte en pleine conversation.
+
+```text
+Codex CLI / App / SDK ──/v1/responses──▶ OpenProvider ──▶ N’importe quel fournisseur
+                                               │
+               Anthropic · Google · xAI · Kimi · Ollama Cloud · Groq
+               OpenRouter · Azure · DeepSeek · GLM · …et OpenAI lui-même
 ```
 
 ```mermaid
 flowchart LR
-  codex[Codex session<br/>CLI, App, SSH, mobile] --> proxy[opencodex]
-  proxy --> existing{Existing thread?}
-  existing -->|yes| pinned[Keep the same<br/>ChatGPT account]
-  existing -->|new session| quota[Refresh quota<br/>5h, weekly, 30d]
-  quota --> pick[Pick lowest-usage<br/>healthy account]
-  pick --> upstream[ChatGPT / Codex backend]
+  codex[Session Codex<br/>CLI, App, SSH ou mobile] --> proxy[OpenProvider]
+  proxy --> existing{Conversation existante ?}
+  existing -->|oui| pinned[Conserver le même<br/>compte ChatGPT]
+  existing -->|nouvelle session| quota[Actualiser les quotas<br/>5 h, 7 j et 30 j]
+  quota --> pick[Choisir le compte sain<br/>le moins utilisé]
+  pick --> upstream[Backend ChatGPT / Codex]
   pinned --> upstream
-  upstream --> outcomes[Quota / auth outcome]
-  outcomes -->|429| cooldown[Cooldown + failover]
-  outcomes -->|401 / 403| reauth[Mark reauth needed]
+  upstream --> outcomes[Résultat quota / authentification]
+  outcomes -->|429| cooldown[Temporisation + basculement]
+  outcomes -->|401 / 403| reauth[Réauthentification nécessaire]
   cooldown --> quota
 ```
 
-## Supported platforms
+## Plateformes prises en charge
 
-| OS | Status | Service manager |
+| Système | État | Gestionnaire de service |
 |---|---|---|
-| macOS (arm64 / x64) | Fully supported | launchd |
-| Linux (x64 / arm64) | Fully supported | systemd (user unit) |
-| Windows (x64) | Fully supported | Task Scheduler (hidden) / opt-in native service (`--native`, WinSW) |
+| macOS arm64 / x64 | Entièrement pris en charge | launchd |
+| Linux x64 / arm64 | Entièrement pris en charge | systemd, unité utilisateur |
+| Windows x64 | Entièrement pris en charge | Planificateur de tâches ou service natif avec `--native` et WinSW |
 
-Requires [Node](https://nodejs.org) 18+. The Bun runtime is bundled automatically on `npm install` — no separate Bun install needed. All three platforms work natively (no WSL needed on Windows).
+Nécessite [Node.js](https://nodejs.org) 18 ou une version plus récente.
 
-## Quick start
+Le runtime Bun est automatiquement inclus pendant l’installation npm. Aucune installation séparée de Bun n’est nécessaire. Les trois plateformes fonctionnent nativement, sans WSL sous Windows.
+
+## Démarrage rapide
 
 ```bash
-# Install (bundles the Bun runtime automatically — only Node 18+ required)
-# Prefer a user-owned Node (nvm/fnm) — avoid `sudo npm install -g …`
+# Installer OpenProvider.
+# Le runtime Bun est automatiquement inclus.
+# Seul Node.js 18 ou une version plus récente est requis.
 npm install -g @mdevs/openprovider
 
-# Interactive setup (writes config, injects into Codex, and offers autostart shim install)
-ocx init
+# Lancer la configuration interactive.
+opr init
 
-# Start the proxy
-ocx start
+# Démarrer le proxy.
+opr start
 
-# If you skipped it during init, install the on-demand autostart shim later
-ocx codex-shim install
+# Installer le shim de démarrage automatique si nécessaire.
+opr codex-shim install
 
-# Use Codex normally — it now routes through opencodex
-codex "Write a hello world in Rust"
+# Utiliser Codex normalement.
+codex "Écris un Hello World en Rust"
 ```
 
+> [!TIP]
+> Préférez une installation Node.js appartenant à votre utilisateur avec nvm ou fnm. Évitez si possible `sudo npm install -g`.
+
 <details>
-<summary><b>"bundled Bun runtime is missing" / npm blocked Bun install scripts?</b></summary>
+<summary><b>Erreur « bundled Bun runtime is missing » ou scripts Bun bloqués par npm</b></summary>
 
-<br/>
+OpenProvider inclut Bun comme dépendance et l’exécute avec un lanceur Node.js. Vous n’avez donc pas besoin d’installer Bun manuellement.
 
-opencodex bundles the Bun runtime as a dependency and runs it via a Node
-launcher, so you do **not** need to install Bun yourself. If you see a
-"bundled Bun runtime is missing" error, the install skipped lifecycle scripts
-(including npm blocking bun's postinstall under `allowScripts`) or optional
-dependencies. Reinstall without those flags, allowing bun's install script:
+Si l’erreur `bundled Bun runtime is missing` apparaît, l’installation a probablement ignoré les scripts de cycle de vie ou les dépendances optionnelles.
+
+Réinstallez le paquet en autorisant le script d’installation de Bun :
 
 ```bash
-npm install -g --allow-scripts=bun @mdevs/openprovider   # no --ignore-scripts, no --omit=optional
+npm install -g --allow-scripts=bun @mdevs/openprovider
+```
 
-# if the original install used sudo, keep using sudo:
+N’utilisez pas `--ignore-scripts` ni `--omit=optional`.
+
+Si l’installation d’origine utilisait `sudo` :
+
+```bash
 sudo npm install -g --allow-scripts=bun @mdevs/openprovider
 ```
 
-npm's own warning suggests an abbreviated command without the package name —
-that would reinstall the current directory, so always pass
-`@mdevs/openprovider` explicitly.
-
-If you installed with `sudo` into a root-owned prefix, the sudo reinstall above
-unblocks that prefix — but prefer migrating to a user-owned Node (nvm, fnm, or
-a user npm prefix) when you can.
+Indiquez toujours explicitement `@mdevs/openprovider`. Une commande npm abrégée sans nom de paquet pourrait réinstaller le répertoire courant.
 
 </details>
 
-## Add a provider
+## Ajouter un fournisseur
 
-The fastest way to add a provider is through the web dashboard:
-
-```bash
-ocx gui
-```
-
-This opens the dashboard at `http://localhost:10100`. From there:
-
-1. Click **"Add Provider"**
-2. Pick from **40+ built-in providers** — or enter a custom OpenAI-compatible endpoint
-3. Paste your API key (or log in via OAuth for Anthropic, xAI, and Kimi)
-4. Models are **auto-discovered** from the provider's `/v1/models` endpoint
-
-Your new provider is ready to use immediately. No restart needed.
-
-You can also add providers through `ocx init` (interactive CLI) or by editing `~/.opencodex/config.json` directly.
-
-## Model routing
-
-Target any configured provider and model using the `provider/model` syntax:
-
-Providers whose own model ids contain `/` (zenmux, openrouter, nvidia, …) are exposed to
-Codex with inner slashes aliased to `-` (e.g. `zenmux/moonshotai-kimi-k3-free`); the
-proxy transparently routes them back to the native id, and the raw full-slash form keeps
-working too.
+Le moyen le plus rapide consiste à utiliser le tableau de bord web :
 
 ```bash
-# Use Claude Opus through Anthropic
-codex -m "anthropic/claude-opus-5" "Explain this stack trace"
-
-# Use Gemini through Google
-codex -m "google/gemini-3-pro" "Write unit tests for auth.ts"
-
-# Use GLM through Ollama Cloud
-codex -m "ollama-cloud/glm-5.2" "Write a SQL migration"
-
-# Use a local model through Ollama
-codex -m "ollama/llama3" "Refactor this function"
+opr gui
 ```
 
-When you omit the `provider/` prefix, opencodex routes to the default provider — or auto-matches based on the model name pattern (e.g., `claude-*` routes to Anthropic, `gpt-*` routes to OpenAI).
+Cette commande ouvre le tableau de bord à l’adresse suivante :
 
-Combo aliases are exact public model ids and may be bare names or use a custom namespace. If a
-combo alias exactly matches a configured non-OpenAI `provider/model` selector, the combo
-intentionally takes precedence in routing, `/v1/models`, and the Codex catalog. Renaming that
-alias or deleting the combo immediately restores the physical provider selector.
+```text
+http://localhost:10100
+```
 
-Routed models also appear in the **Codex App** model picker with per-model reasoning effort controls:
+Depuis cette interface :
 
-Current Codex builds can expose `low`, `medium`, `high`, `xhigh`, `max`, and `ultra` reasoning
-controls when a model advertises them. opencodex keeps `xhigh` and `max` distinct unless a provider
-config explicitly maps one to the other. `ultra` mirrors upstream Codex semantics: it selects
-maximum reasoning plus proactive multi-agent delegation in the client, and is converted to `max`
-before any request reaches a provider. Routed models advertise it only when a provider config opts
-in via `reasoningEfforts`.
+1. Cliquez sur **Ajouter un fournisseur**.
+2. Choisissez parmi plus de **40 fournisseurs intégrés**, ou saisissez une URL personnalisée compatible avec OpenAI.
+3. Collez votre clé API ou utilisez OAuth pour Anthropic, xAI et Kimi.
+4. Les modèles sont automatiquement détectés depuis l’endpoint `/v1/models`.
 
-GPT-5.6 Sol/Terra/Luna are seeded as rollout-ready catalog entries for the OpenAI API key and
-OpenRouter presets (`gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`; OpenRouter uses
-`openai/...`). They remain preview-gated by upstream availability; opencodex only prepares the
-routing and catalog metadata for accounts and providers that can serve them.
+Le nouveau fournisseur est immédiatement disponible, sans redémarrage.
+
+Vous pouvez également ajouter un fournisseur avec :
+
+```bash
+opr init
+```
+
+La configuration peut aussi être modifiée directement dans :
+
+```text
+~/.openprovider/config.json
+```
+
+## Routage des modèles
+
+Ciblez un fournisseur et un modèle avec la syntaxe suivante :
+
+```text
+fournisseur/modèle
+```
+
+Les fournisseurs dont les identifiants de modèles contiennent `/`, comme ZenMux, OpenRouter ou NVIDIA, sont présentés à Codex avec leurs barres obliques internes remplacées par des tirets.
+
+Par exemple :
+
+```text
+zenmux/moonshotai/kimi-k3-free
+```
+
+devient :
+
+```text
+zenmux/moonshotai-kimi-k3-free
+```
+
+Le proxy restaure automatiquement l’identifiant natif. La forme originale reste également prise en charge.
+
+```bash
+# Utiliser Claude Opus avec Anthropic.
+codex -m "anthropic/claude-opus-5" "Explique cette trace d’erreur"
+
+# Utiliser Gemini avec Google.
+codex -m "google/gemini-3-pro" "Écris des tests unitaires pour auth.ts"
+
+# Utiliser GLM avec Ollama Cloud.
+codex -m "ollama-cloud/glm-5.2" "Écris une migration SQL"
+
+# Utiliser un modèle local avec Ollama.
+codex -m "ollama/llama3" "Refactorise cette fonction"
+```
+
+Lorsque le préfixe `fournisseur/` est omis, OpenProvider utilise le fournisseur par défaut ou sélectionne automatiquement un fournisseur d’après le nom du modèle.
+
+Exemples :
+
+- `claude-*` est dirigé vers Anthropic ;
+- `gpt-*` est dirigé vers OpenAI.
+
+Les alias de combinaison sont des identifiants publics exacts. Ils peuvent être simples ou utiliser un espace de noms personnalisé.
+
+Si un alias correspond exactement à un sélecteur `fournisseur/modèle` non-OpenAI déjà configuré, l’alias de combinaison est prioritaire pour le routage, `/v1/models` et le catalogue Codex. Renommer cet alias ou supprimer la combinaison restaure immédiatement le sélecteur physique du fournisseur.
+
+Les modèles routés apparaissent également dans le sélecteur de modèles de l’application Codex, avec des niveaux de raisonnement propres à chaque modèle.
+
+Les versions récentes de Codex peuvent proposer les niveaux suivants :
+
+- `low`
+- `medium`
+- `high`
+- `xhigh`
+- `max`
+- `ultra`
+
+OpenProvider conserve `xhigh` et `max` comme niveaux distincts, sauf si la configuration du fournisseur associe explicitement l’un à l’autre.
+
+Le niveau `ultra` sélectionne le raisonnement maximal et active la délégation proactive à plusieurs agents côté client. Il est converti en `max` avant l’envoi de la requête au fournisseur.
+
+Les modèles routés n’annoncent `ultra` que si leur configuration l’autorise avec `reasoningEfforts`.
+
+GPT-5.6 Sol, Terra et Luna sont préconfigurés comme entrées de catalogue :
+
+- `gpt-5.6-sol`
+- `gpt-5.6-terra`
+- `gpt-5.6-luna`
+
+OpenRouter utilise les identifiants `openai/...`.
+
+Ces modèles restent soumis à leur disponibilité chez le fournisseur. OpenProvider prépare uniquement le routage et les métadonnées du catalogue.
 
 <p align="center">
-  <img src="assets/codex-app-picker.png" alt="Codex App showing opencodex routed models with reasoning effort picker" width="480">
+  <img src="assets/codex-app-picker.png" alt="Sélecteur de modèles Codex avec les modèles routés par OpenProvider" width="480">
 </p>
 
-## OpenAI provider account modes
+## Modes de compte du fournisseur OpenAI
 
-| Provider ID | Route | Credential | Behavior |
+| Identifiant | Route | Identifiants | Comportement |
 |---|---|---|---|
-| `openai` | Codex login | Main + added Codex accounts | Pool by default; optional Direct mode |
-| `openai-apikey` | OpenAI API | API key/key pool | No Codex account routing |
+| `openai` | Connexion Codex | Compte principal et comptes Codex ajoutés | Pool par défaut, mode direct optionnel |
+| `openai-apikey` | API OpenAI | Clé API ou pool de clés | Aucun routage de comptes Codex |
 
-- Pool includes the main Codex login and added accounts, with affinity, quota, cooldown, and failover.
-- Direct short-circuits pool state and uses only the current caller/main-login bearer.
-- Fresh installs and configs with no persisted mode default to Pool. Change the mode on the
-  dashboard's **Providers** page; model ids stay bare in either mode.
-- The legacy public provider id `chatgpt` is hidden after migration. The original config is retained
-  once at `~/.opencodex/config.json.pre-openai-tiers-v2.bak`; restore it with
-  `cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`.
-- Current configs use `openaiProviderTierVersion: 2`. Earlier v1 three-provider configs migrate
-  automatically into the single `openai` row.
-- The API tier includes Pro virtual models (`gpt-5.6-sol-pro`, `gpt-5.6-terra-pro`,
-  `gpt-5.6-luna-pro`). At the wire level, each rewrites to its base model with
-  `reasoning.mode: "pro"`.
-- Its catalog is fixed to eight ids: `gpt-5.5`, `gpt-5.6`, Sol/Terra/Luna, and the three
-  corresponding Pro virtual ids. There is no generic `gpt-5.6-pro` alias.
-- Compact requests keep the selected tier but send the base model without a reasoning object.
-- Official API metadata is 1,050,000 context tokens and 922,000 max input tokens.
+- Le pool inclut la connexion Codex principale et les comptes ajoutés.
+- Il prend en charge l’affinité, les quotas, la temporisation et le basculement.
+- Le mode direct ignore le pool et utilise uniquement le jeton du compte courant.
+- Les nouvelles installations utilisent le mode pool par défaut.
+- Le mode peut être modifié depuis la page **Fournisseurs** du tableau de bord.
+- Les identifiants des modèles restent simples dans les deux modes.
+- L’ancien identifiant `chatgpt` est masqué après la migration.
 
-Use `gpt-5.6-sol` for the configured `openai` account mode and
-`openai-apikey/gpt-5.6-sol` for the API key. Codex-login and API credentials never fall through to
-one another.
+Une sauvegarde de l’ancienne configuration est conservée dans :
 
-### Pool account behavior
-
-Open **Codex Auth** in the dashboard to add accounts and choose which account should handle the
-next Codex session. opencodex keeps these behaviors:
-
-- **Existing sessions keep affinity.** A thread id is bound to the selected account and reused on
-  later turns, so a long request or a mobile/SSH-attached session keeps using the same account.
-- **New sessions can auto-route.** When auto-switch is enabled, opencodex compares the hottest known
-  quota window across 5h, weekly, and 30d usage, then picks a lower-usage eligible account for new
-  sessions once the active account crosses the threshold.
-- **Quota lookup is built in.** The dashboard can refresh all account quotas in one click, and the
-  request log labels pool traffic with non-PII account ordinals.
-- **Failures fail closed.** Token failures mark reauthentication instead of falling back to another
-  credential silently; 429 quota responses put the account in cooldown and can fail over future work
-  to another eligible pool account.
-
-## Highlights
-
-- **Use any LLM with Codex.** 5 protocol adapters cover Anthropic Messages, Google Gemini, Azure, OpenAI Responses passthrough, and every OpenAI-compatible Chat Completions endpoint — that's 40+ providers out of the box.
-- **Use any LLM with Claude Code too.** The same daemon serves the Anthropic Messages API (`/v1/messages` + `count_tokens`): `ocx claude` launches Claude Code fully wired, and routed models appear in its native `/model` picker via gateway model discovery (`claude-ocx-<provider>--<model>` aliases, Claude Code 2.1.129+). Configure slots and model maps on the dashboard's Claude page. The Claude page also carries a separate Desktop profile with Opus, Fable, Sonnet, and Haiku families, accessible drag/keyboard controls, and JSON import/export.
-- **Use any LLM with GitHub Copilot App too.** Point Copilot's Model providers at `http://127.0.0.1:10100/v1` — OpenProvider serves OpenAI-compatible `GET /v1/models` and `POST /v1/chat/completions` so routed models sync into the app. See [docs/github-copilot-app.md](docs/github-copilot-app.md).
-- **Pool ChatGPT accounts safely.** Keep existing Codex threads on one account while new sessions
-  can auto-pick a lower-usage account from the pool, with quota refresh and non-PII request labels.
-- **Log in once, skip the API key.** OAuth support for xAI, Anthropic, and Kimi means you can authenticate with your existing account. Tokens auto-refresh. Or forward your `codex login`, paste an API key, or use `${ENV_VAR}` references — your call.
-- **Works everywhere Codex does.** Injects into Codex CLI, TUI, App, and SDK automatically. Routed models show up in Codex's model picker just like native ones.
-- **History-safe injection.** On local installs the proxy points Codex's own built-in `openai` provider at itself via a single `openai_base_url` line — new threads keep their native provider tag, so ongoing chat history is never remapped and an unclean shutdown can't hide it. (Threads re-tagged by older versions are migrated back once on the first start; remote/LAN binds use a dedicated provider entry instead, since they need an API-key header.)
-- **Delegate to the right model.** Feature up to five routed or native models in Codex's subagent picker from the dashboard or config — route complex tasks to a reasoning model, fast tasks to a cheap one. On the v2 multi-agent surface (GPT-5.6 Sol/Terra) the proxy injects compact, schema-agnostic delegation guidance: an eligible preferred sub-agent model and effort (`injectionModel` / `injectionEffort`), the configured intersection of Codex's picker-visible, v2-compatible, priority-sorted first five with available effort ladders, and the `fork_turns` rules that let cross-model `spawn_agent` calls apply their overrides. Known limitation: when a native parent spawns a routed child, the task body can currently arrive backend-encrypted and be lost ([#92](https://github.com/mDevsLabs/OpenProvider/issues/92)) — use the v1 surface for reliable cross-provider delegation. Want your own wording? Set `injectionPrompt` with `{{model}}` / `{{effort}}` / `{{roster}}` placeholders.
-- **Prepare for preview-gated OpenAI rollouts.** GPT-5.6 Sol/Terra/Luna entries preserve the upstream effort ladders. Direct/Multi use the 372k Codex contract; OpenAI API and OpenRouter use 1.05M metadata when upstream access is available.
-- **Give any model superpowers.** Non-OpenAI models get real web search and image understanding via a `gpt-5.4-mini` sidecar over your ChatGPT login.
-- **Generate images natively.** Codex's standalone `image_gen` tool uses `POST /v1/images/generations` for generation and `POST /v1/images/edits` for edits; it is separate from the hosted Responses `image_generation` tool.
-- **See what's happening.** The web dashboard shows providers, OAuth status, model selection, and a live request log, including cached/cache-write token counts when upstream reports them — no more guessing why a request failed.
-- **Runs in the background.** Install as a system service (launchd / systemd / Task Scheduler) and forget about it. On macOS/Linux the proxy starts at login; on Windows the default Task Scheduler backend starts at logon (windowless), or use `ocx service install --native` for a real Windows service that starts at boot.
-- **Clean exit, zero residue.** `ocx stop` (or the dashboard's Stop button) shuts down the proxy, stops the background service if one is installed, and restores Codex to its original configuration. Plain `codex` works exactly as it did before — no leftover config, no orphaned processes.
-
-## Providers & adapters
-
-| Provider | Adapter | Auth |
-|---|---|---|
-| OpenAI (ChatGPT login) | `openai-responses` | forward (no key) |
-| OpenAI (API key) | `openai-responses` | key |
-| Umans AI Coding Plan | `anthropic` | key |
-| Anthropic Claude | `anthropic` | oauth / key |
-| xAI Grok | `openai-chat` | oauth / key |
-| Kimi (Moonshot) | `openai-chat` | oauth / key |
-| Google Gemini | `google` | key |
-| Azure OpenAI | `azure-openai` | key |
-| Cursor (experimental) | `cursor` | dashboard/local config; live transport; unsafe native local exec is opt-in |
-| Ollama Cloud + 17-provider catalog | `openai-chat` | key |
-| Ollama / vLLM / LM Studio (local) | `openai-chat` | key (usually blank) |
-| Any OpenAI-compatible endpoint | `openai-chat` | key |
-
-Plus DeepSeek, Groq, OpenRouter, Together, Fireworks, Cerebras, Mistral, Hugging Face, NVIDIA NIM, MiniMax, Qwen Cloud, Tencent Cloud Coding Plan, SiliconFlow, and more. See the full list with `ocx init` or in the [provider docs](https://opencodex.me/reference/configuration/).
-
-Cursor support is a staged experimental bridge: it appears in `ocx init` and the dashboard Add
-Provider picker as a local config with Cursor's static public model catalog. Live
-HTTP/2 transport is enabled when a Cursor access token is configured. Cursor server-driven native
-read/write/delete/ls/grep/shell/fetch execution is disabled by default because it bypasses Codex's
-approval and sandbox path. Request text such as a Codex `danger-full-access` sandbox marker never
-authorizes native local exec; set `nativeLocalExec: "on"` only for trusted local experiments where
-every data-plane caller is trusted. `nativeLocalExec: "codex-sandbox"` is accepted for backwards
-compatibility but fails closed like `off`; legacy `unsafeAllowNativeLocalExec: true` remains an
-explicit operator opt-in.
-MCP, screen recording, and computer-use are exposed through executor hooks; when no local executor
-is configured, opencodex returns typed no-executor results instead of policy-blocking the request.
-Cursor OAuth and live model discovery are enabled for the experimental Cursor adapter.
-
-## CLI
-
-```bash
-ocx init                       # interactive setup
-ocx start [--port 10100]       # start the proxy; falls back to a free port if busy
-ocx stop                       # stop + restore native Codex
-ocx restore                    # restore without stopping (alias: ocx eject)
-ocx uninstall                  # remove service/shim/config and restore native Codex
-ocx ensure                     # start if needed + refresh Codex config/cache
-ocx sync                       # refresh models + re-inject into Codex
-ocx codex-shim install         # run `ocx ensure` whenever `codex` is launched
-ocx status                     # is the proxy running?
-ocx login <provider>          # OAuth login (xai, anthropic, kimi, cursor, ...)
-ocx logout <provider>          # remove a stored login
-ocx account <list|current|use> # list/switch accounts & API-key pools (masked; also refresh/auto-switch/remove/add-key)
-ocx gui                        # open the web dashboard
-ocx claude [args...]           # launch Claude Code wired to the proxy (model discovery on)
-ocx claude desktop             # save and apply the Claude Desktop four-family profile
-ocx service [install|start|stop|status|uninstall]   # install/update/start background service
-ocx update [--tag preview]     # update opencodex; preview installs stay on @preview
+```text
+~/.openprovider/config.json.pre-openai-tiers-v2.bak
 ```
 
-### Claude Desktop profile
-
-The dashboard's **Claude → Desktop** view sorts routes into four families: Opus, Fable, Sonnet,
-and Haiku. New routes start in Opus, and the first Opus route is the initial application default.
-Every non-empty family has one default. You can drag a route, or use its visible move control with
-a mouse, touch, or keyboard. **Save and apply** writes the profile to Claude Desktop. JSON export
-and import are available for backup or moving the same setup to another machine.
+Pour la restaurer :
 
 ```bash
-ocx claude desktop [apply]                         # save and apply the current profile
-ocx claude desktop show [--json]                   # inspect routes, families, and defaults
-ocx claude desktop move <route> <family> [--default]
-ocx claude desktop default <family> <route|none>
-ocx claude desktop export <path|->                 # use - to write JSON to stdout
-ocx claude desktop import <path> [--apply]         # validate, then save; optionally apply
+cp ~/.openprovider/config.json.pre-openai-tiers-v2.bak ~/.openprovider/config.json
 ```
 
-Families are `opus`, `fable`, `sonnet`, and `haiku`. Non-Anthropic routes receive stable
-Claude-shaped aliases with a synthetic 2026 date slot; that date is an internal slot, not the
-model's release date. Real Anthropic Claude routes keep their real model ids. Use `none` only for
-an empty family; a non-empty family always needs a default. The older apply forms
-`ocx claude desktop --static`, `--hybrid`, and `--discovery-only` remain supported.
+Les configurations actuelles utilisent :
 
-### Autostart: service vs shim
+```json
+{
+  "openaiProviderTierVersion": 2
+}
+```
 
-opencodex has two ways to auto-start the proxy:
+Les anciennes configurations v1 sont automatiquement migrées vers une entrée `openai` unique.
 
-| | `ocx service` / `ocx service install` | `ocx codex-shim install` |
-|---|---|---|
-| **How** | OS service manager (launchd / systemd / schtasks) | Wraps script launchers for `codex`; real `codex.exe` is left untouched |
-| **When** | Always running after login | On-demand — runs `ocx ensure` when `codex` is launched |
-| **Restart** | Auto-restarts on crash | Starts once per `codex` invocation |
-| **Codex updates** | Unaffected | A completed stable launcher replacement is repaired by the next ordinary `ocx` command |
-| **Remove** | `ocx service uninstall` | `ocx codex-shim uninstall` |
+Le niveau API inclut les modèles virtuels Pro suivants :
 
-Use the **service** for always-on proxy (recommended for development machines). Use the **shim** for
-lightweight, on-demand proxy startup without a background daemon. Shim autostart is enabled by default
-and can be disabled from the GUI dashboard. If the configured proxy port is already busy, `ocx start`
-automatically picks another free local port and updates Codex to use it.
+- `gpt-5.6-sol-pro`
+- `gpt-5.6-terra-pro`
+- `gpt-5.6-luna-pro`
 
-If an external Codex update overwrites an installed shim, the next ordinary `ocx` command backs up
-the stable new launcher and restores the shim. A launcher that is still changing is left untouched
-and retried later. Repair failures warn without failing the requested command; use
-`ocx codex-shim install` as the manual fallback. Set `codexShimAutoRestore` to `false`, or set
-`OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0` for a process-level opt-out.
+Chaque modèle Pro est remplacé au niveau du protocole par son modèle de base avec :
 
-### Uninstall
+```json
+{
+  "reasoning": {
+    "mode": "pro"
+  }
+}
+```
 
-Before removing the npm package, clean up local state:
+Le catalogue contient huit identifiants :
+
+- `gpt-5.5`
+- `gpt-5.6`
+- `gpt-5.6-sol`
+- `gpt-5.6-terra`
+- `gpt-5.6-luna`
+- `gpt-5.6-sol-pro`
+- `gpt-5.6-terra-pro`
+- `gpt-5.6-luna-pro`
+
+Il n’existe pas d’alias générique `gpt-5.6-pro`.
+
+Les métadonnées officielles de l’API indiquent :
+
+- 1 050 000 jetons de contexte ;
+- 922 000 jetons maximum en entrée.
+
+Pour utiliser le mode de compte `openai` :
+
+```text
+gpt-5.6-sol
+```
+
+Pour utiliser une clé API OpenAI :
+
+```text
+openai-apikey/gpt-5.6-sol
+```
+
+Les identifiants Codex et les clés API ne se remplacent jamais automatiquement.
+
+### Comportement du pool de comptes
+
+Ouvrez **Authentification Codex** dans le tableau de bord pour ajouter des comptes et sélectionner celui qui doit traiter la prochaine session.
+
+OpenProvider applique les règles suivantes :
+
+- **Les sessions existantes conservent leur affinité.** Une conversation reste associée au compte sélectionné.
+- **Les nouvelles sessions peuvent être routées automatiquement.** OpenProvider compare les quotas sur 5 heures, 7 jours et 30 jours.
+- **La récupération des quotas est intégrée.** Le tableau de bord peut actualiser tous les quotas en un clic.
+- **Les journaux protègent les informations personnelles.** Les comptes sont représentés par des numéros anonymisés.
+- **Les erreurs de jeton exigent une réauthentification.** Aucun autre identifiant n’est utilisé silencieusement.
+- **Les réponses 429 déclenchent une temporisation.** Les tâches futures peuvent être redirigées vers un autre compte admissible.
+
+## Points forts
+
+- **Utilisez n’importe quel LLM avec Codex.**
+- **Utilisez n’importe quel LLM avec Claude Code.**
+- **Utilisez les modèles routés dans Claude Desktop et Grok Build.**
+- **Utilisez les modèles avec GitHub Copilot App.**
+- **Gérez plusieurs comptes ChatGPT en toute sécurité.**
+- **Connectez-vous avec OAuth sans clé API pour xAI, Anthropic et Kimi.**
+- **Utilisez OpenProvider avec Codex CLI, TUI, App et SDK.**
+- **Conservez l’historique et les fournisseurs natifs des conversations.**
+- **Configurez jusqu’à cinq modèles natifs ou routés comme sous-agents.**
+- **Préparez les modèles GPT-5.6 Sol, Terra et Luna.**
+- **Ajoutez la recherche web et l’analyse d’images aux modèles non-OpenAI.**
+- **Générez et modifiez des images nativement.**
+- **Consultez les requêtes et les erreurs dans le tableau de bord.**
+- **Exécutez le proxy en arrière-plan comme service système.**
+- **Arrêtez proprement le proxy et restaurez automatiquement Codex.**
+
+Claude Code utilise l’API Anthropic Messages exposée par OpenProvider :
+
+- `/v1/messages`
+- `count_tokens`
+
+Pour lancer Claude Code avec OpenProvider :
 
 ```bash
-ocx uninstall
+opr claude
+```
+
+Les modèles routés apparaissent dans le sélecteur `/model` avec des alias de la forme :
+
+```text
+claude-opr-<fournisseur>--<modèle>
+```
+
+Cette fonctionnalité nécessite Claude Code 2.1.129 ou une version plus récente.
+
+Pour GitHub Copilot App, configurez l’URL suivante dans les fournisseurs de modèles :
+
+```text
+http://127.0.0.1:10100/v1
+```
+
+OpenProvider expose notamment :
+
+```text
+GET /v1/models
+POST /v1/chat/completions
+```
+
+Consultez [`docs/github-copilot-app.md`](docs/github-copilot-app.md).
+
+> [!WARNING]
+> Lorsqu’un agent parent natif crée un enfant routé, le contenu de la tâche peut arriver chiffré par le backend et être perdu. Consultez [l’issue #92](https://github.com/mDevsLabs/OpenProvider/issues/92). Utilisez l’interface v1 pour une délégation inter-fournisseurs fiable.
+
+## Fournisseurs et adaptateurs
+
+| Fournisseur | Adaptateur | Authentification |
+|---|---|---|
+| OpenAI avec connexion ChatGPT | `openai-responses` | Transfert sans clé |
+| OpenAI avec clé API | `openai-responses` | Clé |
+| Umans AI Coding Plan | `anthropic` | Clé |
+| Anthropic Claude | `anthropic` | OAuth ou clé |
+| xAI Grok | `openai-chat` | OAuth ou clé |
+| Kimi / Moonshot | `openai-chat` | OAuth ou clé |
+| Google Gemini | `google` | Clé |
+| Azure OpenAI | `azure-openai` | Clé |
+| Cursor, expérimental | `cursor` | Tableau de bord ou configuration locale |
+| Ollama Cloud | `openai-chat` | Clé |
+| Ollama, vLLM ou LM Studio | `openai-chat` | Clé, généralement vide |
+| Tout endpoint compatible OpenAI | `openai-chat` | Clé |
+
+Sont également disponibles :
+
+- DeepSeek
+- Groq
+- OpenRouter
+- Together
+- Fireworks
+- Cerebras
+- Mistral
+- Hugging Face
+- NVIDIA NIM
+- MiniMax
+- Qwen Cloud
+- Tencent Cloud Coding Plan
+- SiliconFlow
+
+Consultez la liste complète avec :
+
+```bash
+opr init
+```
+
+ou dans la [documentation des fournisseurs](https://openprovider.me/reference/configuration/).
+
+### Adaptateur Cursor expérimental
+
+La prise en charge de Cursor est expérimentale. Elle apparaît dans `opr init` et dans le sélecteur **Ajouter un fournisseur** du tableau de bord.
+
+Le transport HTTP/2 en direct est activé lorsqu’un jeton d’accès Cursor est configuré.
+
+L’exécution native demandée par Cursor — lecture, écriture, suppression, `ls`, `grep`, shell ou récupération de ressources — est désactivée par défaut, car elle contourne les mécanismes d’approbation et de sandbox de Codex.
+
+Un marqueur tel que `danger-full-access` dans une requête n’autorise jamais l’exécution locale native.
+
+Pour autoriser explicitement l’exécution locale dans un environnement de confiance :
+
+```json
+{
+  "nativeLocalExec": "on"
+}
+```
+
+La valeur suivante reste acceptée pour compatibilité, mais se comporte comme `off` :
+
+```json
+{
+  "nativeLocalExec": "codex-sandbox"
+}
+```
+
+L’ancienne option suivante reste une activation explicite :
+
+```json
+{
+  "unsafeAllowNativeLocalExec": true
+}
+```
+
+MCP, l’enregistrement d’écran et le contrôle de l’ordinateur sont exposés par des hooks d’exécution. Sans exécuteur local, OpenProvider renvoie un résultat typé indiquant qu’aucun exécuteur n’est disponible.
+
+## Interface en ligne de commande
+
+```bash
+opr init                       # Configuration interactive
+opr start [--port 10100]       # Démarrer le proxy
+opr stop                       # Arrêter le proxy et restaurer Codex
+opr restore                    # Restaurer Codex sans arrêter le proxy
+opr eject                      # Alias de `opr restore`
+opr uninstall                  # Supprimer le service, le shim et la configuration
+opr ensure                     # Démarrer si nécessaire et actualiser Codex
+opr sync                       # Actualiser les modèles et réinjecter la configuration
+opr codex-shim install         # Installer le shim de démarrage à la demande
+opr codex-shim uninstall       # Désinstaller le shim
+opr status                     # Vérifier l’état du proxy
+opr login <fournisseur>        # Se connecter avec OAuth
+opr logout <fournisseur>       # Supprimer une connexion enregistrée
+opr account list               # Lister les comptes
+opr account current            # Afficher le compte courant
+opr account use                # Changer de compte
+opr gui                        # Ouvrir le tableau de bord
+opr claude [arguments...]      # Lancer Claude Code avec OpenProvider
+opr claude desktop             # Enregistrer et appliquer le profil Claude Desktop
+opr service install            # Installer le service
+opr service start              # Démarrer le service
+opr service stop               # Arrêter le service
+opr service status             # Afficher l’état du service
+opr service uninstall          # Désinstaller le service
+opr update                     # Mettre à jour OpenProvider
+opr update --tag preview       # Installer la version de prévisualisation
+```
+
+## Profil Claude Desktop
+
+La vue **Claude → Desktop** du tableau de bord classe les routes dans quatre familles :
+
+- `opus`
+- `fable`
+- `sonnet`
+- `haiku`
+
+Les nouvelles routes sont placées dans Opus. La première route Opus devient la valeur par défaut initiale.
+
+Chaque famille non vide possède une route par défaut. Vous pouvez déplacer une route avec la souris, un écran tactile ou le clavier.
+
+Le bouton **Enregistrer et appliquer** écrit le profil dans Claude Desktop.
+
+L’import et l’export JSON permettent de sauvegarder le profil ou de le transférer vers une autre machine.
+
+```bash
+opr claude desktop apply
+opr claude desktop show
+opr claude desktop show --json
+opr claude desktop move <route> <famille>
+opr claude desktop move <route> <famille> --default
+opr claude desktop default <famille> <route>
+opr claude desktop default <famille> none
+opr claude desktop export <chemin>
+opr claude desktop export -
+opr claude desktop import <chemin>
+opr claude desktop import <chemin> --apply
+```
+
+Les routes non-Anthropic reçoivent des alias stables au format Claude avec une date synthétique en 2026. Cette date est un emplacement interne et non la date de sortie du modèle.
+
+Les véritables routes Anthropic conservent leurs identifiants réels.
+
+Utilisez `none` uniquement pour une famille vide. Une famille non vide doit toujours avoir une valeur par défaut.
+
+Les anciennes commandes restent prises en charge :
+
+```bash
+opr claude desktop --static
+opr claude desktop --hybrid
+opr claude desktop --discovery-only
+```
+
+## Démarrage automatique : service ou shim
+
+OpenProvider propose deux méthodes de démarrage automatique.
+
+| | `opr service install` | `opr codex-shim install` |
+|---|---|---|
+| Fonctionnement | Gestionnaire de services du système | Encapsule les lanceurs de `codex` |
+| Démarrage | Toujours actif après la connexion | Lors du lancement de `codex` |
+| Redémarrage | Automatique après un plantage | Une fois par exécution de `codex` |
+| Mises à jour de Codex | Sans impact | Le shim est réparé par la prochaine commande `opr` |
+| Suppression | `opr service uninstall` | `opr codex-shim uninstall` |
+
+Utilisez le **service** pour disposer d’un proxy toujours actif. Cette option est recommandée sur les machines de développement.
+
+Utilisez le **shim** pour un démarrage léger à la demande, sans service permanent.
+
+Le démarrage automatique par shim est activé par défaut et peut être désactivé dans le tableau de bord.
+
+Si le port configuré est déjà utilisé, OpenProvider choisit automatiquement un autre port local libre et met à jour Codex.
+
+Si une mise à jour de Codex remplace le shim, la prochaine commande `opr` sauvegarde le nouveau lanceur stable puis restaure le shim.
+
+Pour désactiver cette restauration automatique dans la configuration :
+
+```json
+{
+  "codexShimAutoRestore": false
+}
+```
+
+Pour la désactiver avec une variable d’environnement :
+
+```bash
+export OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0
+```
+
+## Désinstallation
+
+Avant de supprimer le paquet npm, nettoyez l’état local :
+
+```bash
+opr uninstall
 npm uninstall -g @mdevs/openprovider
 ```
 
-`ocx uninstall` stops the proxy, removes any installed service, removes the Codex shim, restores
-native Codex config/catalog/history, and deletes `~/.opencodex`.
+La commande `opr uninstall` :
+
+- arrête le proxy ;
+- supprime les services installés ;
+- supprime le shim Codex ;
+- restaure la configuration native de Codex ;
+- restaure le catalogue et l’historique ;
+- supprime `~/.openprovider`.
 
 ## Configuration
 
-Config lives at `~/.opencodex/config.json`. If the file cannot be parsed (e.g. truncated or
-manually broken JSON), opencodex backs it up to `config.json.invalid-<timestamp>`, prints a warning,
-and falls back to defaults — so your original file is never silently lost.
+La configuration se trouve dans :
 
-Here's a typical multi-provider setup:
+```text
+~/.openprovider/config.json
+```
+
+Si le fichier contient du JSON invalide, OpenProvider le sauvegarde sous la forme suivante :
+
+```text
+config.json.invalid-<horodatage>
+```
+
+Un avertissement est affiché et les valeurs par défaut sont utilisées. Le fichier original n’est jamais supprimé silencieusement.
+
+Exemple de configuration avec plusieurs fournisseurs :
 
 ```json
 {
@@ -408,28 +653,35 @@ Here's a typical multi-provider setup:
 }
 ```
 
-Provider entries can also annotate routed catalog metadata and output defaults. Use `contextWindow`
-for a provider-wide Codex-visible context cap, `modelContextWindows` for model-specific caps, and
-`modelInputModalities` for model-specific catalog input hints such as `["text"]` or
-`["text", "image"]`. For Responses models that reject Codex reasoning-summary delivery fields, set
-`modelSupportsReasoningSummaries.<model-id>` to `false`; this updates the catalog and strips stale
-summary-delivery fields at the adapter boundary. For OpenAI-compatible chat providers whose upstream default response budget is
-too small, set `defaultMaxOutputTokens` or per-model `modelMaxOutputTokens`; explicit
-`max_output_tokens` from the client still wins, and unset configs still omit `max_tokens`. Context
-values cap live `/models` metadata; they never raise a smaller live context window. The bundled
-GPT-5.6 Sol/Terra/Luna fallback metadata uses a 1,050,000-token context window for OpenAI API key
-and OpenRouter catalog entries; it does not bypass upstream preview access. See the configuration
-reference for the full field list.
+Options importantes :
 
-> **GLM-5.2 1M context via Z.AI:** through the `openai-chat` adapter, both `glm-5.2`
-> and `glm-5.2[1m]` work — opencodex strips the trailing `[1m]` suffix before
-> sending the request, since OpenAI-compatible endpoints reject the bracketed id
-> (Z.AI 400 code 1211). The `[1m]` suffix is a Claude-Code / Anthropic-endpoint
-> convention; to use it natively, point the `anthropic` adapter at Z.AI's coding
-> base (`https://api.z.ai/api/coding/paas/v4`). Set the 1M context window via the
-> model catalog (`modelContextWindows`), not the model name.
+| Option | Description |
+|---|---|
+| `contextWindow` | Limite de contexte pour tout le fournisseur |
+| `modelContextWindows` | Limites de contexte propres à chaque modèle |
+| `modelInputModalities` | Types d’entrées acceptées, comme le texte ou les images |
+| `modelSupportsReasoningSummaries` | Active ou désactive les résumés de raisonnement |
+| `defaultMaxOutputTokens` | Budget de sortie par défaut |
+| `modelMaxOutputTokens` | Budget de sortie propre à chaque modèle |
 
-Local models work too. Point opencodex at any OpenAI-compatible server running on your machine:
+Une valeur `max_output_tokens` explicitement envoyée par le client reste prioritaire.
+
+Les limites configurées peuvent réduire les métadonnées provenant de `/models`, mais ne peuvent jamais augmenter une fenêtre plus petite annoncée par le fournisseur.
+
+Les métadonnées de secours de GPT-5.6 Sol, Terra et Luna utilisent une fenêtre de contexte de 1 050 000 jetons pour OpenAI avec clé API et OpenRouter. Elles ne contournent pas les restrictions d’accès du fournisseur.
+
+> [!NOTE]
+> Avec l’adaptateur `openai-chat`, `glm-5.2` et `glm-5.2[1m]` fonctionnent. OpenProvider retire le suffixe `[1m]` avant l’envoi, car certains endpoints compatibles OpenAI refusent cet identifiant.
+>
+> Pour utiliser la convention `[1m]` avec l’API Anthropic de Z.AI, configurez :
+>
+> `https://api.z.ai/api/coding/paas/v4`
+>
+> Définissez la fenêtre de contexte dans `modelContextWindows`, et non dans le nom du modèle.
+
+### Modèles locaux
+
+OpenProvider peut utiliser tout serveur local compatible avec OpenAI :
 
 ```json
 {
@@ -454,88 +706,175 @@ Local models work too. Point opencodex at any OpenAI-compatible server running o
 }
 ```
 
-WebSocket transport is off by default. Set `"websockets": true` only if you want Codex to advertise and use the Responses WebSocket path instead of HTTP/SSE.
+Le transport WebSocket est désactivé par défaut.
 
-### Remote access
+Pour l’activer :
 
-By default opencodex binds to `127.0.0.1` (loopback) and requires no extra authentication.
-If you set `"hostname": "0.0.0.0"` to expose the proxy on the LAN, opencodex requires a bearer token
-to protect both the management API (`/api/*`) and the data-plane (`/v1/responses`,
-`/v1/images/generations`, and `/v1/images/edits`):
+```json
+{
+  "websockets": true
+}
+```
+
+Activez cette option uniquement si vous souhaitez que Codex utilise la route Responses WebSocket au lieu de HTTP/SSE.
+
+## Accès distant
+
+Par défaut, OpenProvider écoute uniquement sur :
+
+```text
+127.0.0.1
+```
+
+Aucune authentification supplémentaire n’est alors nécessaire.
+
+Pour exposer le proxy sur le réseau local :
+
+```json
+{
+  "hostname": "0.0.0.0"
+}
+```
+
+Un jeton Bearer devient alors obligatoire pour protéger :
+
+- `/api/*`
+- `/v1/responses`
+- `/v1/images/generations`
+- `/v1/images/edits`
+
+Définissez le jeton avant de démarrer OpenProvider :
 
 ```bash
-export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
-ocx start
+export OPENCODEX_API_AUTH_TOKEN="votre-jeton-secret"
+opr start
 ```
 
-The proxy refuses to start without this variable when binding beyond loopback. If you install a
-background service for LAN access, export the same variable before `ocx service install` so the
-service manager receives it.
-Clients (scripts, remote machines) must include the token in every request:
+Le proxy refuse de démarrer sans cette variable lorsqu’il écoute sur une adresse autre que la boucle locale.
 
-```
-x-opencodex-api-key: your-secret-token
-```
-
-The token is compared in constant time to prevent timing attacks.
-
-opencodex automatically remaps Codex resume history so old OpenAI chats and opencodex-created project
-threads stay visible in Codex App while the proxy is active. opencodex records the original provider/source metadata in
-`~/.opencodex/codex-history-backup.json`. `ocx stop` / `ocx restore` restores backed-up OpenAI rows
-to OpenAI, and ejects any remaining opencodex user threads to OpenAI as well so native Codex does not
-try to resume a thread whose provider no longer exists in `config.toml`.
-
-If you tested an older development build where `syncResumeHistory` already remapped history before
-backup support existed, you can also run the explicit recovery command:
+Pour installer un service avec accès réseau :
 
 ```bash
-ocx recover-history --legacy-openai
+export OPENCODEX_API_AUTH_TOKEN="votre-jeton-secret"
+opr service install
 ```
 
-See the **[Configuration reference](https://opencodex.me/reference/configuration/)** for every field.
+Les clients distants doivent inclure cet en-tête dans chaque requête :
+
+```http
+x-openprovider-api-key: votre-jeton-secret
+```
+
+Le jeton est comparé en temps constant afin de limiter les attaques temporelles.
+
+OpenProvider adapte automatiquement l’historique de reprise de Codex pour conserver la visibilité des anciennes conversations.
+
+Les métadonnées originales sont sauvegardées dans :
+
+```text
+~/.openprovider/codex-history-backup.json
+```
+
+Pour restaurer l’historique :
+
+```bash
+opr stop
+```
+
+ou :
+
+```bash
+opr restore
+```
+
+Si vous avez utilisé une ancienne version de développement sans sauvegarde d’historique :
+
+```bash
+opr recover-history --legacy-openai
+```
+
+Consultez la [référence de configuration](https://openprovider.me/reference/configuration/) pour la liste complète des options.
 
 ## Documentation
 
-The public docs — install, providers, routing, sidecars, Codex integration, Codex App model picker, and CLI/config reference — are built from [`docs-site/`](./docs-site) and published to **[opencodex.me](https://opencodex.me/)**.
+La documentation publique couvre :
 
-Maintainer source-of-truth notes live under [`structure/`](./structure). Historical investigations remain under [`docs/`](./docs).
-Contributor setup lives in [`CONTRIBUTING.md`](./CONTRIBUTING.md), and security reporting guidance
-lives in [`SECURITY.md`](./SECURITY.md).
+- l’installation ;
+- les fournisseurs ;
+- le routage ;
+- les modèles auxiliaires ;
+- l’intégration Codex ;
+- le sélecteur de modèles ;
+- la CLI ;
+- la configuration.
 
-## Development
+Elle est générée depuis [`docs-site/`](./docs-site) et publiée sur [openprovider.me](https://openprovider.me/).
 
-Source development requires the `bun` CLI on your `PATH`. This is separate from the published npm
-package's bundled Bun runtime, which is used only by installed `ocx` commands.
+Les notes des mainteneurs se trouvent dans [`structure/`](./structure).
+
+Les anciennes investigations restent disponibles dans [`docs/`](./docs).
+
+Les instructions destinées aux contributeurs se trouvent dans [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+La procédure de signalement des vulnérabilités se trouve dans [`SECURITY.md`](./SECURITY.md).
+
+## Développement
+
+Le développement depuis les sources nécessite que `bun` soit disponible dans votre `PATH`.
+
+Cette installation est distincte du runtime Bun inclus dans le paquet npm, qui est uniquement utilisé par les commandes `opr` installées.
 
 ```bash
 git clone https://github.com/mDevsLabs/OpenProvider.git
-cd opencodex
+cd OpenProvider
 bun install
-bun run dev:proxy    # start the proxy API in dev mode
-bun run dev:gui      # start the dashboard dev server in another terminal
-bun x tsc --noEmit   # typecheck
+bun run dev:proxy    # Démarrer l’API du proxy en mode développement
+bun run dev:gui      # Démarrer le tableau de bord dans un autre terminal
+bun x tsc --noEmit   # Vérifier les types TypeScript
 ```
 
-`bun run dev` remains an alias for `bun run dev:proxy` for compatibility. In a source checkout,
-the proxy API exposes `/healthz`, `/v1/responses`, `POST /v1/images/generations`,
-`POST /v1/images/edits`, and `/api/*`; `GET /` serves the packaged dashboard only after
-`bun run build:gui` has produced `gui/dist`. While hacking on the dashboard, run the frontend separately:
+La commande suivante reste un alias de `bun run dev:proxy` :
+
+```bash
+bun run dev
+```
+
+Dans un dépôt source, l’API expose :
+
+- `/healthz`
+- `/v1/responses`
+- `POST /v1/images/generations`
+- `POST /v1/images/edits`
+- `/api/*`
+
+La route `GET /` sert le tableau de bord uniquement après la génération de `gui/dist` :
+
+```bash
+bun run build:gui
+```
+
+Pendant le développement du tableau de bord :
 
 ```bash
 bun run dev:gui
 ```
 
-See **[Contributing](./CONTRIBUTING.md)**.
+Consultez le guide [Contribuer](./CONTRIBUTING.md).
 
-## Disclaimer
+## Avertissement
 
-opencodex is an independent, community-maintained project and is **not affiliated with or endorsed by OpenAI, Anthropic, or any other provider**.
+OpenProvider est un projet indépendant maintenu par la communauté.
 
-Some providers — notably Anthropic (Claude) — may suspend or restrict accounts that route API traffic through third-party proxies. **Use at your own risk (UAYOR).** Before connecting a provider, review its Terms of Service to confirm that proxy-based access is permitted. The opencodex maintainers are not responsible for any account actions taken by upstream providers.
+Il n’est **ni affilié à OpenAI, Anthropic ou un autre fournisseur, ni approuvé par eux**.
 
-## License
+Certains fournisseurs, notamment Anthropic avec Claude, peuvent suspendre ou restreindre les comptes qui acheminent leur trafic API par des proxys tiers.
+
+**Utilisez ce logiciel à vos propres risques.**
+
+Avant de connecter un fournisseur, consultez ses conditions d’utilisation afin de vérifier que l’accès par proxy est autorisé.
+
+Les mainteneurs d’OpenProvider ne peuvent pas être tenus responsables des mesures prises par les fournisseurs à l’encontre de votre compte.
+
+## Licence
 
 MIT
-
-
-

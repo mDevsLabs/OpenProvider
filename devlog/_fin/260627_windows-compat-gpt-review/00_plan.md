@@ -9,7 +9,7 @@ for an external review.
 
 - Local branch: `dev`
 - Local/remote commit: `d3303bf2fcf795a7af3236b38719ad0c538e7ef5`
-- GitHub dev URL: `https://github.com/lidge-jun/opencodex/tree/dev`
+- GitHub dev URL: `https://github.com/lidge-jun/openprovider/tree/dev`
 
 ## Review Package
 

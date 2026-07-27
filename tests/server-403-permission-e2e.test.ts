@@ -18,8 +18,8 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-403-e2e-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-403-e2e-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-403-e2e-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-403-e2e-"));
   process.env.OPENCODEX_HOME = testDir;
   clearRequestLogsForTests();
 });

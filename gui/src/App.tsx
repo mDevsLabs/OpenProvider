@@ -43,7 +43,7 @@ const PAGE_TKEY: Record<Page, TKey> = {
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE || "";
-const THEME_KEY = "ocx-theme";
+const THEME_KEY = "opr-theme";
 
 const NAV: { id: Page; tkey: TKey; Icon: typeof IconGrid }[] = [
   { id: "dashboard", tkey: "nav.dashboard", Icon: IconGrid },
@@ -201,7 +201,7 @@ export default function App() {
   const brand = (
     <div className="brand">
       <span className="brand-logo" role="img" aria-label={t("app.logoAria")} />
-      <span className="name">opencodex</span>
+      <span className="name">{t("app.name")}</span>
       <span className="ver">v{displayedVersion}</span>
     </div>
   );

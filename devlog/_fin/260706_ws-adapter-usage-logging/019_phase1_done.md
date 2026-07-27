@@ -39,6 +39,6 @@ Remaining non-blocking note:
 
 ## Lifecycle guard
 
-During this cxc-loop patch pass, no `ocx restart`, `ocx stop`, `ocx start`,
-`ocx ensure`, or `ocx sync` command was run. Tests started only their own
+During this cxc-loop patch pass, no `opr restart`, `opr stop`, `opr start`,
+`opr ensure`, or `opr sync` command was run. Tests started only their own
 ephemeral Bun servers on random ports.

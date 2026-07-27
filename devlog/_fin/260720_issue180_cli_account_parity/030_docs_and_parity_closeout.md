@@ -5,7 +5,7 @@ commands. This phase lands the docs and closes the loop's evidence ledger.
 
 ## Outcome
 
-`ocx account` is documented everywhere the repo documents CLI commands, in all
+`opr account` is documented everywhere the repo documents CLI commands, in all
 three locales, and the parity matrix in `004` is marked with the delivered
 state.
 
@@ -18,11 +18,11 @@ OUT: code changes, README rewrites beyond the check below, release notes.
 
 ### MODIFY `docs-site/src/content/docs/reference/cli.md` (+ `ko/`, `zh-cn/`)
 
-- Add an `ocx account` section after the `ocx provider`/`ocx models` entries
+- Add an `opr account` section after the `opr provider`/`opr models` entries
   (exact anchor re-verified at P): subcommands list/current/use (010) and
   refresh/auto-switch/remove/add-key (020), each with usage, behavior, exit
   codes, `--json` shapes, and the codex "new sessions only" note.
-- Mirror structure of the existing `ocx provider` section; keep the locale
+- Mirror structure of the existing `opr provider` section; keep the locale
   files structurally identical (headings translated, commands verbatim).
 
 ### MODIFY `docs-site/src/content/docs/guides/providers.md` (+ `ko/`, `zh-cn/`)
@@ -34,7 +34,7 @@ OUT: code changes, README rewrites beyond the check below, release notes.
 ### CHECK (modify only if the convention holds)
 
 - `README.md` / `README.ko.md` / `README.zh-CN.md`: if they carry a CLI command
-  table/list, add the one `ocx account` row; if they only deep-link the docs
+  table/list, add the one `opr account` row; if they only deep-link the docs
   site, leave untouched and record the decision here.
 - SoT sync (SOT-SYNC-01): check `structure/` and `docs/` for a CLI-surface or
   architecture doc that enumerates commands; patch it or record its absence.
@@ -49,7 +49,7 @@ OUT: code changes, README rewrites beyond the check below, release notes.
 
 ## Accept criteria
 
-1. `rg -n "ocx account" docs-site/src/content/docs/reference/cli.md
+1. `rg -n "opr account" docs-site/src/content/docs/reference/cli.md
    docs-site/src/content/docs/ko/reference/cli.md
    docs-site/src/content/docs/zh-cn/reference/cli.md` hits in all three.
 2. Docs-site content builds (repo-standard check, e.g. astro build or the

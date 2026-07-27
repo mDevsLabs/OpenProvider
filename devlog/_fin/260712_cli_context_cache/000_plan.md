@@ -7,7 +7,7 @@
 ## 배경 (이전 유닛에서 확정된 사실)
 - CLAUDE_CODE_MAX_CONTEXT_TOKENS: custom id 직접 적용, 인식된 claude id는 DISABLE_COMPACT=1
   병행 필요 (공식 env 문서, devlog/260711_claude_inbound/135).
-- 우리 별칭은 이제 본명/날짜접미사 체계(Desktop) + claude-ocx-*(CLI 하위호환) —
+- 우리 별칭은 이제 본명/날짜접미사 체계(Desktop) + claude-opr-*(CLI 하위호환) —
   CLI 피커의 id 형태에 따라 "custom vs recognized" 분류가 갈릴 수 있음 (조사 대상).
 - 현재 구현: claudeCode.maxContextTokens(수동 숫자) → MAX_CONTEXT_TOKENS+DISABLE_COMPACT 쌍
   주입 (740 유닛/733a930d). 자동(auto) 모드는 없음.

@@ -5,7 +5,7 @@
  * a proxy that started on a fallback port was invisible (duplicate starts, Codex synced
  * back to a dead port), and a foreign app answering 200 on the configured port counted
  * as "our proxy". Liveness now (1) prefers the pid + runtime-port record and (2) requires
- * the /healthz body to identify as opencodex.
+ * the /healthz body to identify as openprovider.
  *
  * Lives outside cli.ts (which dispatches argv at module top level) so tests can import it.
  */
@@ -51,14 +51,14 @@ export function probeHostname(hostname: string | undefined): string {
 }
 
 /**
- * True when a /healthz body identifies an opencodex proxy. Accepts the explicit
- * `service: "opencodex"` marker, plus the legacy `{status, version, uptime}` trio so a
- * still-running pre-identity proxy (e.g. right after `ocx update`) is not mistaken for a
+ * True when a /healthz body identifies an openprovider proxy. Accepts the explicit
+ * `service: "openprovider"` marker, plus the legacy `{status, version, uptime}` trio so a
+ * still-running pre-identity proxy (e.g. right after `opr update`) is not mistaken for a
  * foreign server and shadow-started over.
  */
 export function isOpencodexHealthz(body: HealthzIdentity | null): boolean {
   if (!body) return false;
-  if (body.service === "opencodex") return true;
+  if (body.service === "openprovider") return true;
   if (body.service !== undefined) return false;
   return body.status === "ok" && typeof body.version === "string" && typeof body.uptime === "number";
 }

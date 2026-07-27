@@ -140,13 +140,13 @@ export function effectiveBlockedSkillNames(cc?: Pick<OcxClaudeCodeConfig, "block
 }
 
 /**
- * ocx-route directive (devlog 072): injected agent-definition bodies carry
- * `<!-- ocx-route: <model> -->` because Claude Code 2.1.207 ignores custom
+ * opr-route directive (devlog 072): injected agent-definition bodies carry
+ * `<!-- opr-route: <model> -->` because Claude Code 2.1.207 ignores custom
  * gateway ids in agent frontmatter (live-proven fallback to sonnet). The body
  * rides the subagent's system prompt, so the proxy re-routes here. Only the
  * FIRST directive wins; the scan is bounded to the system field.
  */
-const OCX_ROUTE_RE = /<!--\s*ocx-route:\s*([^\s]+)\s*-->/;
+const OCX_ROUTE_RE = /<!--\s*opr-route:\s*([^\s]+)\s*-->/;
 
 export function extractOcxRouteDirective(body: unknown): string | null {
   if (!isRec(body)) return null;
@@ -193,12 +193,12 @@ function maybeElideSkillText(text: string, names: readonly string[]): string {
   // basenaming (repo precedent: src/codex/inject.ts isOpencodexCatalogPath).
   const base = dir.replace(/\\/g, "/").split("/").filter(Boolean).pop()?.toLowerCase() ?? "";
   if (!names.includes(base)) return text;
-  return `[opencodex] '${base}' skill document bundle (${text.length} chars) elided for routed models `
+  return `[openprovider] '${base}' skill document bundle (${text.length} chars) elided for routed models `
     + "(claudeCode.blockedSkills). The skill is loaded; answer from general knowledge instead of citing the bundle.";
 }
 
 function skillElisionStub(callId: string): string {
-  return "[opencodex] Skill document bundle elided for routed models (claudeCode.blockedSkills). "
+  return "[openprovider] Skill document bundle elided for routed models (claudeCode.blockedSkills). "
     + `The skill loaded, but its reference documents were removed to save context (call ${callId}). `
     + "Answer from general knowledge instead of citing the bundle.";
 }

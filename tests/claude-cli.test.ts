@@ -26,17 +26,17 @@ const AUTH_PRESENT = {
   },
 };
 
-describe("ocx claude env assembly", () => {
+describe("opr claude env assembly", () => {
   test("injects base URL, discovery flag and model slots — NO auth token by default (subscription mode)", () => {
     const env = buildClaudeEnv(cfg({
-      claudeCode: { model: "claude-ocx-gemini--gemini-3-pro", smallFastModel: "gemini/gemini-3-flash" },
+      claudeCode: { model: "claude-opr-gemini--gemini-3-pro", smallFastModel: "gemini/gemini-3-flash" },
     }), 10123, {}, {}, AUTH_PRESENT);
     expect(env.ANTHROPIC_BASE_URL).toBe("http://127.0.0.1:10123");
     // Setting ANTHROPIC_AUTH_TOKEN disables claude.ai connectors and kills subscription
     // OAuth — the launcher must leave it unset on an open loopback proxy.
     expect(env.ANTHROPIC_AUTH_TOKEN).toBeUndefined();
     expect(env.CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY).toBe("1");
-    expect(env.ANTHROPIC_MODEL).toBe("claude-ocx-gemini--gemini-3-pro");
+    expect(env.ANTHROPIC_MODEL).toBe("claude-opr-gemini--gemini-3-pro");
     expect(env.ANTHROPIC_DEFAULT_HAIKU_MODEL).toBe("gemini/gemini-3-flash");
     expect(env.ANTHROPIC_SMALL_FAST_MODEL).toBe("gemini/gemini-3-flash");
     // Never both token vars (Claude Code auth-conflict warning, 003 E1).
@@ -47,9 +47,9 @@ describe("ocx claude env assembly", () => {
 
   test("configured API key becomes the auth token (admission required)", () => {
     const env = buildClaudeEnv(cfg({
-      apiKeys: [{ id: "1", name: "main", key: "sk-ocx-123", createdAt: "2026-01-01" }],
+      apiKeys: [{ id: "1", name: "main", key: "sk-opr-123", createdAt: "2026-01-01" }],
     }), 10100, {});
-    expect(env.ANTHROPIC_AUTH_TOKEN).toBe("sk-ocx-123");
+    expect(env.ANTHROPIC_AUTH_TOKEN).toBe("sk-opr-123");
   });
 
   // Host-managed routing guard (devlog 260720_claude_authmode_persist/020):
@@ -61,11 +61,11 @@ describe("ocx claude env assembly", () => {
 
   test("proxy-owned authentication sets CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1", () => {
     const proxy = buildClaudeEnv(cfg({ claudeCode: { authMode: "proxy" } }), 10100, {});
-    expect(proxy.ANTHROPIC_AUTH_TOKEN).toBe("opencodex-proxy");
+    expect(proxy.ANTHROPIC_AUTH_TOKEN).toBe("openprovider-proxy");
     expect(proxy.CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST).toBe("1");
 
     const admission = buildClaudeEnv(cfg({
-      apiKeys: [{ id: "1", name: "main", key: "sk-ocx-123", createdAt: "2026-01-01" }],
+      apiKeys: [{ id: "1", name: "main", key: "sk-opr-123", createdAt: "2026-01-01" }],
     }), 10100, {});
     expect(admission.CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST).toBe("1");
   });
@@ -230,7 +230,7 @@ describe("ocx claude env assembly", () => {
 
 });
 
-describe("ocx claude Windows launch (devlog 260715_cross_platform_audit/020)", () => {
+describe("opr claude Windows launch (devlog 260715_cross_platform_audit/020)", () => {
   test("win32 .cmd shim launches through cmd.exe with preserved arg boundaries", () => {
     const deps = {
       env: { PATH: "C:\\Users\\u\\AppData\\Roaming\\npm", ComSpec: "C:\\WINDOWS\\system32\\cmd.exe" },

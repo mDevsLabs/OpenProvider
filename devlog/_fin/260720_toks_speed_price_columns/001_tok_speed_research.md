@@ -68,7 +68,7 @@
 
 jawcode는 DB에 `duration`과 nullable `ttft`를 별도로 저장한다. `jawcode/packages/stats/src/db.ts:60-85`, `jawcode/packages/stats/src/types.ts:23-34`. 그러나 집계 `avg_tokens_per_second`는 TTFT를 빼지 않고 `duration > 0 ? output_tokens * 1000 / duration : NULL`로 계산한다. overall과 model group 모두 동일하다. `jawcode/packages/stats/src/db.ts:420-470`.
 
-따라서 jawcode의 현재 tok/s는 본 조사안 **A와 동일한 전체시간 정의**이고, TTFT는 병렬로 평균만 제공하는 별도 지표다. OpenCodex도 A를 즉시 제공하면 jawcode 비교 가능성을 유지한다. B를 추가하더라도 jawcode식 A를 대체하지 말고 `TTFT-adjusted tok/s` 같은 명시적 별도 의미로 제공해야 한다. jawcode가 어떤 runtime hook으로 `ttft`를 실제 측정하는지는 이 참고 범위에서 **미확인**이다(통계 parser는 원본 `msg.ttft`를 그대로 전달한다). `jawcode/packages/stats/src/parser.ts:129-137`.
+따라서 jawcode의 현재 tok/s는 본 조사안 **A와 동일한 전체시간 정의**이고, TTFT는 병렬로 평균만 제공하는 별도 지표다. OpenProvider도 A를 즉시 제공하면 jawcode 비교 가능성을 유지한다. B를 추가하더라도 jawcode식 A를 대체하지 말고 `TTFT-adjusted tok/s` 같은 명시적 별도 의미로 제공해야 한다. jawcode가 어떤 runtime hook으로 `ttft`를 실제 측정하는지는 이 참고 범위에서 **미확인**이다(통계 parser는 원본 `msg.ttft`를 그대로 전달한다). `jawcode/packages/stats/src/parser.ts:129-137`.
 
 ## 6. 표시·API·영속 계층
 

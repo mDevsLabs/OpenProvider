@@ -54,7 +54,7 @@ The static owner currently reconstructs Mid and High with aliases (`src/provider
 
 ### Cursor
 
-Fresh `ocx models --json` output on 2026-07-22 contained `cursor/gemini-3.5-flash` but no Cursor Gemini 3.6 row. `src/adapters/cursor/discovery.ts:136` and Cursor tests remain out of scope until Cursor itself advertises the new model.
+Fresh `opr models --json` output on 2026-07-22 contained `cursor/gemini-3.5-flash` but no Cursor Gemini 3.6 row. `src/adapters/cursor/discovery.ts:136` and Cursor tests remain out of scope until Cursor itself advertises the new model.
 
 ### OrcaRouter
 
@@ -62,7 +62,7 @@ The registry statically seeds `google/gemini-3.5-flash` (`src/providers/registry
 
 ### jawcode metadata source
 
-`/Users/jun/Developer/new/700_projects/jawcode/packages/ai/src/models.json` contained multiple Gemini 3.5 rows and no `gemini-3.6-flash` row when checked on 2026-07-22. The OpenCodex generated snapshot therefore stays untouched in this unit.
+`/Users/jun/Developer/new/700_projects/jawcode/packages/ai/src/models.json` contained multiple Gemini 3.5 rows and no `gemini-3.6-flash` row when checked on 2026-07-22. The OpenProvider generated snapshot therefore stays untouched in this unit.
 
 ## 5. Open questions converted to implementation gates
 

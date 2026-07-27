@@ -8,10 +8,10 @@ description: 配置你的第一个 provider,用三条命令让 OpenAI Codex 通�
 ## 1. 运行设置向导
 
 ```bash
-ocx init
+opr init
 ```
 
-`ocx init` 会引导你完成:
+`opr init` 会引导你完成:
 
 1. **选择 provider** —— 从内置 registry 的 50 个预设中选择一个，或选择 `custom` 手动输入
    base URL 和 adapter。
@@ -21,7 +21,7 @@ ocx init
 5. **注入到 Codex？** —— 在通常的回环地址配置中，OpenProvider 会在
    `$CODEX_HOME/config.toml`（默认 `~/.codex/config.toml`）根级添加 `openai_base_url`，让 Codex
    内置的 `openai` provider 指向代理。监听远程或 LAN 地址时，则改用带 API 认证 header 的专用 provider 条目。
-6. **安装自动启动 shim？** —— 启用后，每次启动 `codex` 都会先运行 `ocx ensure`。
+6. **安装自动启动 shim？** —— 启用后，每次启动 `codex` 都会先运行 `opr ensure`。
 
 结果会保存到 `$OpenProvider_HOME/config.json`（默认 `~/.OpenProvider/config.json`）。
 
@@ -34,24 +34,24 @@ GPT-5.6 Sol/Terra/Luna。只有上游账号具备权限时才能实际调用。O
 ## 2. 启动代理
 
 ```bash
-ocx start            # 默认端口 10100
-ocx start --port 8080
+opr start            # 默认端口 10100
+opr start --port 8080
 ```
 
 启动时,OpenProvider 会:
 
-- 将其 PID 写入 `~/.OpenProvider/ocx.pid`(并拒绝重复启动),
+- 将其 PID 写入 `~/.OpenProvider/opr.pid`(并拒绝重复启动),
 - 在 provider 支持时发现实时模型，并**把原生与已路由条目同步进 Codex 的模型目录**，以及
 - 在 `http://localhost:<port>/v1` 上监听。
 
-如果请求的端口已被占用，`ocx start` 会选择一个空闲端口，将其写入 `runtime-port.json`，并更新
+如果请求的端口已被占用，`opr start` 会选择一个空闲端口，将其写入 `runtime-port.json`，并更新
 Codex 配置以使用实际监听端口。
 
 检查它:
 
 ```bash
-ocx status
-ocx gui       # 在实际监听端口打开仪表盘
+opr status
+opr gui       # 在实际监听端口打开仪表盘
 ```
 
 ## 3. 使用 Codex
@@ -81,7 +81,7 @@ codex -m "openrouter/openai/gpt-5.6-luna" "Summarize this trace"
 ## 选择 sub-agent 模型（可选）
 
 新配置会在 Codex 的 sub-agent 选择器中优先显示 `gpt-5.5`、`gpt-5.6-sol`、
-`gpt-5.6-terra`、`gpt-5.6-luna` 和 `gpt-5.4-mini`。通过 `ocx gui`，你可以从原生或已路由模型中
+`gpt-5.6-terra`、`gpt-5.6-luna` 和 `gpt-5.4-mini`。通过 `opr gui`，你可以从原生或已路由模型中
 选择并调整最多五个条目的顺序。仪表盘还可以设置一个首选 sub-agent 模型及 reasoning effort；
 OpenProvider 会把这项指引加入 v1 协作请求。
 
@@ -90,8 +90,8 @@ OpenProvider 会把这项指引加入 v1 协作请求。
 部分 provider 支持真正的账号登录(OAuth,自动刷新):
 
 ```bash
-ocx login xai          # 也可使用 anthropic、kimi、kiro、google-antigravity、cursor
-ocx logout xai
+opr login xai          # 也可使用 anthropic、kimi、kiro、google-antigravity、cursor
+opr logout xai
 ```
 
 默认 OpenAI 路径**无需 key** —— 它会直接转发你现有的 `codex login` 凭据。若要使用 OpenAI
@@ -102,9 +102,9 @@ API key，请添加 `openai-apikey` provider。该预设包含 `gpt-5.6-sol`、`
 ## 停止与恢复
 
 ```bash
-ocx stop          # 停止代理并恢复原生 Codex
-ocx restore       # 不停止代理，仅恢复原生 Codex（别名：ocx eject）
-ocx restore back  # 让 Codex 再次使用仍在运行的代理
+opr stop          # 停止代理并恢复原生 Codex
+opr restore       # 不停止代理，仅恢复原生 Codex（别名：opr eject）
+opr restore back  # 让 Codex 再次使用仍在运行的代理
 ```
 
 ## 下一步

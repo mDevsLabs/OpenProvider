@@ -2,7 +2,7 @@
 
 ## Goal
 
-Fix the Phase 120 WebSocket transport findings against current Codex RS, then ship opencodex as
+Fix the Phase 120 WebSocket transport findings against current Codex RS, then ship openprovider as
 version 1.9.0.
 
 This phase is C4 because it changes a long-lived transport, Codex provider capability
@@ -43,13 +43,13 @@ advertisement, push/main merge state, and npm release behavior.
 
 Modify:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/.gitignore`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/config.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/types.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/codex-inject.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/codex-inject.test.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/.gitignore`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/config.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/types.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/codex-inject.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/codex-inject.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts`
 
 Plan:
 
@@ -71,12 +71,12 @@ Acceptance:
 
 Modify:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/src/ws-bridge.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/server.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/types.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/ws-endpoint.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/ws-bridge.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/server.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/types.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/ws-endpoint.test.ts`
 
 Plan:
 
@@ -119,11 +119,11 @@ Acceptance:
 
 Modify:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/ws-endpoint.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/ws-endpoint.test.ts`
 
 New:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/devlog/132_websocket-correctness-release/10_verification.md`
+- `/Users/jun/Developer/new/700_projects/openprovider/devlog/132_websocket-correctness-release/10_verification.md`
 
 Plan:
 
@@ -140,13 +140,13 @@ Plan:
   - `bun test tests/codex-catalog.test.ts`
   - `bun test tests`
   - `bun x tsc --noEmit`
-- Run live `ocx` smoke with `websockets:false` default to confirm Codex no longer selects WS by
+- Run live `opr` smoke with `websockets:false` default to confirm Codex no longer selects WS by
   default; explicit `websockets:true` can be tested with direct WS script.
 
 Acceptance:
 
 - All local gates pass.
-- `ocx` ends stopped.
+- `opr` ends stopped.
 - Verification doc records exact commands and residual limitation: socket-close cancellation and
   same-socket new-turn cancellation are proven locally; a human-visible TUI Ctrl-C interrupt may
   still require a Codex-driven manual/live transcript if automation cannot inject it reliably.
@@ -155,7 +155,7 @@ Acceptance:
 
 Modify:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/package.json`
+- `/Users/jun/Developer/new/700_projects/openprovider/package.json`
 
 Plan:
 
@@ -173,7 +173,7 @@ Acceptance:
 - `origin/main` contains the 1.9.0 release commit.
 - GitHub Release workflow passes.
 - npm shows `@mdevs/openprovider@1.9.0`.
-- Local `ocx status` is not running.
+- Local `opr status` is not running.
 
 ## Non-Goals
 
@@ -181,6 +181,6 @@ Acceptance:
   conservative behavior is implemented and tested.
 - Native upstream WebSocket-to-WebSocket bridging is not required; native passthrough may continue
   HTTP Responses upstream as long as Codex-facing WS protocol behavior is correct.
-- Non-representable provider modalities outside the current opencodex/jawcode type model are out of
+- Non-representable provider modalities outside the current openprovider/jawcode type model are out of
   scope.
 

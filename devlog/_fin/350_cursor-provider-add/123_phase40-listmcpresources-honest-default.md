@@ -29,7 +29,7 @@ with `readMcpResource`:
 +    ? await deps.listMcpResources()
 +    : create(ListMcpResourcesExecResultSchema, {
 +        result: { case: "error", value: create(ListMcpResourcesErrorSchema, {
-+          error: "No local MCP resource executor is configured inside opencodex.",
++          error: "No local MCP resource executor is configured inside openprovider.",
 +        }) },
 +      });
 ```

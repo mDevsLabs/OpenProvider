@@ -18,7 +18,7 @@ consumer subscription" pattern. This is why `00_plan.md` gates the guardian per 
 defaults it off.
 
 The clean dividing line across all providers: **sanctioned API-key usage is fine; reusing
-consumer-subscription OAuth tokens outside the vendor's own client is the risky part.** opencodex's
+consumer-subscription OAuth tokens outside the vendor's own client is the risky part.** openprovider's
 `authMode: "key"` providers are low risk; its `authMode: "oauth"` / `"forward"` consumer paths are
 where this matters.
 
@@ -43,7 +43,7 @@ a violation of the Consumer Terms of Service." Anthropic then deployed **server-
 (reported Jan–Mar 2026): consumer-plan OAuth tokens now error outside Claude Code / claude.ai. The
 stated motive was stopping "subscription arbitrage" by third-party harnesses (e.g. OpenClaw).
 
-Implication for opencodex: routing Claude Pro/Max OAuth through the proxy is a *live, enforced*
+Implication for openprovider: routing Claude Pro/Max OAuth through the proxy is a *live, enforced*
 violation today, independent of pooling. Proactive refresh would additionally generate exactly the
 non-official-client traffic the server-side block looks for. → Default `refreshPolicy: "disabled"`,
 plus a login-time ToS warning.

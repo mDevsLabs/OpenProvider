@@ -7,14 +7,14 @@
 ## 결론 (한 줄)
 
 ChatGPT Codex 백엔드(`chatgpt.com/backend-api/codex/responses`)가 장시간 요청에서
-비선언 transient 502를 뱉었고, **ocx는 HTTP 502를 재시도하지 않고 Anthropic
+비선언 transient 502를 뱉었고, **opr는 HTTP 502를 재시도하지 않고 Anthropic
 `api_error`로 변환해 내려보내기 때문에** Claude Code Task(sol 빌더)가 재시도 신호 없이
 치명 에러로 즉사했다. 모델 라우팅 충돌은 없었다.
 
 ## 실패 체인 (sol 서브에이전트, file:line 근거)
 
 ```
-Claude Code /v1/messages (model claude-ocx-native--gpt-5.6-sol[1m])
+Claude Code /v1/messages (model claude-opr-native--gpt-5.6-sol[1m])
   └ index.ts:450,461            라우터 → handleClaudeMessages (타임아웃 비활성)
   └ claude-messages.ts:302,307  [1m] 마커 제거 → alias 해석
   └ claude/alias.ts:40,48       native pseudo-provider → bare gpt-5.6-sol
@@ -78,7 +78,7 @@ Tier-1 후보로 남은 것(스니펫만, 원문 미확인): Codex 백엔드 SSE
    분류만 바꾸면 Claude Code 쪽 내장 재시도가 작동. 1번보다 구현이 작고 겹쳐 써도 됨.
    선행 확인 1건: Claude Code가 529를 실제 재시도하는지 실측(잔여 항목).
 3. **request-log 5xx 영속화**: 200개 링버퍼라 사후 분석이 불가능했다. 5xx/terminal
-   이상 항목만이라도 `~/.opencodex/`에 append 하면 다음 사건은 즉시 판별 가능.
+   이상 항목만이라도 `~/.openprovider/`에 append 하면 다음 사건은 즉시 판별 가능.
 4. (보류) mid-stream resume은 업스트림 커서 없이는 불안전 — 현행 fail-closed 유지.
 
 ## 잔여 항목 (정직한 미해결)

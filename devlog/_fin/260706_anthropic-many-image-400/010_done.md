@@ -29,6 +29,6 @@
   >2000px image is fixed by the trim (count drops to 20 so the 8000px cap applies),
   but a request needing >20 large images simultaneously loses the oldest ones.
 - Sniffers are header-only; a malformed header means "unknown", never a drop.
-- The RUNNING ocx instance must be restarted to pick this up.
+- The RUNNING opr instance must be restarted to pick this up.
 
 ## Terminal outcome: DONE

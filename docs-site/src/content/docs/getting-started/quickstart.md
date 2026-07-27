@@ -8,10 +8,10 @@ This guide takes you from a fresh install to running Codex against a non-OpenAI 
 ## 1. Run the setup wizard
 
 ```bash
-ocx init
+opr init
 ```
 
-`ocx init` walks you through:
+`opr init` walks you through:
 
 1. **Pick a provider** — choose one of the 50 built-in registry presets or `custom` to type a base
    URL and adapter.
@@ -21,7 +21,7 @@ ocx init
 5. **Inject into Codex?** — on a normal loopback setup, OpenProvider adds a root `openai_base_url` to
    `$CODEX_HOME/config.toml` (default `~/.codex/config.toml`) so Codex's built-in `openai` provider
    targets the proxy. Remote/LAN binds use a dedicated provider entry with an API-auth header instead.
-6. **Install the autostart shim?** — when enabled, launching `codex` runs `ocx ensure` first.
+6. **Install the autostart shim?** — when enabled, launching `codex` runs `opr ensure` first.
 
 The result is saved to `$OpenProvider_HOME/config.json` (default `~/.OpenProvider/config.json`).
 
@@ -35,25 +35,25 @@ adapter metadata.
 ## 2. Start the proxy
 
 ```bash
-ocx start            # defaults to port 10100
-ocx start --port 8080
+opr start            # defaults to port 10100
+opr start --port 8080
 ```
 
 On start, OpenProvider:
 
-- writes its PID to `~/.OpenProvider/ocx.pid` (and refuses to start twice),
+- writes its PID to `~/.OpenProvider/opr.pid` (and refuses to start twice),
 - discovers live models where the provider supports it and **syncs native and routed entries into
   Codex's model catalog**,
 - listens on `http://localhost:<port>/v1`.
 
-If the requested port is busy, `ocx start` selects a free port, records it in `runtime-port.json`,
+If the requested port is busy, `opr start` selects a free port, records it in `runtime-port.json`,
 and updates Codex to use the live listener.
 
 Check it:
 
 ```bash
-ocx status
-ocx gui       # open the dashboard on the live port
+opr status
+opr gui       # open the dashboard on the live port
 ```
 
 ## 3. Use Codex
@@ -74,7 +74,7 @@ codex -m "ollama-cloud/glm-5.2"      "Write a SQL migration"
 ## Choose sub-agent models (optional)
 
 A fresh config features five native models in Codex's sub-agent picker: `gpt-5.5`,
-`gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, and `gpt-5.4-mini`. Open `ocx gui` to replace or
+`gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, and `gpt-5.4-mini`. Open `opr gui` to replace or
 reorder up to five native or routed models. The dashboard can also set one preferred sub-agent model
 and reasoning effort; OpenProvider adds that guidance to v1 collaboration requests.
 
@@ -83,8 +83,8 @@ and reasoning effort; OpenProvider adds that guidance to v1 collaboration reques
 Some providers support real account login (OAuth, auto-refreshed):
 
 ```bash
-ocx login xai          # or: anthropic, kimi, kiro, google-antigravity, cursor
-ocx logout xai
+opr login xai          # or: anthropic, kimi, kiro, google-antigravity, cursor
+opr logout xai
 ```
 
 OpenAI itself needs **no key** — the default provider forwards your existing `codex login`
@@ -93,9 +93,9 @@ credentials straight through (see [Providers](/guides/providers/)).
 ## Stopping & restoring
 
 ```bash
-ocx stop          # stop the proxy and restore native Codex
-ocx restore       # restore native Codex without stopping (alias: ocx eject)
-ocx restore back  # route Codex through the still-running proxy again
+opr stop          # stop the proxy and restore native Codex
+opr restore       # restore native Codex without stopping (alias: opr eject)
+opr restore back  # route Codex through the still-running proxy again
 ```
 
 ## Next

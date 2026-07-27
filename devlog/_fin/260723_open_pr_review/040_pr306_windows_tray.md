@@ -12,7 +12,7 @@
 - Windows-only notification-area tray (`src/tray/windows-tray.ps1`, 272-line PowerShell WinForms
   app) with Start/Stop/Restart/Open dashboard/Open logs/Exit; singleton via named mutex keyed
   on sha256(home path); heartbeat JSON + action log.
-- `ocx tray install|start|stop|status|uninstall` CLI + `HKCU\...\Run` login registration,
+- `opr tray install|start|stop|status|uninstall` CLI + `HKCU\...\Run` login registration,
   preserved across package updates (`src/update/tray-update-plan.mjs`).
 - Restart-safety diagnostics: `src/codex/autostart-health.ts` classifies OCX-owned routing vs
   custom/remote gateways vs stale/disabled/conflicting lifecycle state; fail-closed injection.

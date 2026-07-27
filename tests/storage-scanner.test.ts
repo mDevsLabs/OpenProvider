@@ -18,7 +18,7 @@ let previousCodexHome: string | undefined;
  * date-partitioned sessions/, flat archived_sessions/, versioned state / logs
  * sqlite files with WAL siblings, plus non-session dirs for the "other" bucket.
  */
-function buildFixtureHome(home: string = mkdtempSync(join(tmpdir(), "ocx-storage-fixture-"))): string {
+function buildFixtureHome(home: string = mkdtempSync(join(tmpdir(), "opr-storage-fixture-"))): string {
 
   mkdirSync(join(home, "sessions", "2026", "05", "27"), { recursive: true });
   mkdirSync(join(home, "sessions", "2026", "06", "01"), { recursive: true });
@@ -170,7 +170,7 @@ describe("scanStorage", () => {
    // A literal '#'/'?'/'%' in the path is legal on POSIX filesystems and starts a
    // fragment/query/escape if the immutable file: URI is built by naive string
    // concatenation — it must not silently degrade every row count to null.
-   const parent = mkdtempSync(join(tmpdir(), "ocx-storage-uri-"));
+   const parent = mkdtempSync(join(tmpdir(), "opr-storage-uri-"));
     // '?' is illegal on NTFS; use only chars valid across all CI platforms.
     const weirdHome = join(parent, "weird#name+with%percent");
     mkdirSync(weirdHome);
@@ -211,7 +211,7 @@ describe("scanStorage", () => {
   }, 15_000);
 
   test("reports empty buckets for a missing or empty home without throwing", () => {
-    fixtureHome = mkdtempSync(join(tmpdir(), "ocx-storage-empty-"));
+    fixtureHome = mkdtempSync(join(tmpdir(), "opr-storage-empty-"));
     const emptyReport = scanStorage(fixtureHome);
     expect(emptyReport.total).toEqual({ bytes: 0, fileCount: 0 });
     for (const b of emptyReport.buckets) {
@@ -224,7 +224,7 @@ describe("scanStorage", () => {
   }, 15_000);
 
   test("throws when the home exists but is not a directory", () => {
-    fixtureHome = mkdtempSync(join(tmpdir(), "ocx-storage-notdir-"));
+    fixtureHome = mkdtempSync(join(tmpdir(), "opr-storage-notdir-"));
     const filePath = join(fixtureHome, "home-is-a-file");
     writeFileSync(filePath, "not a directory");
     // A missing home is a normal fresh-machine state (zeros), but a *broken* home

@@ -29,7 +29,7 @@ Audited CLOSEABLE (work landed + tested; devlog status lines were stale):
 | issue_local_catalog-sync-hardening | `13c03e6`/`b5c4848`; Gap A/B + `codex-catalog-sync-hardening.test.ts` |
 | 260702_cursor-toolcall-mcp-empty-rca | **closed as SUPERSEDED**: symptoms fixed via WP2 (`9340872`); this doc's own proposed fix (proactive field-4) + `run_shell` flip were deliberately NOT taken |
 | 380_prompt-caching-strategy | **re-audited → CLOSEABLE** (initial OPEN verdict was wrong). Actionable core landed across ~11 commits — Phase 1/3 telemetry, Phase 2 prompt_cache_key preserve, Phase 5 Anthropic cache_control. Phase 4 (derived key) + Phase 6 (routing) are doc-declared future/optional. See its `10_closeout.md`. |
-| 260702_codex-history-sync-hardening | **re-audited → CLOSEABLE** (initial PARTIAL verdict superseded). Design A + the routing-fallback fix (root `model_provider="opencodex"`, `744cc9e`) shipped and work; Design B (openai-id override) is a parked optional alternative, not a live defect. See its `03_closeout.md`. |
+| 260702_codex-history-sync-hardening | **re-audited → CLOSEABLE** (initial PARTIAL verdict superseded). Design A + the routing-fallback fix (root `model_provider="openprovider"`, `744cc9e`) shipped and work; Design B (openai-id override) is a parked optional alternative, not a live defect. See its `03_closeout.md`. |
 
 ## Second-pass re-audit note (2026-07-03)
 

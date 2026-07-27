@@ -6,7 +6,7 @@
 client bodies verbatim to api.anthropic.com — no `normalizeAnthropicImages`, no
 `enforceAnthropicImageLimits` (rg-verified). Claude Code resizes single images at
 ingestion (001 §2) but its HISTORY still accumulates: >20MiB aggregate base64 and >100
-images reproduce 413/400 through ocx. The routed (non-passthrough) branch is covered via
+images reproduce 413/400 through opr. The routed (non-passthrough) branch is covered via
 the anthropic adapter; only the native branch leaks.
 
 ## Diff plan

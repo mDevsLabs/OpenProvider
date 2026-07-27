@@ -2,7 +2,7 @@
 
 ## Trigger
 
-Kiro/CodeWhisperer does not return authoritative token usage. opencodex now
+Kiro/CodeWhisperer does not return authoritative token usage. openprovider now
 estimates usage so Codex display and auto-compact work, but internal usage logs
 still classify those numbers as `reported`. The parity review also asks for
 redacted diagnostics that make Kiro auth/region/model/debugging easier without
@@ -112,7 +112,7 @@ leaking prompts, tokens, profile ARNs, or local paths.
 - No raw prompt or full Kiro payload logging.
 - No full raw AWS eventstream frame capture.
 - No public Responses API schema change for usage; estimated status is for
-  opencodex logs/debugging.
+  openprovider logs/debugging.
 
 ## Completion evidence
 

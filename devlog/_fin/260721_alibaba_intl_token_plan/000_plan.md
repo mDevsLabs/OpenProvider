@@ -1,7 +1,7 @@
 # Alibaba Token Plan International (ap-southeast-1) Provider
 
 ## Objective
-Add `alibaba-token-plan-intl` provider to OpenCodex for international Alibaba Cloud
+Add `alibaba-token-plan-intl` provider to OpenProvider for international Alibaba Cloud
 accounts that get redirected from the China console.
 
 ## Evidence

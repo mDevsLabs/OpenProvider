@@ -33,7 +33,7 @@ Its catalog also maps Umans models to:
 - `provider: "umans"`
 - `baseUrl: "https://api.code.umans.ai"`
 
-This strongly supports making opencodex's first-class Umans preset use the `anthropic` adapter,
+This strongly supports making openprovider's first-class Umans preset use the `anthropic` adapter,
 not the `openai-chat` adapter.
 
 ## Evidence
@@ -244,11 +244,11 @@ Notable model metadata:
   via-handoff, not native image blocks.
 - `umans-glm-5.2`: context 405,504, maxTokens 131,071.
 
-## Implications for opencodex
+## Implications for openprovider
 
 ### 1. Default Umans preset should be `anthropic`
 
-Recommended opencodex provider seed:
+Recommended openprovider provider seed:
 
 ```json
 {
@@ -268,9 +268,9 @@ Recommended opencodex provider seed:
 }
 ```
 
-### 2. opencodex may need an Umans-specific Anthropic compat flag
+### 2. openprovider may need an Umans-specific Anthropic compat flag
 
-Oh My Pi sets `escapeBuiltinToolNames: true` for Umans. opencodex currently only has generic
+Oh My Pi sets `escapeBuiltinToolNames: true` for Umans. openprovider currently only has generic
 Anthropic tool mapping and does not expose an equivalent provider flag. If issue #18 includes
 tool/file-change instability on Umans, this is a concrete compatibility gap to inspect.
 
@@ -288,21 +288,21 @@ Oh My Pi does not rely only on generic `/models`. It uses:
 
 Patch direction:
 
-- For opencodex, a first pass can ship static model metadata in `PROVIDER_REGISTRY`.
+- For openprovider, a first pass can ship static model metadata in `PROVIDER_REGISTRY`.
 - A second pass can add Umans-specific live metadata enrichment for context/output/vision/thinking
   flags.
 
 ### 4. `openai-chat` should remain an advanced fallback only
 
 Umans does expose Chat Completions, but Oh My Pi's coding-agent path deliberately chooses
-Anthropic Messages. For opencodex/Codex, the safer UX is:
+Anthropic Messages. For openprovider/Codex, the safer UX is:
 
 - default: `umans` -> `anthropic`
 - optional advanced: `umans-openai` -> `openai-chat`
 
 ## Conclusion
 
-Oh My Pi strongly confirms the previous opencodex research:
+Oh My Pi strongly confirms the previous openprovider research:
 
 - Umans should be treated as an Anthropic Messages provider for coding-agent usage.
 - API-key validation should call `/v1/messages` with `x-api-key`, not `/chat/completions` with
@@ -310,6 +310,6 @@ Oh My Pi strongly confirms the previous opencodex research:
 - Umans model metadata should include mandatory reasoning, text-only GLM via-handoff handling, and
   built-in tool-name escaping.
 
-For opencodex, the next implementation should add a first-class Umans provider preset using the
+For openprovider, the next implementation should add a first-class Umans provider preset using the
 `anthropic` adapter and then test issue #18 against that path before attempting duplicate-suppression
 logic in the OpenAI Chat adapter.

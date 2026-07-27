@@ -183,7 +183,7 @@ export function warnDroppedConfiguredIdsOnce(name: string, droppedConfiguredIds:
   if (lastDropWarnSignature.get(name) === signature) return;
   lastDropWarnSignature.set(name, signature);
   console.warn(
-    `[opencodex] Provider model discovery for "${name}" omitted configured model ids; dropping them from the authoritative live catalog: ${droppedConfiguredIds.join(", ")}.`,
+    `[openprovider] Provider model discovery for "${name}" omitted configured model ids; dropping them from the authoritative live catalog: ${droppedConfiguredIds.join(", ")}.`,
   );
 }
 
@@ -275,7 +275,7 @@ export async function fetchProviderModels(name: string, prov: OcxProviderConfig,
     markModelsFetchFailure(name);
     markProviderDiscoveryFailed(name, { reason: "provider" });
     console.warn(
-      `[opencodex] Cursor model discovery for "${name}" failed [${liveResult.error}]${liveResult.detail ? `: ${liveResult.detail}` : ""}; using stale/static catalog degradation.`,
+      `[openprovider] Cursor model discovery for "${name}" failed [${liveResult.error}]${liveResult.detail ? `: ${liveResult.detail}` : ""}; using stale/static catalog degradation.`,
     );
     const staleCursor = getStaleCached(name);
     return staleCursor ? applyConfigHintsToCachedModels(name, prov, staleCursor) : configured;
@@ -329,7 +329,7 @@ export async function fetchProviderModels(name: string, prov: OcxProviderConfig,
       const { models, fallback, shouldLog } = failedDiscoveryFallback({ reason: "blocked" });
       if (shouldLog) {
         console.warn(
-          `[opencodex] Provider model discovery for "${name}" was blocked by destination policy: ${destinationError} [urlClass=${urlClass}, fallback=${fallback}].`,
+          `[openprovider] Provider model discovery for "${name}" was blocked by destination policy: ${destinationError} [urlClass=${urlClass}, fallback=${fallback}].`,
         );
       }
       return models;
@@ -340,7 +340,7 @@ export async function fetchProviderModels(name: string, prov: OcxProviderConfig,
       const { models, fallback, shouldLog } = failedDiscoveryFallback({ reason: "http", httpStatus: res.status });
       if (shouldLog) {
         console.warn(
-          `[opencodex] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
+          `[openprovider] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
         );
       }
       return models;
@@ -360,7 +360,7 @@ export async function fetchProviderModels(name: string, prov: OcxProviderConfig,
         : "returned a non-JSON 2xx response";
       if (shouldLog) {
         console.warn(
-          `[opencodex] Provider model discovery for "${name}" ${diagnostic} [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
+          `[openprovider] Provider model discovery for "${name}" ${diagnostic} [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
         );
       }
       return models;
@@ -372,7 +372,7 @@ export async function fetchProviderModels(name: string, prov: OcxProviderConfig,
       const { models, fallback, shouldLog } = failedDiscoveryFallback({ reason: "invalid_response" });
       if (shouldLog) {
         console.warn(
-          `[opencodex] Provider model discovery for "${name}" returned malformed 2xx data [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
+          `[openprovider] Provider model discovery for "${name}" returned malformed 2xx data [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
         );
       }
       return models;
@@ -409,7 +409,7 @@ export async function fetchProviderModels(name: string, prov: OcxProviderConfig,
     }
     if (live.length === 0 && name !== OPENAI_API_PROVIDER_ID) {
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" returned an authoritative empty catalog; ${droppedConfiguredIds.length > 0 ? `dropping configured model ids: ${droppedConfiguredIds.join(", ")}` : "no models will be exposed"}.`,
+        `[openprovider] Provider model discovery for "${name}" returned an authoritative empty catalog; ${droppedConfiguredIds.length > 0 ? `dropping configured model ids: ${droppedConfiguredIds.join(", ")}` : "no models will be exposed"}.`,
       );
     } else if (droppedConfiguredIds.length > 0
       && name !== OPENAI_API_PROVIDER_ID
@@ -423,7 +423,7 @@ export async function fetchProviderModels(name: string, prov: OcxProviderConfig,
     const { models, fallback, shouldLog } = failedDiscoveryFallback({ reason: "network" });
     if (shouldLog) {
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
+        `[openprovider] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
       );
     }
     return models;
@@ -624,7 +624,7 @@ export function augmentRoutedModelsWithRegistryOpenAiApiRows(
     const warningKey = `${trusted.provider}/${trusted.id}\n${liveSignature}\n${trustedSignature}`;
     if (openAiApiCollisionWarnings.has(warningKey)) continue;
     openAiApiCollisionWarnings.add(warningKey);
-    console.warn(`[opencodex] replacing conflicting live OpenAI API metadata for ${trusted.provider}/${trusted.id} with trusted registry metadata`);
+    console.warn(`[openprovider] replacing conflicting live OpenAI API metadata for ${trusted.provider}/${trusted.id} with trusted registry metadata`);
   }
 
   return [

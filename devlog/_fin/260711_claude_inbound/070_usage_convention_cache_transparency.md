@@ -3,7 +3,7 @@
 Round 4 (user report 260711 20:05): "캐싱이 하나도 처리가 안되고, 토큰 사용량이 어떻게
 처리되고 있는지 너무 불투명해".
 
-## Findings (live usage.jsonl, requests ocx-mrg9a*–mrg9d*)
+## Findings (live usage.jsonl, requests opr-mrg9a*–mrg9d*)
 
 1. **Upstream Anthropic prompt caching WORKS on the routed path.** The adapter's
    heuristic breakpoints (tools/system/penultimate-user + top-level automatic

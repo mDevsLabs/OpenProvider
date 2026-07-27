@@ -23,7 +23,7 @@ status.json.proxy.health.ok)` (audit blocker 2: gating on `!proxy.running` =
 ```ts
 if (!(status.json.proxy.pid || status.json.proxy.health.ok)) {
   console.log("   ↳ Not running — Codex/Claude requests will fail with connection errors.");
-  console.log("     Restart with 'ocx start', or install the persistent service: 'ocx service install'.");
+  console.log("     Restart with 'opr start', or install the persistent service: 'opr service install'.");
 }
 ```
 
@@ -38,7 +38,7 @@ explicit-stop call site instead:
 ```ts
 case "stop": {
   if (await handleStop()) {
-    console.log("⚠️  Codex/Claude requests through the proxy will fail until it is restarted ('ocx start' or 'ocx service start').");
+    console.log("⚠️  Codex/Claude requests through the proxy will fail until it is restarted ('opr start' or 'opr service start').");
   }
   break;
 }
@@ -58,9 +58,9 @@ export function proxyDownRestartHint(input: {
 }): string | null {
   if (input.proxyRunning) return null;
   const restart = input.serviceViable
-    ? "Restart it with 'ocx service start' (service installed) or 'ocx start'."
-    : "Restart it with 'ocx start', or install the persistent service: 'ocx service install'.";
-  return `The ocx proxy is not running. Codex/Claude clients pinned to 127.0.0.1:${input.port} fail with errors like "error sending request for url (http://127.0.0.1:${input.port}/v1/responses)". ${restart}`;
+    ? "Restart it with 'opr service start' (service installed) or 'opr start'."
+    : "Restart it with 'opr start', or install the persistent service: 'opr service install'.";
+  return `The opr proxy is not running. Codex/Claude clients pinned to 127.0.0.1:${input.port} fail with errors like "error sending request for url (http://127.0.0.1:${input.port}/v1/responses)". ${restart}`;
 }
 ```
 
@@ -120,15 +120,15 @@ New section next to "Catalog troubleshooting":
 
 If Codex shows retries followed by an error like
 `stream disconnected before completion: error sending request for url (http://127.0.0.1:10100/v1/responses)`
-(and Claude Code shows a similar connection failure), the opencodex proxy is not
+(and Claude Code shows a similar connection failure), the openprovider proxy is not
 running — nothing is listening on the configured port. Restart it:
 
 ​```bash
-ocx start              # foreground
-ocx service install    # persistent: auto-starts on login and respawns on crash
+opr start              # foreground
+opr service install    # persistent: auto-starts on login and respawns on crash
 ​```
 
-Check state any time with `ocx status`; `ocx doctor` reports restart safety.
+Check state any time with `opr status`; `opr doctor` reports restart safety.
 ```
 
 Same content translated per locale (short section, keep code blocks identical).
@@ -146,4 +146,4 @@ Same content translated per locale (short section, keep code blocks identical).
   and keep `/no token found/i`; add an instructions-capture test for the onAuth text
   (loginKiro with onManualCodeInput + onAuth spy, empty input → assert instructions).
 - tests/doctor.test.ts — `proxyDownRestartHint`: returns null when running; includes
-  port, symptom substring, `ocx start`; prefers `ocx service start` when serviceViable.
+  port, symptom substring, `opr start`; prefers `opr service start` when serviceViable.

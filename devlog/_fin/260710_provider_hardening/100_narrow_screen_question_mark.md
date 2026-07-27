@@ -34,7 +34,7 @@ Reading this as a dense developer-tool control embedded in an expressive docs la
    - Apply the same icon replacement to the multi-agent help control, using `models.v2Label` as its accessible name and `aria-haspopup="dialog"`.
 4. MODIFY `docs-site/src/assets/dashboard.png`
    - Refresh from a sanitized rendered GUI after the source change; no unrelated visual edits.
-   - Deterministic capture fixture: run the GUI against an ephemeral loopback Bun mock API that returns only fixed synthetic health/provider/settings/sidecar/usage/v2/injection/models/diagnostics payloads. Do not contact the running user proxy or read `~/.opencodex`.
+   - Deterministic capture fixture: run the GUI against an ephemeral loopback Bun mock API that returns only fixed synthetic health/provider/settings/sidecar/usage/v2/injection/models/diagnostics payloads. Do not contact the running user proxy or read `~/.openprovider`.
    - Capture at the existing 3200x1574 pixel dimensions in light mode after data settles. Verify dimensions/profile metadata and inspect the captured pixels; OCR/text inspection must show no standalone help `?` while preserving the expected synthetic dashboard labels.
 5. CHECK
    - `rg` proves no `>?</button>` / Help-labeled literal question-mark buttons remain.

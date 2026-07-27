@@ -12,14 +12,14 @@ describe("Codex catalog refresh", () => {
   test("writes an expired Codex models cache whenever the materialized catalog exists", async () => {
     let invalidated = 0;
     const result = await refreshCodexModelCatalog(config, {
-      syncCatalogModels: async () => ({ added: 0, path: "/tmp/opencodex-catalog.json" }),
+      syncCatalogModels: async () => ({ added: 0, path: "/tmp/openprovider-catalog.json" }),
       invalidateCodexModelsCache: () => { invalidated += 1; },
       existsSync: () => true,
     });
 
     expect(result).toEqual({
       added: 0,
-      path: "/tmp/opencodex-catalog.json",
+      path: "/tmp/openprovider-catalog.json",
       catalogExists: true,
       cacheSynced: true,
     });

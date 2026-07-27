@@ -10,10 +10,10 @@ Code から OAuth ログイン、アカウントプール、キーフェイル�
 ## クイックスタート
 
 ```bash
-ocx claude
+opr claude
 ```
 
-`ocx claude` はプロキシが実行中か確認した後、環境を接続して Claude Code を実行します。
+`opr claude` はプロキシが実行中か確認した後、環境を接続して Claude Code を実行します。
 
 | 変数 | 値 |
  --- | --- |
@@ -26,21 +26,21 @@ ocx claude
 | `ANTHROPIC_DEFAULT_{OPUS,SONNET,FABLE}_MODEL` | `claudeCode.tierModels.*` (任意) |
 | `CLAUDE_CODE_ALWAYS_ENABLE_EFFORT` | `alwaysEnableEffort` がオンなら `1` (条件付き) |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS` / `DISABLE_COMPACT` | `maxContextTokens` が設定された場合の従来コンテキスト上書き値 (条件付き) |
-直接 export した変数が常に優先します。追加引数はそのまま渡されます: `ocx claude -p "hello"`。
+直接 export した変数が常に優先します。追加引数はそのまま渡されます: `opr claude -p "hello"`。
 
 ## システム環境統合(macOS)
 
-`claudeCode.systemEnv` を `true` に設定すると(デフォルト: **オフ`)`ocx start` が `launchctl setenv` を
+`claudeCode.systemEnv` を `true` に設定すると(デフォルト: **オフ`)`opr start` が `launchctl setenv` を
 使い `ANTHROPIC_BASE_URL` と関連 Claude Code 環境変数をシステム全体に注入します。そのため新規
-ターミナルのウィンドウとタブでは `ocx claude` ラッパーなしでも通常の `claude` コマンドがプロキシを経由します。すでに開いている
+ターミナルのウィンドウとタブでは `opr claude` ラッパーなしでも通常の `claude` コマンドがプロキシを経由します。すでに開いている
 シェルには適用されないので開き直す必要があります。
 
-`ocx stop` とプロキシ終了は**注入されたキーを解除します**。以前の値を復元せず、OpenProvider が
-注入したキーのみ削除します。プロキシは `~/.OpenProvider/claude-env.sh` も書き出し、`ocx start` はこのファイルを
+`opr stop` とプロキシ終了は**注入されたキーを解除します**。以前の値を復元せず、OpenProvider が
+注入したキーのみ削除します。プロキシは `~/.OpenProvider/claude-env.sh` も書き出し、`opr start` はこのファイルを
 自動で読み込む `.zshrc` source hook をインストールします。
 
 設定で `claudeCode.systemEnv: false` に指定するか GUI トグルでオフにできます。この機能は macOS
-専用で、他のプラットフォームでは `ocx claude` を使ってください。
+専用で、他のプラットフォームでは `opr claude` を使ってください。
 
 ## ネイティブ Claude パススルー(サブスクリプション直接接続)
 
@@ -55,7 +55,7 @@ ocx claude
 
 次の 4 つの条件を**すべて**満たすとパススルーが動作します。`nativePassthrough` が `false` でなく、
 モデル名が `claude` または `anthropic` で始まり、bearer または `x-api-key` が `sk-ant-` で
-始まり、エイリアス/モデルマップ解決結果が変更されていない同じモデルであること。そのため `ocx claude` を
+始まり、エイリアス/モデルマップ解決結果が変更されていない同じモデルであること。そのため `opr claude` を
 使うとき "claude.ai connectors are disabled" 警告ももう表示されません。
 
 `claudeCode.nativePassthrough: false` でオフにでき、`claudeCode.anthropicBaseUrl` で別のアドレスを
@@ -69,7 +69,7 @@ Claude Code 2.1.129 以降は `GET /v1/models?limit=1000` でゲートウェイ�
 
 | 画面 | 形式 | 例 |
  --- | --- | --- |
-| Claude Code CLI | `claude-ocx-<provider>--<model>` | `claude-ocx-native--gpt-5.6-sol` |
+| Claude Code CLI | `claude-opr-<provider>--<model>` | `claude-opr-native--gpt-5.6-sol` |
 | Claude Desktop 3P | `claude-opus-4-8-<code>` (3 桁の base36 ハッシュ) | `claude-opus-4-8-ncb` |
 
 プロキシはリクエストごとに系列を選びます。`?ids=cli` または `?ids=desktop` が優先し、指定しないと
@@ -119,7 +119,7 @@ Claude ページで圧縮値を調整できます。**警告:** モデルの実�
 
 ### 実モデル環境
 
-`effectiveModelEnv` は `ocx claude` / システム環境 / シェルファイルが注入するスロット 6 つを計算します。
+`effectiveModelEnv` は `opr claude` / システム環境 / シェルファイルが注入するスロット 6 つを計算します。
 `ANTHROPIC_MODEL`、4 つの `ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU,FABLE}_MODEL`、従来
 `ANTHROPIC_SMALL_FAST_MODEL` です。実際の Haiku 値は `tierModels.haiku ?? smallFastModel` で、
 両 Haiku 変数に入ります。
@@ -128,22 +128,22 @@ Claude ページで圧縮値を調整できます。**警告:** モデルの実�
 
 ## ロスターエージェント(injectAgents)
 
-`ocx claude` とシステム環境デーモンは推奨サブエージェントロスター(Subagents タブ、最大 5 モデル)と
-`ocx-self` を `~/.claude/agents/ocx-*.md` に同期します。
+`opr claude` とシステム環境デーモンは推奨サブエージェントロスター(Subagents タブ、最大 5 モデル)と
+`opr-self` を `~/.claude/agents/opr-*.md` に同期します。
 
-- **`ocx-self`** は `/model` ピッカーのデフォルトを固定し、値がない場合は `claudeCode.model` を使います。
+- **`opr-self`** は `/model` ピッカーのデフォルトを固定し、値がない場合は `claudeCode.model` を使います。
   両方ない場合は作成しません。モデル継承は使いません。
-- 各エージェント本文には `<!-- ocx-route: <model> -->` ディレクティブが含まれます。プロキシはこのディレクティブで
+- 各エージェント本文には `<!-- opr-route: <model> -->` ディレクティブが含まれます。プロキシはこのディレクティブで
   実際のルートを固定します。そのため Agent ツールの `model` 引数は機能せず、プレースホルダとして
   `"haiku"` を渡してください。
 - frontmatter にはエイリアスが入り、ルーティングはディレクティブに従います。
-- `generated-by: OpenProvider` が含まれる標識検証済み `ocx-*.md` ファイルのみ上書きまたは整理します。
+- `generated-by: OpenProvider` が含まれる標識検証済み `opr-*.md` ファイルのみ上書きまたは整理します。
   ユーザー作成のエージェントは触りません。
 - ファイルごとに原子的に同期します(write + rename)。
 - `enabled: false` または `injectAgents: false` を設定すると所有権確認済みの定義をすべて整理します。
 - GUI PUT とロスター変更は即座に再同期し、launcher/system-env は実行時に同期します。
 
-ディスパッチ例: `subagent_type: "ocx-gpt-5-6-sol"`。1M をサポートする対象には `[1m]` が自動で
+ディスパッチ例: `subagent_type: "opr-gpt-5-6-sol"`。1M をサポートする対象には `[1m]` が自動で
 付きます。
 
 ## バンドルスキルの省略(blockedSkills)
@@ -308,7 +308,7 @@ role、`tool_use_id` のない `tool_result`、id/name のない `tool_use`、na
 
 ## デバッグキャプチャ
 
-`ocx debug claude on|off|status|reset`、`OCX_CLAUDE_DEBUG=1` または
+`opr debug claude on|off|status|reset`、`OCX_CLAUDE_DEBUG=1` または
 `PUT /api/debug {"claude": true}` で入力キャプチャを制御します。`GET /api/claude/inbound-debug` は
 `{enabled, entries}` を返します(最新項目から、20 件の循環バッファ)。
 
@@ -324,7 +324,7 @@ role、`tool_use_id` のない `tool_result`、id/name のない `tool_use`、na
 ラベルはすべての言語で意図的に同じです。ページには次の項目が表示されます。
 
 - 入力遮断スイッチ(使用トグル)
-- クイックスタート(`ocx claude`)と手動環境ブロック
+- クイックスタート(`opr claude`)と手動環境ブロック
 - Fast Mode セレクター(Auto / ON / OFF)
 - 自動コンテキストトグルと圧縮しきい値ドロップダウン
 - サブエージェント自動登録トグル
@@ -348,18 +348,18 @@ Anthropic OAuth アクティブアカウントが `needsReauth` 状態でない�
 Anthropic バックエンドを明示すると意図的に失敗後停止します。
 
 **"claude.ai connectors are disabled"** — シェルに `ANTHROPIC_API_KEY` または
-`ANTHROPIC_AUTH_TOKEN` が設定されています。`ocx claude` は意図的に `ANTHROPIC_API_KEY` を
-設定しないため、直接 export していれば解除してください。`ocx claude` 使用時は
+`ANTHROPIC_AUTH_TOKEN` が設定されています。`opr claude` は意図的に `ANTHROPIC_API_KEY` を
+設定しないため、直接 export していれば解除してください。`opr claude` 使用時は
 `ANTHROPIC_BASE_URL`、検索、自動コンテキスト、設定されたモデルスロットを注入しますが
 `ANTHROPIC_API_KEY` は絶対に注入しません。
 
 **/model ピッカーにモデルが表示されない** — `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` が
-設定されているか確認してください(`ocx claude` では自動)。`ocx claude` を実行して
+設定されているか確認してください(`opr claude` では自動)。`opr claude` を実行して
 `~/.claude/cache/gateway-models.json` のゲートウェイモデルキャッシュを更新してください。
 `claudeCode.enabled` が `false` でないかも確認してください。
 
 **ポート変更後に古い環境が残る** — プロキシポートが変わった場合、既存シェルの
-`ANTHROPIC_BASE_URL` が古い値の可能性があります。新規ターミナルを開くか `ocx claude` を再実行してください。
+`ANTHROPIC_BASE_URL` が古い値の可能性があります。新規ターミナルを開くか `opr claude` を再実行してください。
 
 **大型モデルなのにコンテキストが 200k に制限される** — ピッカーで `[1m]` 変種を選ぶか、デフォルトでオンの
 自動コンテキストを使ってください。ピッカーに `[1m]` 行がない場合はモデルの公式コンテキストウィンドウが
@@ -369,7 +369,7 @@ Anthropic バックエンドを明示すると意図的に失敗後停止しま�
 言及すると自動で読み込まれます。ネイティブパススルーでは正常で、ルーティングモデルでは OpenProvider が
 デフォルトでスタブに差し替えます(`blockedSkills: ["claude-api"]`)。
 
-**サブエージェントが誤ったモデルにディスパッチされる** — ロスターエージェント(`ocx-*`)は Agent ツールの `model`
-引数ではなく `<!-- ocx-route: ... -->` ディレクティブを使います。ディレクティブが希望ルートと一致するか確認し、
+**サブエージェントが誤ったモデルにディスパッチされる** — ロスターエージェント(`opr-*`)は Agent ツールの `model`
+引数ではなく `<!-- opr-route: ... -->` ディレクティブを使います。ディレクティブが希望ルートと一致するか確認し、
 モデルプレースホルダとして `"haiku"` を渡してください。
 

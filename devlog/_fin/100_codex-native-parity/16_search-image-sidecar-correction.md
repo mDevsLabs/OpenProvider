@@ -14,7 +14,7 @@ The first 100.2 implementation normalized routed entries to:
 web_search_tool_type = "text"
 ```
 
-That was too conservative for opencodex's actual web-search path.
+That was too conservative for openprovider's actual web-search path.
 
 ## Final Policy
 
@@ -29,8 +29,8 @@ This does not mean the routed upstream provider receives OpenAI hosted image-sea
 The runtime path remains:
 
 1. Codex enables hosted web search from catalog metadata.
-2. opencodex parses and suppresses the hosted `web_search` tool before sending the request upstream.
-3. opencodex exposes a synthetic `web_search(query)` function to the routed model when sidecar
+2. openprovider parses and suppresses the hosted `web_search` tool before sending the request upstream.
+3. openprovider exposes a synthetic `web_search(query)` function to the routed model when sidecar
    prerequisites are met.
 4. The sidecar executes real hosted web search through the native ChatGPT forward provider, using
    `gpt-5.4-mini` by default.
@@ -46,8 +46,8 @@ web_search_tool_type = "text_and_image"
 supports_search_tool = true
 ```
 
-opencodex's sidecar uses that model for the real hosted search call. Therefore the catalog capability
-is true for the opencodex route as a whole, even when the final routed upstream model only receives a
+openprovider's sidecar uses that model for the real hosted search call. Therefore the catalog capability
+is true for the openprovider route as a whole, even when the final routed upstream model only receives a
 textual summary of image results.
 
 ## Verification Scope

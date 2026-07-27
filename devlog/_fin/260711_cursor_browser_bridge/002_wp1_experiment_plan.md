@@ -22,22 +22,22 @@ public bridge `Hardcode84/opencode-cursor` plus `funny-vibes/agent-vibes`:
 
 ## The real puzzle (from code read)
 
-opencodex ALREADY advertises client tools via `buildCursorToolDefinitions`
-(providerIdentifier `opencodex-responses`, name = bare wire name e.g.
+openprovider ALREADY advertises client tools via `buildCursorToolDefinitions`
+(providerIdentifier `openprovider-responses`, name = bare wire name e.g.
 `exec_command` / `node_repl__js`; Cursor displays them as
-`mcp_opencodex-responses_<name>`). And `exec_command` IS demonstrably called by
+`mcp_openprovider-responses_<name>`). And `exec_command` IS demonstrably called by
 cursor models (tool-definitions.ts comment: live sessions saw
-`mcp_opencodex-responses_exec_command`). Yet `mcp__node_repl__js` (Browser) is
-not called. So the earlier "opencodex-responses is dropped" root cause is at
+`mcp_openprovider-responses_exec_command`). Yet `mcp__node_repl__js` (Browser) is
+not called. So the earlier "openprovider-responses is dropped" root cause is at
 least incomplete: at least one client tool under that provider IS callable.
 
 Competing hypotheses to disambiguate with ONE live probe:
-- H1 (naming): opencodex sets `name` = bare `toolName`, not `mcp_<provider>_<tool>`.
+- H1 (naming): openprovider sets `name` = bare `toolName`, not `mcp_<provider>_<tool>`.
   Cursor still surfaces `exec_command` (heavily reinforced by system notes) but
   drops/hides other client tools because the model-facing name doesn't match the
   `mcp_<provider>_<tool>` convention the working bridges use.
-- H2 (provider id): tools under `opencodex-responses` are second-class; the same
-  tool under provider id `opencodex` (matching the working reference) becomes
+- H2 (provider id): tools under `openprovider-responses` are second-class; the same
+  tool under provider id `openprovider` (matching the working reference) becomes
   callable.
 - H3 (behavioral): all client tools ARE surfaced; gpt-5.6-luna just does not
   spontaneously call node_repl, while exec_command wins because of the system-note
@@ -47,7 +47,7 @@ Competing hypotheses to disambiguate with ONE live probe:
 
 Driver: a throwaway script that imports `createLiveCursorTransport` and drives ONE
 live turn against api2.cursor.sh using the cursor access token from
-`~/.opencodex/auth.json` (via `OPENCODEX_CURSOR_TEST_TOKEN`). This is a pure
+`~/.openprovider/auth.json` (via `OPENCODEX_CURSOR_TEST_TOKEN`). This is a pure
 outbound h2 request: no second server, no pid file, no config writes, no Codex
 sync, zero interference with the live proxy on port 10100.
 
@@ -55,9 +55,9 @@ sync, zero interference with the live proxy on port 10100.
 experimental branch that emits the SAME probe tool under 3 variant schemes with
 distinct model-facing names in ONE request, so a single live turn tests the whole
 matrix (budget: 1 Cursor request):
-- V_A: provider=`opencodex-responses`, name=bare `probe_a`  (current scheme)
-- V_B: provider=`opencodex`,           name=`mcp_opencodex_probe_b`, toolName=`probe_b`  (working-reference scheme)
-- V_C: provider=`opencodex-responses`, name=`mcp_opencodex-responses_probe_c`, toolName=`probe_c`  (current provider, pre-prefixed name)
+- V_A: provider=`openprovider-responses`, name=bare `probe_a`  (current scheme)
+- V_B: provider=`openprovider`,           name=`mcp_openprovider_probe_b`, toolName=`probe_b`  (working-reference scheme)
+- V_C: provider=`openprovider-responses`, name=`mcp_openprovider-responses_probe_c`, toolName=`probe_c`  (current provider, pre-prefixed name)
 
 Prompt forces tool use: "Call every tool available to you exactly once with
 minimal args, then stop." `toolChoice: auto`, `parallelToolCalls: true`. Capture
@@ -80,7 +80,7 @@ a `tool_call_start` is the one Cursor made callable.
 
 - Live Cursor probe requests: target 1, hard cap 6 (goal budget). Each variant
   matrix is one request.
-- Never restart/kill proxy pid (ocx.pid). Verify pid unchanged before/after.
+- Never restart/kill proxy pid (opr.pid). Verify pid unchanged before/after.
 - All experimental scaffolding (env branch + probe script) is removed before any
   DONE claim; only a real, tested fix (if any) is committed.
 - tsc + `bun test tests/cursor-*.test.ts` before completion.
@@ -95,7 +95,7 @@ direct independent audit (AUDIT-LOOP-01 fallback). One blocker found and folded:
   `mcpArgsFromToolCall` (protobuf-events.ts:48-51) and
   `mapSyntheticMcpExecToToolEvents` (protobuf-events.ts:126) hard-filter on
   `args.providerIdentifier === OCX_RESPONSES_TOOL_PROVIDER`. A variant-B call
-  (provider `opencodex`) is therefore NEVER surfaced as `tool_call_start` through
+  (provider `openprovider`) is therefore NEVER surfaced as `tool_call_start` through
   `run()` - it routes to native-exec `mcpExec` -> `toolNotFound` and is invisible
   to a CursorServerMessage observer. The script also bypasses the real
   `/v1/responses` system-note injection (`buildCursorToolGuidanceSystemNote`) so a

@@ -1,7 +1,7 @@
-# 002 — Existing `ocx` CLI surface (research)
+# 002 — Existing `opr` CLI surface (research)
 
 Source: explorer lane "Nietzsche" (read-only repo scan, 2026-07-20). Entry chain:
-`ocx`/`opencodex` → bin/ocx.mjs (update intercept :246, spawns Bun on
+`opr`/`openprovider` → bin/ocx.mjs (update intercept :246, spawns Bun on
 src/cli/index.ts :258, mirrors child exit code :290) → dispatch switch
 src/cli/index.ts:451.
 
@@ -38,7 +38,7 @@ src/cli/index.ts:451.
 - Port/host: `findLiveProxy()` (src/server/proxy-liveness.ts:93) — liveness-first,
   identity-probed, never a blind `config.port`; URL host via `probeHostname()` (:46).
 - Auth headers: `runningProxyUpdateHeaders()` (src/oauth/login-cli.ts:9-14) sets
-  `X-OpenCodex-API-Key` from `OPENCODEX_API_AUTH_TOKEN`; `ocx claude` falls back to
+  `X-OpenProvider-API-Key` from `OPENCODEX_API_AUTH_TOKEN`; `opr claude` falls back to
   `config.apiKeys[0].key` when the env is absent (src/cli/claude.ts:120-121).
 - Endpoints consumed today: `/healthz`, POST `/api/stop`, GET/PUT `/api/debug*`,
   POST `/api/providers`, GET `/api/claude-code`, GET `/v1/models?ids=cli`.
@@ -46,10 +46,10 @@ src/cli/index.ts:451.
 ## Account/credential gap finding (issue #180 core)
 
 **No CLI command touches codex-auth account listing or switching.**
-`rg "codex-auth" src/cli/` → zero hits. No `ocx account`, no CLI equivalent of
+`rg "codex-auth" src/cli/` → zero hits. No `opr account`, no CLI equivalent of
 `PUT /api/codex-auth/active`, no multi-account quota view, no OAuth account or
-apiKeyPool switching. Adjacent surfaces only: `ocx login/logout` (single credential),
-`ocx status` OAuth summary, `ocx provider show/list` masked key display. This is the
+apiKeyPool switching. Adjacent surfaces only: `opr login/logout` (single credential),
+`opr status` OAuth summary, `opr provider show/list` masked key display. This is the
 exact parity gap.
 
 ## Help/registration convention for a new command family
@@ -58,7 +58,7 @@ exact parity gap.
    `HelpEntry { usage, summary, details? }` (:7-11).
 2. Add one aligned line to the hardcoded `printUsage()` text (help.ts:119-158) —
    the two are independent; both must be updated.
-3. Dispatch: `ocx help account` resolves via index.ts:49-52; `ocx account --help`
+3. Dispatch: `opr help account` resolves via index.ts:49-52; `opr account --help`
    intercepted by index.ts:54-57 (`hasHelpFlag` help.ts:160-162); both land in
    `printSubcommandUsage()` (help.ts:164-173).
 4. Multi-subcommand family: mirror `provider` — lazy `await import("./account")` in
@@ -69,6 +69,6 @@ exact parity gap.
    (`process.exitCode = await cmdX()`) for test/Windows-friendly flows (v2).
 6. Docs parity: reference/cli.md in all three locales (en/ko/zh-cn).
 
-Known inconsistencies NOT to copy: `ocx v2` documented in docs but missing from
-`helpEntries`; `ocx claude` has a help entry but is absent from all three docs-site
+Known inconsistencies NOT to copy: `opr v2` documented in docs but missing from
+`helpEntries`; `opr claude` has a help entry but is absent from all three docs-site
 CLI reference pages; help.ts `debug` entry omits the `injection` scope.

@@ -14,7 +14,7 @@ function nvidiaConfig(): OcxConfig {
     port: 10100,
     defaultProvider: "nvidia",
     providers: {
-      // Bare persisted config, like `ocx init` writes: registry seeds must backfill the flags.
+      // Bare persisted config, like `opr init` writes: registry seeds must backfill the flags.
       nvidia: { adapter: "openai-chat", baseUrl: "https://integrate.api.nvidia.com/v1", apiKey: "k" },
     },
   };

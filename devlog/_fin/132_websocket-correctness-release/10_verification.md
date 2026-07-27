@@ -18,18 +18,18 @@ Commits:
 
 Modified:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/.gitignore`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/config.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/types.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/codex-inject.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/server.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/ws-bridge.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/codex-inject.test.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/ws-endpoint.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/.gitignore`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/config.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/types.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/codex-inject.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/server.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/ws-bridge.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/codex-inject.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/ws-endpoint.test.ts`
 
 ## Closed Findings
 
@@ -67,17 +67,17 @@ Modified:
 - `bun x tsc --noEmit`
   - passed with exit 0.
 
-## Live `ocx` Smoke
+## Live `opr` Smoke
 
 Initial state:
 
-- `ocx status` returned `Proxy not running`.
-- `~/.opencodex/config.json` had `websockets` absent, with providers `openai`, `opencode-go`,
+- `opr status` returned `Proxy not running`.
+- `~/.openprovider/config.json` had `websockets` absent, with providers `openai`, `opencode-go`,
   `anthropic`.
 
 Default advertisement smoke:
 
-- `ocx start` started the proxy on `http://localhost:10100`.
+- `opr start` started the proxy on `http://localhost:10100`.
 - `GET /healthz` returned HTTP 200.
 - `GET /v1/models?client_version=0.141.0` returned catalog rows with `supports_websockets` absent
   for:
@@ -98,13 +98,13 @@ Direct WebSocket smoke:
 
 Shutdown:
 
-- `ocx stop` stopped PID 23557.
-- Final `ocx status` must remain `Proxy not running` before release.
+- `opr stop` stopped PID 23557.
+- Final `opr status` must remain `Proxy not running` before release.
 
 ## Residual Note
 
 Codex RS exposes no standalone `response.cancel` client frame in the checked source. Phase 132
-therefore implements the server-side safe behavior available to opencodex: socket close cancellation
+therefore implements the server-side safe behavior available to openprovider: socket close cancellation
 and same-socket replacement-turn cancellation. A human-visible TUI Ctrl-C transcript remains useful
 release evidence if automation can drive it reliably, but it is no longer the only proof of stale
 frame isolation.

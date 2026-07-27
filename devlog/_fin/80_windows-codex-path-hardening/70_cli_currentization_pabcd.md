@@ -7,7 +7,7 @@ Clean up the CLI surface so users can quickly diagnose version, runtime, service
 ## Source Evidence
 
 - User feedback: CLI is currently messy and `-v` is missing.
-- Emergency finding on 2026-06-27: local `~/.opencodex/config.json` and `auth.json` can retain a removed `cursor` OAuth provider, producing repeated `Unknown OAuth provider: cursor` failures until config/auth cleanup.
+- Emergency finding on 2026-06-27: local `~/.openprovider/config.json` and `auth.json` can retain a removed `cursor` OAuth provider, producing repeated `Unknown OAuth provider: cursor` failures until config/auth cleanup.
 - Hotfix commit: `c560b54 fix(oauth): classify stale provider config`.
 
 ## PABCD Work Unit
@@ -28,7 +28,7 @@ Scope:
 Non-goals:
 
 - Do not re-add Cursor OAuth provider support here.
-- Do not mutate config during `ocx -v`, `ocx --version`, `ocx version`, or `ocx help`.
+- Do not mutate config during `opr -v`, `opr --version`, `opr version`, or `opr help`.
 - Do not print tokens, API keys, Authorization headers, or raw OAuth credentials.
 - Do not turn `status` into an interactive repair flow.
 
@@ -37,8 +37,8 @@ Non-goals:
 Ask a read-only auditor to verify:
 
 - `package.json` is the authoritative version source or a generated constant is explicitly justified.
-- `ocx -v`, `ocx --version`, and `ocx version` can exit 0 without loading or mutating user config.
-- `ocx status` can detect unsupported `authMode: "oauth"` provider ids and stale auth entries without printing secrets.
+- `opr -v`, `opr --version`, and `opr version` can exit 0 without loading or mutating user config.
+- `opr status` can detect unsupported `authMode: "oauth"` provider ids and stale auth entries without printing secrets.
 - Existing commands still support subcommand help without side effects.
 
 ### B — Build
@@ -48,14 +48,14 @@ Implementation checklist:
 Version and help:
 
 - Add global `-v`, `--version`, and `version` support.
-- Print a stable single-line version by default, for example `opencodex 2.5.x`.
-- Keep `ocx help`, `ocx --help`, and `ocx -h` side-effect free.
+- Print a stable single-line version by default, for example `openprovider 2.5.x`.
+- Keep `opr help`, `opr --help`, and `opr -h` side-effect free.
 - Add subcommand help coverage for important commands that mutate state.
 
 Status diagnostics:
 
-- Extend `ocx status` with:
-  - opencodex version;
+- Extend `opr status` with:
+  - openprovider version;
   - Node launcher path when relevant;
   - Bun path/version if safely available;
   - platform and arch;
@@ -68,13 +68,13 @@ Status diagnostics:
 
 ```text
 Unsupported OAuth provider in config: cursor
-Fix: remove or reconfigure provider 'cursor' in ~/.opencodex/config.json, then remove stale auth entry from ~/.opencodex/auth.json.
+Fix: remove or reconfigure provider 'cursor' in ~/.openprovider/config.json, then remove stale auth entry from ~/.openprovider/auth.json.
 ```
 
 Optional cleanup command:
 
-- Consider `ocx config doctor` as read-only first.
-- Consider `ocx config cleanup --stale-oauth` only if it backs up files and prints exactly what changed.
+- Consider `opr config doctor` as read-only first.
+- Consider `opr config cleanup --stale-oauth` only if it backs up files and prints exactly what changed.
 - If implemented, require tests for backup creation and token-safe output.
 
 Suggested commits:
@@ -96,25 +96,25 @@ bun x tsc --noEmit
 Manual smoke:
 
 ```bash
-ocx -v
-ocx --version
-ocx version
-ocx help
-ocx restore --help
-ocx status
+opr -v
+opr --version
+opr version
+opr help
+opr restore --help
+opr status
 ```
 
 Stale provider smoke:
 
 ```bash
 # In a temp OPENCODEX_HOME, create config/auth entries for cursor with authMode oauth.
-ocx status
+opr status
 # Confirm status warns, exits 0, and prints no token material.
 ```
 
 ### D — Done Criteria
 
-- `ocx -v`, `ocx --version`, and `ocx version` work and do not mutate config.
-- `ocx status` gives enough information for Windows reports: version, runtime, service/log path, config path, provider/default summary.
+- `opr -v`, `opr --version`, and `opr version` work and do not mutate config.
+- `opr status` gives enough information for Windows reports: version, runtime, service/log path, config path, provider/default summary.
 - Stale unsupported OAuth providers are diagnosed with safe cleanup guidance.
 - Tests cover version flags, no-mutation help/version behavior, and stale provider diagnostics.

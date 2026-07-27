@@ -67,7 +67,7 @@ export function activeCodexConfigPath(): string {
 
 export function activeDefaultCatalogPath(): string {
   const home = activeCodexHome();
-  return home ? join(home, "opencodex-catalog.json") : DEFAULT_CATALOG_PATH;
+  return home ? join(home, "openprovider-catalog.json") : DEFAULT_CATALOG_PATH;
 }
 
 export function activeCodexModelsCachePath(): string {
@@ -267,7 +267,7 @@ export function ensureStrictCatalogFields(
     entry.max_context_window = contextWindow;
   }
   if (typeof entry.effective_context_window_percent !== "number") entry.effective_context_window_percent = 95;
-  if (typeof entry.comp_hash !== "string") entry.comp_hash = "opencodex";
+  if (typeof entry.comp_hash !== "string") entry.comp_hash = "openprovider";
   return ensureAutoCompactTokenLimit(entry);
 }
 
@@ -309,7 +309,7 @@ export function normalizeRoutedCatalogEntry(entry: RawEntry, parallelToolCalls =
   // Per-model routed opt-ins can be added once provider metadata exposes this capability.
   delete entry.supports_reasoning_summaries;
   const isCursorEntry = typeof entry.slug === "string" && entry.slug.startsWith("cursor/");
-  // Routed providers use opencodex sidecars and client-executed tool discovery. The sidecar
+  // Routed providers use openprovider sidecars and client-executed tool discovery. The sidecar
   // runs through native gpt-5.4-mini, so image search is available and verbalized for text-only
   // models. EXCEPT cursor: its runTurn transport bypasses the web-search plan entirely and
   // rejects server search queries — advertising the tool would make models call into a void.

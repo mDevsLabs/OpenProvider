@@ -73,9 +73,9 @@ export default function Startup({ apiBase }: { apiBase: string }) {
             }
             setCodexRuntimeFix(
               newer
-                ? "ocx doctor --fix-codex-runtime && ocx sync"
+                ? "opr doctor --fix-codex-runtime && opr sync"
                 : clampActive
-                  ? "ocx sync"
+                  ? "opr sync"
                   : null,
             );
           }

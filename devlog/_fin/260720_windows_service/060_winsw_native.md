@@ -2,14 +2,14 @@
 
 ## 목표
 
-`ocx service install --native`가 WinSW 2.12.0으로 진짜 SCM 서비스를 **사용자 계정**
+`opr service install --native`가 WinSW 2.12.0으로 진짜 SCM 서비스를 **사용자 계정**
 으로 등록한다. 옵트인 전용 — 기본값 승격은 범위 밖. LocalSystem 금지.
 
 ## 설계 결정 (sol 검토 반영)
 
 - **바이너리 조달**: npm 패키지에 바이너리를 커밋하지 않는다(레포 정책상 실바이너리
-  커밋 회피). 대신 `ocx service install --native`가 최초 실행 시 GitHub 릴리스에서
-  `WinSW.NET461.exe`(v2.12.0)를 `~/.opencodex/winsw/`에 다운로드하고 **핀 고정
+  커밋 회피). 대신 `opr service install --native`가 최초 실행 시 GitHub 릴리스에서
+  `WinSW.NET461.exe`(v2.12.0)를 `~/.openprovider/winsw/`에 다운로드하고 **핀 고정
   SHA-256 검증 후에만** 사용(불일치 시 fail-closed, 파일 삭제). 오프라인/프록시
   환경은 실패 메시지에 수동 배치 경로 안내. npm 동봉 전환은 후속 결정.
 - **계정 (감사 blocker 3 반영)**: WinSW **v2.12 스키마**는 `<serviceaccount>` 안에
@@ -20,14 +20,14 @@
   `runFileInteractive()`** 를 새로 써서 사용자가 직접 프롬프트에 응답하게 한다.
   WinSW의 UAC 자가승격에 의존함을 명시하고, 사용자가 UAC를 거부하면 명확한 에러로
   중단(조용한 scheduler 폴백 금지). 설치 후 **검증 단계**: `sc.exe qc
-  opencodex-proxy-native` 출력의 `SERVICE_START_NAME`이 의도한 사용자와 일치하는지
+  openprovider-proxy-native` 출력의 `SERVICE_START_NAME`이 의도한 사용자와 일치하는지
   확인하고, LocalSystem이면 즉시 `winsw uninstall` 롤백 + 에러 (WinSW 기본값이
   LocalSystem이므로 XML 미적용 사고를 구조적으로 차단). 재설치("service already
   exists" 실패) 경로: 서비스가 이미 존재하면 install을 건너뛰고 자산 재기록 +
   `winsw stop`(무시 가능) + `winsw start`로 자격증명 재프롬프트 없이 갱신.
   passwordless MS 계정 실패는 명확한 에러로 표면화(실측 매트릭스).
 - **graceful stop**: WinSW `<stoptimeout>` + Ctrl+C 우선 동작에 위임하되, 프록시가
-  시그널로 죽는 경로와 무관하게 `ocx service stop`은 기존 drain
+  시그널로 죽는 경로와 무관하게 `opr service stop`은 기존 drain
   (`stopTrackedProxyForServiceCommand`)을 계속 수행. WinSW가 먼저 자식을 죽이는
   경우의 이중 안전.
 - **토큰**: 래퍼 배치를 쓰지 않으므로 앱이 직접 읽는다 — `OCX_API_TOKEN_FILE`
@@ -40,9 +40,9 @@
      `WINSW_SHA256`(핀; 구현 시 실제 릴리스 자산에서 채움 — B 단계에서
      `curl | shasum -a 256`으로 확정, 문서에 기록)
    - `winswDir()` = `join(getConfigDir(), "winsw")`, `winswExePath()`,
-     `winswXmlPath()` (= `winswDir()/opencodex-proxy.xml`; WinSW는 exe와 동명
-     XML을 요구하므로 exe를 `opencodex-proxy.exe`로 저장)
-   - `buildWinswXml(entry): string` — `<service>` id `opencodex-proxy-native`,
+     `winswXmlPath()` (= `winswDir()/openprovider-proxy.xml`; WinSW는 exe와 동명
+     XML을 요구하므로 exe를 `openprovider-proxy.exe`로 저장)
+   - `buildWinswXml(entry): string` — `<service>` id `openprovider-proxy-native`,
      `<executable>`=bun, `<arguments>`=cli start, `<env name="OCX_SERVICE" value="1"/>`,
      `<env name="OCX_API_TOKEN_FILE" .../>`, CODEX_HOME/OPENCODEX_HOME 절대경로,
      **`<env name="PATH" value="<현재 PATH, XML 이스케이프>"/>`** (감사 WARN 7 —
@@ -60,7 +60,7 @@
    - `statusWinsw()` — WinSW v2 `status`의 정확한 출력(`Started`/`Stopped`/
      `NonExistent`)을 파싱(감사 WARN 8): `NonExistent`→미설치, exe/xml 존재 여부와
      SCM 존재를 혼동하지 않는다. exe가 지워졌는데 SCM 서비스가 남은 경우는 status
-     진단에 "stale native service — run `ocx service uninstall`" 힌트.
+     진단에 "stale native service — run `opr service uninstall`" 힌트.
 2. **MODIFY** `src/service.ts`:
    - `ServiceOps` 선택이 backend 인자를 받도록: `platformOps(backend?: "scheduler"|"native")`.
      win32에서 `backend==="native"`면 winsw ops 반환. 기본은 scheduler.

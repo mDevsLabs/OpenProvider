@@ -10,7 +10,7 @@
   into Responses events feeds its payloads into request-log usage inspection before
   finalization.
 - Non-goals: provider prompt-cache policy, GUI presentation changes, provider quota,
-  OAuth/account work, `ocx` lifecycle commands. The running local proxy must not be
+  OAuth/account work, `opr` lifecycle commands. The running local proxy must not be
   restarted in this work-phase.
 - Verifier:
   - `bun run typecheck`
@@ -20,7 +20,7 @@
   integration log reports usage + terminal metadata.
 - Memory artifact: this devlog unit plus cxc ledger.
 - Expected terminal outcome: DONE. Use BLOCKED only if the test harness cannot run
-  locally without restarting `ocx`.
+  locally without restarting `opr`.
 - Escalation: NEEDS_HUMAN if the fix requires changing live provider config or
   restarting/stopping the user's running proxy.
 
@@ -73,6 +73,6 @@
 
 ## Out of scope guard
 
-- Do not run `ocx restart`, `ocx stop`, `ocx start`, `ocx ensure`, or `ocx sync`.
+- Do not run `opr restart`, `opr stop`, `opr start`, `opr ensure`, or `opr sync`.
 - Do not edit unrelated OAuth, provider-api-key, GUI, quota, or structure-doc changes
   already present in the dirty worktree.

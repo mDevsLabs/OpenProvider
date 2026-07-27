@@ -118,7 +118,7 @@ describe("antigravity credential persistence (projectId survives the store)", ()
     tmp = join(tmpdir(), `ag-store-${Date.now()}-${Math.random().toString(16).slice(2)}`);
     mkdirSync(tmp, { recursive: true });
     process.env.HOME = tmp;
-    process.env.OPENCODEX_HOME = join(tmp, "ocx");
+    process.env.OPENCODEX_HOME = join(tmp, "opr");
     await saveCredential("google-antigravity", { access: "a", refresh: "r", expires: Date.now() + 3_600_000, projectId: "proj-persist" });
     expect(getCredential("google-antigravity")?.projectId).toBe("proj-persist");
   });

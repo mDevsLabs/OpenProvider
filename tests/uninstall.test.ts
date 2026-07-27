@@ -21,7 +21,7 @@ describe("full uninstall command", () => {
   test("CLI exposes explicit legacy history recovery command", async () => {
     const cli = await readText("src/cli/index.ts");
 
-    expect(cli).toContain("ocx recover-history --legacy-openai");
+    expect(cli).toContain("opr recover-history --legacy-openai");
     expect(cli).toContain("function handleRecoverHistory()");
     expect(cli).toContain("restoreLegacyOpenaiHistory");
   });

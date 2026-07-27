@@ -1,38 +1,38 @@
 ---
 title: CLI リファレンス
-description: すべての ocx コマンドとフラグ。
+description: すべての opr コマンドとフラグ。
 ---
 
-OpenProvider CLI は `ocx` です。最上位の使い方は `ocx help`（または `--help` / `-h`）で確認します。
-ヘルプ表に登録されたコマンドの詳細な使い方は `ocx help <command>` で見られます。ヘルプとバージョン
+OpenProvider CLI は `opr` です。最上位の使い方は `opr help`（または `--help` / `-h`）で確認します。
+ヘルプ表に登録されたコマンドの詳細な使い方は `opr help <command>` で見られます。ヘルプとバージョン
 コマンドは読み取り専用で、Codex/OpenProvider の状態を開始、停止、インストール、削除、書き換えしません。
 
 ## 設定とライフサイクル
 
-### `ocx init`
+### `opr init`
 
 対話型設定ウィザードです。プロバイダー（プリセットまたはカスタム）、API キー（直接入力または `${ENV}`）、
 デフォルトモデル、プロキシポートを順に尋ね、`~/.OpenProvider/config.json` を保存します。選択に応じてプロキシを
 `$CODEX_HOME/config.toml`（デフォルト `~/.codex/config.toml`）に注入し、Codex 自動起動 shim もインストールします。
 
-### `ocx start [--port <port>]`
+### `opr start [--port <port>]`
 
 プロキシサーバーを起動します（優先ポート `10100`）。そのポートが既に使われていると OpenProvider が別の空き
 ポートを選び、記録します。PID とランタイムポート状態を保存し、生きている 2 つ目のインスタンスは起動しません。起動時に各プロバイダーのモデルを Codex カタログに同期します。管理型サービス
 （`OCX_SERVICE=1`）として実行した場合を除き、終了時にネイティブ Codex を復元します。
 
 ```bash
-ocx start
-ocx start --port 8080
+opr start
+opr start --port 8080
 ```
 
-### `ocx stop`
+### `opr stop`
 
 実行中のプロキシを PID で停止し PID ファイルを消したのち、ネイティブ Codex を復元します。管理型
 バックグラウンドサービスがインストールされている場合は先にサービスを停止し、プロキシが再び立ち上がらないようにします。ウェブ
 ダッシュボードの **Stop** ボタン（`POST /api/stop`）も同じ操作を行います。
 
-### `ocx restore` &nbsp;·&nbsp; `ocx eject`
+### `opr restore` &nbsp;·&nbsp; `opr eject`
 
 プロキシはそのままにしてネイティブ Codex を復元します。注入された設定行とルーティングカタログ項目を削除し、通常の `codex` が再びネイティブで動くようにします。`eject` は `restore` の別名です。
 
@@ -40,26 +40,26 @@ ocx start --port 8080
 `codex` に再接続します。
 
 ```bash
-ocx restore back
-ocx eject back
+opr restore back
+opr eject back
 ```
 
-### `ocx recover-history --legacy-openai`
+### `opr recover-history --legacy-openai`
 
 戻せるバックアップに対応する前の Codex App 履歴を再マッピングしていた旧開発ビルド向けの明示的復旧
 コマンドです。履歴データベースがロックされている場合は先に Codex を閉じてください。
 
-### `ocx restart`
+### `opr restart`
 
 `stop` のあとに `ensure` を実行します。プロキシ/サービスを停止してネイティブ Codex を復元したのちプロキシを
 バックグラウンドで起動し、実際のポートを Codex に再同期します。
 
-### `ocx ensure`
+### `opr ensure`
 
 バックグラウンドプロキシが実行中かを冪等に確認し、リアルタイムモデルカタログを同期します。
 `codexAutoStart` が `false` なら自動起動がオフである旨のメッセージだけを出力し、何もしません。
 
-### `ocx status [--json]`
+### `opr status [--json]`
 
 プロキシ PID、`/healthz` 接続状態、ダッシュボード URL、設定ファイルパス、デフォルトプロバイダー、Codex 自動起動
 設定、サービス状態、shim 状態、ユーザー名をマスクした実効 Codex home を読み取り専用の診断要約として出力します。
@@ -68,7 +68,7 @@ ocx eject back
 機械が読める読み取り専用の診断契約は `--json` で受け取ります。
 
 ```bash
-ocx status --json
+opr status --json
 ```
 
 省略されたオブジェクト形式は次のとおりです。
@@ -90,7 +90,7 @@ ocx status --json
   },
   "paths": {
     "config": "/Users/example/.OpenProvider/config.json",
-    "pid": "/Users/example/.OpenProvider/ocx.pid",
+    "pid": "/Users/example/.OpenProvider/opr.pid",
     "runtime": "/path/to/bun"
   },
   "runtime": {
@@ -119,28 +119,28 @@ ocx status --json
 フィールドは維持されます。API キー、OAuth トークン、authorization ヘッダー、リクエスト内容、メール、アカウント識別子は
 意図的に除外します。
 
-### `ocx health [--json]`
+### `opr health [--json]`
 
 実行中のプロキシの身元を確認します。通常出力には PID とポートが表示され、`--json` は
 `{ok, pid, port}` を出力します。正常時のみ終了コード 0、それ以外は 1 を返すためサービス probe に使えます。
 
-### `ocx uninstall` &nbsp;·&nbsp; `ocx remove`
+### `opr uninstall` &nbsp;·&nbsp; `opr remove`
 
 サービスとプロキシを停止し、サービスと Codex shim を削除したのちネイティブ Codex を復元します。すべての
 復元ステップが成功した場合にのみ OpenProvider のローカル設定まで消します。`remove` は `uninstall` の別名です。
 
 ## モデルと Codex
 
-### `ocx sync`
+### `opr sync`
 
 設定されたすべてのプロバイダーからリアルタイムモデル一覧を取得し、マージしたカタログを Codex に再注入します。
 プロバイダーを追加したときや利用可能なモデル一覧を最新化したいときに実行してください。
 
-### `ocx sync-cache`
+### `opr sync-cache`
 
 Codex のローカルモデルセレクターキャッシュを無効化し、現在の OpenProvider カタログで再構築させます。
 
-### `ocx v2 [subcommand]`
+### `opr v2 [subcommand]`
 
 Codex の `multi_agent_v2` 機能フラグと 3 段階の multi-agent surface mode を管理します。
 
@@ -155,11 +155,11 @@ Codex の `multi_agent_v2` 機能フラグと 3 段階の multi-agent surface mo
 | `threads <n>` | 現在の v1/v2 thread limit を設定します（1 以上の整数）。 |
 
 ```bash
-ocx v2 status
-ocx v2 mode v1
-ocx v2 mode default
-ocx v2 on
-ocx v2 threads 16
+opr v2 status
+opr v2 mode v1
+opr v2 mode default
+opr v2 on
+opr v2 threads 16
 ```
 
 `mode` サブコマンドは OpenProvider 設定に `multiAgentMode` を記録し Codex カタログを再
@@ -168,14 +168,14 @@ ocx v2 threads 16
 既存の `config.toml` をそのまま復元します。
 変更は新しい Codex セッションから適用され、実行中のセッションは固定された surface を維持します。
 
-### `ocx models [--provider <name>] [--json]`
+### `opr models [--provider <name>] [--json]`
 
 設定されたプロバイダーに静的に seed されたモデルを一覧します。`--provider` は 1 つのプロバイダーだけを選び、
 `--json` はモデルメタデータとともに `liveModels` がランタイム専用項目を追加できる旨の案内を
-返します。リアルタイムカタログを取得するコマンドではありません。その作業には `ocx sync` やダッシュボードを
+返します。リアルタイムカタログを取得するコマンドではありません。その作業には `opr sync` やダッシュボードを
 使ってください。
 
-### `ocx provider <subcommand>`
+### `opr provider <subcommand>`
 
 非対話型のプロバイダー管理コマンドです。レジストリ項目は名前だけで seed され、カスタム名には
 `--adapter` と `--base-url` が両方必要です。
@@ -189,20 +189,20 @@ ocx v2 threads 16
 | `set-default <name>` | `--json` | 既存のプロバイダーをデフォルトに選びます。 |
 
 ```bash
-ocx provider list --json
-ocx provider add anthropic --api-key sk-ant-... --set-default --sync
-ocx provider add local-dev --adapter openai-chat --base-url http://localhost:11434/v1
-ocx provider show anthropic --json
-ocx models --provider anthropic --json
+opr provider list --json
+opr provider add anthropic --api-key sk-ant-... --set-default --sync
+opr provider add local-dev --adapter openai-chat --base-url http://localhost:11434/v1
+opr provider show anthropic --json
+opr models --provider anthropic --json
 ```
 
-### `ocx account <subcommand>`
+### `opr account <subcommand>`
 
 実行中のプロキシを経由してプロバイダーアカウントと API-key pool を照会・切り替えます。デプロイされたヘルプの
 コマンド面は次のとおりです。
 
 ```text
-Usage: ocx account <list|current|use|refresh|auto-switch|remove|add-key> ...
+Usage: opr account <list|current|use|refresh|auto-switch|remove|add-key> ...
 
 List and switch provider accounts and API-key pools (GUI parity).
 
@@ -237,7 +237,7 @@ API エラーは終了コード 1 です。認証情報フィールドは manage
 }
 ```
 
-#### `ocx account list [provider] [--json] [--all]`
+#### `opr account list [provider] [--json] [--all]`
 
 プロバイダーを省略すると Codex pool、OAuth アカウント、設定された API-key pool をすべて一覧します。空の
 プロバイダーは `--all` を指定しない限り飛ばし、プロバイダーを指定するとその認証情報 family だけを照会します。通常出力列は `PROVIDER TYPE ID PLAN/LABEL STATUS` で固定 Codex 行には
@@ -247,7 +247,7 @@ API エラーは終了コード 1 です。認証情報フィールドは manage
 { accounts: AccountRow[], notes: string[] }
 ```
 
-#### `ocx account current <provider> [--json]`
+#### `opr account current <provider> [--json]`
 
 アクティブなアカウントまたは key を表示します。手動 pin のない Codex pool は使用量が最も低いアカウントを自動選択すると表示します。他の family にアクティブな認証情報がなくてもその状態を知らせ終了コード 0 を返します。`--json` 形式は次のとおりです。
 
@@ -255,7 +255,7 @@ API エラーは終了コード 1 です。認証情報フィールドは manage
 { provider, type, activeId: string | null, autoSwitchThreshold?: number, account: AccountRow | null }
 ```
 
-#### `ocx account use <provider> <account-or-key-id|main> [--json]`
+#### `opr account use <provider> <account-or-key-id|main> [--json]`
 
 既存の Codex アカウント、OAuth アカウント、または API key を選びます。`openai` で `main` は Codex App ログインを
 選択します。Codex の選択は **新しいセッション** から適用され、既存の thread は現在のアカウントを維持します。auto-switch
@@ -266,9 +266,9 @@ threshold がオンなら後で手動 pin を上書きできます。不明な�
 { ok: true, provider, type, activeId }
 ```
 
-#### `ocx account refresh <provider> [--json]`
+#### `opr account refresh <provider> [--json]`
 
-Codex pool は `ocx account refresh openai [--json]` を使います。アカウント quota を強制的に最新化し、確認可能な週次/月次の割合と reset 時刻を表示します。quota 情報がない場合は 0% ではなく unknown と表示します。JSON envelope は `{ accounts: AccountRow[] }` で各 Codex 行に `quota` が入ります。
+Codex pool は `opr account refresh openai [--json]` を使います。アカウント quota を強制的に最新化し、確認可能な週次/月次の割合と reset 時刻を表示します。quota 情報がない場合は 0% ではなく unknown と表示します。JSON envelope は `{ accounts: AccountRow[] }` で各 Codex 行に `quota` が入ります。
 
 OAuth および API-key プロバイダーでは provider quota-report endpoint を強制的に最新化します。token
 再ログインや単なる account-list 再照会ではありません。`--json` は
@@ -277,7 +277,7 @@ OAuth および API-key プロバイダーでは provider quota-report endpoint 
 プロバイダーと management API エラーは終了コード 1 で、上流 quota probe が失敗またはタイムアウトした場合はダッシュボードの quota バーと同様に null/古い report に低下して終了コード 0 を
 返します。
 
-#### `ocx account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]`
+#### `opr account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]`
 
 `openai` Codex アカウント pool だけを制御します。`on` は 80%、`off` は 0% に設定し `status` は現在値を読みます。`threshold <n>` は 0 から 100 までの整数だけを受け付けます。他のプロバイダーや誤った値は終了
 コード 1 です。`--json` は次を返します。
@@ -286,7 +286,7 @@ OAuth および API-key プロバイダーでは provider quota-report endpoint 
 { provider, autoSwitchThreshold: number, enabled: boolean }
 ```
 
-#### `ocx account remove <provider> <id|main> --yes [--json]`
+#### `opr account remove <provider> <id|main> --yes [--json]`
 
 保護された非対話型削除のため `--yes` が必須です。削除前に id の存在を確認し、不明な id は DELETE を送らずに終了コード 1 を返します。メインの Codex App ログインは削除できないため
 `remove openai main --yes` も拒否します。削除後に family を再読みします。固定された Codex アカウントを
@@ -298,45 +298,45 @@ OAuth および API-key プロバイダーでは provider quota-report endpoint 
 { error: string } // stderr, exit 1
 ```
 
-#### `ocx account add-key <provider> [--label <label>] [--json]`
+#### `opr account add-key <provider> [--label <label>] [--json]`
 
 API-key プロバイダーに key を追加してアクティブ化します。key は TTY でない pipe/redirect stdin からだけ
 読みます。対話型 TTY 入力、空入力、OAuth/Codex プロバイダー、API エラーは終了コード 1 です。label
 に key が含まれていても key を絶対に echo しません。secret manager や here-string を使ってください。
 
 ```bash
-ocx account add-key openrouter --label personal <<< "$OPENROUTER_API_KEY"
-security find-generic-password -w openrouter | ocx account add-key openrouter --json
+opr account add-key openrouter --label personal <<< "$OPENROUTER_API_KEY"
+security find-generic-password -w openrouter | opr account add-key openrouter --json
 ```
 
 `--json` は `{ ok: true, id: string | null, label?: string }` を返し key を含みません。
 
 ## 認証
 
-### `ocx login <provider>`
+### `opr login <provider>`
 
 プロバイダーに登録されたログイン手順を開始します。OAuth プロバイダーはブラウザを開き、自動更新される
 認証情報を `~/.OpenProvider/` 以下に保存します。API キーログインプロバイダーはキーダッシュボードを開き、キーを
 入力させて可能な場合は検証したのち、結果のプロバイダー設定を保存します。名前がない、または不明な名前の場合は現在許可される OAuth および API キープロバイダー id を出力します。
 
 ```bash
-ocx login xai
+opr login xai
 ```
 
-### `ocx logout <provider>`
+### `opr logout <provider>`
 
 プロバイダーに保存された OAuth 認証情報を削除します。
 
 ## ダッシュボード
 
-### `ocx gui`
+### `opr gui`
 
 `http://localhost:<port>` で [ウェブダッシュボード](/ja/guides/web-dashboard/) を開きます。
 プロキシが実行中でない場合は自動的に起動します。
 
 ## バックグラウンドサービス
 
-### `ocx service [subcommand]`
+### `opr service [subcommand]`
 
 OpenProvider をログイン管理型のバックグラウンドサービス（macOS **launchd**、Linux **systemd user unit**、
 Windows **Task Scheduler**）として実行します。ログイン時に自動的に起動し、異常終了時に再
@@ -354,21 +354,21 @@ Windows **Task Scheduler**）として実行します。ログイン時に自動
 | `remove` | `uninstall` の別名です。 |
 
 ```bash
-ocx service
-ocx service install
-ocx service status
-ocx service uninstall
+opr service
+opr service install
+opr service status
+opr service uninstall
 ```
 
-### `ocx codex-shim <subcommand>`
+### `opr codex-shim <subcommand>`
 
 PATH 上のスクリプトベース `codex` ランチャーを軽量な自動起動スクリプトで包みます。実際の `codex.exe`
 対象は正確な実行ファイル呼び出しが壊れないように触りません。
 
-完了した外部 Codex 更新がインストール済み shim を上書きした場合、次の通常の `ocx` コマンドが
+完了した外部 Codex 更新がインストール済み shim を上書きした場合、次の通常の `opr` コマンドが
 安定した新しいランチャーをバックアップし、コマンド実行前に shim を復元します。まだ変更中の
 ランチャーには触れず、後で再試行します。修復失敗は要求されたコマンドを失敗させず警告だけを
-表示し、手動の代替手段は `ocx codex-shim install` です。自動修復を無効にするには
+表示し、手動の代替手段は `opr codex-shim install` です。自動修復を無効にするには
 `codexShimAutoRestore` を `false` にするか、プロセスで
 `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` を設定します。
 
@@ -380,53 +380,53 @@ PATH 上のスクリプトベース `codex` ランチャーを軽量な自動起
 | `status` | shim 状態（インストール済み / 古い / なし）を報告します。 |
 
 ```bash
-ocx codex-shim install
-ocx codex-shim status
-ocx codex-shim uninstall
+opr codex-shim install
+opr codex-shim status
+opr codex-shim uninstall
 ```
 
 :::tip[Service vs Shim]
-常にプロキシをオンにしておくには `ocx service` を使ってください（推奨）。デーモンなしで必要なときだけ軽く起動したいなら
-`ocx codex-shim` を使ってください。この場合プロキシは `codex` を実行したときだけ起動します。
+常にプロキシをオンにしておくには `opr service` を使ってください（推奨）。デーモンなしで必要なときだけ軽く起動したいなら
+`opr codex-shim` を使ってください。この場合プロキシは `codex` を実行したときだけ起動します。
 :::
 
 ## 診断
 
-### `ocx doctor`
+### `opr doctor`
 
 状態パスとファイルシステムの種類、WSL 二重インストール、プロキシ環境/設定、ChatGPT 接続状態、Codex プラグインと
 プロジェクト設定の警告、保留中の履歴マイグレーションを読み取り専用で診断します。Codex app-home targeting
 セクションは Windows Orca runtime-home の不一致を限定的に検出し、必要なら元の Orca サービス削除と App
 home での再インストールを案内します。新しい診断のパスは OS ユーザー名をマスクします。復旧案内は出力しますが自ら適用はしません。
 
-### `ocx debug [provider|usage …]`
+### `opr debug [provider|usage …]`
 
 実行中のプロキシの管理 API からランタイムデバッグ override を読むか変えます。
 
 ```bash
-ocx debug provider on|off|status|reset
-ocx debug provider logs [-f|--follow]
-ocx debug usage on|off|status|reset
-ocx debug usage logs [-f|--follow]
+opr debug provider on|off|status|reset
+opr debug provider logs [-f|--follow]
+opr debug usage on|off|status|reset
+opr debug usage logs [-f|--follow]
 ```
 
-スコープを指定しないと `ocx debug` が使い方を出力します。プロキシが止まっているときは次回起動時に
+スコープを指定しないと `opr debug` が使い方を出力します。プロキシが止まっているときは次回起動時に
 適用される環境変数のデフォルト値も示します。プロバイダーデバッグのデフォルトは `OCX_DEBUG=1` で既存の
 `OCX_DEBUG_FRAMES=1` もサポートします。使用量デバッグのデフォルトは `OpenProvider_USAGE_DEBUG=1` です。
 
 ## アップデート
 
-### `ocx update`
+### `opr update`
 
 npm から OpenProvider を自己更新します。安定版インストールは `@latest`、プレビューインストールは `@preview` を
 維持し `--tag latest|preview` で切り替えできます。ソース checkout では代わりに
 `git pull && bun install` を案内し、該当タグの最新版なら何もしません。ファイルを
 差し替える前に実行中のプロキシを停止します。インストール済みのサービスは再ビルドして自動起動し、
-フォアグラウンドインストールには次のステップとして `ocx start` を案内します。
+フォアグラウンドインストールには次のステップとして `opr start` を案内します。
 
 ```bash
-ocx update
-ocx update --tag preview
+opr update
+opr update --tag preview
 ```
 
 [Release ワークフロー](https://github.com/mDevsLabs/OpenProvider/actions/workflows/release.yml) が npm に
@@ -434,16 +434,16 @@ ocx update --tag preview
 
 ## ヘルプ
 
-`ocx help`、`ocx --help`、`ocx -h` — 最上位の使い方と例を出力します。
+`opr help`、`opr --help`、`opr -h` — 最上位の使い方と例を出力します。
 
-`ocx help <command>`、`ocx <command> --help`、`ocx <command> -h` — `src/cli/help.ts` に登録された
+`opr help <command>`、`opr <command> --help`、`opr <command> -h` — `src/cli/help.ts` に登録された
 コマンドの詳細な使い方を出力します。`provider`、`debug`、`v2` のサブコマンド契約全体は上にまとめてあります。
 
 ヘルプフラグがあっても不明なコマンドはエラーとして扱うため、スクリプトは出力文字列を解析せずに終了コードを信頼できます。
 
 ## バージョン
 
-`ocx --version`、`ocx -v`、`ocx version` — スクリプトが読みやすい 1 行のバージョンを出力して
+`opr --version`、`opr -v`、`opr version` — スクリプトが読みやすい 1 行のバージョンを出力して
 終了します。
 
 ## 内部コマンド

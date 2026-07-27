@@ -27,7 +27,7 @@ beforeEach(() => {
   mkdirSync(TEST_DIR, { recursive: true });
   process.env.OPENCODEX_HOME = TEST_DIR;
   delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-server-images-codex-");
+  isolatedCodexHome = installIsolatedCodexHome("opr-server-images-codex-");
   clearCodexUpstreamHealth();
   clearThreadAccountMap();
   clearAccountNeedsReauth("pool-a");
@@ -564,7 +564,7 @@ test("images routes require API auth and local Origin on non-loopback bindings",
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-opencodex-api-key": "local-secret",
+        "x-openprovider-api-key": "local-secret",
         origin: "https://attacker.test",
       },
       body: JSON.stringify({ prompt: "a cat" }),

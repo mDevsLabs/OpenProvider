@@ -60,7 +60,7 @@ Local-only stacking of merge-ready PRs. NO push, NO GitHub mutations. Sol subage
      gateway discovery via anthropic-version). Fix: keep `requireApiAuth` — /v1/models
      never forwards Authorization upstream, so the dual-bearer concern doesn't apply.
   2. Medium — docs/github-copilot-app.md remote setup self-contradictory (API-key
-     field vs x-opencodex-api-key header). **Residual**: docs-only, loopback unaffected;
+     field vs x-openprovider-api-key header). **Residual**: docs-only, loopback unaffected;
      recorded here as upstream feedback, not fixed locally.
   3. High — outbound.ts hand-rolled `\n\n` splitter misses CRLF framing and
      terminal-event-at-EOF → valid responses misreported as "truncated". Semantic

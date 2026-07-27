@@ -3,8 +3,8 @@
 - **Date:** 2026-07-06 · **Branch:** dev-B · **Class:** C3 (shared behavior on every start/stop, cross-platform)
 - **Loop archetype:** spec-satisfaction repair (verifier defines done: targeted tests + full `bun test` + tsc)
 - **Trigger:** Design B (phases 1-4) removed the re-tag failure class, but the
-  steady-state paths still WRITE-open `state_5.sqlite` on every `ocx start` and
-  `ocx stop` even when there is nothing to migrate. On Windows the Codex app holds
+  steady-state paths still WRITE-open `state_5.sqlite` on every `opr start` and
+  `opr stop` even when there is nothing to migrate. On Windows the Codex app holds
   the DB (WAL, busy_timeout 5s); each write open can stall up to ~10.5s
   (2 attempts x 5s busy + 500ms delay) AND surface a false
   "migration deferred / history could NOT be restored" warning although zero rows
@@ -21,7 +21,7 @@
   CRLF round-trip) + existing suites green + `bun x tsc --noEmit`.
 - **Stop condition:** C passes full suite; D records evidence.
 - **HOTL bounds:** write scope = this repo only (src/, tests/, devlog/). No pushes,
-  no global installs, no edits to ~/.opencodex or ~/.codex live configs, do not
+  no global installs, no edits to ~/.openprovider or ~/.codex live configs, do not
   kill the running proxy (port 10100). Budget: current session tokens; hitting it
   = BUDGET_EXHAUSTED with best-so-far.
 - **Escalation:** if the readonly probe turns out to block on a real Windows WAL
@@ -34,7 +34,7 @@
    straight to `withHistoryRetry(syncCodexHistoryProviderUnsafe("openai"))` — a
    write `openStateDb` (busy_timeout 5000) with 2 attempts/500ms, even when
    pending=0 and backup=0.
-2. `restoreNativeCodex()` (codex-inject.ts:524) runs on every `ocx stop`/shutdown
+2. `restoreNativeCodex()` (codex-inject.ts:524) runs on every `opr stop`/shutdown
    and calls `syncCodexHistoryProvider("openai")` — same write open; on failure it
    prints "routed threads stay hidden", which is FALSE under Design B steady state
    (threads are already tagged openai; nothing is hidden).
@@ -69,7 +69,7 @@
   ONLY by `restoreNativeCodex` when the loaded config is loopback (Design B mode,
   `!shouldInjectApiAuthHeader(config)`). Legacy (non-loopback) stop/restore paths
   are byte-for-byte unchanged. TOCTOU note: under Design B no writer produces
-  `opencodex` rows anymore (the proxy stopped re-tagging), so probe-then-skip
+  `openprovider` rows anymore (the proxy stopped re-tagging), so probe-then-skip
   cannot lose a concurrent row; in legacy mode the flag is never set.
   `migrateHistoryToOpenai` gets the gate built in — it is Design-B-specific by
   contract (inject/guardian callers only) and the guardian's re-count protection
@@ -100,7 +100,7 @@ function openaiRestoreIsNoop(stateDbPath: string, backupPath: string): boolean {
 - `syncCodexHistoryProvider(provider, stateDbPath?, backupPath?, opts?)`: new
   optional `opts: { skipWhenProvablyNoop?: boolean }`. Only when the flag is set,
   provider is "openai", AND the DB exists, apply the gate before `withHistoryRetry`.
-  Default behavior (no flag) is unchanged. The opencodex (forward) direction never
+  Default behavior (no flag) is unchanged. The openprovider (forward) direction never
   gates.
 - Probe-failed (`failed: true`) falls through to today's write attempt — locked DBs
   with unknown state keep the current behavior and warnings.
@@ -139,7 +139,7 @@ firing when nothing is pending. Locked+pending keeps the warning — still true 
 - Missing DB + leftover backup manifest does NOT satisfy the noop gate
   (`countPendingOpencodexHistory` reports backupEntries>0).
 - `syncCodexHistoryProvider("openai", ..., { skipWhenProvablyNoop: true })`:
-  steady state returns zeros without rewriting rollouts; with pending opencodex
+  steady state returns zeros without rewriting rollouts; with pending openprovider
   rows it still restores; WITHOUT the flag behavior is unchanged (existing tests
   already cover the default path).
 

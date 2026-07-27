@@ -2,7 +2,7 @@
 
 Date: 2026-07-23 KST
 
-Issue: https://github.com/lidge-jun/opencodex/issues/287
+Issue: https://github.com/lidge-jun/openprovider/issues/287
 
 Implementation branch: `codex/fix-287-linux-autoconnect` from `origin/dev`
 
@@ -22,7 +22,7 @@ Acceptance criteria:
 3. Every non-Darwin host renders Auto-connect unchecked and disabled, even when
    `claudeCode.systemEnv: true` is persisted.
 4. The disabled control has a localized, programmatically-associated explanation:
-   Auto-connect is macOS-only and the supported workaround is `ocx claude`.
+   Auto-connect is macOS-only and the supported workaround is `opr claude`.
 5. Saving the page after loading an unsupported persisted `true` submits
    `systemEnv: false`; the UI cannot report the unsupported value as active or
    successfully selectable.
@@ -267,7 +267,7 @@ export function AutoConnectSetting({
           <span className="desc">{t("claude.systemEnvDesc")}</span>
         ) : (
           <span className="desc" id={unsupportedDescriptionId}>
-            <Trans k="claude.systemEnvUnsupported" cmd="ocx claude" />
+            <Trans k="claude.systemEnvUnsupported" cmd="opr claude" />
           </span>
         )}
         {supported && checked && (
@@ -447,7 +447,7 @@ test("Auto-connect renders disabled, unchecked, and explained on an unsupported 
   expect(html).not.toContain('checked=""');
   expect(html).toContain('aria-describedby="claude-system-env-unsupported"');
   expect(html).toContain("macOS only");
-  expect(html).toContain('<code class="chip">ocx claude</code>');
+  expect(html).toContain('<code class="chip">opr claude</code>');
 });
 ```
 
@@ -478,8 +478,8 @@ platform tests and React SSR render tests; no Playwright dependency is added.
 |---|---:|---:|---|---|---:|
 | Darwin | `false`/absent | `true` | enabled, unchecked | Existing description; user may enable | current selection |
 | Darwin | `true` | `true` | enabled, checked | Existing terminal-relaunch warning | `true` |
-| Linux | `false`/absent | `false` | disabled, unchecked | macOS-only explanation + `ocx claude` | `false` |
-| Linux | `true` (legacy persisted state) | `false` | reconciled to disabled, unchecked | macOS-only explanation + `ocx claude`; never shown active | `false` |
+| Linux | `false`/absent | `false` | disabled, unchecked | macOS-only explanation + `opr claude` | `false` |
+| Linux | `true` (legacy persisted state) | `false` | reconciled to disabled, unchecked | macOS-only explanation + `opr claude`; never shown active | `false` |
 | Windows/other non-Darwin | either | `false` | disabled, unchecked | same supported workaround | `false` |
 | Missing capability field (stale/old backend) | either | treated as `false` | disabled, unchecked | fail-closed explanation | `false` |
 
@@ -494,5 +494,5 @@ platform tests and React SSR render tests; no Playwright dependency is added.
   this PR.
 - No docs-site change is required: `docs-site/src/content/docs/guides/claude-code.md:31-43`
   already states that system environment integration is macOS-only and recommends
-  `ocx claude` elsewhere.
+  `opr claude` elsewhere.
 - Open questions: **none**.

@@ -1,6 +1,6 @@
 # chase — 실행 인덱스
 
-> current through: OpenCodex source and model chase re-audit on 2026-07-17
+> current through: OpenProvider source and model chase re-audit on 2026-07-17
 > durable roadmap: [`devlog/_plan/260717_non_openai_provider_chase/000_plan.md`](../_plan/260717_non_openai_provider_chase/000_plan.md)
 
 오래된 7월 1일 분류의 “Cursor 어댑터 미포팅”, “xAI 전용 경로 없음”은 현재 소스와 맞지 않는다. 아래 표는 OpenAI와 xAI를 제외한 다음 실행 순서다. 한 행은 한 PABCD work-phase이며, 정확한 diff와 검증 기준은 연결된 decade 문서가 정본이다.
@@ -25,9 +25,9 @@
 | 14 | Native Bedrock Runtime | Mantle-gap only; optional SigV4 | [`140`](../_plan/260717_non_openai_provider_chase/140_bedrock_runtime_sigv4.md) |
 | 15 | integration and chase closure | final gate | [`150`](../_plan/260717_non_openai_provider_chase/150_integration_closeout.md) |
 
-## opencodex 선행 (유지·회귀 방지)
+## openprovider 선행 (유지·회귀 방지)
 
-Kiro 풀세트, Codex WS, xAI OAuth/replay/live discovery는 따라잡을 대상이 아니라 현재 OpenCodex 소유 경로다. 이 로드맵은 해당 경로를 건드리지 않는다.
+Kiro 풀세트, Codex WS, xAI OAuth/replay/live discovery는 따라잡을 대상이 아니라 현재 OpenProvider 소유 경로다. 이 로드맵은 해당 경로를 건드리지 않는다.
 
 ## 갱신 규칙
 

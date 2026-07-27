@@ -33,7 +33,7 @@ The recent exposing change was Design B:
 - follow-up hardening through `22561a4`
 
 Design B caused plain Codex traffic to use the built-in OpenAI provider with
-`openai_base_url` pointed at ocx. That increased use of the `/v1/responses`
+`openai_base_url` pointed at opr. That increased use of the `/v1/responses`
 WebSocket path. The WebSocket endpoint itself is older than the last 100 commits;
 the recent change exposed a pre-existing request-log inspection gap.
 
@@ -127,8 +127,8 @@ Fresh checks from this repair:
 - `bun run typecheck` - pass
 - `bun test tests/adapter-usage.test.ts tests/request-log.test.ts tests/ws-endpoint.test.ts tests/server-auth.test.ts` - pass, 99 tests / 287 expects
 - Note: an earlier non-loop repair attempt restarted the local proxy. The cxc-loop
-  patch pass did not run `ocx restart`, `ocx stop`, `ocx start`, `ocx ensure`, or
-  `ocx sync`.
+  patch pass did not run `opr restart`, `opr stop`, `opr start`, `opr ensure`, or
+  `opr sync`.
 
 ## Prevention rule
 
@@ -139,7 +139,7 @@ assert a routed adapter reports usage through that transport.
 ## cxc-loop addendum
 
 - P: `010_phase1_ws_usage_log_patch.md` records the repair loop scope and excludes
-  `ocx` lifecycle commands.
+  `opr` lifecycle commands.
 - A: `gpt-5.5` reviewer PASSed the SSE fix and identified the JSON fallback
   observation gap as a residual risk.
 - B: JSON fallback observation was added to the same bridge hook instead of leaving

@@ -376,7 +376,7 @@ async function fetchCursorQuota(provider: string): Promise<ProviderQuotaReport |
   const authHeaders = {
     Accept: "application/json",
     Authorization: `Bearer ${accessToken}`,
-    "User-Agent": "opencodex-quota",
+    "User-Agent": "openprovider-quota",
   } as const;
 
   // Prefer dashboard period usage (Pro/Team/Ultra spend allowance in USD cents).

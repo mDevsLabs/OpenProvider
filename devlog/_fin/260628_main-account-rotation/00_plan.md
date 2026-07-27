@@ -6,17 +6,17 @@ Class: **C4** (auth/credential + routing surface) → full PABCD + THOROUGH veri
 ## Part 1 — Plain explanation
 
 Today the "main" Codex account (the one the Codex CLI itself is logged into, stored in
-`~/.codex/auth.json`) is **excluded** from opencodex's automatic account rotation. The
+`~/.codex/auth.json`) is **excluded** from openprovider's automatic account rotation. The
 rotation engine only ever picks from pool accounts; the main account is a passthrough
 fallback that the proxy never load-balances, quota-tracks, fails over, or cools down.
 
 This change makes the main account a **first-class rotation member**, treated like any
 pool account for: quota-based auto-switch, failure failover, cooldown, quota tracking,
-and upstream-token injection — **without** importing its credentials into opencodex's
+and upstream-token injection — **without** importing its credentials into openprovider's
 managed store. The main account keeps `~/.codex/auth.json` as its read-only credential
 source (Option A). The Codex CLI login stays separate; if the main token is expired the
 account is treated as "needs re-login via Codex CLI" (excluded from rotation, surfaced as
-a reauth error) rather than refreshed by opencodex.
+a reauth error) rather than refreshed by openprovider.
 
 Identity: the main account participates under the stable id `__main__` (already used by
 the reset-credit + accounts-list APIs).
@@ -25,7 +25,7 @@ the reset-credit + accounts-list APIs).
 - **No sticky thread-affinity for main.** `bindThreadAffinity` requires a managed
   credential record, which main lacks; main re-resolves per request via active/auto-switch.
   Functionally correct, just not session-pinned. Out of scope to add.
-- **No opencodex-side refresh of the main token.** Expiry → reauth notice (Option A).
+- **No openprovider-side refresh of the main token.** Expiry → reauth notice (Option A).
 - Main is **not** imported into the managed store; `checkAccountIdCollision` stays as-is
   (still blocks importing the main login as a pool account).
 

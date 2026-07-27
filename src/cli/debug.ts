@@ -7,7 +7,7 @@ type DebugScope = "provider" | "usage" | "injection";
 async function requireLiveProxy() {
   const live = await findLiveProxy();
   if (!live) {
-    console.error("Proxy is not running. Start it with: ocx start");
+    console.error("Proxy is not running. Start it with: opr start");
     process.exit(1);
   }
   return live;
@@ -49,11 +49,11 @@ function printScopeStatus(scope: DebugScope, view: DebugSettingsView): void {
   if (scope === "provider") {
     console.log(`Provider debug: ${view.enabled ? "ON" : "off"}`);
     console.log(`  env=${view.env.debug ? "on" : "off"}, runtime=${view.runtimeOverride.debug === undefined ? "env/default" : view.runtimeOverride.debug ? "on" : "off"}`);
-    console.log("  Tail: ocx debug provider logs [-f]");
+    console.log("  Tail: opr debug provider logs [-f]");
   } else if (scope === "usage") {
     console.log(`Usage debug: ${view.usage ? "ON" : "off"}`);
     console.log(`  env=${view.env.usage ? "on" : "off"}, runtime=${view.runtimeOverride.usage === undefined ? "env/default" : view.runtimeOverride.usage ? "on" : "off"}`);
-    console.log("  Tail: ocx debug usage logs [-f] (via running proxy API)");
+    console.log("  Tail: opr debug usage logs [-f] (via running proxy API)");
   } else {
     console.log(`Injection debug: ${view.injection ? "ON" : "off"}`);
     console.log(`  env=${view.env.injection ? "on" : "off"}, runtime=${view.runtimeOverride.injection === undefined ? "env/default" : view.runtimeOverride.injection ? "on" : "off"}`);
@@ -114,7 +114,7 @@ async function printUsageLogs(follow: boolean): Promise<void> {
     }
     const entries = await res.json() as { seq: number; line: string }[];
     for (const entry of entries) console.log(entry.line);
-    if (entries.length === 0) console.log("(empty — enable with: ocx debug usage on)");
+    if (entries.length === 0) console.log("(empty — enable with: opr debug usage on)");
     if (entries.length > 0) after = entries[entries.length - 1]!.seq;
   } catch (err) {
     console.error(`Failed to read usage debug logs: ${err instanceof Error ? err.message : String(err)}`);
@@ -172,17 +172,17 @@ async function handleScopeCommand(scope: DebugScope, actionArgv: string[]): Prom
   }
 
   console.error(scope === "injection"
-    ? "Usage: ocx debug injection on|off|status|reset"
-    : `Usage: ocx debug ${scope} on|off|status|reset|logs [-f]`);
+    ? "Usage: opr debug injection on|off|status|reset"
+    : `Usage: opr debug ${scope} on|off|status|reset|logs [-f]`);
   process.exit(1);
 }
 
 function printTopLevelHelp(): void {
   console.log("Debug commands (proxy must be running):");
   console.log("");
-  console.log("  ocx debug provider on|off|status|reset|logs [-f]");
-  console.log("  ocx debug usage on|off|status|reset|logs [-f]");
-  console.log("  ocx debug injection on|off|status|reset");
+  console.log("  opr debug provider on|off|status|reset|logs [-f]");
+  console.log("  opr debug usage on|off|status|reset|logs [-f]");
+  console.log("  opr debug injection on|off|status|reset");
   console.log("");
   console.log("Env defaults on start:");
   console.log("  provider → OCX_DEBUG=1 (legacy OCX_DEBUG_FRAMES still works)");

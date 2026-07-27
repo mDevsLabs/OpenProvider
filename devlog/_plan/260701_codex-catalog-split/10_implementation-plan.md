@@ -28,7 +28,7 @@ import-path churn in tests or src.
 
 ## P - Plan / golden snapshot FIRST (work-phase 0)
 
-The catalog is injected into Codex (the on-disk opencodex-catalog.json). The
+The catalog is injected into Codex (the on-disk openprovider-catalog.json). The
 split must be byte-identical for the same inputs. So BEFORE moving anything:
 
 1. grep -nE '^export ' src/codex-catalog.ts -> freeze the public surface to

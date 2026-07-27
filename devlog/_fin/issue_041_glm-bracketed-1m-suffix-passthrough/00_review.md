@@ -15,7 +15,7 @@ documented id for the 1M variant, so this looks like a passthrough issue.
 
 ## Root-cause analysis (confirmed in code + external docs)
 
-opencodex forwards the model id **verbatim** as the chat-completions `model`
+openprovider forwards the model id **verbatim** as the chat-completions `model`
 value. The openai-chat adapter builds the request body with:
 
 ```ts

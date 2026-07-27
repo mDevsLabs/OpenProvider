@@ -28,8 +28,8 @@ beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
   previousClaudeConfigDir = process.env.CLAUDE_CONFIG_DIR;
   previousDesktopConfigDir = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-claude-mgmt-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-claude-mgmt-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-claude-mgmt-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-claude-mgmt-"));
   process.env.OPENCODEX_HOME = testDir;
   // These API tests intentionally toggle agent injection off. Never let that
   // prune the developer's real ~/.claude/agents directory.
@@ -69,7 +69,7 @@ test("GET /api/claude-code returns defaults + available + aliases", async () => 
     expect(d.modelMap).toEqual({});
     expect(d.available).toContain("mock/test-model");
     // Aliases preview uses the readable CLI-surface family (devlog 050 / audit 051 #2).
-    expect(d.aliases.some((a: { id: string }) => a.id === "claude-ocx-mock--test-model")).toBe(true);
+    expect(d.aliases.some((a: { id: string }) => a.id === "claude-opr-mock--test-model")).toBe(true);
     expect(typeof d.port).toBe("number");
   } finally {
     server.stop(true);
@@ -372,7 +372,7 @@ test("PUT immediately restores generated agents after re-enable and roster chang
       body: JSON.stringify({ injectAgents: true }),
     });
     expect(enable.status).toBe(200);
-    expect(readdirSync(agentsDir).some(name => name === "ocx-gpt-5-6-sol.md")).toBe(true);
+    expect(readdirSync(agentsDir).some(name => name === "opr-gpt-5-6-sol.md")).toBe(true);
 
     const disable = await fetch(new URL("/api/claude-code", server.url), {
       method: "PUT",
@@ -388,7 +388,7 @@ test("PUT immediately restores generated agents after re-enable and roster chang
       body: JSON.stringify({ injectAgents: true }),
     });
     expect(reenable.status).toBe(200);
-    expect(readdirSync(agentsDir).some(name => name === "ocx-gpt-5-6-sol.md")).toBe(true);
+    expect(readdirSync(agentsDir).some(name => name === "opr-gpt-5-6-sol.md")).toBe(true);
 
     const roster = await fetch(new URL("/api/subagent-models", server.url), {
       method: "PUT",
@@ -396,7 +396,7 @@ test("PUT immediately restores generated agents after re-enable and roster chang
       body: JSON.stringify({ models: ["gpt-5.6-terra"] }),
     });
     expect(roster.status).toBe(200);
-    expect(readdirSync(agentsDir)).toEqual(["ocx-gpt-5-6-terra.md"]);
+    expect(readdirSync(agentsDir)).toEqual(["opr-gpt-5-6-terra.md"]);
   } finally {
     server.stop(true);
   }

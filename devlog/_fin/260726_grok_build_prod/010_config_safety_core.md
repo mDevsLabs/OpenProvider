@@ -64,18 +64,18 @@ for (const match of outsideManagedRegion.matchAll(MODEL_HEADER)) {
 
 ### 방출 측 대칭 확인
 
-`buildGrokManagedBlock()`은 `ocx-` 접두 + `[^A-Za-z0-9_-]` 치환으로 alias를 만들므로 점이 남지
+`buildGrokManagedBlock()`은 `opr-` 접두 + `[^A-Za-z0-9_-]` 치환으로 alias를 만들므로 점이 남지
 않는다(E1의 점-alias 함정에 해당하지 않음). 이 성질이 회귀하지 않도록 테스트로 고정한다.
 
 ### 회귀 테스트 (`tests/grok-config-inject.test.ts` 추가)
 
-1. `["model"."ocx-gpt-5"]`를 소유한 설정 → 생성 블록이 `[model.ocx-gpt-5]`를 재사용하지 않고
-   `[model.ocx-gpt-5-2]`로 회피.
-2. `['model'.ocx-gpt-5]` 동일.
-3. `[ "model" . 'ocx-gpt-5' ]` 공백/혼합 인용 동일.
+1. `["model"."opr-gpt-5"]`를 소유한 설정 → 생성 블록이 `[model.opr-gpt-5]`를 재사용하지 않고
+   `[model.opr-gpt-5-2]`로 회피.
+2. `['model'.opr-gpt-5]` 동일.
+3. `[ "model" . 'opr-gpt-5' ]` 공백/혼합 인용 동일.
 4. 방출된 모든 alias에 `.`이 없음 (점-alias 함정 고정).
-5. `[[model.ocx-gpt-5]]` (배열 테이블) 예약됨.
-6. `[model.ocx-gpt-5.sub]` (하위 테이블) 예약됨.
+5. `[[model.opr-gpt-5]]` (배열 테이블) 예약됨.
+6. `[model.opr-gpt-5.sub]` (하위 테이블) 예약됨.
 
 ### 추가 철자 커버리지 (감사 지적)
 
@@ -86,11 +86,11 @@ for (const match of outsideManagedRegion.matchAll(MODEL_HEADER)) {
 
 | 사용자 철자 | 우리 블록과의 충돌 | 예약 |
 |-------------|-------------------|------|
-| `[[model.ocx-mine]]` | **duplicate key** | 필수 |
-| `["model"."ocx-mine"]` | **duplicate key** | 필수 |
-| `[model.ocx-mine.sub]` | 충돌 없음 (유효) | 보수적 선택 |
-| `[model]` + `ocx-mine.k = 1` | **duplicate key** | 미커버(D7) |
-| 루트 `model.ocx-mine.k = 1` | **duplicate key** | 미커버(D7) |
+| `[[model.opr-mine]]` | **duplicate key** | 필수 |
+| `["model"."opr-mine"]` | **duplicate key** | 필수 |
+| `[model.opr-mine.sub]` | 충돌 없음 (유효) | 보수적 선택 |
+| `[model]` + `opr-mine.k = 1` | **duplicate key** | 미커버(D7) |
+| 루트 `model.opr-mine.k = 1` | **duplicate key** | 미커버(D7) |
 
 따라서 헤더 정규식을 다음으로 확장한다 — 여는 괄호를 1~2개 허용하고, 두 번째 세그먼트 뒤에
 **추가 세그먼트가 이어져도** 두 번째 세그먼트를 예약한다:
@@ -113,14 +113,14 @@ prompt = """
 [model.a.b
 """
 
-[model.ocx-mine]
+[model.opr-mine]
 ```
 
 회귀 테스트로 고정한다.
 
 세 세그먼트 헤더(`[model.x.y]`)는 이제 `x`를 예약한다. 초판은 이를 "예약하면 안 된다"고 적었으나
 충돌하지 않더라도 사용자 네임스페이스를 피하는 편이 안전하므로 **예약을 유지**한다.
-루트 dotted 키(`model.ocx-mine.x = 1`)와 `[model]` + dotted 키 형태는 실제로 충돌하지만
+루트 dotted 키(`model.opr-mine.x = 1`)와 `[model]` + dotted 키 형태는 실제로 충돌하지만
 우선순위를 낮춰 `000`의 잔여 위험(D7)으로 남긴다.
 멀티라인 문자열 안의 헤더가 헛되이 예약되는 경우도 같은 성격의 잔여 위험이며, 비용은 alias
 접미사 하나뿐이다.
@@ -135,7 +135,7 @@ prompt = """
 inject: `const separator = content.endsWith("\n") ? "\n" : "\n\n";`
 strip: `if (prefix.endsWith("\n\n")) prefix = prefix.slice(0, -1);` — 항상 하나만 제거.
 
-원래 개행이 없던 파일은 `ocx stop` 후 개행 하나를 얻는다.
+원래 개행이 없던 파일은 `opr stop` 후 개행 하나를 얻는다.
 
 ### 왜 strip만 고쳐서는 불가능한가
 

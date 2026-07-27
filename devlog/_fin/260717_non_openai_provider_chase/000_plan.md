@@ -13,7 +13,7 @@
 - Non-goals: OpenAI changes, further xAI work, production code changes in this Phase-0 cycle, release, deploy, and push.
 - Verifier: each decade document must name real files, before/after behavior, activation scenarios, focused commands, and terminal outcomes; an independent A reviewer must verify the map against the current tree.
 - Stop condition: this docs-only cycle ends when all decade docs exist, the chase source-of-truth is synchronized, the goalplan is registered, and the independent audit passes. Later implementation stops only when every work-phase and criterion is closed with fresh evidence.
-- Memory artifact: this folder, `.codexclaw/goalplans/opencodex-openai-xai-provider-chase-durable-docs/goalplan.json`, and its ledger.
+- Memory artifact: this folder, `.codexclaw/goalplans/openprovider-openai-xai-provider-chase-durable-docs/goalplan.json`, and its ledger.
 - Terminal outcomes: `DONE`, `NOOP`, `BLOCKED`, `UNSAFE`, `NEEDS_HUMAN`; `BUDGET_EXHAUSTED` is unavailable until a later HOTL phase states a real bound.
 - Escalation: the main session reclaims a slice after two failed delegated packets; any future delegation is registered during that work-phase's P, never improvised during B.
 

@@ -1,6 +1,6 @@
 # 005 — Upstream model/provider delta backlog
 
-> Re-triaged: 2026-07-17 against OpenCodex `f779f3d9` (original model-import baseline `0167b415`) and the fingerprinted local jawcode snapshot in `devlog/_fin/260717_jawcode_model_import_audit/001_research_snapshot.md`
+> Re-triaged: 2026-07-17 against OpenProvider `f779f3d9` (original model-import baseline `0167b415`) and the fingerprinted local jawcode snapshot in `devlog/_fin/260717_jawcode_model_import_audit/001_research_snapshot.md`
 
 초기 후보는 jawcode의 로컬 미커밋 `struct_har/chase/model/`과 실제 `packages/ai` 변경을 함께 대조했다. 이 문서는 실행 우선순위만 요약하며, 판정 근거는 [006](./006_jawcode_import_matrix.md), 모델명은 [007](./007_model_id_delta.md), 로직은 [008](./008_logic_delta.md)를 정본으로 삼는다.
 

@@ -8,7 +8,7 @@ trace for routed models — matching native OpenAI models.
 ## Why (grounded in the codex-rs trace, see 01_codex-rs-consumer-trace.md)
 - codex-rs renders the persisted / expandable reasoning block from the **summary
   channel** (`ReasoningSummaryCell`, tui/src/history_cell/messages.rs:197-506).
-- Native OpenAI models fill `summary`; opencodex's `reasoning_raw_delta` path
+- Native OpenAI models fill `summary`; openprovider's `reasoning_raw_delta` path
   fills only `content` and leaves `summary: []` → timer shows, nothing to expand.
 - Non-OpenAI chat providers (DeepSeek-R-style) do NOT emit a separate condensed
   summary stream. Their full `reasoning_content` IS the human-visible thinking,

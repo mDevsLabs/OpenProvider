@@ -1,7 +1,7 @@
 /**
  * Shared Grok Build config sync: gather the visible model catalog and (re)inject the
- * managed block into ~/.grok/config.toml. Used by `ocx start` (server process) and by
- * `ocx ensure` / `ocx restart` (parent process, after live discovery or child readiness)
+ * managed block into ~/.grok/config.toml. Used by `opr start` (server process) and by
+ * `opr ensure` / `opr restart` (parent process, after live discovery or child readiness)
  * so the fence exists deterministically once the proxy reports healthy.
  *
  * Deps are injectable (mirrors src/codex/sync.ts) so tests can run without a live proxy.

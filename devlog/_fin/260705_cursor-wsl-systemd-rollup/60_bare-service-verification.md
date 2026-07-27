@@ -1,4 +1,4 @@
-# Bare `ocx service` Verification
+# Bare `opr service` Verification
 
 ## Commands
 
@@ -15,4 +15,4 @@
 
 ## Outcome
 
-DONE: bare `ocx service` now defaults to the existing install/update/start service path, while explicit invalid service subcommands still fail with usage and `ocx service start` remains installed-service-only.
+DONE: bare `opr service` now defaults to the existing install/update/start service path, while explicit invalid service subcommands still fail with usage and `opr service start` remains installed-service-only.

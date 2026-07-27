@@ -189,9 +189,9 @@ describe("runWindowsElevated spawn contract", () => {
     const child = fakeChild({ hang: true });
     const started = startElevatedSchtasksCreateAndRun(
       "schtasks.exe",
-      ["/create", "/tn", "opencodex-proxy", "/f"],
-      ["/run", "/tn", "opencodex-proxy"],
-      ["/delete", "/tn", "opencodex-proxy", "/f"],
+      ["/create", "/tn", "openprovider-proxy", "/f"],
+      ["/run", "/tn", "openprovider-proxy"],
+      ["/delete", "/tn", "openprovider-proxy", "/f"],
     );
     const raced = await raceWithTimeout(started.completion, 20);
     expect(raced.status).toBe("timed-out");
@@ -232,9 +232,9 @@ describe("one-UAC create/run/rollback elevated script", () => {
   test("embeds create, run, and delete rollback without a second RunAs or temp file writes", () => {
     const script = buildElevatedSchtasksCreateAndRunScript(
       "C:\\Windows\\System32\\schtasks.exe",
-      ["/create", "/tn", "opencodex-proxy", "/xml", "C:\\Users\\Jane Doe\\task.xml", "/f"],
-      ["/run", "/tn", "opencodex-proxy"],
-      ["/delete", "/tn", "opencodex-proxy", "/f"],
+      ["/create", "/tn", "openprovider-proxy", "/xml", "C:\\Users\\Jane Doe\\task.xml", "/f"],
+      ["/run", "/tn", "openprovider-proxy"],
+      ["/delete", "/tn", "openprovider-proxy", "/f"],
     );
     expect(script).toContain("Invoke-OcxSchtasks");
     expect(script).toContain(`exit ${OCX_ELEVATED_CREATE_FAILED}`);
@@ -244,7 +244,7 @@ describe("one-UAC create/run/rollback elevated script", () => {
     expect(script).toContain('"C:\\Users\\Jane Doe\\task.xml"');
     expect(script).not.toContain("-Verb RunAs");
     expect(script).not.toMatch(/Set-Content|Out-File|Add-Content|New-Item/i);
-    expect(script).not.toMatch(/TEMP|tmpdir|ocx-elev/i);
+    expect(script).not.toMatch(/TEMP|tmpdir|opr-elev/i);
   });
 });
 
@@ -312,7 +312,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
       writeInstallState: () => { writeCount += 1; },
     });
 
-    const result = await finalizeWindowsSchedulerServiceRegistration("C:\\Users\\x\\.opencodex\\opencodex-service.cmd");
+    const result = await finalizeWindowsSchedulerServiceRegistration("C:\\Users\\x\\.openprovider\\openprovider-service.cmd");
     expect(result).toEqual({ kind: "done" });
     expect(elevateLaunches).toBe(1);
     expect(writeCount).toBe(1);
@@ -414,7 +414,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     });
 
     const result = await finalizeWindowsSchedulerServiceRegistration(
-      "C:\\Users\\x\\.opencodex\\opencodex-service.cmd",
+      "C:\\Users\\x\\.openprovider\\openprovider-service.cmd",
     );
     expect(result.kind).toBe("indeterminate");
     expect(writeCount).toBe(0);
@@ -760,9 +760,9 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
 
     const result = await runElevatedSchtasksCreateAndRun(
       "schtasks.exe",
-      ["/create", "/tn", "opencodex-proxy", "/f"],
-      ["/run", "/tn", "opencodex-proxy"],
-      ["/delete", "/tn", "opencodex-proxy", "/f"],
+      ["/create", "/tn", "openprovider-proxy", "/f"],
+      ["/run", "/tn", "openprovider-proxy"],
+      ["/delete", "/tn", "openprovider-proxy", "/f"],
     );
     expect(launches).toBe(1);
     expect(result.outcome).toBe("success");

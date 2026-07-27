@@ -7,7 +7,7 @@ test("Usage renders the single stacked layout (no layout toggle, no workspace ra
 
   expect(page).not.toContain("viewMode");
   expect(page).not.toContain("readViewMode");
-  expect(page).not.toContain("ocx-usage-view");
+  expect(page).not.toContain("opr-usage-view");
   expect(page).not.toContain("UsageWorkspaceBody");
   expect(page).not.toContain("UsageWorkspaceSection");
   expect(page).not.toContain("usage-workspace-");

@@ -9,7 +9,7 @@
 
 ## The five phases
 
-| Phase | Provider | Strategy | Difficulty | jawcode core | opencodex doc |
+| Phase | Provider | Strategy | Difficulty | jawcode core | openprovider doc |
 |:-----:|----------|----------|:----------:|--------------|---------------|
 | **10** | `google-vertex` | **extend `google`** + ADC | MEDIUM | `google-vertex.ts`, `google-auth.ts` | `10_phase1_google-vertex.md` |
 | **20** | `google-antigravity` | **extend `google`** + OAuth | MEDIUM | `google-antigravity.ts`, `oauth/google-antigravity.ts` | `20_phase2_google-antigravity.md` |
@@ -34,14 +34,14 @@
 
 ## Shared infrastructure (build once, reuse)
 
-| Module (NEW in opencodex) | Built in | Reused by | jawcode source |
+| Module (NEW in openprovider) | Built in | Reused by | jawcode source |
 |---------------------------|:--------:|-----------|----------------|
 | `google` adapter mode-hook (`googleMode` config branch) | 10 | 20 | `google.ts` extension |
 | GCP ADC resolver (`src/lib/gcp-adc.ts`) | 10 | — | `google-auth.ts` |
 | OAuth registry pattern (`OAUTH_PROVIDERS` entry) | 20 | 50 | `oauth/index.ts:36-61` |
 | AWS SigV4 signer (`src/lib/aws-auth.ts`, zero `@aws-sdk`) | 30 | — | `aws-sigv4.ts`, `aws-credentials.ts` |
 | **AWS eventstream decoder** (`src/lib/eventstream-decoder.ts`) | 30 | **40** | `aws-eventstream.ts` |
-| Transport escape hatch (`runTurn` hook) | 50 | — | (opencodex `350` §2) |
+| Transport escape hatch (`runTurn` hook) | 50 | — | (openprovider `350` §2) |
 
 ## The "1 phase = 1 PABCD pass" contract
 
@@ -73,12 +73,12 @@ No phase bundles a second provider; a phase may *internally* have sub-steps but 
 
 ## Audit record (PABCD-A, jaw Backend employee)
 
-A backend specialist independently audited `10`–`50` against jawcode + opencodex source. **Verdict:
+A backend specialist independently audited `10`–`50` against jawcode + openprovider source. **Verdict:
 PASS-with-fixes.** Confirmed sound: the extend-`google` vs new-adapter split, the sequencing
 (10→20 google-mode hook; 30→40 shared `decodeEventStream`, verified `kiro.ts:31` + `amazon-bedrock.ts:37`
 both import it; 50 isolated), the 1-phase-1-PABCD framing, and the auth approaches. **Fixed findings**
 (all in Phase 20 + cites): (1) antigravity `parseStream` is **not** unchanged — it nests under
-`response.candidates` vs opencodex's top-level `chunk.candidates`, so Phase 20 adds a mode-aware parser;
+`response.candidates` vs openprovider's top-level `chunk.candidates`, so Phase 20 adds a mode-aware parser;
 (2) `projectId` must be read from the stored credential (server injects only the bare token);
 (3) added the `cloudcode-pa.googleapis.com` prod-fallback endpoint; (4) corrected jawcode cite prefixes
 to `utils/oauth/…`.

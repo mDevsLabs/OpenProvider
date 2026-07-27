@@ -69,15 +69,15 @@ device-flow bridge. OpenProvider stores their credentials in
 CLI; it acquires a ChatGPT credential while creating a `forward`-mode provider entry.
 
 ```bash
-ocx login xai          # xAI Grok
-ocx login anthropic    # Anthropic Claude (Pro/Max)
-ocx login kimi         # Moonshot Kimi
-ocx login kiro         # import kiro-cli credentials (or token fallback)
-ocx login google-antigravity
-ocx login cursor       # standalone Cursor PKCE login
-ocx login github-copilot  # GitHub device flow → Copilot token (Copilot Pro/Business)
-ocx login chatgpt      # standalone ChatGPT OAuth login
-ocx logout <provider>
+opr login xai          # xAI Grok
+opr login anthropic    # Anthropic Claude (Pro/Max)
+opr login kimi         # Moonshot Kimi
+opr login kiro         # import kiro-cli credentials (or token fallback)
+opr login google-antigravity
+opr login cursor       # standalone Cursor PKCE login
+opr login github-copilot  # GitHub device flow → Copilot token (Copilot Pro/Business)
+opr login chatgpt      # standalone ChatGPT OAuth login
+opr logout <provider>
 ```
 
 | Provider | Adapter | Base URL | Notes |
@@ -133,20 +133,20 @@ headers — see [Adapters](/reference/adapters/)). Pool mode overwrites only aut
 client identity (for example `originator`, session, or thread headers) when the caller did not send
 them.
 
-**Diagnostics and reauth.** Human `ocx status` prints an OAuth health block (redacted account ids,
-no tokens). `ocx doctor` adds an OAuth reliability section with writable-store / single-flight checks
+**Diagnostics and reauth.** Human `opr status` prints an OAuth health block (redacted account ids,
+no tokens). `opr doctor` adds an OAuth reliability section with writable-store / single-flight checks
 and WARN rows that include a recovery Action. When an OAuth provider account needs reauthentication, run
-`ocx login <provider>` (or use Reauthenticate in the dashboard). Codex pool accounts are not an
-`ocx login` provider — reauthenticate via the dashboard Codex account pool. See
-[`ocx status` / `ocx doctor`](/reference/cli/) in the CLI reference.
+`opr login <provider>` (or use Reauthenticate in the dashboard). Codex pool accounts are not an
+`opr login` provider — reauthenticate via the dashboard Codex account pool. See
+[`opr status` / `opr doctor`](/reference/cli/) in the CLI reference.
 
 ### Kiro credential import
 
 Kiro login expects the Kiro CLI: install it (`curl -fsSL https://cli.kiro.dev/install | bash`)
-and sign in with `kiro-cli login` first. Without a kiro-cli session, `ocx login kiro` falls
+and sign in with `kiro-cli login` first. Without a kiro-cli session, `opr login kiro` falls
 back to a pasted access token or the `KIRO_ACCESS_TOKEN` environment variable.
 
-`ocx login kiro` searches the platform Kiro CLI stores and opens SQLite databases read-only. Two
+`opr login kiro` searches the platform Kiro CLI stores and opens SQLite databases read-only. Two
 environment variables make selection explicit without copying credentials into OpenProvider:
 
 - `KIROCLI_DB_PATH` selects a nonstandard Kiro CLI SQLite database. The path must already exist;
@@ -207,14 +207,14 @@ management API is `/api/providers/keys` and returns masked keys only.
 
 ### Switching accounts from the terminal
 
-Use `ocx account list`, `ocx account current`, and `ocx account use` to inspect or switch the same
+Use `opr account list`, `opr account current`, and `opr account use` to inspect or switch the same
 Codex, OAuth, and API-key pools without opening the dashboard. See the
-[CLI reference](/reference/cli/#ocx-account-subcommand) for commands, JSON output, and
+[CLI reference](/reference/cli/#opr-account-subcommand) for commands, JSON output, and
 new-session behavior.
 
 ### GPT-5.6 preview paths
 
-GPT-5.6 Sol/Terra/Luna are seeded in provider fallback lists so `ocx sync` can keep the models
+GPT-5.6 Sol/Terra/Luna are seeded in provider fallback lists so `opr sync` can keep the models
 visible even while live catalogs lag:
 
 | Codex route | Seeded model ids | Codex-visible context |
@@ -235,12 +235,12 @@ A provider is included when OpenProvider has a matching wire adapter, **not** ba
 (AI Studio, Vertex, and Antigravity/Cloud Code Assist modes), `azure` / `azure-openai`, `kiro`, and
 `cursor`. A proprietary API without one of these implementations, such as native Amazon Bedrock,
 is not supported directly.
-**GitHub Copilot** is an OAuth provider (`ocx login github-copilot`) that exchanges a GitHub
+**GitHub Copilot** is an OAuth provider (`opr login github-copilot`) that exchanges a GitHub
 device-flow login for a short-lived Copilot API token — not a pasted API key. **GitLab Duo** remains
 a key/subscription-token gateway on its OpenAI-compatible endpoint. **Cloudflare AI
 Gateway** needs your account + gateway ids filled into the URL.
 
-Cursor is tracked separately as an experimental adapter. `adapter: "cursor"` appears in `ocx init`
+Cursor is tracked separately as an experimental adapter. `adapter: "cursor"` appears in `opr init`
 and the dashboard Add Provider picker as an experimental local config entry with Cursor's static
 fallback model catalog metadata. When a Cursor access token is configured, OpenProvider uses Cursor's
 live HTTP/2 transport. Its v2.7.1 fallback seed includes `gpt-5.6-sol` / `terra` / `luna` (1M context)
@@ -279,7 +279,7 @@ Point OpenProvider at a local OpenAI-compatible server — usually with a blank 
 ## Any OpenAI-compatible endpoint
 
 If a provider speaks Chat Completions, the `openai-chat` adapter handles it — choose **Custom** in the
-dashboard or `custom` in `ocx init` and enter the base URL. See the
+dashboard or `custom` in `opr init` and enter the base URL. See the
 [Configuration reference](/reference/configuration/) for every provider field
 (`headers`, `noReasoningModels`, `noVisionModels`, `models`, …).
 

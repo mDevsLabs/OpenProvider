@@ -28,7 +28,7 @@
  (user activation)가 이미 소실된 상태다. 일반 브라우저에서도 팝업 차단 대상이 되며,
  Codex 인앱 브라우저에서는 "링크 가기"라는 앱 레벨 프롬프트로 중재된다.
  
- "링크 가기"는 opencodex i18n 문자열이 아님 — ko.ts에 해당 문구 없음.
+ "링크 가기"는 openprovider i18n 문자열이 아님 — ko.ts에 해당 문구 없음.
  Codex 앱의 WebView가 `_blank` 탐색 요청을 인터셉트하면서 자체 UI로 보여주는 것.
  
  ### 근본 불일치: 서버측 openUrl 패턴의 미적용

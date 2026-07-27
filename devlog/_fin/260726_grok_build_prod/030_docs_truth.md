@@ -4,7 +4,7 @@
 
 ## 문서 수정 1 — 비루프백 안내가 틀렸다
 
-현재 문구는 "비루프백이면 per-model `api_key`를 admission 토큰으로 바꿔라"고 한다. 두 가지가 틀렸다: (a) 다음 `ocx start`/`ensure`가 fence를 재생성하며 되돌린다, (b) `base_url`이 `127.0.0.1`로 남으면 애초에 도달 불가다.
+현재 문구는 "비루프백이면 per-model `api_key`를 admission 토큰으로 바꿔라"고 한다. 두 가지가 틀렸다: (a) 다음 `opr start`/`ensure`가 fence를 재생성하며 되돌린다, (b) `base_url`이 `127.0.0.1`로 남으면 애초에 도달 불가다.
 
 wp1 이후로는 자동 생성 블록이 비루프백에서 `env_key`를 쓰므로, 안내는 "환경변수를 설정하라"로 바뀐다.
 
@@ -12,16 +12,16 @@ wp1 이후로는 자동 생성 블록이 비루프백에서 `env_key`를 쓰므�
 -## Authentication note
 -
 -Grok Build requires a non-empty API key for custom models even on loopback. The injected
--entries carry a placeholder (`opencodex-loopback`) — opencodex ignores admission keys for
+-entries carry a placeholder (`openprovider-loopback`) — openprovider ignores admission keys for
 -loopback connections, so no real secret is involved. If you bind the proxy on a
--non-loopback host, replace the per-model `api_key` with your opencodex admission token.
+-non-loopback host, replace the per-model `api_key` with your openprovider admission token.
 +## Authentication note
 +
 +Grok Build requires a credential for custom models even on loopback. On a loopback bind the
-+injected entries carry a placeholder (`opencodex-loopback`) — opencodex ignores admission
++injected entries carry a placeholder (`openprovider-loopback`) — openprovider ignores admission
 +keys for loopback connections, so no real secret is involved.
 +
-+When the proxy is bound to a non-loopback host, opencodex requires a real admission token on
++When the proxy is bound to a non-loopback host, openprovider requires a real admission token on
 +every request. The generated entries then carry
 +`env_key = "OPENCODEX_API_AUTH_TOKEN"` instead of a literal key: Grok Build reads the token
 +from that environment variable at request time, so no secret is written into your shared
@@ -29,7 +29,7 @@ wp1 이후로는 자동 생성 블록이 비루프백에서 `env_key`를 쓰므�
 +
 +```bash
 +export OPENCODEX_API_AUTH_TOKEN="…"   # same token the proxy was started with
-+grok -m ocx-… -p "hello"
++grok -m opr-… -p "hello"
 +```
 +
 +If the variable is unset, Grok Build fails closed for those models rather than falling back
@@ -43,10 +43,10 @@ wp1 이후로는 자동 생성 블록이 비루프백에서 `env_key`를 쓰므�
 소스에는 `ConfigFileWatcher` → `ConfigUpdate::ModelsChanged` 경로가 실제로 있지만 (`180_grok-build .../config/reloader.rs:385`), docs.x.ai는 이를 보장하지 않고 `grok inspect` 후 세션 재선택을 안내한다. 버전 보장 없이 "watch하고 hot-reload한다"고 쓰면 안 된다.
 
 ```diff
--- **Config read timing:** start opencodex first, then launch `grok` for the most
+-- **Config read timing:** start openprovider first, then launch `grok` for the most
 -  predictable results. Recent Grok Build versions watch `config.toml` and hot-reload
 -  `[model.*]` changes into an open session; older builds may need a restart.
-+- **Config read timing:** start opencodex first, then launch `grok` for the most
++- **Config read timing:** start openprovider first, then launch `grok` for the most
 +  predictable results. If you refresh the catalog while `grok` is already open, run
 +  `grok inspect` to confirm the config was picked up, then reopen the session or
 +  re-select the model with `/model`. Some builds do pick up `[model.*]` edits without a

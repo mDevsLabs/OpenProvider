@@ -94,7 +94,7 @@ The recognized Codex effort ladder is `low < medium < high < xhigh < max < ultra
 
 - `ultra` is a client-facing selection: maximum reasoning plus proactive multi-agent delegation
   (derived in codex-rs core, not by the proxy). Upstream converts it to `max` at the inference
-  boundary; ocx mirrors that in two places — the Responses parser normalizes `ultra -> max` at
+  boundary; opr mirrors that in two places — the Responses parser normalizes `ultra -> max` at
   ingest, and `mapReasoningEffort` converts any direct `ultra` caller to the `max` wire value.
 - Routed models default to the `low..max` ladder. `ultra` is per-model opt-in via the
   `reasoningEfforts` provider config; when opted in it renders its canonical description.
@@ -102,7 +102,7 @@ The recognized Codex effort ladder is `low < medium < high < xhigh < max < ultra
   (`src/codex/data/upstream-models.json`, openai/codex PR #31684): exact per-slug ladders
   (`sol`/`terra` end at `ultra`, `luna` ends at `max` — no ultra), default efforts
   (`sol` = `low`, `terra`/`luna` = `medium`), real display names/descriptions/NUX, and
-  `multi_agent_version` (`sol`/`terra` v2, `luna` v1). ocx adaptations: `minimal_client_version`
+  `multi_agent_version` (`sol`/`terra` v2, `luna` v1). opr adaptations: `minimal_client_version`
   is stripped (it would hide the model from older installed clients) and
   `prefer_websockets`/`supports_websockets` follow the central websocket gate. A future
   `gpt-5.6-*` slug the snapshot predates falls back to template synthesis plus
@@ -175,8 +175,8 @@ Useful probes:
 ```bash
 codex doctor --json
 codex debug models
-ocx sync
-ocx status
+opr sync
+opr status
 ```
 
 Expected high-level result:

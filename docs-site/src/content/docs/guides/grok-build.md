@@ -10,29 +10,29 @@ automatically — no manual config editing required.
 
 ## Auto-registration
 
-When `~/.grok` exists, `ocx start` (and `ocx ensure` / `ocx restart`) writes a managed block
+When `~/.grok` exists, `opr start` (and `opr ensure` / `opr restart`) writes a managed block
 into `~/.grok/config.toml`:
 
 ```toml
-# >>> OpenProvider managed block — do not edit (removed by `ocx stop`) >>>
-[model.ocx-gpt-5-6-sol]
+# >>> OpenProvider managed block — do not edit (removed by `opr stop`) >>>
+[model.opr-gpt-5-6-sol]
 model = "gpt-5.6-sol"
 base_url = "http://127.0.0.1:10100/v1"
 api_backend = "chat_completions"
 api_key = "OpenProvider-loopback"
 name = "OCX gpt-5.6-sol"
-# ... one [model.ocx-*] table per visible model ...
+# ... one [model.opr-*] table per visible model ...
 # <<< OpenProvider managed block <<<
 ```
 
 - **Additive:** your own config outside the fence is never touched. Before the first
   injection into a pre-existing file, a one-time backup is written to
   `~/.grok/config.toml.bak-OpenProvider`.
-- **Idempotent:** every `ocx start` (and `ocx ensure` while autostart is enabled) replaces
+- **Idempotent:** every `opr start` (and `opr ensure` while autostart is enabled) replaces
   the fenced block with the current catalog.
-- **Removed on teardown:** `ocx stop`, `ocx eject`, `ocx uninstall`, and graceful
+- **Removed on teardown:** `opr stop`, `opr eject`, `opr uninstall`, and graceful
   non-service daemon shutdown strip the fenced block and restore your file
-  byte-for-byte. Under a service manager, teardown goes through `ocx stop`/`ocx
+  byte-for-byte. Under a service manager, teardown goes through `opr stop`/`opr
   uninstall` (service-mode processes intentionally keep the block across respawns).
 - **Conflict-safe:** aliases already defined by your own `[model.*]` tables are respected
   (OpenProvider suffixes its own entries); a damaged fence (begin marker without end marker)
@@ -41,9 +41,9 @@ name = "OCX gpt-5.6-sol"
 Then pick a model inside Grok Build:
 
 ```bash
-grok models          # lists ocx-* entries alongside native grok models
-grok -m ocx-anthropic-claude-opus-4-8 -p "hello"
-# or in the TUI: /model ocx-anthropic-claude-opus-4-8
+grok models          # lists opr-* entries alongside native grok models
+grok -m opr-anthropic-claude-opus-4-8 -p "hello"
+# or in the TUI: /model opr-anthropic-claude-opus-4-8
 ```
 
 ## Authentication note
@@ -56,7 +56,7 @@ loopback connections, so no real secret is involved.
 the wildcards `0.0.0.0` and `::`, which expose every interface — requests need your real
 admission token, and a managed block cannot carry one safely. Writing the literal token would
 put your secret into `~/.grok/config.toml` and overwrite whatever you set there on the next
-`ocx start`/`ensure`/`restart`. So OpenProvider writes nothing at all in that case (and removes
+`opr start`/`ensure`/`restart`. So OpenProvider writes nothing at all in that case (and removes
 any block left over from an earlier loopback bind), and you configure the models yourself
 outside the managed markers, where nothing OpenProvider does can clobber them. See
 [Manual recipe](#manual-recipe-without-auto-registration) for the exact table, and set both
@@ -79,7 +79,7 @@ If you manage `~/.grok/config.toml` yourself — or OpenProvider is on a non-loo
 per-model tables with **direct fields**, outside the `# >>> OpenProvider managed block` markers:
 
 ```toml
-[model.ocx-opus]
+[model.opr-opus]
 model = "anthropic/claude-opus-4-8"
 base_url = "http://127.0.0.1:10100/v1"
 api_backend = "chat_completions"
@@ -90,7 +90,7 @@ For a proxy reachable over the network, point `base_url` at the address `grok` c
 dial and use your admission token:
 
 ```toml
-[model.ocx-opus]
+[model.opr-opus]
 model = "anthropic/claude-opus-4-8"
 base_url = "http://192.168.1.10:10100/v1"   # the reachable host, not 127.0.0.1
 api_backend = "chat_completions"
@@ -112,11 +112,11 @@ the id `grok-4.5`. Generated aliases avoid dots entirely for this reason.
   rejects unknown event types, so a manually configured `api_backend = "responses"` model
   can fail mid-turn on slow upstreams. The auto-registered entries pin
   `api_backend = "chat_completions"`, which never surfaces raw heartbeat frames.
-- **Service-installed `ocx restart`:** when OpenProvider runs under a service manager,
-  `ocx restart` currently stops the service and replaces it with an unmanaged process —
+- **Service-installed `opr restart`:** when OpenProvider runs under a service manager,
+  `opr restart` currently stops the service and replaces it with an unmanaged process —
   service persistence (auto-restart, start-at-login) is lost until the next
-  `ocx service` setup, and if that unmanaged process dies the managed block can point at
-  a dead proxy until the next `ocx start`/`ocx ensure` refreshes it.
+  `opr service` setup, and if that unmanaged process dies the managed block can point at
+  a dead proxy until the next `opr start`/`opr ensure` refreshes it.
 - **Config read timing:** start OpenProvider first, then launch `grok` for the most
   predictable results. Grok Build watches `~/.grok/config.toml` and reloads when the
   `[model]` table actually changes (roughly a one-second debounce, compared by content), so
@@ -126,5 +126,5 @@ the id `grok-4.5`. Generated aliases avoid dots entirely for this reason.
   invalidates the *entire* user config layer, which is why OpenProvider writes the file
   atomically — Grok never sees a half-written config.
 - **Catalog updates:** the fenced block reflects the catalog at injection time. After
-  adding providers or models, run `ocx ensure` (or restart the proxy) to refresh it.
+  adding providers or models, run `opr ensure` (or restart the proxy) to refresh it.
 

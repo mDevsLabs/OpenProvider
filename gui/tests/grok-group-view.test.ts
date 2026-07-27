@@ -9,8 +9,8 @@ const CANDIDATES: GrokCandidate[] = [
 ];
 
 const ALIASES = new Map([
-  ["gpt-5.6-sol", "ocx-gpt-5-6-sol"],
-  ["cursor/grok-4.5", "ocx-cursor-grok-4-5"],
+  ["gpt-5.6-sol", "opr-gpt-5-6-sol"],
+  ["cursor/grok-4.5", "opr-cursor-grok-4-5"],
 ]);
 
 test("groups partition native from routed", () => {
@@ -41,6 +41,6 @@ test("a model not in the fence has a null alias", () => {
   const kimi = view.rows.find(r => r.id === "kimi/k3[1m]");
   const cursor = view.rows.find(r => r.id === "cursor/grok-4.5");
   expect(kimi!.alias).toBeNull();
-  expect(cursor!.alias).toBe("ocx-cursor-grok-4-5");
+  expect(cursor!.alias).toBe("opr-cursor-grok-4-5");
 });
 

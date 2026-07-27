@@ -16,8 +16,8 @@ let upstream: ReturnType<typeof Bun.serve> | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-keyfail-e2e-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-keyfail-e2e-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-keyfail-e2e-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-keyfail-e2e-"));
   process.env.OPENCODEX_HOME = testDir;
   clearKeyCooldowns();
 });

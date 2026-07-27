@@ -691,16 +691,16 @@ index 78445619..9dabc7db 100644
      mkdirSync(agentsDir, { recursive: true });
      const victim = join(dir, "victim.md");
      writeFileSync(victim, "precious");
--    symlinkSync(victim, join(agentsDir, "ocx-linked.md"));
+-    symlinkSync(victim, join(agentsDir, "opr-linked.md"));
 +    try {
-+      symlinkSync(victim, join(agentsDir, "ocx-linked.md"));
++      symlinkSync(victim, join(agentsDir, "opr-linked.md"));
 +    } catch (e: unknown) {
 +      if ((e as NodeJS.ErrnoException).code === "EPERM") return; // skip on Windows without elevated symlink rights
 +      throw e;
 +    }
      syncClaudeAgentDefs([], dir); // prune pass
      expect(readFileSync(victim, "utf8")).toBe("precious");
-     expect(readdirSync(agentsDir)).toContain("ocx-linked.md");
+     expect(readdirSync(agentsDir)).toContain("opr-linked.md");
 
 From 4ef3713effb0be71b80fcafe4aef1650bf3e74be Mon Sep 17 00:00:00 2001
 From: Wibias <37517432+Wibias@users.noreply.github.com>

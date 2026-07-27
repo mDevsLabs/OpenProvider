@@ -2,12 +2,12 @@
 
 > Goal: `160d07c7-38b`
 > Branch: `dev`
-> Remote pushed before this phase: `https://github.com/lidge-jun/opencodex/tree/dev`
+> Remote pushed before this phase: `https://github.com/lidge-jun/openprovider/tree/dev`
 > Class: C4/C3 multi-phase integration. Cursor provider protocol boundary + Responses API tool contract.
 
 ## Easy explanation
 
-Cursor currently returns zero tool calls because opencodex drops the incoming Responses API
+Cursor currently returns zero tool calls because openprovider drops the incoming Responses API
 `tools[]` before building the Cursor request, and then ignores Cursor's tool-call update
 protobufs if the server emits them. Previous MCP work made local MCP execution real after
 Cursor asks for an MCP tool, but it did not make Codex's ordinary client tools visible to

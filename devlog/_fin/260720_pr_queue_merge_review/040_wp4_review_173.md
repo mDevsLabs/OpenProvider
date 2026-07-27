@@ -32,8 +32,8 @@ DB에서 null로 자주 빠지는지 실측.
 
 ```
 git fetch origin pull/173/head
-git worktree add /tmp/ocx-pr173 FETCH_HEAD --detach
-cd /tmp/ocx-pr173
+git worktree add /tmp/opr-pr173 FETCH_HEAD --detach
+cd /tmp/opr-pr173
 bun install
 bun test tests/storage-scanner.test.ts tests/api-storage.test.ts
 # 실기 activation: PR 헤드에서 스캐너를 실제 ~/.codex에 대해 실행
@@ -41,8 +41,8 @@ bun -e 'import { scanStorage } from "./src/storage/scanner.ts";
   const r = scanStorage("/Users/jun/.codex");
   console.log(JSON.stringify({ total: r.total, buckets: r.buckets.map(b =>
     ({ key: b.key, bytes: b.bytes, files: b.fileCount, rows: b.rows })) }, null, 1));'
-cd /Users/jun/developer/new/700_projects/opencodex
-git worktree remove --force /tmp/ocx-pr173
+cd /Users/jun/developer/new/700_projects/openprovider
+git worktree remove --force /tmp/opr-pr173
 ```
 기대: `state_db.rows`와 `logs_db.rows`가 숫자(라이브 WAL에서 null이면 그것이
 발견사항), total.bytes > 0. **(A-gate fold #6):** "스캔 전후 ~/.codex 무수정"은

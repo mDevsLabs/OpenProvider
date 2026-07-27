@@ -7,7 +7,7 @@ Date: 2026-07-02 (Boss direct, continuing the PABCD loop after WP2/WP0 closed)
 ### `src/adapters/cursor/tool-definitions.ts`
 
 - **Changes**: Added `normalizeCursorWireName` — folds the Cursor-displayed
-  `mcp_opencodex-responses_<tool>` MCP name back to the advertised wire name —
+  `mcp_openprovider-responses_<tool>` MCP name back to the advertised wire name —
   and applied it inside `responsesToolNameFromCursorWire`. System guidance now
   states the long display name is the SAME tool (call whichever the list
   shows; no user-facing narration about the naming difference) and conditions

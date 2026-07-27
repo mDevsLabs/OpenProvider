@@ -42,12 +42,12 @@ this work-phase — investigation and documentation only.
 - **#280**: reporter confirmed resolution after owner walkthrough;
   root cause was missing enabled `openai` provider, not a proxy regression.
   Action: post final confirmation answer + close. (Draft reply in 008 doc; NOT posted in this phase.)
-- **#288**: DEMOTED from bucket-1 candidate after A-phase audit. OpenCodex's
+- **#288**: DEMOTED from bucket-1 candidate after A-phase audit. OpenProvider's
   injected catalog DOES influence the spawn_agent allowlist: Codex advertises
   the first 5 featured (lowest-priority) picker-visible catalog entries to
   spawn_agent (src/config.ts:556, src/codex/catalog.ts:1091,
   MAX_MODEL_OVERRIDES_IN_SPAWN_AGENT=5). Whether the reporter's custom models
-  were excluded by OpenCodex featuring or by app-side filtering is unresolved →
+  were excluded by OpenProvider featuring or by app-side filtering is unresolved →
   lane 6 must determine the enforcement boundary before any close.
 - **#291**: RECLASSIFIED bucket 3 → bucket 1 after A-phase audit. The edit
   capability already exists: `ProviderSettings` form edits
@@ -62,7 +62,7 @@ this work-phase — investigation and documentation only.
 - **#297**: `clampCatalogModelsToCodexSupport` (src/codex/catalog.ts:954) runs as
   the last sync step (catalog.ts:2205) after `ensureGpt56ReasoningLevels` /
   `ensureUltraReasoningLevel` (catalog.ts:866/885). Regression from b7ce5aad.
-  Highest-confidence opencodex-side bug; contributor-reported with root cause.
+  Highest-confidence openprovider-side bug; contributor-reported with root cause.
 - **#295 / #300**: `multiAgentGuidanceText` (src/server/responses.ts:201) claims
   schema-visible args are "hidden"; `subagentRosterText` (responses.ts:254)
   advertises catalog-resolved models the runtime allowlist may reject. #300 asks
@@ -77,7 +77,7 @@ this work-phase — investigation and documentation only.
   (src/server/system-env.ts:210 and 3 sibling guards). Question: implement Linux
   support vs GUI honesty (hide/disable the toggle on Linux).
 - **#290**: empty `spawn_agent` args from a custom-model parent — determine
-  opencodex-side translation vs upstream (#92 family) vs model capability.
+  openprovider-side translation vs upstream (#92 family) vs model capability.
 
 ### Bucket 3 — long-term
 
@@ -100,7 +100,7 @@ this work-phase — investigation and documentation only.
 | 6 | #290 #288 | `007_investigation_290_288_spawn_agent.md` | src/server/responses.ts spawn surface, src/config.ts, src/codex/catalog.ts (featuring/priority → spawn_agent allowlist), #92 devlog history, tests/multi-agent-compat.test.ts |
 
 Each worker: read-only on `src/`, verifies the reporter's claims against
-`origin/dev` code, classifies opencodex-side vs upstream, and writes one
+`origin/dev` code, classifies openprovider-side vs upstream, and writes one
 investigation doc with VERBATIM `path:line` anchors + a recommended fix
 direction + effort estimate. Bucket reclassification proposals are returned as
 judgments; the main session decides.
@@ -119,7 +119,7 @@ Additionally the main session writes:
 
 1. All 11 issues carry a bucket with a stated reason; bucket-1 candidates verified or demoted.
 2. Docs 002-007 exist, each with >= 3 verbatim `path:line` anchors that the main session re-verified against the tree.
-3. Each investigation doc ends with: verdict (opencodex-bug / upstream / feature / needs-repro), recommended direction, effort estimate.
+3. Each investigation doc ends with: verdict (openprovider-bug / upstream / feature / needs-repro), recommended direction, effort estimate.
 4. No production code touched (`git diff --stat` shows only devlog).
 5. Unit committed on `codex/issue-triage-260723`; no push.
 

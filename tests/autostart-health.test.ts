@@ -6,7 +6,7 @@ import { invalidateStartupHealthCache, markStartupHealthDiagnosticStale } from "
 import type { OcxConfig } from "../src/types";
 
 const base = {
-  routingKind: "opencodex-local" as const,
+  routingKind: "openprovider-local" as const,
   autostartEnabled: true,
   serviceInstalled: false,
   serviceViable: false,
@@ -27,10 +27,10 @@ describe("Codex startup health", () => {
       status: "at-risk",
       rebootSafe: false,
       protection: "none",
-      recommendedCommand: "ocx service install",
+      recommendedCommand: "opr service install",
     });
     expect(startupHealthSummary(health)).toContain("AT RISK");
-    expect(startupHealthSummary(health)).toContain("ocx service install");
+    expect(startupHealthSummary(health)).toContain("opr service install");
   });
 
   test("treats a background service as restart protection", () => {
@@ -62,20 +62,20 @@ describe("Codex startup health", () => {
     expect(deriveStartupHealth({ ...base, autostartEnabled: false, shimInstalled: true, shimHealthy: true }).status).toBe("at-risk");
   });
 
-  test("native routing has no opencodex restart dependency", () => {
+  test("native routing has no openprovider restart dependency", () => {
     const health = deriveStartupHealth({ ...base, routingKind: "native" });
     expect(health).toMatchObject({ status: "native", rebootSafe: true, protection: "none" });
   });
 
   test("recognizes marker-owned and legacy routing without claiming user overrides", () => {
     expect(hasInjectedCodexRouting([
-      '# Auto-injected by opencodex',
+      '# Auto-injected by openprovider',
       'openai_base_url = "http://127.0.0.1:10100/v1"',
       "[features]",
     ].join("\n"))).toBe(true);
     expect(hasInjectedCodexRouting([
-      'model_provider = "opencodex"',
-      "[model_providers.opencodex]",
+      'model_provider = "openprovider"',
+      "[model_providers.openprovider]",
       'base_url = "http://127.0.0.1:10100/v1"',
     ].join("\n"))).toBe(true);
     expect(hasInjectedCodexRouting('openai_base_url = "http://127.0.0.1:10100/v1"')).toBe(false);
@@ -100,19 +100,19 @@ describe("Codex startup health", () => {
     expect(classifyCodexRouting('model_provider = "openai"')).toBe("native");
     expect(classifyCodexRouting([
       "[features]",
-      'model_provider = "opencodex"',
-      "[model_providers.opencodex]",
+      'model_provider = "openprovider"',
+      "[model_providers.openprovider]",
       'base_url = "http://127.0.0.1:10100/v1"',
     ].join("\n"))).toBe("native");
     expect(classifyCodexRouting([
-      'model_provider = "opencodex"',
-      "[model_providers.opencodex]",
+      'model_provider = "openprovider"',
+      "[model_providers.openprovider]",
       'base_url = "https://gateway.example/v1"',
-    ].join("\n"))).toBe("opencodex-local");
+    ].join("\n"))).toBe("openprovider-local");
     expect(classifyCodexRouting([
-      "# Auto-injected by opencodex",
+      "# Auto-injected by openprovider",
       'openai_base_url = "http://192.168.1.10:10100/v1"',
-    ].join("\n"))).toBe("opencodex-local");
+    ].join("\n"))).toBe("openprovider-local");
   });
 
   test("fails closed for installed-but-broken services and custom local gateways", () => {
@@ -126,13 +126,13 @@ describe("Codex startup health", () => {
       routingInjected: false,
       localRoutingDependency: true,
       protection: "none",
-      recommendedCommand: "ocx restore",
+      recommendedCommand: "opr restore",
     });
     expect(deriveStartupHealth({ ...base, routingKind: "custom-local", serviceInstalled: true, serviceViable: true, serviceEnabled: true, serviceRunning: true })).toMatchObject({
       status: "at-risk",
       rebootSafe: false,
       protection: "none",
-      recommendedCommand: "ocx restore",
+      recommendedCommand: "opr restore",
     });
     expect(deriveStartupHealth({ ...base, routingKind: "custom-remote" })).toMatchObject({
       status: "native",
@@ -142,11 +142,11 @@ describe("Codex startup health", () => {
       status: "at-risk",
       rebootSafe: false,
       protection: "none",
-      recommendedCommand: "ocx restore",
+      recommendedCommand: "opr restore",
     });
     const custom = deriveStartupHealth({ ...base, routingKind: "custom-local" });
-    expect(startupHealthSummary(custom)).toContain("run 'ocx restore'");
-    expect(startupHealthSummary(custom)).not.toContain("ocx service install");
+    expect(startupHealthSummary(custom)).toContain("run 'opr restore'");
+    expect(startupHealthSummary(custom)).not.toContain("opr service install");
   });
 
   test("exposes a secret-free startup health DTO to the dashboard", async () => {
@@ -170,9 +170,9 @@ describe("Codex startup health", () => {
     expect(typeof body.rebootSafe).toBe("boolean");
     expect(typeof body.routingInjected).toBe("boolean");
     expect(body.commands).toEqual({
-      installService: "ocx service install",
-      installShim: "ocx codex-shim install",
-      restoreNative: "ocx restore",
+      installService: "opr service install",
+      installShim: "opr codex-shim install",
+      restoreNative: "opr restore",
     });
 
     const serialized = JSON.stringify(body).toLowerCase();

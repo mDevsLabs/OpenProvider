@@ -272,7 +272,7 @@ describe("OpenAI provider option startup coordinator", () => {
       "/virtual/config.json": "current",
       "/virtual/config.json.pre-openai-tiers-v2.bak": "older",
     });
-    // Stale backup (config was rewritten by ocx init) is deleted and recreated atomically
+    // Stale backup (config was rewritten by opr init) is deleted and recreated atomically
     // with proper permissions, not written in-place (issue #257).
     expect(backupConfigBeforeOpenAiTierMigration("/virtual/config.json", different.io)).toBe("created");
     expect(new TextDecoder().decode(different.files.get("/virtual/config.json.pre-openai-tiers-v2.bak")!.bytes)).toBe("current");
@@ -293,7 +293,7 @@ describe("OpenAI provider option startup coordinator", () => {
 
   test("backup replaces a differing v2 JSON backup (post-migration config was rewritten)", () => {
     // A backup whose openaiProviderTierVersion is 2 was created from an already-migrated
-    // config, meaning ocx init or another process replaced config.json after migration.
+    // config, meaning opr init or another process replaced config.json after migration.
     const v2Backup = JSON.stringify({ openaiProviderTierVersion: 2, port: 10100, defaultProvider: "openai", providers: {} });
     const io = virtualBackupIO({
       "/virtual/config.json": "current-config",

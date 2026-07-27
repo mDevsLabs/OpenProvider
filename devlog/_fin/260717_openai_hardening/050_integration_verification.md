@@ -5,7 +5,7 @@
 Close the OpenAI hardening goal with one zero-network integration spine, isolated
 runtime/client-history proof, maintained documentation, fresh exit-zero gates, and a
 criterion-to-evidence ledger. No command may mutate or spend from the user's real
-OpenCodex, Codex, or OpenAI state.
+OpenProvider, Codex, or OpenAI state.
 
 > Archive note: `_plan/260717_openai_hardening` paths in this execution record are
 > historical; after Cycle C the same relative files live under `_fin/260717_openai_hardening`.
@@ -22,7 +22,7 @@ the focused unit and transport suites. Migration runs in the separately evaluate
 
 Before dynamic imports, create fresh temporary `OPENCODEX_HOME`, `CODEX_HOME`, and
 `CLAUDE_CONFIG_DIR` (audit fold-back: `/api/subagent-models` calls
-`syncClaudeAgentDefsBestEffort`, which writes `ocx-*.md` under `CLAUDE_CONFIG_DIR` or
+`syncClaudeAgentDefsBestEffort`, which writes `opr-*.md` under `CLAUDE_CONFIG_DIR` or
 real `~/.claude`; the temp dir isolates that side effect and is removed in `finally`,
 with the real Claude directory hash-compared before/after), set
 all three environment variables, and install a saved-`fetch` interceptor. Configure Direct,
@@ -140,7 +140,7 @@ remove temporary homes on success or failure.
 
 Before and after the run, hash the real config path, Codex config path, and credential
 store paths when present. Record only path labels, existence, and hashes; assert they
-are unchanged. Never call `ocx start`, `ocx restart`, or `ocx stop` against real homes.
+are unchanged. Never call `opr start`, `opr restart`, or `opr stop` against real homes.
 
 The script also has read-only `--check-live-key`: parse raw config locally, resolve
 `$VAR`/`${VAR}`, and print JSON with only status `AVAILABLE`,
@@ -199,7 +199,7 @@ Update only stale OpenAI claims in:
 Pre-Cycle-B full-suite baseline (non-gating receipt, 2026-07-17, HEAD `df740d84`):
 plain `bun test` exits 1 with 2734 pass / 14 pre-existing failures (11 OAuth-refresh
 cases plus provider discovery, OAuth-status privacy, and Claude passthrough logging;
-tail preserved at `/tmp/opencodex-cycle-b-full-test.log`). These failures predate this
+tail preserved at `/tmp/openprovider-cycle-b-full-test.log`). These failures predate this
 unit and are NOT attributable to Cycle B. The gating full-suite command for this cycle
 is `bun test --isolate tests`, which must exit 0.
 
@@ -280,7 +280,7 @@ The isolated runtime proof used two cold-start children and never addressed port
 Both reported version `2.7.23` with distinct PIDs and ephemeral loopback ports; the current redacted
 artifact is the source of truth for those volatile values. Direct resolved with caller ownership, Multi resolved
 through the main fixture account, and API Pro resolved to `gpt-5.6-sol` with
-`reasoning.mode=pro`. Real OpenCodex/Codex config and credential-store hashes were
+`reasoning.mode=pro`. Real OpenProvider/Codex config and credential-store hashes were
 unchanged. `codex-cli 0.144.4` completed one temp-home activation turn; the redacted
 rollout excerpt retains selected id `openai-apikey/gpt-5.6-sol-pro`, provider `openai`,
 and one rollout. During fixture development, two attempts first failed on an invalid

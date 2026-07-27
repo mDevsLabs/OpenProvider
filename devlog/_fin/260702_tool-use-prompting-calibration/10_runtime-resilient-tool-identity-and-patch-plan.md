@@ -756,7 +756,7 @@ Non-OpenAI / non-ChatGPT provider rollout plan:
 
 - Anthropic / Claude-family routes: add a medium-strength catalog note that
   maps Claude Code habits (`Read`, `Bash`, permission wording, `mcp__...`
-  names) onto the current opencodex catalog. Do not suppress those terms
+  names) onto the current openprovider catalog. Do not suppress those terms
   globally; only say they are unavailable when the current wire names do not
   list them.
 - Gemini / Antigravity / Google routes: add a stronger negative-transfer note
@@ -769,7 +769,7 @@ Non-OpenAI / non-ChatGPT provider rollout plan:
   invented-tool or wrong-schema rates.
 - OpenCode-compatible routes: explicitly guard against `bash`, `read`, `grep`,
   `glob`, and `apply_patch` transfer unless those exact names are advertised.
-  If opencodex exposes `exec_command` and structured `apply_patch` instead,
+  If openprovider exposes `exec_command` and structured `apply_patch` instead,
   teach that mapping as capabilities, not as permanent aliases.
 - Aider-like routes: do not force a function-call catalog worldview too hard.
   Emphasize repo-map/add-file/test-loop habits only as task strategy, while

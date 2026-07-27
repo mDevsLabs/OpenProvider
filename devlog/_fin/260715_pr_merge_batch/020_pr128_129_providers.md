@@ -66,7 +66,7 @@ arrays must contain both IDs in registry order.
 2. `git merge --no-ff pr-129` -> resolve duplicates per conflict map, then stacked fixes:
    - replace machine-derived bootstrap `client` hash (hostname/OS/arch/CPU/username)
      with a persisted random UUID under the repo's config dir helper
-     (`getConfigDir()` / OPENCODEX_HOME-aware; no hardcoded ~/.opencodex).
+     (`getConfigDir()` / OPENCODEX_HOME-aware; no hardcoded ~/.openprovider).
    - retry predicate: drain/cancel first response body, then retry ONCE on 401 only;
      403 is NOT retried unless a documented MiMo token-expiry signature in the body
      identifies it as retryable (align tests with this exact predicate).
@@ -85,7 +85,7 @@ arrays must contain both IDs in registry order.
 - `bun test --isolate ./tests/` + `bun run typecheck` green after EACH merge.
 - `cd gui && bun run lint` (or CI-equivalent) green — #128's red-CI cause was GUI lint.
 - Registry parity test passes with both providers present.
-- Spot-check: `ocx sync`-generated catalog unaffected for existing providers (no
+- Spot-check: `opr sync`-generated catalog unaffected for existing providers (no
   regression on existing provider entries; check derive snapshot tests).
 - Existing `opencode-zen` provider behavior change from #128's host-based Zen schema
   sanitizer: verify it is intentional and covered by a test, or scope it to

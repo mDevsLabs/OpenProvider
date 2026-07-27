@@ -7,8 +7,8 @@ Work class: C4 (new data-plane API contract + OAuth credential forwarding)
 ## Loop specification
 
 - Archetype: spec-satisfaction repair.
-- Trigger: Codex `image_gen.imagegen` called `POST /v1/images/generations` through opencodex and received `404 Unknown endpoint`.
-- Goal: make Codex standalone image generation and edit calls traverse opencodex with the same authenticated upstream contract Codex uses without the proxy.
+- Trigger: Codex `image_gen.imagegen` called `POST /v1/images/generations` through openprovider and received `404 Unknown endpoint`.
+- Goal: make Codex standalone image generation and edit calls traverse openprovider with the same authenticated upstream contract Codex uses without the proxy.
 - Non-goals: change `codex-rs`; change `ima2-gen`; replace the standalone Codex tool with the Responses hosted `image_generation` tool; add image generation to non-OpenAI providers; redesign account routing; publish or release a package.
 - Verifier: focused Bun integration tests, the affected server/auth suite, full `bun test ./tests/`, `bun run typecheck`, `bun run privacy:scan`, and an endpoint activation probe that reproduces the original path against the patched source.
 - Stop condition: both image routes proxy correctly, auth/header invariants are proven, upstream failures remain faithful, unrelated `/v1/*` paths still return JSON 404, and every verifier exits 0.

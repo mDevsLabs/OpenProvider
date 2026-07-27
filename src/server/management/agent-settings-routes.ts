@@ -440,7 +440,7 @@ export async function handleAgentSettingsRoutes(ctx: ManagementContext): Promise
       const { readRuntimePort } = await import("../../config");
       // The host/port the proxy ACTUALLY bound — not the request authority (caller-
       // influenced) and not config.hostname, which sync.ts warns may have drifted.
-      // `ocx ensure` passes live.hostname for the same reason; the runtime-port record
+      // `opr ensure` passes live.hostname for the same reason; the runtime-port record
       // is the in-process equivalent, written at startup.
       const runtime = readRuntimePort(process.pid);
       const port = runtime?.port ?? config.port;
@@ -552,7 +552,7 @@ export async function handleAgentSettingsRoutes(ctx: ManagementContext): Promise
       if (existsSync(metaPath)) {
         try {
           const meta = JSON.parse(readFile(metaPath, "utf8"));
-          const entry = Array.isArray(meta.entries) ? meta.entries.find((e: { name?: string }) => e?.name === "opencodex") : undefined;
+          const entry = Array.isArray(meta.entries) ? meta.entries.find((e: { name?: string }) => e?.name === "openprovider") : undefined;
           if (entry?.id) {
             configPath = join(libraryPath, `${entry.id}.json`);
             if (existsSync(configPath)) {
@@ -623,7 +623,7 @@ export async function handleAgentSettingsRoutes(ctx: ManagementContext): Promise
       // subscription. The old coercion made every save convert an untouched auto config
       // into a sticky manual subscription with no way back.
       authMode: authModeIntent(config),
-      /** Does the opencodex dummy marker get injected — NOT a claim about native auth. */
+      /** Does the openprovider dummy marker get injected — NOT a claim about native auth. */
       markerMode: resolvedAuthMode.markerMode,
       authModeOrigin: resolvedAuthMode.origin,
       ...(resolvedAuthMode.foundBy ? { authFoundBy: resolvedAuthMode.foundBy } : {}),
@@ -837,7 +837,7 @@ export async function handleAgentSettingsRoutes(ctx: ManagementContext): Promise
     save(config);
     const warnings: string[] = [];
     // authMode changes must reconcile the injected system env too: switching back to
-    // Subscription has to remove the opencodex-owned dummy ANTHROPIC_AUTH_TOKEN
+    // Subscription has to remove the openprovider-owned dummy ANTHROPIC_AUTH_TOKEN
     // (audit R1 blocker #1/#2, devlog 260720_claude_authmode_persist).
     if (body.systemEnv !== undefined || body.authMode !== undefined) {
       try {

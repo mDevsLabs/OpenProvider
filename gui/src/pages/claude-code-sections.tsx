@@ -203,8 +203,8 @@ export function ClaudeCodeQuickstartSection({ manualEnv }: { manualEnv: string }
   return (
     <>
       <div className="h-section">{t("claude.quickstart")}</div>
-      <p className="muted text-label" style={{ margin: "0 0 8px" }}><Trans k="claude.quickstartHint" cmd="ocx claude" /></p>
-      <pre className="mono card" style={{ padding: "10px 14px", overflowX: "auto", margin: 0 }}>ocx claude</pre>
+      <p className="muted text-label" style={{ margin: "0 0 8px" }}><Trans k="claude.quickstartHint" cmd="opr claude" /></p>
+      <pre className="mono card" style={{ padding: "10px 14px", overflowX: "auto", margin: 0 }}>opr claude</pre>
       <details style={{ margin: "10px 0 0" }}>
         <summary className="muted text-label" style={{ cursor: "pointer", padding: "2px 2px" }}>{t("claude.manualEnv")}</summary>
         <pre className="mono card text-label" style={{ padding: "10px 14px", overflowX: "auto", margin: "6px 0 0" }}>{manualEnv}</pre>

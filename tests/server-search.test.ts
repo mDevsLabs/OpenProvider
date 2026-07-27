@@ -27,7 +27,7 @@ beforeEach(() => {
   mkdirSync(TEST_DIR, { recursive: true });
   process.env.OPENCODEX_HOME = TEST_DIR;
   delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-server-search-codex-");
+  isolatedCodexHome = installIsolatedCodexHome("opr-server-search-codex-");
   clearCodexUpstreamHealth();
   clearThreadAccountMap();
   clearAccountNeedsReauth("pool-a");
@@ -391,7 +391,7 @@ test("search routes require API auth and local Origin on non-loopback bindings",
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-opencodex-api-key": "local-secret",
+        "x-openprovider-api-key": "local-secret",
         origin: "https://attacker.test",
       },
       body: JSON.stringify({ id: "search-session" }),

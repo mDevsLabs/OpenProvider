@@ -414,9 +414,9 @@ export function getCodexAccountHealthSnapshot(accountId: string, now = Date.now(
 Map `retry-after` → `rate_limit`, others → `quota` for health reason. Do **not** change `recordCodexUpstreamOutcome`.
 
 Set `action` strings:
-- reauth: `run \`ocx login <provider>\``
+- reauth: `run \`opr login <provider>\``
 - cooldown: `wait until <local time> or start a new session with another eligible account`
-- warning refresh_conflict: `re-run \`ocx doctor\` after ensuring only one proxy process writes the credential store`
+- warning refresh_conflict: `re-run \`opr doctor\` after ensuring only one proxy process writes the credential store`
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -437,7 +437,7 @@ EOF
 
 ---
 
-### Task 5: `ocx status` OAuth health output
+### Task 5: `opr status` OAuth health output
 
 **Files:**
 - Modify: `src/cli/index.ts` (status human printer that currently calls `oauthLoginSummary`)
@@ -460,7 +460,7 @@ test("formats reauthentication required", () => {
     provider: "openai",
     accountId: "acct_abcdefghijklmnopqrstuvwxyz",
     health: { status: "reauth_required", reason: "refresh_failed" },
-    action: "run `ocx login openai`",
+    action: "run `opr login openai`",
   }]);
   expect(text).toContain("OAuth health: warning");
   expect(text).toContain("account-…wxyz");
@@ -490,7 +490,7 @@ Expected: PASS
 ```bash
 git add src/cli/status-oauth.ts src/cli/index.ts tests/cli-status-oauth-health.test.ts
 git commit -m "$(cat <<'EOF'
-feat(cli): show OAuth health in ocx status
+feat(cli): show OAuth health in opr status
 
 EOF
 )"
@@ -498,7 +498,7 @@ EOF
 
 ---
 
-### Task 6: `ocx doctor` OAuth checks
+### Task 6: `opr doctor` OAuth checks
 
 **Files:**
 - Modify: `src/cli/doctor.ts`
@@ -509,7 +509,7 @@ EOF
 - Produces: doctor rows like:
   - `[OK] OAuth credential storage is writable.`
   - `[OK] Token refresh single-flight is active.`
-  - `[WARN] Account account-…42 requires reauthentication. Action: run \`ocx login <provider>\``
+  - `[WARN] Account account-…42 requires reauthentication. Action: run \`opr login <provider>\``
   - `[WARN] Account account-…17 is rate limited until … Action: …`
   - `[OK] No fabricated official-client metadata detected.` (static OK for Codex forward path unless a runtime detector exists; do not invent a false positive scanner)
 
@@ -538,7 +538,7 @@ Expected: PASS
 ```bash
 git add src/cli/doctor.ts tests/doctor-oauth.test.ts
 git commit -m "$(cat <<'EOF'
-feat(cli): add OAuth reliability checks to ocx doctor
+feat(cli): add OAuth reliability checks to opr doctor
 
 EOF
 )"
@@ -578,7 +578,7 @@ Expected: FAIL on missing `health`
 
 - [ ] **Step 3: Minimal API + UI implementation**
 
-Attach projected health to account DTOs. In GUI, show badge + short explanation (what happened, provider/account redacted, blocked?, next action). Actions: Reauthenticate button (existing), copy `ocx doctor`, disable probe messaging during cooldown. No “anti-ban” copy.
+Attach projected health to account DTOs. In GUI, show badge + short explanation (what happened, provider/account redacted, blocked?, next action). Actions: Reauthenticate button (existing), copy `opr doctor`, disable probe messaging during cooldown. No “anti-ban” copy.
 
 - [ ] **Step 4: Run tests**
 
@@ -687,7 +687,7 @@ Content to add (factual, concise):
 - How cooldowns work (Retry-After / reset headers / backoff; no probe during Retry-After cooldowns)
 - Session affinity is process-local; policy on errors (policy A)
 - Which Codex client metadata is preserved; what is not fabricated
-- How to use `ocx status` and `ocx doctor` for OAuth health
+- How to use `opr status` and `opr doctor` for OAuth health
 - How to reauthenticate
 - Explicit: this does not guarantee protection from provider enforcement
 
@@ -746,8 +746,8 @@ bun run build:gui
 | Affinity process-local, policy A | 8 + design decision |
 | Client metadata integrity | 8 |
 | Health model | 4 |
-| `ocx status` | 5 |
-| `ocx doctor` | 6 |
+| `opr status` | 5 |
+| `opr doctor` | 6 |
 | Dashboard | 7 |
 | Structured logs | 2 (+ hooks in 3) |
 | Account redaction | 1 (+ consumers 5–7) |

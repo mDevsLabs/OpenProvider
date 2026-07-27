@@ -1,6 +1,6 @@
 # 260726 PR close/rework 로드맵
 
-기준점: `dev = origin/dev = 8756daa5`. 워크트리 `/Users/jun/.codex/worktrees/ebcd/opencodex`.
+기준점: `dev = origin/dev = 8756daa5`. 워크트리 `/Users/jun/.codex/worktrees/ebcd/openprovider`.
 분석 스냅샷: 2026-07-26 09:00 KST. sol medium 3기 병렬 파견으로 열린 PR 17건과 열린 이슈 18건을 전수 대조했다.
 
 조사 근거와 외부 원문 확인 결과는 [`001_research_pr_inventory.md`](./001_research_pr_inventory.md)에 분리했다.

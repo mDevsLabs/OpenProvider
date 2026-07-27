@@ -40,4 +40,4 @@ surface; openai/codex#14695 confirms function_call_output array-output shape bre
   with mandated fallback behavior; dropping it is lossless for routed chat models. Not implemented.
 - ToolSearchCall/ToolSearchOutput `execution` field: informational; not needed for pairing.
 
-## Not live until ocx restart (still pending user approval, along with image-guard + compaction v2).
+## Not live until opr restart (still pending user approval, along with image-guard + compaction v2).

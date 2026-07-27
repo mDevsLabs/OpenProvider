@@ -3,9 +3,9 @@ import { decodeJwtPayload } from "../oauth/chatgpt";
 
 /**
  * Stable id under which the "main" Codex account (the Codex CLI login stored in
- * ~/.codex/auth.json) participates in opencodex's account rotation. The main account is
+ * ~/.codex/auth.json) participates in openprovider's account rotation. The main account is
  * NOT imported into the managed credential store (Option A): its token is read-only from
- * auth.json, so opencodex never refreshes it — an expired token surfaces as a reauth
+ * auth.json, so openprovider never refreshes it — an expired token surfaces as a reauth
  * notice (re-login via the Codex CLI) rather than a background refresh.
  */
 export const MAIN_CODEX_ACCOUNT_ID = "__main__";

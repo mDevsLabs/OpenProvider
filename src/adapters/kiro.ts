@@ -1357,7 +1357,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter 
     contextInputEstimate: number;
   }> => {
     if (typeof provider.apiKey !== "string" || provider.apiKey.trim() === "") {
-      throw new Error("kiro token missing — run ocx login kiro");
+      throw new Error("kiro token missing — run opr login kiro");
     }
     const region = resolveKiroApiRegion();
     const profileArn = resolveKiroProfileArn();

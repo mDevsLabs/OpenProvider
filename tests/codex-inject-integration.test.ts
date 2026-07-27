@@ -43,8 +43,8 @@ describe("injectCodexConfig integration (Design B)", () => {
   let ocxHome: string;
 
   beforeEach(() => {
-    codexHome = mkdtempSync(join(tmpdir(), "ocx-inject-codex-"));
-    ocxHome = mkdtempSync(join(tmpdir(), "ocx-inject-home-"));
+    codexHome = mkdtempSync(join(tmpdir(), "opr-inject-codex-"));
+    ocxHome = mkdtempSync(join(tmpdir(), "opr-inject-home-"));
   });
 
   afterEach(() => {
@@ -54,14 +54,14 @@ describe("injectCodexConfig integration (Design B)", () => {
 
   test("upgrade path: a legacy-injected config converts to the Design B form in one inject", () => {
     writeFileSync(join(codexHome, "config.toml"), [
-      'model_provider = "opencodex"',
+      'model_provider = "openprovider"',
       'model = "gpt-5.5"',
       "",
       "[features]",
       "fast_mode = true",
       "",
-      "# Auto-injected by opencodex",
-      "[model_providers.opencodex]",
+      "# Auto-injected by openprovider",
+      "[model_providers.openprovider]",
       'name = "OpenProvider Proxy"',
       'base_url = "http://127.0.0.1:10100/v1"',
       'wire_api = "responses"',
@@ -75,12 +75,12 @@ describe("injectCodexConfig integration (Design B)", () => {
 
     const config = readFileSync(join(codexHome, "config.toml"), "utf8");
     expect(config).toContain('openai_base_url = "http://127.0.0.1:10100/v1"');
-    expect(config).toContain("# Auto-injected by opencodex");
-    expect(config).not.toContain("[model_providers.opencodex]");
-    expect(config).not.toContain('model_provider = "opencodex"');
+    expect(config).toContain("# Auto-injected by openprovider");
+    expect(config).not.toContain("[model_providers.openprovider]");
+    expect(config).not.toContain('model_provider = "openprovider"');
     expect(config).toContain('model = "gpt-5.5"');
     // Exactly one marker survives (the Design B one) — no duplicate accumulation.
-    expect(config.match(/Auto-injected by opencodex/g)?.length).toBe(1);
+    expect(config.match(/Auto-injected by openprovider/g)?.length).toBe(1);
   });
 
   test("re-inject over a Design B config is idempotent", () => {
@@ -92,7 +92,7 @@ describe("injectCodexConfig integration (Design B)", () => {
     const second = readFileSync(join(codexHome, "config.toml"), "utf8");
 
     expect(second.match(/openai_base_url/g)?.length).toBe(1);
-    expect(second.match(/Auto-injected by opencodex/g)?.length).toBe(1);
+    expect(second.match(/Auto-injected by openprovider/g)?.length).toBe(1);
     expect(second).toBe(first);
   });
 
@@ -112,7 +112,7 @@ describe("injectCodexConfig integration (Design B)", () => {
 
     const config = readFileSync(join(codexHome, "config.toml"), "utf8");
     expect(config).toContain('openai_base_url = "https://my-own-gateway.example/v1"');
-    expect(config).not.toContain("# Auto-injected by opencodex\nopenai_base_url");
+    expect(config).not.toContain("# Auto-injected by openprovider\nopenai_base_url");
   });
 
   test("external model provider stays byte-for-byte unchanged so its session history remains visible", () => {
@@ -131,7 +131,7 @@ describe("injectCodexConfig integration (Design B)", () => {
 
     const sessionsDir = join(codexHome, "sessions");
     mkdirSync(sessionsDir);
-    const profilePath = join(codexHome, "opencodex.config.toml");
+    const profilePath = join(codexHome, "openprovider.config.toml");
     const profile = "sentinel profile\n";
     writeFileSync(profilePath, profile, "utf8");
     const rolloutPath = join(sessionsDir, "rollout-custom.jsonl");
@@ -149,7 +149,7 @@ describe("injectCodexConfig integration (Design B)", () => {
     db.run(`INSERT INTO threads VALUES ('thread-custom', ?, 'custom', 'cli', 'hello', 1)`, rolloutPath);
     db.close();
     const dbBefore = readFileSync(dbPath);
-    const journalPath = join(codexHome, "opencodex-journal.json");
+    const journalPath = join(codexHome, "openprovider-journal.json");
     writeFileSync(journalPath, JSON.stringify({
       version: 1,
       originalConfig: Buffer.from('model_provider = "openai"\n').toString("base64"),
@@ -178,7 +178,7 @@ describe("injectCodexConfig integration (Design B)", () => {
     const configPath = join(codexHome, "config.toml");
     const config = 'model_provider = "custom"\nmodel = "third-party-model"\n';
     writeFileSync(configPath, config, "utf8");
-    const profilePath = join(codexHome, "opencodex.config.toml");
+    const profilePath = join(codexHome, "openprovider.config.toml");
     const profile = 'model_provider = "custom"\n';
     writeFileSync(profilePath, profile, "utf8");
 
@@ -200,7 +200,7 @@ describe("injectCodexConfig integration (Design B)", () => {
     db.close();
     const dbBefore = readFileSync(dbPath);
 
-    const journalPath = join(codexHome, "opencodex-journal.json");
+    const journalPath = join(codexHome, "openprovider-journal.json");
     writeFileSync(journalPath, JSON.stringify({
       version: 1,
       originalConfig: Buffer.from('model_provider = "openai"\n').toString("base64"),
@@ -246,7 +246,7 @@ describe("injectCodexConfig integration (Design B)", () => {
     expect(r.status).toBe(0);
     const message = JSON.parse(r.stdout).message;
     expect(message).toContain("http://192.168.1.20:10100/v1");
-    expect(message).toContain("x-opencodex-api-key from OPENCODEX_API_AUTH_TOKEN");
+    expect(message).toContain("x-openprovider-api-key from OPENCODEX_API_AUTH_TOKEN");
     expect(readFileSync(join(codexHome, "config.toml"), "utf8")).toBe(original);
   });
 
@@ -258,8 +258,8 @@ describe("injectCodexConfig integration (Design B)", () => {
     expect(JSON.parse(r.stdout).success).toBe(true);
 
     const config = readFileSync(join(codexHome, "config.toml"), "utf8");
-    expect(config).toContain('model_provider = "opencodex"');
-    expect(config).toContain("[model_providers.opencodex]");
+    expect(config).toContain('model_provider = "openprovider"');
+    expect(config).toContain("[model_providers.openprovider]");
     expect(config).toContain('base_url = "http://192.168.1.20:10100/v1"');
     expect(config).not.toContain("openai_base_url");
   });

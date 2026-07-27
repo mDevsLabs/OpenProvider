@@ -8,7 +8,7 @@ as missing. Current `parseKiroStream()` closes an open tool call and emits
 event. That can turn an upstream cut-off into a successful Codex tool call with
 partial or invalid JSON.
 
-`kiro-gateway` has a broader truncation recovery subsystem. opencodex should at
+`kiro-gateway` has a broader truncation recovery subsystem. openprovider should at
 least stop silently completing truncated Kiro tool calls and surface a clear,
 redacted upstream truncation failure.
 

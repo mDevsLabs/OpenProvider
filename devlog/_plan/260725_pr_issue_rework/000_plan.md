@@ -8,7 +8,7 @@
 
 ## 착수 시점 사실
 
-- 작업 워크트리: `/Users/jun/.codex/worktrees/ebcd/opencodex` (브랜치 `dev`)
+- 작업 워크트리: `/Users/jun/.codex/worktrees/ebcd/openprovider` (브랜치 `dev`)
 - **소스 기준점(source baseline)** = `origin/dev` = `037e8f5e4fa32a82e4149acc509554f157656dad`
   - **갱신 (WP1 A-gate residual 반영):** `origin/dev`는 이후 `faaaf98f8306ee50d4b4a7ee64d95140c371812c`
     (README 문서 커밋)로 이동했다. 우리 대상 소스 파일(`src/adapters/google.ts`,

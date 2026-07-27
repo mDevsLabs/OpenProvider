@@ -34,7 +34,7 @@ export interface SettingsData {
   hostname: string;
   startupHealth?: {
     status: "native" | "protected" | "at-risk";
-    routingKind: "native" | "opencodex-local" | "custom-local" | "custom-remote" | "unknown";
+    routingKind: "native" | "openprovider-local" | "custom-local" | "custom-remote" | "unknown";
     autostartEnabled: boolean;
     shimCoverage: "full" | "cli-only" | "none";
     diagnosticStale: boolean;

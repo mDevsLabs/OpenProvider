@@ -26,7 +26,7 @@ Files: src/server.ts or extracted helper if needed, websocket tests.
 Verification: websocket/server-auth tests + typecheck.
 
 ### Cycle 4 - P1 Bun runtime override and version diagnostics
-Goal: add validated OPENCODEX_BUN_PATH override plus Bun/opencodex version diagnostics for status/service logging.
+Goal: add validated OPENCODEX_BUN_PATH override plus Bun/openprovider version diagnostics for status/service logging.
 Files: src/bun-runtime.ts, src/service.ts, src/cli.ts, tests/bun-runtime.test.ts, tests/service.test.ts, tests/cli-help.test.ts.
 Verification: focused tests + typecheck.
 

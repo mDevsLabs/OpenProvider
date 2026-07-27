@@ -27,7 +27,7 @@ OUT: GUI 변경(현행 GUI는 서버가 왕복만 해주면 그대로 동작), s
 
 - 010: management-api authMode 왕복 + live-apply + stale 토큰 정리 + 회귀
   테스트. (완료 — f1d2b19b, D 기록 090_done.md)
-- 020: settings.env 라우팅 납치 방어 — `ocx claude` spawn env에
+- 020: settings.env 라우팅 납치 방어 — `opr claude` spawn env에
   `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1` (cc-switch 잔재가
   `~/.claude/settings.json` env로 BASE_URL/TOKEN을 덮어쓰는 것 차단).
   launchctl 주입은 감사 R1 #2로 철회. D 기록은 091_done_phase2.md.
@@ -44,8 +44,8 @@ OUT: GUI 변경(현행 GUI는 서버가 왕복만 해주면 그대로 동작), s
   (`body.systemEnv !== undefined || body.authMode !== undefined`). 활성 시나리오:
   단위 테스트로 authMode 단독 PUT이 재조정 경로에 도달함을 관찰(비-darwin에선
   no-op 반환이므로 반환값/호출 여부로 관찰).
-- systemEnv 재주입은 proxy가 아닐 때, 이전에 opencodex가 주입한(tracking에 있는)
-  `ANTHROPIC_AUTH_TOKEN`이 더미(`opencodex-proxy`)로 남아 있으면 제거한다.
+- systemEnv 재주입은 proxy가 아닐 때, 이전에 openprovider가 주입한(tracking에 있는)
+  `ANTHROPIC_AUTH_TOKEN`이 더미(`openprovider-proxy`)로 남아 있으면 제거한다.
   사용자 소유(주입 목록에 없는) 토큰은 건드리지 않는다. 활성 시나리오:
   `tests/system-env.test.ts` 전환 테스트(proxy 주입 상태 → subscription 재적용
   → 더미 토큰 unset 관찰).

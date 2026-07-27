@@ -14,7 +14,7 @@ id는 변하지 않습니다. API GPT-5.6은 context 1,050,000 / max input 922,0
 
 ## 통합 경로
 
-`ocx init`, `ocx start`, `ocx sync`는 해석된 `CODEX_HOME` 아래의 파일을 맞춥니다.
+`opr init`, `opr start`, `opr sync`는 해석된 `CODEX_HOME` 아래의 파일을 맞춥니다.
 
 ```text
 $CODEX_HOME/config.toml
@@ -109,7 +109,7 @@ OpenProvider는 모든 카탈로그 항목의 `multi_agent_version`을 제어하
 | **base**(설치 기본값) | 업스트림 pin을 복원합니다. Sol/Terra는 v2, Luna는 v1을 쓰며, pin이 없는 모델은 Codex `multi_agent_v2` 기능 플래그를 따릅니다. |
 | **v2** | 업스트림 pin보다 우선해 모든 모델을 v2 multi-agent surface로 강제합니다(Luna 포함). |
 
-Dashboard나 Models 페이지, `ocx v2 mode v1|default|v2`, 또는
+Dashboard나 Models 페이지, `opr v2 mode v1|default|v2`, 또는
 `PUT /api/v2`와 `{ "multiAgentMode": "v1" }`로 설정할 수 있습니다. 변경 사항은 새 Codex
 세션부터 적용됩니다.
 
@@ -161,7 +161,7 @@ override로 v2의 부모 모델 상속 규칙을 우회할 수 없습니다.
 선택기에 오래된 항목이 남아 있으면 카탈로그를 새로 쓰고 대상 Codex 화면을 다시 여세요.
 
 ```bash
-ocx sync
+opr sync
 ```
 
 OpenProvider는 카탈로그의 표시 여부, priority, 메타데이터가 바뀔 때마다 `models_cache.json`을 의도적으로

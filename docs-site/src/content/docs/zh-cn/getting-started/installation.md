@@ -1,9 +1,9 @@
 ---
 title: 安装
-description: 安装 OpenProvider(ocx)代理及其前置条件,并验证它能够运行。
+description: 安装 OpenProvider(opr)代理及其前置条件,并验证它能够运行。
 ---
 
-安装 OpenProvider 后会得到 `ocx` 和 `OpenProvider` 两个等价命令，它们都指向同一个基于 Bun 的
+安装 OpenProvider 后会得到 `opr` 和 `OpenProvider` 两个等价命令，它们都指向同一个基于 Bun 的
 小型本地 HTTP 服务器。模型请求会发往路由所选的 provider；当已路由模型需要时，可选的
 vision 和网络搜索 sidecar 也可以使用你的 ChatGPT 登录凭据。
 
@@ -11,7 +11,7 @@ vision 和网络搜索 sidecar 也可以使用你的 ChatGPT 登录凭据。
 
 | 要求 | 原因 |
 | --- | --- |
-| **[Node](https://nodejs.org) ≥ 18** | `ocx` 运行在 Bun 运行时上，但运行时会在 `npm install` 时自动打包，你**无需**自己安装 Bun。 |
+| **[Node](https://nodejs.org) ≥ 18** | `opr` 运行在 Bun 运行时上，但运行时会在 `npm install` 时自动打包，你**无需**自己安装 Bun。 |
 | **[OpenAI Codex](https://openai.com/codex)**(CLI、App 或 SDK) | OpenProvider 所代理的客户端。OpenProvider 会写入 `$CODEX_HOME/config.toml`（默认 `~/.codex/config.toml`）。 |
 | 一个 provider 账号或 API key | Anthropic、xAI、Kimi、Ollama Cloud、OpenRouter、OpenAI API key、一个 OpenAI 兼容端点,或你的 ChatGPT 登录凭据。 |
 
@@ -38,7 +38,7 @@ sudo npm install -g --allow-scripts=bun @bitkyc08/OpenProvider
 确认两个命令都已加入 `PATH`：
 
 ```bash
-ocx --version
+opr --version
 OpenProvider --version
 ```
 
@@ -50,7 +50,7 @@ OpenProvider 构建时，才需要使用 preview 渠道：
 
 ```bash
 npm install -g @bitkyc08/OpenProvider@preview
-ocx update --tag preview
+opr update --tag preview
 ```
 
 ## 从源码运行
@@ -77,17 +77,17 @@ OpenProvider 状态文件位于 `$OpenProvider_HOME`（默认 `~/.OpenProvider`�
 | 路径 | 用途 |
 | --- | --- |
 | `$OpenProvider_HOME/config.json` | 你的 provider、默认 provider、端口及选项。 |
-| `$OpenProvider_HOME/ocx.pid` | 正在运行的代理的 PID（单实例保护）。 |
+| `$OpenProvider_HOME/opr.pid` | 正在运行的代理的 PID（单实例保护）。 |
 | `$OpenProvider_HOME/runtime-port.json` | 当前 PID、主机名和端口，包括自动选择的备用端口。 |
-| `$OpenProvider_HOME/auth.json` | 执行 `ocx login` 后保存的 OAuth 凭据。 |
+| `$OpenProvider_HOME/auth.json` | 执行 `opr login` 后保存的 OAuth 凭据。 |
 | `$OpenProvider_HOME/catalog-backup*.json` | OpenProvider 修改 Codex 模型目录前创建的备份。 |
 | `$CODEX_HOME/config.toml` | 仅监听回环地址时，OpenProvider 会添加由自身标记管理的根级 `openai_base_url`；监听非回环地址时，则使用 `model_provider = "OpenProvider"` 和 `[model_providers.OpenProvider]`，以便 Codex 发送 API 认证 header。 |
 | `$CODEX_HOME/OpenProvider.config.toml` | 与 Codex 主配置一同写入的备用/参考 profile。 |
 | `$CODEX_HOME/OpenProvider-catalog.json` | 供 Codex 使用的原生与已路由模型目录。 |
 
 :::note
-OpenProvider 绝不会删除你的 Codex 配置。每次注入都是可逆的 —— `ocx stop`、`ocx restore`
-或 `ocx eject` 会精确剥离 OpenProvider 所添加的那些行,并恢复原生 Codex。
+OpenProvider 绝不会删除你的 Codex 配置。每次注入都是可逆的 —— `opr stop`、`opr restore`
+或 `opr eject` 会精确剥离 OpenProvider 所添加的那些行,并恢复原生 Codex。
 :::
 
 ## 下一步

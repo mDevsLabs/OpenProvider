@@ -28,8 +28,8 @@ describe("expandUserPath", () => {
 
 describe("OpenProvider_HOME tilde expansion", () => {
   test("getConfigDir honors OpenProvider_HOME=~/...", () => {
-    process.env.OpenProvider_HOME = "~/.ocx-tilde-test";
-    expect(getConfigDir()).toBe(join(homedir(), ".ocx-tilde-test"));
+    process.env.OpenProvider_HOME = "~/.opr-tilde-test";
+    expect(getConfigDir()).toBe(join(homedir(), ".opr-tilde-test"));
   });
 });
 

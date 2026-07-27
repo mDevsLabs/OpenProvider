@@ -5,7 +5,7 @@
 - Keep this docs-only; no source runtime change.
 
 ## Planned diff
-- `README.md`: add a short note under Development explaining `bun run dev` exposes `/healthz`, `/v1/responses`, and `/api/*`; use `ocx gui` for packaged dashboard or `cd gui && bun dev` for frontend development.
+- `README.md`: add a short note under Development explaining `bun run dev` exposes `/healthz`, `/v1/responses`, and `/api/*`; use `opr gui` for packaged dashboard or `cd gui && bun dev` for frontend development.
 - `README.ko.md`: same clarification in Korean.
 - `README.zh-CN.md`: same clarification in Chinese if the matching section exists.
 - `docs-site/src/content/docs/getting-started/installation.md`: mirror the source-run clarification.

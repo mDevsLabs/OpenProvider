@@ -1,13 +1,13 @@
-# Graceful shutdown — `ocx start` Ctrl-C must not orphan the proxy
+# Graceful shutdown — `opr start` Ctrl-C must not orphan the proxy
 
 Goal ID: 7b2c754f-54d · Branch: `feat/kiro-on-dev` · Class: C3 (process lifecycle + npm `bin` launcher / release surface → C4-level care)
 
 ## Part 1 — Plain explanation
 
-When you run `ocx start` and press Ctrl-C, the proxy is supposed to shut down
+When you run `opr start` and press Ctrl-C, the proxy is supposed to shut down
 gracefully: stop accepting work, finish/abort in-flight turns, free the port,
 remove its pid/runtime-port files, and restore the Codex config. Today that does
-**not** reliably happen. The `ocx` command is a thin Node launcher (`bin/ocx.mjs`)
+**not** reliably happen. The `opr` command is a thin Node launcher (`bin/ocx.mjs`)
 that runs the real proxy on the bundled Bun runtime via a **blocking** `spawnSync`.
 `spawnSync` can't run JS signal handlers and does **not** forward signals to the
 Bun child. So when the launcher gets the signal but the Bun child does not (Codex
@@ -22,9 +22,9 @@ de-duping the near-simultaneous "group + forwarded" double-delivery.
 
 ## Reproduction (verified live)
 
-`ocx start &` → `kill -INT <launcherPid>` → for 8s+: `launcher=dead bun=alive
-port=bound`; `ocx.pid` + `runtime-port.json` remained; Codex config NOT restored
-(opencodex entries grew to 5). Confirms the orphan.
+`opr start &` → `kill -INT <launcherPid>` → for 8s+: `launcher=dead bun=alive
+port=bound`; `opr.pid` + `runtime-port.json` remained; Codex config NOT restored
+(openprovider entries grew to 5). Confirms the orphan.
 
 ## Part 2 — Diff-level plan
 
@@ -36,7 +36,7 @@ Before (tail):
 const bun = resolveBun();
 const res = spawnSync(bun, [cliPath, ...process.argv.slice(2)], { stdio: "inherit" });
 if (res.error) {
-  console.error(`opencodex: failed to launch Bun runtime: ${res.error.message}`);
+  console.error(`openprovider: failed to launch Bun runtime: ${res.error.message}`);
   process.exit(1);
 }
 if (res.signal) {
@@ -60,7 +60,7 @@ const clearHandlers = () => { for (const [sig, h] of handlers) process.removeLis
 
 child.on("error", err => {
   clearHandlers();
-  console.error(`opencodex: failed to launch Bun runtime: ${err.message}`);
+  console.error(`openprovider: failed to launch Bun runtime: ${err.message}`);
   process.exit(1);
 });
 child.on("exit", (code, signal) => {
@@ -78,7 +78,7 @@ Import change: add `spawn` to the existing `node:child_process` import
 Before:
 ```js
 const shutdown = () => {
-  console.log("\n🛑 Shutting down opencodex proxy...");
+  console.log("\n🛑 Shutting down openprovider proxy...");
   void (async () => {
     await drainAndShutdown(server, config.shutdownTimeoutMs ?? 5000);
     syncCleanup();
@@ -101,7 +101,7 @@ const shutdown = () => {
   }
   shuttingDown = true;
   shutdownStartedAt = now;
-  console.log("\n🛑 Shutting down opencodex proxy...");
+  console.log("\n🛑 Shutting down openprovider proxy...");
   void (async () => {
     try {
       await drainAndShutdown(server, config.shutdownTimeoutMs ?? 5000);
@@ -124,7 +124,7 @@ Integration test isolated from the real environment:
 - wait for `GET /healthz` 200.
 - send `SIGINT` to the **launcher PID only** (the bug's trigger).
 - assert within ~10s: launcher process exits, AND `/healthz` no longer responds
-  (Bun child gone / port freed), AND `<home>/ocx.pid` was removed.
+  (Bun child gone / port freed), AND `<home>/opr.pid` was removed.
 - `afterAll`: best-effort kill any survivor.
 
 Existing `tests/shutdown-drain.test.ts` (turn tracking + stream lifetime) is
@@ -138,7 +138,7 @@ unchanged and continues to cover the drain unit.
   port freed, pid removed, Codex config restored.
 
 ## Risk / blast radius
-- `bin/ocx.mjs` is the published npm entrypoint (every `ocx` invocation) → release
+- `bin/ocx.mjs` is the published npm entrypoint (every `opr` invocation) → release
   surface; the change keeps the same exit-code/signal-mirroring contract for
   non-`start` commands (they exit normally; handlers simply detach on child exit).
 - Windows has no real POSIX signals; forwarding is best-effort and try/caught.

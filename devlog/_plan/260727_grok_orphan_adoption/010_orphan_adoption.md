@@ -1,4 +1,4 @@
-# 010 — WP1: adopt opencodex-owned orphans (diff-level)
+# 010 — WP1: adopt openprovider-owned orphans (diff-level)
 
 One work-phase, one cycle. All edits land in `src/grok/inject.ts` plus one new test
 file. No other production file changes.
@@ -8,28 +8,28 @@ file. No other production file changes.
 The whole design hangs on one question: is this table ours? Answer conjunctively, and
 bias every uncertain case toward "not ours" (F1).
 
-A table qualifies as an opencodex orphan when ALL of:
+A table qualifies as an openprovider orphan when ALL of:
 
 1. its header is a PLAIN `[model.<alias>]` — never `[[model.x]]`, never
    `[model.x.sub]` (F3: those spellings mark human authorship and stay reserved);
 2. it sits OUTSIDE the managed region;
-3. it carries `api_key = "opencodex-loopback"` — the strong signal, a literal string we
+3. it carries `api_key = "openprovider-loopback"` — the strong signal, a literal string we
    own and no human has cause to type;
 4. its `base_url` is a loopback URL (`127.0.0.1` / `localhost`) — corroborating, and it
    keeps us from adopting an entry someone copied our api_key into while pointing at a
    real remote host.
 
-`extra_headers = { "x-opencodex-grok" = "1" }` is deliberately NOT required: the oldest
+`extra_headers = { "x-openprovider-grok" = "1" }` is deliberately NOT required: the oldest
 orphans predate it, and requiring it would leave exactly the entries causing #511
 unadopted. It is accepted as an additional positive signal but never as the sole one.
 
-The `ocx-` alias prefix and the `OCX ` name prefix are NOT part of the predicate (weak;
+The `opr-` alias prefix and the `OCX ` name prefix are NOT part of the predicate (weak;
 a human could write either).
 
 ## New code
 
 ```ts
-/** A plain [model.<alias>] table outside the fence that opencodex itself wrote. */
+/** A plain [model.<alias>] table outside the fence that openprovider itself wrote. */
 interface OrphanTable {
   alias: string;
   /** Offsets into the NORMALIZED (\n) content: header start .. next header or EOF. */
@@ -37,7 +37,7 @@ interface OrphanTable {
   end: number;
 }
 
-const OPENCODEX_API_KEY = "opencodex-loopback";
+const OPENCODEX_API_KEY = "openprovider-loopback";
 
 function isLoopbackBaseUrl(value: string): boolean
 function tableBodyKeys(body: string): Map<string, string>   // bare `k = "v"` scan, quoted values unwrapped
@@ -87,7 +87,7 @@ field that identifies the actual model, not the alias. Then `[models] default` a
 `[ui] fork_secondary_model` are rewritten:
 
 ```
-default = "ocx-gpt-5-6-sol"   ->   default = "ocx-gpt-5-6-sol-2"
+default = "opr-gpt-5-6-sol"   ->   default = "opr-gpt-5-6-sol-2"
 ```
 
 Only bare `key = "value"` assignments at the top level of `[models]` / `[ui]` are
@@ -102,7 +102,7 @@ alias survives, not a specific string.
 
 ## Tests (`tests/grok-orphan-adoption.test.ts`, NEW)
 
-Fixture built from the real shape in `000`: an orphan `[model.ocx-gpt-5-6-sol]` with no
+Fixture built from the real shape in `000`: an orphan `[model.opr-gpt-5-6-sol]` with no
 `context_window` above the fence, the correct `-2` entry inside it, `default` pointing at
 the orphan, plus a hand-written `[model.my-own]` and a `[[model.arr]]`.
 
@@ -110,7 +110,7 @@ the orphan, plus a hand-written `[model.my-own]` and a `[[model.arr]]`.
 - the surviving table carries the authoritative `context_window`;
 - `[models] default` is rewritten to the surviving alias (F2);
 - the hand-written `[model.my-own]` survives byte-identically (F1) — including when it
-  points at a loopback `base_url` but carries no opencodex api_key;
+  points at a loopback `base_url` but carries no openprovider api_key;
 - `[[model.arr]]` is never adopted and stays reserved (F3);
 - a table whose api_key is ours but whose base_url is REMOTE is not adopted (F1);
 - keys of the table FOLLOWING a removed orphan are intact (F4);
@@ -121,6 +121,6 @@ the orphan, plus a hand-written `[model.my-own]` and a `[[model.arr]]`.
 
 ## Out of scope
 
-`stripGrokConfig` is untouched: `ocx stop` removing the fence should not also delete
+`stripGrokConfig` is untouched: `opr stop` removing the fence should not also delete
 adopted-but-not-yet-swept entries. Reformatting user content. Changing the alias
 allocator.

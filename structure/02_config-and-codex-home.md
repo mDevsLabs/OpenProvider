@@ -15,7 +15,7 @@ $CODEX_HOME/models_cache.json
 Never assume macOS-only paths. Windows, service installs, and app-launched Codex can all depend on
 the resolved `CODEX_HOME`.
 
-OpenProvider never overrides an explicit `CODEX_HOME`. On Windows, `ocx doctor` and `ocx status`
+OpenProvider never overrides an explicit `CODEX_HOME`. On Windows, `opr doctor` and `opr status`
 nevertheless diagnose the high-confidence Orca dual-home case: both `CODEX_HOME` and
 `ORCA_CODEX_HOME` select Orca's `orca/codex-runtime-home/home`, while the ChatGPT/Codex app uses the
 default `%USERPROFILE%\\.codex`. Sync and restore output always prints the exact target Codex home;
@@ -33,12 +33,12 @@ the recorded service ownership.
 - 다른 대안 대신 이 방식을 선택한 이유: It fixes the silent failure while avoiding destructive or noisy behavior for intentional custom homes.
 - 장점, 단점 및 영향: Orca users get an actionable warning; other multi-home products remain unchanged until they have an equally reliable signature.
 
-`atomicWriteFile` uses a temp file named `{path}.ocx.{pid}.{seq}.tmp` (process ID + incrementing
-sequence number) to avoid collisions when concurrent writers (e.g. `ocx stop` and the proxy's own
+`atomicWriteFile` uses a temp file named `{path}.opr.{pid}.{seq}.tmp` (process ID + incrementing
+sequence number) to avoid collisions when concurrent writers (e.g. `opr stop` and the proxy's own
 shutdown handler) both restore Codex config simultaneously. The temp is renamed atomically into place.
 
 Response-state loading performs a bounded recovery pass for interrupted snapshot writes. It only
-matches regular files named `responses-state.json.ocx.<pid>.<sequence>.tmp`, waits at least 15
+matches regular files named `responses-state.json.opr.<pid>.<sequence>.tmp`, waits at least 15
 minutes, and skips the current or any live PID. Eligible files are truncated before unlinking so a
 matching stale path is unlinked without following it. Path-based truncation is intentionally avoided:
 a same-user replacement could otherwise turn cleanup into a write through a symlink. Unrelated
@@ -98,6 +98,6 @@ and `routeModel`, but user config overrides registry defaults per field/key.
 
 ## Restore
 
-`ocx stop`, `ocx restore` / `ocx eject`, `ocx service stop`, and `ocx service uninstall` must strip
+`opr stop`, `opr restore` / `opr eject`, `opr service stop`, and `opr service uninstall` must strip
 OpenProvider config and routed catalog entries without damaging native Codex state.
 

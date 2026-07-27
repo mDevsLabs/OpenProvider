@@ -2,15 +2,15 @@
 
 ## Context
 
-The local `dist/bin` command aliases are required for the `ocx` developer
+The local `dist/bin` command aliases are required for the `opr` developer
 workflow, but `dist/` is ignored by default. This record keeps the symlink setup
-explicit without running `ocx`, `codex`, `cursor`, or `cursor-agent`.
+explicit without running `opr`, `codex`, `cursor`, or `cursor-agent`.
 
 ## Symlink Targets
 
-- `dist/bin/ocx` -> `ocx.mjs`
+- `dist/bin/opr` -> `ocx.mjs`
 - `dist/bin/ocx.mjs` -> `../../bin/ocx.mjs`
-- `dist/bin/opencodex` -> `ocx.mjs`
+- `dist/bin/openprovider` -> `ocx.mjs`
 
 ## Safety Boundary
 

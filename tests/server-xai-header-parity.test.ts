@@ -19,8 +19,8 @@ let originalFetch: typeof fetch;
 beforeEach(() => {
   originalFetch = globalThis.fetch;
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-xai-parity-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-xai-parity-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-xai-parity-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-xai-parity-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 

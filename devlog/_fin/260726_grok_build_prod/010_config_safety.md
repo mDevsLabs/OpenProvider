@@ -4,13 +4,13 @@
 
 ## 블로커 1 — 비루프백에서 플레이스홀더 자격 증명이 401을 만든다
 
-현재 `buildGrokManagedBlock`은 모든 모델에 `api_key = "opencodex-loopback"`을 쓴다. 그런데 `isApiAuthRequired`는 `hostname`이 비루프백이면 true이고, 그때 `hasValidApiAuth`는 `isProxyAdmissionSecret`로 실제 토큰을 요구한다(`src/server/auth-cors.ts:121,163`). 따라서 LAN 바인드에서 자동 등록된 모든 모델이 401이다. 사용자가 손으로 고쳐도 다음 `ocx start`/`ensure`가 fence를 재생성하며 되돌린다.
+현재 `buildGrokManagedBlock`은 모든 모델에 `api_key = "openprovider-loopback"`을 쓴다. 그런데 `isApiAuthRequired`는 `hostname`이 비루프백이면 true이고, 그때 `hasValidApiAuth`는 `isProxyAdmissionSecret`로 실제 토큰을 요구한다(`src/server/auth-cors.ts:121,163`). 따라서 LAN 바인드에서 자동 등록된 모든 모델이 401이다. 사용자가 손으로 고쳐도 다음 `opr start`/`ensure`가 fence를 재생성하며 되돌린다.
 
 리뷰어 두 곳(Codex P2, CodeRabbit Major)은 "비루프백이면 자동 등록을 거부하라"고 제안했다. 하지만 Grok Build는 `env_key`를 지원하므로 더 나은 해법이 있다: **환경변수 이름만 쓰고 값은 쓰지 않는다.**
 
 ### 결정
 
-루프백: 기존대로 `api_key = "opencodex-loopback"` (프록시가 무시하는 더미).
+루프백: 기존대로 `api_key = "openprovider-loopback"` (프록시가 무시하는 더미).
 
 비루프백: `api_key` 대신 `env_key = "OPENCODEX_API_AUTH_TOKEN"`을 쓴다. 토큰 값은 config에 남지 않고, 변수가 없으면 grok이 세션 토큰으로 폴백하지 않고 fail-closed다 (`180_grok-build .../model_providers.rs:741`). 프록시 자신도 같은 환경변수에서 토큰을 읽으므로(`auth-cors.ts:111`) 이름이 자연히 일치한다.
 
@@ -41,10 +41,10 @@
 
 ```diff
        'api_backend = "chat_completions"',
--      'api_key = "opencodex-loopback"',
+-      'api_key = "openprovider-loopback"',
 +      requiresAdmission
 +        ? `env_key = ${tomlString(ADMISSION_TOKEN_ENV)}`
-+        : 'api_key = "opencodex-loopback"',
++        : 'api_key = "openprovider-loopback"',
 ```
 
 `isLoopbackHostname`은 `src/server/auth-cors.ts`에서 가져온다. `src/codex/inject.ts`가 이미 같은 곳에서 import하므로 계층 위반이 아니다.
@@ -114,7 +114,7 @@ function canonicalTomlKey(raw: string | undefined): string | undefined {
 
 1. `non-loopback bind uses env_key instead of a literal token` — `injectGrokConfig(port, models, { grokHome, hostname: "192.168.1.50" })` 후 파일에 `env_key = "OPENCODEX_API_AUTH_TOKEN"`이 있고 `api_key`와 실제 토큰 문자열이 **없음**을 단언.
 2. `loopback keeps the placeholder api_key` — 대조군.
-3. `reserves aliases declared with a quoted first key segment` — `["model"."ocx-probe"]`, `['model'.ocx-other]`를 미리 둔 뒤 생성 별칭이 충돌하지 않고 `-2` 접미사를 받는지 단언.
+3. `reserves aliases declared with a quoted first key segment` — `["model"."opr-probe"]`, `['model'.opr-other]`를 미리 둔 뒤 생성 별칭이 충돌하지 않고 `-2` 접미사를 받는지 단언.
 4. `restores a config that had no trailing newline byte-for-byte` — 원본 문자열을 저장 → inject → strip → `readFileSync`가 원본과 **정확히** 같은지 단언.
 
 `tests/grok-sync.test.ts`에는 비루프백 hostname을 넘겼을 때 `env_key`가 나오는 경로 1건을 추가한다.

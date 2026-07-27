@@ -65,7 +65,7 @@ test("the guard rejects an over-long label", () => {
 });
 
 test("writeDesktop3pConfig emits a config whose model list passes the guard end to end", () => {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-desktop-guard-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-desktop-guard-"));
   const prev = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
   process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = dir;
   try {

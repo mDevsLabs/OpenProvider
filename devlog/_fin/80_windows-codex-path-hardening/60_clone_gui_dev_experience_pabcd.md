@@ -56,7 +56,7 @@ Implementation checklist:
   - GUI built: `GET / -> GUI dashboard`;
   - GUI missing: show setup/fallback guidance.
 - Expand `rootFallbackPayload()` with exact clone commands.
-- Replace generic `gui/README.md` with OpenCodex-specific instructions.
+- Replace generic `gui/README.md` with OpenProvider-specific instructions.
 
 Suggested commit:
 

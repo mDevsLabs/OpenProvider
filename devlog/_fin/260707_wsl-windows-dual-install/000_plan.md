@@ -1,6 +1,6 @@
 # WSL + Windows 동시 설치 하드닝 (260707)
 
-Goal: Codex CLI가 WSL과 Windows 양쪽에 설치된 머신에서 ocx의 shim/홈 해석/진단이 안전하게 동작. Session 019f34f2-3c06-7250-a2ee-dd3707f8130d.
+Goal: Codex CLI가 WSL과 Windows 양쪽에 설치된 머신에서 opr의 shim/홈 해석/진단이 안전하게 동작. Session 019f34f2-3c06-7250-a2ee-dd3707f8130d.
 
 ## 조사 (cxc-search Tier 1+2)
 
@@ -10,13 +10,13 @@ Goal: Codex CLI가 WSL과 Windows 양쪽에 설치된 머신에서 ocx의 shim/�
 
 ## 위험 모델
 
-1. **Shim이 Windows 런처를 감싸는 사고**: WSL에서 `ocx ensure` 시 PATH interop으로 `/mnt/c/.../codex`(npm sh 런처)가 발견되면, WSL 전용 bun 경로를 박은 sh shim으로 교체됨 → Windows 쪽 codex 호출 전부 파손. ← 이번 패치로 차단.
-2. **홈 불일치**: 양쪽 설치 시 ocx는 리눅스 `~/.codex`를 관리하는데 사용자가 Windows Codex app을 쓰면 카탈로그/로그인이 서로 다른 홈에 있음 → doctor 진단+힌트로 가시화.
-3. **localhost 방향성**: WSL의 ocx에 Windows codex가 붙는 건 기본 동작(NAT localhostForwarding), 역방향은 mirrored 필요 → doctor 힌트 텍스트에 포함하지 않고 dual-install 힌트로 노출(과잉 경고 방지).
+1. **Shim이 Windows 런처를 감싸는 사고**: WSL에서 `opr ensure` 시 PATH interop으로 `/mnt/c/.../codex`(npm sh 런처)가 발견되면, WSL 전용 bun 경로를 박은 sh shim으로 교체됨 → Windows 쪽 codex 호출 전부 파손. ← 이번 패치로 차단.
+2. **홈 불일치**: 양쪽 설치 시 opr는 리눅스 `~/.codex`를 관리하는데 사용자가 Windows Codex app을 쓰면 카탈로그/로그인이 서로 다른 홈에 있음 → doctor 진단+힌트로 가시화.
+3. **localhost 방향성**: WSL의 opr에 Windows codex가 붙는 건 기본 동작(NAT localhostForwarding), 역방향은 mirrored 필요 → doctor 힌트 텍스트에 포함하지 않고 dual-install 힌트로 노출(과잉 경고 방지).
 
 ## 구현
 
-- shim.ts: `findCodexOnPath` 주입 가능 deps로 재작성. WSL에서 `/mnt/<drive>/` PATH 엔트리 스킵 + 스킵된 Windows codex를 `lastShimDiscoveryError` 가이던스로 기록("WSL에 codex 설치하거나 Windows에서 ocx ensure 실행"). interop 디렉토리는 Windows 런처 이름(codex.exe/.cmd/.ps1 포함)으로 조회. `isWindowsInteropDir`/`lastCodexDiscoveryError` export.
+- shim.ts: `findCodexOnPath` 주입 가능 deps로 재작성. WSL에서 `/mnt/<drive>/` PATH 엔트리 스킵 + 스킵된 Windows codex를 `lastShimDiscoveryError` 가이던스로 기록("WSL에 codex 설치하거나 Windows에서 opr ensure 실행"). interop 디렉토리는 Windows 런처 이름(codex.exe/.cmd/.ps1 포함)으로 조회. `isWindowsInteropDir`/`lastCodexDiscoveryError` export.
 - home.ts: `listWslWindowsCodexHomes` 추출(동작 불변 리팩토링), doctor가 재사용.
 - doctor.ts: `collectWslDualInstall` — 리눅스 `~/.codex/config.toml` 존재, Windows 프로필 `.codex` 목록, 유효 CODEX_HOME이 /mnt인지, PATH의 codex가 interop인지 보고. runDoctor에 "WSL Codex installs" 섹션 + 힌트 2종(홈 분리/공유 옵션, interop shim 거부 안내).
 
@@ -29,7 +29,7 @@ Goal: Codex CLI가 WSL과 Windows 양쪽에 설치된 머신에서 ocx의 shim/�
 
 추가 조사(Tier 1+2, Microsoft 공식 문서 재확인):
 - wsl-config: `[automount] root` 기본 `/mnt/`, 사용자 변경 가능 → 1차 패치의 하드코딩 `/mnt` 가정이 커스텀 루트에서 무력화됨.
-- systemd: WSL 0.67.6+에서 `[boot] systemd=true` 필요. 없으면 `ocx service install` 불가.
+- systemd: WSL 0.67.6+에서 `[boot] systemd=true` 필요. 없으면 `opr service install` 불가.
 - networking: NAT localhost는 Windows→WSL 단방향(localhostForwarding 기본 on). 양방향은 `.wslconfig` `networkingMode=mirrored`.
 
 구현:

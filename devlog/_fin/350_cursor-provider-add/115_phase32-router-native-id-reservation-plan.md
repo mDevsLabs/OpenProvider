@@ -13,7 +13,7 @@ for today's config but relies on ordering + a hard-coded prefix list, so future 
 
 ## 1. Easy explanation
 
-opencodex must never accidentally send a plain OpenAI/Codex model (like `gpt-5.5`) to Cursor. The
+openprovider must never accidentally send a plain OpenAI/Codex model (like `gpt-5.5`) to Cursor. The
 current fix checks a short list of prefixes (`gpt-`, `o1-`, `o3-`, `o4-`) before Cursor's model list.
 That's correct now, but a new native model name that isn't in that list could still slip through to
 Cursor. The fix makes a permanent rule: **bare native OpenAI/Codex slugs are reserved** — Cursor can
@@ -22,7 +22,7 @@ configured, return a clear routing error instead of silently falling through to 
 
 ## 2. Pre-write evidence
 
-### Current opencodex — prefix-list + ordering
+### Current openprovider — prefix-list + ordering
 ```11:30:src/router.ts
 const MODEL_PROVIDER_PATTERNS: Array<{ providerNames: string[]; prefixes: string[] }> = [
   { providerNames: ["anthropic"], prefixes: ["claude-", …] },

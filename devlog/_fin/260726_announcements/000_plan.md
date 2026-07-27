@@ -2,7 +2,7 @@
 
 ## Objective
 
-Give opencodex a way to tell a user that something changed — without building the
+Give openprovider a way to tell a user that something changed — without building the
 notification treadmill that makes users learn to dismiss without reading.
 
 Two rules, set by the maintainer, shape everything below:
@@ -68,7 +68,7 @@ Server config, not `localStorage`.
 clearing site data, would see every announcement again — a backlog dump through
 the side door, defeating rule 2. Announcement state is a property of the
 installation, not of a browser profile. It also has to be readable by any future
-non-GUI surface (`ocx status`), which a browser store cannot serve.
+non-GUI surface (`opr status`), which a browser store cannot serve.
 
 Cost accepted: a config write on dismissal, and a new field in `OcxConfig`. The
 theme precedent stays in `localStorage` because it genuinely IS per-device.
@@ -105,7 +105,7 @@ in the previous unit.
 - Write scope: `src/`, `gui/src/`, `gui/tests/`, `tests/`,
   `devlog/_plan/260726_announcements/`.
 - Out of scope: a per-command CLI banner (rejected: it pollutes scriptable output;
-  `ocx status` is the ceiling if it is ever wanted), security-boundary PR merges,
+  `opr status` is the ceiling if it is ever wanted), security-boundary PR merges,
   release publication, version bumps, `main`/`preview` promotion.
 - Bounds: local gates only. No push without explicit approval (LOOP-GIT-01).
 

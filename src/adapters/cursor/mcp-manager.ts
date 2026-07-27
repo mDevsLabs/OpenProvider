@@ -7,7 +7,7 @@ import type { ResolvedMcpServer } from "./mcp-config";
 const DEFAULT_CONNECT_TIMEOUT_MS = 15_000;
 const DEFAULT_CALL_TIMEOUT_MS = 120_000;
 
-/** A tool discovered on a connected MCP server, with its opencodex-advertised name. */
+/** A tool discovered on a connected MCP server, with its openprovider-advertised name. */
 export interface McpToolHandle {
   serverName: string;
   toolName: string;
@@ -92,7 +92,7 @@ export class CursorMcpManager {
       const transport = this.options.transportFactory
         ? this.options.transportFactory(server)
         : this.createTransport(server);
-      const client = new Client({ name: "opencodex", version: "1.0.0" });
+      const client = new Client({ name: "openprovider", version: "1.0.0" });
       await this.withTimeout(client.connect(transport), this.connectTimeoutMs, `connect ${server.serverName}`);
       this.servers.set(server.serverName, { server, client });
       await this.indexTools(server, client);

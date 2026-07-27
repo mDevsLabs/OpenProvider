@@ -28,7 +28,7 @@ affordance), but state the boundary honestly and defend it:
   accepts **no body**, and it takes **no caller-supplied path, host, port, or model
   list** — every input comes from the persisted config and the runtime port record. The
   worst an authenticated caller can do is re-run the sync the CLI already runs on every
-  `ocx start`/`ensure`/`restart`.
+  `opr start`/`ensure`/`restart`.
 - Concurrency: applies are serialized with a module-level promise chain so two clicks
   cannot interleave two read-modify-write cycles on the same file.
 - The guard test is rewritten to assert the single-writer rule mechanically: `rg` over
@@ -42,7 +42,7 @@ Root cause: `030` copied `Number(url.port) || config.port` from the Desktop appl
 and passed `config.hostname`. `url` is built from the request
 (`src/server/index.ts:302`), so a proxied or renamed authority can misreport it, and
 `config.hostname` is exactly the value `src/grok/sync.ts:24` warns may have drifted
-from the bound host — which is why `ocx ensure` passes `live.hostname`
+from the bound host — which is why `opr ensure` passes `live.hostname`
 (`src/cli/index.ts:320-324`).
 
 Decision: the authoritative source already exists and neither the reviewer nor the plan
@@ -61,7 +61,7 @@ Root cause: `buildGrokManagedBlock` assigns aliases with a collision counter ove
 list it is given, plus reservations for user-owned tables (`src/grok/inject.ts:130-165`).
 Two facts follow that `030`/`040` missed: the GUI cannot compute an alias from
 `{id, contextWindow, native}`, and excluding an earlier colliding model shifts the
-suffix of a later one — a user's `ocx-kimi-k3-2` can silently become `ocx-kimi-k3`.
+suffix of a later one — a user's `opr-kimi-k3-2` can silently become `opr-kimi-k3`.
 
 Decision, two parts:
 

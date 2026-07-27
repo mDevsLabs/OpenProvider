@@ -31,7 +31,7 @@ MODIFY `tests/server-auth.test.ts`
   - loopback/default config rejects non-loopback `Origin` with 403.
   - loopback/default config accepts matching loopback `Origin` with 204.
 - Add a WebSocket upgrade regression test for non-loopback bindings:
-  - valid `X-OpenCodex-API-Key` is not enough when `Origin` is hostile.
+  - valid `X-OpenProvider-API-Key` is not enough when `Origin` is hostile.
   - response is 403 with `origin_rejected` / cross-origin rejection shape.
 - Reuse existing `startServer`, `saveConfig`, and `config()` test helpers.
 

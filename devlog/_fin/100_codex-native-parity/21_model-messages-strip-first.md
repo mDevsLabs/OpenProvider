@@ -4,7 +4,7 @@
 
 For routed non-OpenAI models, strip `model_messages` first.
 
-Do not try to preserve `/personality` on routed models until opencodex owns provider-safe
+Do not try to preserve `/personality` on routed models until openprovider owns provider-safe
 `model_messages` templates.
 
 ## Why This Changed
@@ -36,8 +36,8 @@ base_instructions
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/core/src/session/mod.rs:592
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:452
+/tmp/openprovider-codex-src/codex-rs/core/src/session/mod.rs:592
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:452
 ```
 
 ## Native Model State
@@ -56,12 +56,12 @@ Most current native picker models use `model_messages`:
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/models-manager/models.json:24
-/tmp/opencodex-codex-src/codex-rs/models-manager/models.json:118
-/tmp/opencodex-codex-src/codex-rs/models-manager/models.json:207
-/tmp/opencodex-codex-src/codex-rs/models-manager/models.json:291
-/tmp/opencodex-codex-src/codex-rs/models-manager/models.json:375
-/tmp/opencodex-codex-src/codex-rs/models-manager/models.json:455
+/tmp/openprovider-codex-src/codex-rs/models-manager/models.json:24
+/tmp/openprovider-codex-src/codex-rs/models-manager/models.json:118
+/tmp/openprovider-codex-src/codex-rs/models-manager/models.json:207
+/tmp/openprovider-codex-src/codex-rs/models-manager/models.json:291
+/tmp/openprovider-codex-src/codex-rs/models-manager/models.json:375
+/tmp/openprovider-codex-src/codex-rs/models-manager/models.json:455
 ```
 
 The template shape is simple but large:
@@ -74,23 +74,23 @@ The template shape is simple but large:
 `supports_personality` is derived from the template, not an independent flag:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:446
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:474
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:490
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:512
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:553
-/tmp/opencodex-codex-src/codex-rs/app-server/src/models.rs:25
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:446
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:474
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:490
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:512
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:553
+/tmp/openprovider-codex-src/codex-rs/app-server/src/models.rs:25
 ```
 
-## Current opencodex Risk
+## Current openprovider Risk
 
-opencodex currently deep-clones the native template and rewrites only `base_instructions`:
+openprovider currently deep-clones the native template and rewrites only `base_instructions`:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:108
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:122
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:135
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:157
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:108
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:122
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:135
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:157
 ```
 
 That rewrite is probably ineffective for routed entries cloned from modern native models, because
@@ -104,10 +104,10 @@ There is also uneven proxy-side mitigation:
 Relevant local paths:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts:206
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/openai-chat.ts:10
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/anthropic.ts:51
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/google.ts:13
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts:206
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/openai-chat.ts:10
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/anthropic.ts:51
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/google.ts:13
 ```
 
 ## Practical Policy
@@ -129,7 +129,7 @@ Native OpenAI passthrough entries should keep `model_messages`.
 
 ## Future Option
 
-Provider-safe personality can come back later through opencodex-owned templates. That should be a
+Provider-safe personality can come back later through openprovider-owned templates. That should be a
 separate feature:
 
 1. create a small routed template independent of upstream GPT wording;

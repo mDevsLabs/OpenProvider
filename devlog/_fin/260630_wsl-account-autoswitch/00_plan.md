@@ -60,7 +60,7 @@ Four parallel investigators, all read-only:
 | 00 | P0 | This plan + root-cause model | Scope frozen; phase stubs created |
 | 10 | P0 | Quota-deadlock fix (routing) | All-unknown set can still rotate (round-robin / tie-break); regression tests |
 | 20 | P0 | Quota priming | Startup/pre-route WHAM prime so candidates aren't stuck unknown; failure is diagnosable |
-| 30 | P1 | WSL networking diagnostics | `ocx doctor`-style WHAM reachability + proxy/env report; actionable hints |
+| 30 | P1 | WSL networking diagnostics | `opr doctor`-style WHAM reachability + proxy/env report; actionable hints |
 | 40 | P1 | Thread-affinity re-eval | Re-run auto-switch when the bound account crosses threshold, not only on error |
 | 50 | P2 | drvfs hardening | Classify IO errors as transient (not reauth); warn when state dir is on `/mnt/c` |
 | 90 | P0 | Final review | Independent review + full typecheck/test/privacy-scan evidence |

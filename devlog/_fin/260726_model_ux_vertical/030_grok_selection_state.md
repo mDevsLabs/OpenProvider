@@ -34,7 +34,7 @@ pretending otherwise would be a guard that cannot fail. The rule is:
 | request body | ignored entirely | none |
 
 The worst an authenticated same-origin caller can do is re-run the sync that
-`ocx start` / `ensure` / `restart` already run unprompted.
+`opr start` / `ensure` / `restart` already run unprompted.
 
 **Concurrency.** Two clicks must not interleave two read-modify-write cycles over one
 file. The route serializes through a module-level chain:
@@ -77,8 +77,8 @@ silent pass. Add it to the schema object in the same commit.
 handed, plus reservations for user-owned `[model.*]` tables
 (`src/grok/inject.ts:130-165`). Dropping an entry BEFORE the builder sees it therefore
 renumbers its colliding successors: with `kimi/k3` and `kimi-k3` both sanitizing to
-`ocx-kimi-k3`, switching the first one off silently renames the second from
-`ocx-kimi-k3-2` to `ocx-kimi-k3` — renaming a name the user already typed into grok.
+`opr-kimi-k3`, switching the first one off silently renames the second from
+`opr-kimi-k3-2` to `opr-kimi-k3` — renaming a name the user already typed into grok.
 Order preservation alone does not prevent this (audit blocker 3).
 
 Fix: allocate aliases over the **unfiltered** list and skip only the emission.
@@ -223,7 +223,7 @@ export async function fetchGrokCandidateModels(config: OcxConfig): Promise<GrokC
       const { readRuntimePort } = await import("../../config");
       // The host/port the proxy ACTUALLY bound — not the request authority (caller-
       // influenced, src/server/index.ts:302) and not config.hostname, which
-      // src/grok/sync.ts:24 warns may have drifted. `ocx ensure` passes live.hostname
+      // src/grok/sync.ts:24 warns may have drifted. `opr ensure` passes live.hostname
       // for this exact reason (src/cli/index.ts:320-324); the runtime-port record is
       // the in-process equivalent, written at startup (src/cli/index.ts:200).
       const runtime = readRuntimePort(process.pid);
@@ -256,9 +256,9 @@ and the serialization above, not on a claim that nothing writes.
 - excluding one id omits exactly that `[model.…]` table and keeps the others;
 - excluding an unknown id changes nothing;
 - **alias stability**: with two ids that sanitize to the same base alias, excluding the
-  first leaves the second's alias unchanged (`ocx-kimi-k3-2` stays `ocx-kimi-k3-2`) —
+  first leaves the second's alias unchanged (`opr-kimi-k3-2` stays `opr-kimi-k3-2`) —
   the regression the audit found;
-- a user-reserved `[model.ocx-…]` table outside the fence still pushes generated
+- a user-reserved `[model.opr-…]` table outside the fence still pushes generated
   aliases past it while exclusions are active;
 - excluding everything writes a fence with the two markers and no `[model.` table, and
   `stripGrokConfig` removes it cleanly — **activation evidence** for the empty case

@@ -2,12 +2,12 @@
 
 Date: 2026-07-23 (KST), commits `8ddeab8f` + `7c521a6c`
 
-**전제(오딧 합의): 본 라이브 검증은 non-service 경로 한정.** service-installed 환경의 `ocx restart`는 service manager를 중지하고 unmanaged child로 대체하여 persistence(자동 재시작/로그인 시작)를 잃는 **기존 restart 결함**이 있으며, unmanaged child 사망 시 grok fence가 다음 start/ensure까지 **무기한** dead proxy를 가리킬 수 있다. → wp5 문서 known-limitations에 release-known-limitation으로 명기. **후속 acceptance criterion(고정):** "service-installed `ocx restart`는 service manager를 통해 재시작하고 재시작 후 fence를 재보장한다" — restart 재설계는 본 goal 스코프 밖, 별도 이슈 대상.
+**전제(오딧 합의): 본 라이브 검증은 non-service 경로 한정.** service-installed 환경의 `opr restart`는 service manager를 중지하고 unmanaged child로 대체하여 persistence(자동 재시작/로그인 시작)를 잃는 **기존 restart 결함**이 있으며, unmanaged child 사망 시 grok fence가 다음 start/ensure까지 **무기한** dead proxy를 가리킬 수 있다. → wp5 문서 known-limitations에 release-known-limitation으로 명기. **후속 acceptance criterion(고정):** "service-installed `opr restart`는 service manager를 통해 재시작하고 재시작 후 fence를 재보장한다" — restart 재설계는 본 goal 스코프 밖, 별도 이슈 대상.
 
 ## c1 — ensure 재주입 (라이브, :10190 격리)
 
-1. live 분기: fence 수동 strip → `ocx ensure` → `+ Grok Build config updated` + fence 1 복원. `live.hostname` 전달 (proxy-liveness 런타임 기록).
-2. spawned 분기: `ocx restart`(stop→ensure) 후 부모가 waitForProxy 성공 직후 직접 주입 — readiness race 해소 (오딧 블로커 1).
+1. live 분기: fence 수동 strip → `opr ensure` → `+ Grok Build config updated` + fence 1 복원. `live.hostname` 전달 (proxy-liveness 런타임 기록).
+2. spawned 분기: `opr restart`(stop→ensure) 후 부모가 waitForProxy 성공 직후 직접 주입 — readiness race 해소 (오딧 블로커 1).
 3. `codexAutoStart=false`면 ensure가 조기 리턴하는 기존 게이트 확인 (grok과 무관, 기존 동작).
 
 ## c2 — restart 왕복 (라이브)

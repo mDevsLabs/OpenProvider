@@ -161,7 +161,7 @@ export async function handleManagementAPI(req: Request, url: URL, config: OcxCon
     const grokNote = grok.ok ? "" : ` Grok config cleanup failed: ${grok.message}`;
     return jsonResponse(restore.success
       ? { success: true, message: `Proxy stopping, native Codex restored.${grokNote}` }
-      : { success: false, message: `Proxy stopping, but native Codex restore failed: ${restore.message}. Run \`ocx restore\`.${grokNote}` });
+      : { success: false, message: `Proxy stopping, but native Codex restore failed: ${restore.message}. Run \`opr restore\`.${grokNote}` });
   }
 
   if (url.pathname.startsWith("/api/codex-auth/")) {

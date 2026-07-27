@@ -31,7 +31,7 @@ built-in DeepSeek preset 추가가 400으로 거부되는데, Add Provider 모�
 ## 워크어라운드 실효성
 
 - POST 실패 시 provider는 생성되지 않음 (persist 이전 400) → PATCH 경로로 직접 못 감.
-- 가능: (a) proxy fake-ip-filter에 호스트 추가(권장), (b) CLI `ocx provider add --allow-private-network`,
+- 가능: (a) proxy fake-ip-filter에 호스트 추가(권장), (b) CLI `opr provider add --allow-private-network`,
   (c) 통과 가능한 baseUrl로 생성 후 PATCH 2회(어색하지만 가능, `management-api.ts:668,679`).
 
 ## 수정 방향 (011 패치 단위 입력)

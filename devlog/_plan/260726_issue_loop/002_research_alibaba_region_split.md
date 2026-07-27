@@ -83,7 +83,7 @@ combos therefore destroys the whole config it was trying to repair.
 
 ## Why the destination row cannot simply be moved
 
-`ocx provider add` and the GUI persist registry-derived fields onto the config
+`opr provider add` and the GUI persist registry-derived fields onto the config
 row (`src/cli/provider.ts:163`, `src/providers/derive.ts:102`), and registry
 enrichment only fills fields that are *absent* (`derive.ts:220`). Moving the
 Beijing row wholesale therefore carries its 6-model list, its default model, and

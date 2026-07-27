@@ -60,7 +60,7 @@ export async function handleSearch(
     return formatErrorResponse(
       400,
       "invalid_request_error",
-      "Built-in web search needs a ChatGPT forward provider, but none is configured in opencodex. "
+      "Built-in web search needs a ChatGPT forward provider, but none is configured in openprovider. "
       + "Routed and OpenAI API-key providers cannot serve /v1/alpha/search.",
     );
   }

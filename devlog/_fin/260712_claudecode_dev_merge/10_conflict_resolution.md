@@ -36,6 +36,6 @@
 | GUI build | ✓ built |
 | release.ts bun build | ✓ 9.24 KB |
 | CLI smoke `bun run src/cli/index.ts help` | ok |
-| npm pack + 격리 prefix 글로벌 설치 + ocx help | ok (gui/dist 45파일 포함) |
+| npm pack + 격리 prefix 글로벌 설치 + opr help | ok (gui/dist 45파일 포함) |
 
-글로벌 설치 스모크는 사용자의 실제 글로벌 ocx를 건드리지 않도록 `--prefix /tmp/ocx-smoke`로 격리 실행.
+글로벌 설치 스모크는 사용자의 실제 글로벌 opr를 건드리지 않도록 `--prefix /tmp/opr-smoke`로 격리 실행.

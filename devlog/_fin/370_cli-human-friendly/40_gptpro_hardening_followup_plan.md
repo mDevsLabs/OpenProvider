@@ -6,7 +6,7 @@ Status: implementation plan for post-audit hardening.
 
 After pushing `dev`, GPT Pro audited the recent CLI UX changes through agbrowse:
 
-- GitHub branch: `https://github.com/lidge-jun/opencodex/tree/dev`
+- GitHub branch: `https://github.com/lidge-jun/openprovider/tree/dev`
 - ChatGPT conversation: `https://chatgpt.com/c/6a3ff217-2d1c-83ee-8f59-b56d028f8259`
 
 GPT Pro verdict: no blocking release-stopper, but several hardening gaps should be fixed.
@@ -30,14 +30,14 @@ That conflicts with `status --json` being documented as read-only diagnostics. T
 
 ### Medium B - fallback runtime port visibility
 
-`ocx start` can choose a free fallback port if the configured/preferred port is busy, but `status` and `gui` derive URLs from config. When fallback is not persisted, status can check the wrong port.
+`opr start` can choose a free fallback port if the configured/preferred port is busy, but `status` and `gui` derive URLs from config. When fallback is not persisted, status can check the wrong port.
 
 This needs a runtime-selected-port source of truth. It must not blindly make random fallback ports permanent config defaults unless that UX is intentional.
 
 ### Low - parser and usage gaps
 
-- `ocx status --json --yaml` should fail instead of ignoring extra args.
-- `ocx start --port 123abc` should fail instead of accepting `123`.
+- `opr status --json --yaml` should fail instead of ignoring extra args.
+- `opr start --port 123abc` should fail instead of accepting `123`.
 - unknown `start` args should fail.
 - `service` / `codex-shim` invalid usage strings should include `remove`.
 
@@ -60,17 +60,17 @@ Scope:
 Files:
 
 ```path
-/Users/jun/Developer/new/700_projects/opencodex/src/cli.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/service.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/cli-help.test.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/cli-status-json.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/cli.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/service.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/cli-help.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/cli-status-json.test.ts
 ```
 
 Acceptance:
 
-- `ocx status --json --yaml` exits 1 with usage.
-- `ocx start --port 123abc --help` still prints help, but `ocx start --port 123abc` exits 1.
-- `ocx start --bad` exits 1.
+- `opr status --json --yaml` exits 1 with usage.
+- `opr start --port 123abc --help` still prints help, but `opr start --port 123abc` exits 1.
+- `opr start --bad` exits 1.
 - invalid service/shim subcommands mention `remove`.
 - existing help/status tests pass.
 
@@ -86,15 +86,15 @@ Scope:
 Files:
 
 ```path
-/Users/jun/Developer/new/700_projects/opencodex/src/config.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/cli-status.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/cli-status-json.test.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/config.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/config.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/cli-status.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/cli-status-json.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/config.test.ts
 ```
 
 Acceptance:
 
-- `ocx status --json` on malformed config still prints parseable JSON.
+- `opr status --json` on malformed config still prints parseable JSON.
 - no `config.json.invalid-*` is created by status diagnostics.
 - no chmod/harden behavior is triggered by status diagnostics.
 - output includes a safe warning/error field if config could not be parsed.
@@ -111,10 +111,10 @@ Scope:
 Files:
 
 ```path
-/Users/jun/Developer/new/700_projects/opencodex/src/config.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/cli.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/cli-status.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/cli-status-json.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/config.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/cli.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/cli-status.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/cli-status-json.test.ts
 ```
 
 Acceptance:

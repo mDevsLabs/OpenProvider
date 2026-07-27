@@ -2,23 +2,23 @@
 
 ## Question
 
-Can opencodex dynamically reuse jawcode's existing model defaults for context windows, capabilities,
+Can openprovider dynamically reuse jawcode's existing model defaults for context windows, capabilities,
 and usage metadata?
 
 ## Short Answer
 
-Yes, jawcode has richer metadata, but opencodex should not import it directly at runtime first.
+Yes, jawcode has richer metadata, but openprovider should not import it directly at runtime first.
 
 Recommended approach:
 
 ```text
-jawcode rich metadata -> build-time generated opencodex snapshot -> small opencodex projection -> verified Codex catalog fields
+jawcode rich metadata -> build-time generated openprovider snapshot -> small openprovider projection -> verified Codex catalog fields
 ```
 
 Do not do:
 
 ```text
-dynamic import @jawcode-dev/ai at opencodex runtime -> spread jawcode Model into Codex catalog
+dynamic import @jawcode-dev/ai at openprovider runtime -> spread jawcode Model into Codex catalog
 ```
 
 ## jawcode Sources
@@ -67,9 +67,9 @@ jawcode structure docs summarize the catalog fields:
 /Users/jun/Developer/new/700_projects/jawcode/structure/30_providers.md:156
 ```
 
-## Current opencodex Shape
+## Current openprovider Shape
 
-opencodex currently carries routed catalog models as:
+openprovider currently carries routed catalog models as:
 
 ```ts
 export interface CatalogModel {
@@ -82,17 +82,17 @@ export interface CatalogModel {
 Path:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:34
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:34
 ```
 
 Provider config is also narrower:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:204
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:208
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:209
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:222
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:227
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:204
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:208
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:209
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:222
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:227
 ```
 
 ## Direct Runtime Dependency Risk
@@ -105,24 +105,24 @@ Provider config is also narrower:
 /Users/jun/Developer/new/700_projects/jawcode/packages/ai/package.json:115
 ```
 
-But runtime importing it into opencodex is risky:
+But runtime importing it into openprovider is risky:
 
-- opencodex currently keeps runtime deps small;
-- jawcode's package has a higher Bun floor than opencodex;
+- openprovider currently keeps runtime deps small;
+- jawcode's package has a higher Bun floor than openprovider;
 - it may pull in provider SDK and agent-specific surfaces;
-- opencodex is meant to be a small proxy, not a full jawcode runtime;
+- openprovider is meant to be a small proxy, not a full jawcode runtime;
 - failures would have to degrade cleanly on every user install.
 
-Current opencodex dependency baseline:
+Current openprovider dependency baseline:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/package.json:18
-/Users/jun/Developer/new/700_projects/opencodex/package.json:31
+/Users/jun/Developer/new/700_projects/openprovider/package.json:18
+/Users/jun/Developer/new/700_projects/openprovider/package.json:31
 ```
 
 ## Recommended Projection
 
-Generate a small opencodex-owned metadata file, for example:
+Generate a small openprovider-owned metadata file, for example:
 
 ```ts
 export interface OcxModelMetadata {
@@ -146,20 +146,20 @@ export interface OcxModelMetadata {
 Generated source candidates:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/generated/jawcode-model-metadata.ts
-/Users/jun/Developer/new/700_projects/opencodex/scripts/generate-jawcode-metadata.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/generated/jawcode-model-metadata.ts
+/Users/jun/Developer/new/700_projects/openprovider/scripts/generate-jawcode-metadata.ts
 ```
 
 Do not write these in this docs phase; this is the Phase 100 implementation target.
 
 ## Provider-ID Mapping
 
-opencodex provider ids do not always match jawcode provider ids. The snapshot generator needs an
+openprovider provider ids do not always match jawcode provider ids. The snapshot generator needs an
 explicit mapping layer.
 
 Examples:
 
-| opencodex provider | possible jawcode source |
+| openprovider provider | possible jawcode source |
 | --- | --- |
 | `xai` | `xai` |
 | `anthropic` | `anthropic` |
@@ -189,7 +189,7 @@ https://opencode.ai/zen/go/v1
 ```
 
 with explicit API-resolution overrides for known OpenCode Go routing mismatches. The Phase 100
-metadata generator should therefore map opencodex `opencode-go` directly to jawcode `opencode-go`
+metadata generator should therefore map openprovider `opencode-go` directly to jawcode `opencode-go`
 and reuse jawcode's discovered context/capability metadata where exact model ids match.
 
 Policy:
@@ -197,7 +197,7 @@ Policy:
 ```text
 mapped exact provider/model -> use jawcode metadata
 mapped provider but unknown model -> use provider default/conservative values
-unmapped provider -> keep current opencodex conservative defaults
+unmapped provider -> keep current openprovider conservative defaults
 ```
 
 The generator must report unmapped providers and models instead of silently guessing.
@@ -242,15 +242,15 @@ jawcode has richer per-response usage:
 /Users/jun/Developer/new/700_projects/jawcode/packages/ai/src/types.ts:514
 ```
 
-opencodex currently has:
+openprovider currently has:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:158
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:159
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:160
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:158
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:159
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:160
 ```
 
-Phase 100 implementation should extend opencodex response usage separately from catalog metadata:
+Phase 100 implementation should extend openprovider response usage separately from catalog metadata:
 
 ```ts
 interface OcxUsage {
@@ -268,7 +268,7 @@ confused with Responses token usage.
 
 1. Add generated jawcode metadata snapshot.
 2. Extend internal `CatalogModel` with optional metadata.
-3. Use metadata for opencodex runtime gates first:
+3. Use metadata for openprovider runtime gates first:
    - no vision if `input` lacks `image`;
    - no reasoning if `reasoning` is false or compat says reasoning effort unsupported;
    - reasoning raw/summary mapping from `compat.reasoningContentField` where reliable.

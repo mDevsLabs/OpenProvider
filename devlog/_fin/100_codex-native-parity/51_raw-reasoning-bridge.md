@@ -36,23 +36,23 @@ events.
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs:334
-/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs:335
-/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs:336
-/tmp/opencodex-codex-src/codex-rs/core/src/session/turn.rs:2310
-/tmp/opencodex-codex-src/codex-rs/core/src/session/turn.rs:2325
-/tmp/opencodex-codex-src/codex-rs/app-server-protocol/src/protocol/event_mapping.rs:384
-/tmp/opencodex-codex-src/codex-rs/app-server-protocol/src/protocol/event_mapping.rs:389
-/tmp/opencodex-codex-src/codex-rs/app-server-protocol/src/protocol/event_mapping.rs:390
+/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs:334
+/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs:335
+/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs:336
+/tmp/openprovider-codex-src/codex-rs/core/src/session/turn.rs:2310
+/tmp/openprovider-codex-src/codex-rs/core/src/session/turn.rs:2325
+/tmp/openprovider-codex-src/codex-rs/app-server-protocol/src/protocol/event_mapping.rs:384
+/tmp/openprovider-codex-src/codex-rs/app-server-protocol/src/protocol/event_mapping.rs:389
+/tmp/openprovider-codex-src/codex-rs/app-server-protocol/src/protocol/event_mapping.rs:390
 ```
 
 Upstream fixture helper:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/core/tests/common/responses.rs:766
-/tmp/opencodex-codex-src/codex-rs/core/tests/common/responses.rs:768
-/tmp/opencodex-codex-src/codex-rs/core/tests/common/responses.rs:769
-/tmp/opencodex-codex-src/codex-rs/core/tests/common/responses.rs:770
+/tmp/openprovider-codex-src/codex-rs/core/tests/common/responses.rs:766
+/tmp/openprovider-codex-src/codex-rs/core/tests/common/responses.rs:768
+/tmp/openprovider-codex-src/codex-rs/core/tests/common/responses.rs:769
+/tmp/openprovider-codex-src/codex-rs/core/tests/common/responses.rs:770
 ```
 
 ## Required Sequence
@@ -68,11 +68,11 @@ Raw reasoning must arrive while a reasoning output item is active:
 Relevant upstream test source:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/core/tests/suite/items.rs:1150
-/tmp/opencodex-codex-src/codex-rs/core/tests/suite/items.rs:1152
-/tmp/opencodex-codex-src/codex-rs/core/tests/suite/items.rs:1153
-/tmp/opencodex-codex-src/codex-rs/core/tests/suite/items.rs:1154
-/tmp/opencodex-codex-src/codex-rs/core/tests/suite/items.rs:1155
+/tmp/openprovider-codex-src/codex-rs/core/tests/suite/items.rs:1150
+/tmp/openprovider-codex-src/codex-rs/core/tests/suite/items.rs:1152
+/tmp/openprovider-codex-src/codex-rs/core/tests/suite/items.rs:1153
+/tmp/openprovider-codex-src/codex-rs/core/tests/suite/items.rs:1154
+/tmp/openprovider-codex-src/codex-rs/core/tests/suite/items.rs:1155
 ```
 
 Final raw reasoning item shape:
@@ -91,30 +91,30 @@ Final raw reasoning item shape:
 The model supports both `summary` and raw `content`:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/models.rs:947
-/tmp/opencodex-codex-src/codex-rs/protocol/src/models.rs:951
-/tmp/opencodex-codex-src/codex-rs/protocol/src/models.rs:954
-/tmp/opencodex-codex-src/codex-rs/protocol/src/models.rs:1604
-/tmp/opencodex-codex-src/codex-rs/protocol/src/models.rs:1605
+/tmp/openprovider-codex-src/codex-rs/protocol/src/models.rs:947
+/tmp/openprovider-codex-src/codex-rs/protocol/src/models.rs:951
+/tmp/openprovider-codex-src/codex-rs/protocol/src/models.rs:954
+/tmp/openprovider-codex-src/codex-rs/protocol/src/models.rs:1604
+/tmp/openprovider-codex-src/codex-rs/protocol/src/models.rs:1605
 ```
 
-## Current opencodex State
+## Current openprovider State
 
-opencodex currently maps every provider `thinking_delta` into the summary path:
+openprovider currently maps every provider `thinking_delta` into the summary path:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts:167
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts:169
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts:176
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts:83
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts:86
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts:90
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts:167
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts:169
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts:176
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts:83
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts:86
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts:90
 ```
 
 Current adapter event type:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts:151
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts:151
 ```
 
 ```ts
@@ -124,13 +124,13 @@ Current adapter event type:
 Incoming historical reasoning is already parsed from either summary or raw content:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/schema.ts:21
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/schema.ts:22
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/schema.ts:42
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/schema.ts:45
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/schema.ts:46
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts:242
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts:243
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/schema.ts:21
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/schema.ts:22
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/schema.ts:42
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/schema.ts:45
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/schema.ts:46
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts:242
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts:243
 ```
 
 So the missing piece is outbound bridge mode, not inbound schema awareness.

@@ -109,7 +109,7 @@ test("a stale marker never suppresses the admission key", () => {
     { authDetect: fileAuth("present") },
   );
   expect(env.ANTHROPIC_AUTH_TOKEN).toBe("admission-key");
-  // opencodex really does own authentication here, so the host flag is correct.
+  // openprovider really does own authentication here, so the host flag is correct.
   expect(env.CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST).toBe("1");
 });
 
@@ -155,13 +155,13 @@ test("manual subscription withholds the marker even when auth is absent", () => 
 // ~/.claude/settings.json env block cannot silently steal routing. But the same flag
 // is read as a host-auth assertion, so emitting it WITHOUT a host token makes a valid
 // claude.ai subscription look logged out — that is the #253 failure. The flag is
-// therefore correct exactly when opencodex owns authentication, and the auto path has
+// therefore correct exactly when openprovider owns authentication, and the auto path has
 // to reach that conclusion on its own.
 // ---------------------------------------------------------------------------
 
 test("auto-resolved proxy emits the host-managed assertion with its token", () => {
   const env = buildClaudeEnv(cfg(), 10100, {}, {}, { authDetect: fileAuth("absent") });
-  // Auto found no Claude auth, so opencodex owns authentication here.
+  // Auto found no Claude auth, so openprovider owns authentication here.
   expect(env.ANTHROPIC_AUTH_TOKEN).toBe(PROXY_MARKER);
   expect(env.CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST).toBe("1");
 });
@@ -185,7 +185,7 @@ test("the host-managed assertion never travels without a host token", () => {
 
 // The hijack itself. A cc-switch/CCR leftover puts a competing provider in
 // settings.json `env`. Claude Code merges that block into the launch env; the strip is
-// what keeps opencodex routing. We model the merge and assert the strip fires exactly
+// what keeps openprovider routing. We model the merge and assert the strip fires exactly
 // when we asserted host ownership.
 function simulateClaudeCodeSettingsMerge(
   launchEnv: Record<string, string | undefined>,

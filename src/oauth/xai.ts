@@ -216,7 +216,7 @@ export async function loginXai(
         }
       }
     } else if (importLocal === "only") {
-      throw new Error("No Grok CLI token found at ~/.grok/auth.json. Run 'ocx login xai' for browser OAuth.");
+      throw new Error("No Grok CLI token found at ~/.grok/auth.json. Run 'opr login xai' for browser OAuth.");
     }
   }
 

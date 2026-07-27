@@ -45,7 +45,7 @@ Implementation checklist:
 - Set restart interval and restart count explicitly.
 - Set battery behavior explicitly.
 - Set multiple-instance policy explicitly.
-- Preserve intentional stop semantics: `ocx service stop` must not immediately resurrect the service.
+- Preserve intentional stop semantics: `opr service stop` must not immediately resurrect the service.
 - Ensure uninstall still stops and kills tracked child before task deletion.
 
 Suggested commit:
@@ -66,11 +66,11 @@ bun x tsc --noEmit
 Manual Windows smoke:
 
 ```powershell
-ocx service install
-schtasks /query /tn OpenCodex /xml
+opr service install
+schtasks /query /tn OpenProvider /xml
 # Verify ExecutionTimeLimit PT0S, restart settings, battery policy, multiple instance policy.
-ocx service stop
-# Verify no opencodex/Bun child remains and it does not respawn.
+opr service stop
+# Verify no openprovider/Bun child remains and it does not respawn.
 ```
 
 ### D — Done Criteria

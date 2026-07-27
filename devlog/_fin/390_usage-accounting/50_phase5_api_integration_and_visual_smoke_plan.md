@@ -11,7 +11,7 @@ Integration test that boots a real server with `startServer(0)`, hand-writes a s
 - `GET /api/usage` returns `200`, JSON-parseable, with the documented shape (`range`, `since`, `generatedAt`, `summary`, `days`, `models`, `providers`).
 - `?range=7d` filters out older entries; `?range=30d` is the default; `?range=unknown` falls back to `30d`.
 - A missing file (no `usage.jsonl` written) returns an empty summary, not 500.
-- The endpoint requires the same `x-opencodex-api-key` auth as other management endpoints (verify a `401` without it and `200` with it).
+- The endpoint requires the same `x-openprovider-api-key` auth as other management endpoints (verify a `401` without it and `200` with it).
 
 This is the canonical proof that the wire path matches the unit-tested summarizer.
 

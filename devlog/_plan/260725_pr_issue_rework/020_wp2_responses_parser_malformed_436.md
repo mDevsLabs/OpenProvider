@@ -51,11 +51,11 @@ A-gate가 3라운드 연속 FAIL했다. 원인은 계약의 세부가 아니라 
 ## 착수 시점 사실
 
 - 기준 시각: 2026-07-25 KST.
-- worktree: `/Users/jun/.codex/worktrees/ebcd/opencodex`.
+- worktree: `/Users/jun/.codex/worktrees/ebcd/openprovider`.
 - 현재 체크아웃은 detached HEAD이며, `HEAD == origin/dev == 037e8f5e4fa32a82e4149acc509554f157656dad`.
 - PR #436 base/head: `dev` ← `acfe5c14034c0e3a5802757ab53b1ef1212747ab` (`fix/responses-parser-content-validation`).
 - PR 원문 diff 길이: 209줄. 대상은 `src/responses/parser.ts` MODIFY, `tests/responses-parser-malformed-content.test.ts` NEW.
-- 실행 명령: `gh pr diff 436 --repo lidge-jun/opencodex | git apply --check -`.
+- 실행 명령: `gh pr diff 436 --repo lidge-jun/openprovider | git apply --check -`.
 - 결과: exit 0, stderr/stdout 없음. 기준 `037e8f5e`에는 clean apply된다.
 - **순서 의존:** 이 clean-apply 사실은 독립 적용 가능성만 뜻한다. #436 단독 적용 시 malformed message content가 `[]`가 되고, 현재 dev의 `src/adapters/google.ts:110-120`은 이를 `parts: []`로 직렬화한다. 그러면 #420이 재발한다. 반드시 WP1(#430)을 먼저 적용하고 그 결과 위에서 이 WP를 실행한다.
 
@@ -71,7 +71,7 @@ A-gate가 3라운드 연속 FAIL했다. 원인은 계약의 세부가 아니라 
 
 ### PR snapshot diff — 그대로 적용
 
-출처: `gh pr diff 436 --repo lidge-jun/opencodex`, head `acfe5c14034c0e3a5802757ab53b1ef1212747ab`.
+출처: `gh pr diff 436 --repo lidge-jun/openprovider`, head `acfe5c14034c0e3a5802757ab53b1ef1212747ab`.
 
 ```diff
 diff --git a/src/responses/parser.ts b/src/responses/parser.ts

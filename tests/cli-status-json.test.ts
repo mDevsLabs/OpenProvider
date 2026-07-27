@@ -9,19 +9,19 @@ import { selectListenTarget } from "../src/cli/status";
 const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
 const cliPath = join(repoRoot, "src", "cli", "index.ts");
 
-function runStatusJson(opencodexHome: string) {
+function runStatusJson(openproviderHome: string) {
   return spawnSync(process.execPath, [cliPath, "status", "--json"], {
     cwd: repoRoot,
-    env: { ...process.env, OPENCODEX_HOME: opencodexHome },
+    env: { ...process.env, OPENCODEX_HOME: openproviderHome },
     encoding: "utf8",
   });
 }
 
 describe("CLI status JSON", () => {
   test("status --json prints valid read-only diagnostics without secrets", () => {
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-status-json-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-status-json-"));
     try {
-      const configPath = join(opencodexHome, "config.json");
+      const configPath = join(openproviderHome, "config.json");
       writeFileSync(configPath, JSON.stringify({
         port: 9,
         providers: {
@@ -36,14 +36,14 @@ describe("CLI status JSON", () => {
         codexAutoStart: false,
       }), "utf8");
 
-      const beforeFiles = readdirSync(opencodexHome).sort();
-      const result = runStatusJson(opencodexHome);
-      const afterFiles = readdirSync(opencodexHome).sort();
+      const beforeFiles = readdirSync(openproviderHome).sort();
+      const result = runStatusJson(openproviderHome);
+      const afterFiles = readdirSync(openproviderHome).sort();
 
       expect(result.status).toBe(0);
       expect(result.stderr).toBe("");
       expect(afterFiles).toEqual(beforeFiles);
-      expect(existsSync(join(opencodexHome, "ocx.pid"))).toBe(false);
+      expect(existsSync(join(openproviderHome, "opr.pid"))).toBe(false);
 
       const parsed = JSON.parse(result.stdout) as {
         schemaVersion?: unknown;
@@ -95,7 +95,7 @@ describe("CLI status JSON", () => {
       expect(parsed.listen?.port).toBe(9);
       expect(parsed.listen?.source).toBe("config");
       expect(parsed.paths?.config).toBe(configPath);
-      expect(parsed.paths?.pid).toBe(join(opencodexHome, "ocx.pid"));
+      expect(parsed.paths?.pid).toBe(join(openproviderHome, "opr.pid"));
       expect(typeof parsed.paths?.runtime).toBe("string");
       expect(typeof parsed.runtime?.source).toBe("string");
       expect(parsed.codexAutostart).toBe(false);
@@ -134,24 +134,24 @@ describe("CLI status JSON", () => {
         expect(serialized).not.toContain(forbidden);
       }
     } finally {
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
     }
   });
 
   test("status --json reports catalogClamp.runtimeVersion when clamp is active", async () => {
     const { chmodSync } = await import("node:fs");
     const { persistEffortClamp, resetCodexRuntimeResolveCacheForTests } = await import("../src/codex/runtime");
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-status-clamp-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-status-clamp-"));
     try {
-      writeFileSync(join(opencodexHome, "config.json"), JSON.stringify({
+      writeFileSync(join(openproviderHome, "config.json"), JSON.stringify({
         port: 9,
         providers: {},
         defaultProvider: "openai",
       }), "utf8");
       const fakeCodex = process.platform === "win32"
-        ? join(opencodexHome, "bin", "codex.cmd")
-        : join(opencodexHome, "bin", "codex");
-      mkdirSync(join(opencodexHome, "bin"), { recursive: true });
+        ? join(openproviderHome, "bin", "codex.cmd")
+        : join(openproviderHome, "bin", "codex");
+      mkdirSync(join(openproviderHome, "bin"), { recursive: true });
       if (process.platform === "win32") {
         writeFileSync(fakeCodex, "@echo off\r\necho codex-cli 0.133.0\r\n", "utf8");
       } else {
@@ -163,14 +163,14 @@ describe("CLI status JSON", () => {
         runtimeVersion: "0.133.0",
         removedEfforts: ["max", "ultra"],
         affectedModels: ["gpt-5.6-sol"],
-      }, { configDir: opencodexHome });
+      }, { configDir: openproviderHome });
       resetCodexRuntimeResolveCacheForTests();
 
       const result = spawnSync(process.execPath, [cliPath, "status", "--json"], {
         cwd: repoRoot,
         env: {
           ...process.env,
-          OPENCODEX_HOME: opencodexHome,
+          OPENCODEX_HOME: openproviderHome,
           CODEX_CLI_PATH: fakeCodex,
           PATH: "",
         },
@@ -191,14 +191,14 @@ describe("CLI status JSON", () => {
       });
     } finally {
       resetCodexRuntimeResolveCacheForTests();
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
     }
   });
 
   test("status rejects unknown flags instead of silently printing human text", () => {
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-status-json-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-status-json-"));
     try {
-      writeFileSync(join(opencodexHome, "config.json"), JSON.stringify({
+      writeFileSync(join(openproviderHome, "config.json"), JSON.stringify({
         port: 9,
         providers: {},
         defaultProvider: "openai",
@@ -206,22 +206,22 @@ describe("CLI status JSON", () => {
 
       const result = spawnSync(process.execPath, [cliPath, "status", "--yaml"], {
         cwd: repoRoot,
-        env: { ...process.env, OPENCODEX_HOME: opencodexHome },
+        env: { ...process.env, OPENCODEX_HOME: openproviderHome },
         encoding: "utf8",
       });
 
       expect(result.status).toBe(1);
-      expect(result.stderr).toContain("Usage: ocx status [--json]");
+      expect(result.stderr).toContain("Usage: opr status [--json]");
       expect(result.stdout).toBe("");
     } finally {
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
     }
   });
 
   test("status --json rejects additional flags", () => {
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-status-json-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-status-json-"));
     try {
-      writeFileSync(join(opencodexHome, "config.json"), JSON.stringify({
+      writeFileSync(join(openproviderHome, "config.json"), JSON.stringify({
         port: 9,
         providers: {},
         defaultProvider: "openai",
@@ -229,27 +229,27 @@ describe("CLI status JSON", () => {
 
       const result = spawnSync(process.execPath, [cliPath, "status", "--json", "--yaml"], {
         cwd: repoRoot,
-        env: { ...process.env, OPENCODEX_HOME: opencodexHome },
+        env: { ...process.env, OPENCODEX_HOME: openproviderHome },
         encoding: "utf8",
       });
 
       expect(result.status).toBe(1);
-      expect(result.stderr).toContain("Usage: ocx status [--json]");
+      expect(result.stderr).toContain("Usage: opr status [--json]");
       expect(result.stdout).toBe("");
     } finally {
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
     }
   });
 
   test("status --json on malformed config remains read-only and secret-safe", () => {
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-status-json-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-status-json-"));
     try {
-      const configPath = join(opencodexHome, "config.json");
+      const configPath = join(openproviderHome, "config.json");
       writeFileSync(configPath, '{ "apiKey": "sk-status-secret", invalid json', "utf8");
-      const beforeFiles = readdirSync(opencodexHome).sort();
+      const beforeFiles = readdirSync(openproviderHome).sort();
 
-      const result = runStatusJson(opencodexHome);
-      const afterFiles = readdirSync(opencodexHome).sort();
+      const result = runStatusJson(openproviderHome);
+      const afterFiles = readdirSync(openproviderHome).sort();
 
       expect(result.status).toBe(0);
       expect(result.stderr).toBe("");
@@ -268,7 +268,7 @@ describe("CLI status JSON", () => {
       expect(serialized).not.toContain("sk-status-secret");
       expect(serialized).not.toContain("apiKey");
     } finally {
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
     }
   });
 

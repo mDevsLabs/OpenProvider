@@ -14,8 +14,8 @@ with **no policy boundary**.
 
 ## 1. Easy explanation
 
-Right now, when a real Cursor server tells opencodex "write this file" / "delete that folder" /
-"run this shell command" / "fetch this URL", opencodex **just does it** — anywhere on disk, any
+Right now, when a real Cursor server tells openprovider "write this file" / "delete that folder" /
+"run this shell command" / "fetch this URL", openprovider **just does it** — anywhere on disk, any
 command, any URL. There is no on/off switch and no "only inside this folder" fence. A live Cursor
 turn can therefore touch the whole machine. The fix is a **deny-by-default policy**: every native
 operation is refused unless the user explicitly turns it on, and writes/reads are fenced to a
@@ -24,7 +24,7 @@ so the turn never hangs — it just gets told "tool not available".
 
 ## 2. Pre-write evidence (current code + reference)
 
-### Current opencodex — direct execution, no gate
+### Current openprovider — direct execution, no gate
 - `src/adapters/cursor/native-exec.ts:47-76` — `handleCursorNativeExec` dispatches **every** case
   (`readArgs`, `writeArgs`, `deleteArgs`, `lsArgs`, `grepArgs`, `shellArgs`, `shellStreamArgs`,
   `backgroundShellSpawnArgs`, `writeShellStdinArgs`, `fetchArgs`, `mcpArgs`, … `computerUseArgs`,
@@ -55,7 +55,7 @@ so the turn never hangs — it just gets told "tool not available".
   (`jawcode cursor.ts:1376-1382`).
 - Unimplemented bridges (`backgroundShellSpawnArgs`, `fetchArgs`) hardcode `reason:"Not implemented"`
   rejections (`jawcode cursor.ts:1100-1114`, `1128-1139`).
-- **Conclusion:** the safe default is "decline with a typed rejection", and opencodex already imports
+- **Conclusion:** the safe default is "decline with a typed rejection", and openprovider already imports
   the same generated schemas (it builds the *success* variants in `native-exec-fs.ts`), so the
   `rejected` case is available on the same `*ResultSchema`.
 
@@ -141,7 +141,7 @@ Mode → capability matrix:
   `CursorExecPolicy`; absent ⇒ `DEFAULT_CURSOR_EXEC_POLICY` (deny). Document in config.
 
 ## 5. Out of scope (separate later phases)
-- Wiring opencodex's own executor hooks (so allowed modes do real work safely) — `112`+ track auth,
+- Wiring openprovider's own executor hooks (so allowed modes do real work safely) — `112`+ track auth,
   this phase only adds the **gate** and the typed rejections. A follow-up may map allowed cases to a
   sandboxed executor.
 - MCP/computer-use/screen real execution — denied by default here; enabling is a separate C4 decision.

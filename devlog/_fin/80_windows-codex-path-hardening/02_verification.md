@@ -21,31 +21,31 @@ bun run src/cli.ts sync
 
 Verify:
 
-- `~/.codex/config.toml` contains root `model_provider = "opencodex"`;
-- `~/.codex/opencodex.config.toml` exists;
-- `~/.codex/opencodex-catalog.json` exists;
+- `~/.codex/config.toml` contains root `model_provider = "openprovider"`;
+- `~/.codex/openprovider.config.toml` exists;
+- `~/.codex/openprovider-catalog.json` exists;
 - `~/.codex/models_cache.json` is invalidated when catalog sync changes model visibility/order.
 
 ### Custom Codex Home
 
 ```sh
-mkdir -p /tmp/ocx-codex-home
-CODEX_HOME=/tmp/ocx-codex-home bun run src/cli.ts sync
+mkdir -p /tmp/opr-codex-home
+CODEX_HOME=/tmp/opr-codex-home bun run src/cli.ts sync
 ```
 
 Verify:
 
-- writes go to `/tmp/ocx-codex-home`;
-- no new opencodex config/catalog/cache files are written to the default `~/.codex`;
-- profile fallback file is `/tmp/ocx-codex-home/opencodex.config.toml`.
+- writes go to `/tmp/opr-codex-home`;
+- no new openprovider config/catalog/cache files are written to the default `~/.codex`;
+- profile fallback file is `/tmp/opr-codex-home/openprovider.config.toml`.
 
 ## Platform Service Checks
 
 ### macOS
 
 ```sh
-CODEX_HOME=/tmp/ocx-codex-home bun run src/cli.ts service install
-plutil -p ~/Library/LaunchAgents/com.opencodex.proxy.plist
+CODEX_HOME=/tmp/opr-codex-home bun run src/cli.ts service install
+plutil -p ~/Library/LaunchAgents/com.openprovider.proxy.plist
 ```
 
 Verify:
@@ -57,24 +57,24 @@ Verify:
 ### Linux
 
 ```sh
-CODEX_HOME=/tmp/ocx-codex-home bun run src/cli.ts service install
-systemctl --user cat opencodex-proxy.service
+CODEX_HOME=/tmp/opr-codex-home bun run src/cli.ts service install
+systemctl --user cat openprovider-proxy.service
 ```
 
 Verify:
 
-- unit contains `Environment="CODEX_HOME=/tmp/ocx-codex-home"`;
+- unit contains `Environment="CODEX_HOME=/tmp/opr-codex-home"`;
 - unit contains `Environment="OCX_SERVICE=1"`;
-- logs append to the opencodex config log path;
-- `systemctl --user status opencodex-proxy.service` is active.
+- logs append to the openprovider config log path;
+- `systemctl --user status openprovider-proxy.service` is active.
 
 ### Windows
 
 ```powershell
-$env:CODEX_HOME = "$env:TEMP\ocx-codex-home"
+$env:CODEX_HOME = "$env:TEMP\opr-codex-home"
 bun run src/cli.ts service install
-schtasks /query /tn opencodex-proxy
-type "$HOME\.opencodex\opencodex-service.cmd"
+schtasks /query /tn openprovider-proxy
+type "$HOME\.openprovider\openprovider-service.cmd"
 ```
 
 Verify:
@@ -103,8 +103,8 @@ Expected:
 After sync/start, open a fresh Codex process and verify:
 
 - routed models appear in the model picker or `codex debug models`;
-- `codex --profile opencodex` uses the standalone `$CODEX_HOME/opencodex.config.toml`;
-- native Codex still works after `ocx restore` or service stop/uninstall.
+- `codex --profile openprovider` uses the standalone `$CODEX_HOME/openprovider.config.toml`;
+- native Codex still works after `opr restore` or service stop/uninstall.
 
 ## Known Constraints
 

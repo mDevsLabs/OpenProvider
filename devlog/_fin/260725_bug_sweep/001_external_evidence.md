@@ -52,12 +52,12 @@ decade 구현 문서가 참조하는 공식 문서 근거를 한곳에 모은다
 
 ## 경쟁 PR 현황 (2026-07-25 기준)
 
-- [PR #376](https://github.com/lidge-jun/opencodex/pull/376) — #373을 닫으려 했으나
+- [PR #376](https://github.com/lidge-jun/openprovider/pull/376) — #373을 닫으려 했으나
   CHANGES_REQUESTED. estimator가 wire pruning 이전 원본을 계산하고, payload 구성을
   중복 수행하며, 두 결과가 같은 인스턴스에서 나온다는 보장이 없다는 지적.
   owner 요구: 이미 pruning·정규화된 wire payload를 소비하고, request 구성을 중복하지 말며,
   checkpoint/carry가 없을 때만 계산할 것.
-- [PR #408](https://github.com/lidge-jun/opencodex/pull/408) — Windows UAC 승격.
+- [PR #408](https://github.com/lidge-jun/openprovider/pull/408) — Windows UAC 승격.
   **최신 head는 `src/service.ts`에 대규모 변경을 담고 있으며**
   `evaluateWindowsSchedulerInstallVerification()`이라는 새 `windowsTaskRegistrationHealthy()`
   소비자와 전용 테스트를 추가했다. WP2 착수 시 최신 head 기준으로 재확인해야 한다.

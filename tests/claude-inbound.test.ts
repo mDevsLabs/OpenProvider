@@ -255,8 +255,8 @@ describe("prompt cache key provenance (devlog 130 B3)", () => {
   });
 
   test("[1m] strip works for both alias families before decode", () => {
-    // Legacy claude-ocx-* (pure decode, no registry needed).
-    expect(resolveInboundModel("claude-ocx-cursor--gpt-5.6-luna[1m]")).toBe("cursor/gpt-5.6-luna");
+    // Legacy claude-opr-* (pure decode, no registry needed).
+    expect(resolveInboundModel("claude-opr-cursor--gpt-5.6-luna[1m]")).toBe("cursor/gpt-5.6-luna");
   });
 });
 
@@ -368,23 +368,23 @@ describe("bundled-skill elision for routed models (devlog 260712 060)", () => {
   });
 });
 
-describe("ocx-route directive (devlog 072)", () => {
+describe("opr-route directive (devlog 072)", () => {
   const { extractOcxRouteDirective } = require("../src/claude/inbound") as typeof import("../src/claude/inbound");
 
   test("extracts from string and block-array system; first directive wins", () => {
-    expect(extractOcxRouteDirective({ system: "intro\n<!-- ocx-route: claude-ocx-native--gpt-5.6-sol[1m] -->\nrest" }))
-      .toBe("claude-ocx-native--gpt-5.6-sol[1m]");
+    expect(extractOcxRouteDirective({ system: "intro\n<!-- opr-route: claude-opr-native--gpt-5.6-sol[1m] -->\nrest" }))
+      .toBe("claude-opr-native--gpt-5.6-sol[1m]");
     expect(extractOcxRouteDirective({
       system: [
         { type: "text", text: "You are a delegated worker" },
-        { type: "text", text: "<!-- ocx-route: gemini/gemini-3-pro --> and <!-- ocx-route: other -->" },
+        { type: "text", text: "<!-- opr-route: gemini/gemini-3-pro --> and <!-- opr-route: other -->" },
       ],
     })).toBe("gemini/gemini-3-pro");
   });
 
   test("absent or malformed directives return null", () => {
     expect(extractOcxRouteDirective({ system: "no directive here" })).toBeNull();
-    expect(extractOcxRouteDirective({ system: [{ type: "text", text: "<!-- ocx-route: -->" }] })).toBeNull();
+    expect(extractOcxRouteDirective({ system: [{ type: "text", text: "<!-- opr-route: -->" }] })).toBeNull();
     expect(extractOcxRouteDirective({})).toBeNull();
     expect(extractOcxRouteDirective(null)).toBeNull();
   });

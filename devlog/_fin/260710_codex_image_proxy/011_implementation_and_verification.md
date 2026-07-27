@@ -73,7 +73,7 @@ Evidence root:
 
 `.codexclaw/evidence/019f4a8d-53c2-7de1-b812-beed6d130796/qa/http-images/`
 
-A patched-source opencodex server and mock forward provider were driven with `curl -i`:
+A patched-source openprovider server and mock forward provider were driven with `curl -i`:
 
 - generation returned 200 and proved `/backend-api/codex/images/generations`, auth, account, and `version`;
 - edit returned 200 and proved `/backend-api/codex/images/edits`;

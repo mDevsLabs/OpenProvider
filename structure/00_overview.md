@@ -1,4 +1,4 @@
-# opencodex Structure
+# openprovider Structure
 
 This folder is the maintainer source of truth for the current system shape. Public user workflows
 belong in `docs-site/`; historical investigations belong in `docs/`.
@@ -19,13 +19,13 @@ belong in `docs-site/`; historical investigations belong in `docs/`.
 
 ## Product boundary
 
-opencodex is a local Responses-compatible proxy for Codex. It does not patch Codex binaries. It
+openprovider is a local Responses-compatible proxy for Codex. It does not patch Codex binaries. It
 changes local Codex state by writing a provider table and model catalog, then serves:
 
 ```text
 Codex CLI / TUI / App / SDK
   -> http://127.0.0.1:<port>/v1/responses
-  -> opencodex routing + adapter bridge
+  -> openprovider routing + adapter bridge
   -> upstream provider
 ```
 
@@ -49,15 +49,15 @@ providers are routed by explicit `provider/model`, provider model lists, or the 
 
 | Path | Owner | Notes |
 | --- | --- | --- |
-| `~/.opencodex/config.json` | opencodex | Main config written by `ocx init` and the dashboard. |
-| `~/.opencodex/auth.json` | opencodex | OAuth tokens; not committed. Multiauth shape: `provider -> { activeAccountId, accounts[] }` (legacy single-credential values normalize on load; a one-time `auth.json.pre-multiauth` backup guards downgrades). ChatGPT scratch OAuth stays separate from the Codex account store; identity-less providers (kimi/kiro/cursor) replace their active slot. |
-| `~/.opencodex/codex-accounts.json` | opencodex | Hardened main-plus-added credential store used by `openai` in Pool mode. |
-| `~/.opencodex/catalog-backup.json` | opencodex | One-time pristine Codex catalog backup for restore. |
-| `~/.opencodex/usage.jsonl` | opencodex | Append-only request usage log (0o600); request metadata + token counts only, never prompts or auth. |
-| `$CODEX_HOME/config.toml` | Codex, edited by opencodex | Active provider and provider table. |
-| `$CODEX_HOME/opencodex.config.toml` | opencodex | Optional profile for explicit Codex opt-in. |
-| `$CODEX_HOME/opencodex-catalog.json` | opencodex | Shared native+routed model catalog. |
-| `$CODEX_HOME/models_cache.json` | Codex, invalidated by opencodex | Cache invalidated after model/catalog changes. |
+| `~/.openprovider/config.json` | openprovider | Main config written by `opr init` and the dashboard. |
+| `~/.openprovider/auth.json` | openprovider | OAuth tokens; not committed. Multiauth shape: `provider -> { activeAccountId, accounts[] }` (legacy single-credential values normalize on load; a one-time `auth.json.pre-multiauth` backup guards downgrades). ChatGPT scratch OAuth stays separate from the Codex account store; identity-less providers (kimi/kiro/cursor) replace their active slot. |
+| `~/.openprovider/codex-accounts.json` | openprovider | Hardened main-plus-added credential store used by `openai` in Pool mode. |
+| `~/.openprovider/catalog-backup.json` | openprovider | One-time pristine Codex catalog backup for restore. |
+| `~/.openprovider/usage.jsonl` | openprovider | Append-only request usage log (0o600); request metadata + token counts only, never prompts or auth. |
+| `$CODEX_HOME/config.toml` | Codex, edited by openprovider | Active provider and provider table. |
+| `$CODEX_HOME/openprovider.config.toml` | openprovider | Optional profile for explicit Codex opt-in. |
+| `$CODEX_HOME/openprovider-catalog.json` | openprovider | Shared native+routed model catalog. |
+| `$CODEX_HOME/models_cache.json` | Codex, invalidated by openprovider | Cache invalidated after model/catalog changes. |
 | `dist/`, `gui/dist/`, `node_modules/` | generated | Build output/dependencies. |
 
 ## Non-negotiable invariants
@@ -68,7 +68,7 @@ providers are routed by explicit `provider/model`, provider model lists, or the 
 - Routed model slugs use `provider/model`.
 - OpenAI has one `openai` Codex-login provider with Pool(default)/Direct modes and a separate `openai-apikey`; see [`08_openai-provider-tiers.md`](08_openai-provider-tiers.md).
 - Codex `spawn_agent` visibility depends on the first five featured catalog entries.
-- `ocx stop`, `ocx restore`, and service stop/uninstall must leave native Codex usable.
+- `opr stop`, `opr restore`, and service stop/uninstall must leave native Codex usable.
 
 ## Writing rule
 

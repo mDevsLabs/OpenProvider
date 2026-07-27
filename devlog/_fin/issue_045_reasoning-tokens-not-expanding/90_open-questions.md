@@ -9,5 +9,5 @@
       client compatibility, accepting dedupe risk? (approach B) — default no.
 - [ ] Confirm `hideThinkingSummary` should also suppress routed reasoning_content
       (treat identically to thinking). Default: yes (same human-visible thinking).
-- [ ] Any downstream opencodex consumer (logs/usage) that reads the reasoning
+- [ ] Any downstream openprovider consumer (logs/usage) that reads the reasoning
       `content` field and would break if it moves to `summary`?

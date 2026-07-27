@@ -14,7 +14,7 @@ ID は変わりません。API GPT-5.6 は context 1,050,000 / max input 922,000
 
 ## 統合経路
 
-`ocx init`、`ocx start`、`ocx sync` は解決された `CODEX_HOME` の下のファイルを合わせます。
+`opr init`、`opr start`、`opr sync` は解決された `CODEX_HOME` の下のファイルを合わせます。
 
 ```text
 $CODEX_HOME/config.toml
@@ -107,7 +107,7 @@ OpenProvider は全カタログ項目の `multi_agent_version` を制御する 3
 | **base**(インストール時デフォルト) | 上流 pin を復元します。Sol/Terra は v2、Luna は v1 を使い、pin のないモデルは Codex `multi_agent_v2` フィーチャーフラグに従います。 |
 | **v2** | 上流 pin より優先し全モデルを v2 マルチエージェントサーフェスに強制します(Luna 含む)。 |
 
-ダッシュボードや Models ページ、`ocx v2 mode v1|default|v2`、または
+ダッシュボードや Models ページ、`opr v2 mode v1|default|v2`、または
 `PUT /api/v2` と `{ "multiAgentMode": "v1" }` で設定できます。変更は新しい Codex
 セッションから適用されます。
 
@@ -159,7 +159,7 @@ Codex はピッカーに表示されるカタログ項目を `priority` 昇順�
 ピッカーに古い項目が残っている場合はカタログを書き直し対象 Codex 画面を再度開いてください。
 
 ```bash
-ocx sync
+opr sync
 ```
 
 OpenProvider はカタログの表示可否、priority、メタデータが変わるたびに `models_cache.json` を意図的に

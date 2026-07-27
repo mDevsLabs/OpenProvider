@@ -2,7 +2,7 @@
 
 ## Part 1: Easy Explanation
 
-The next implementation pass makes native Anthropic caching behave like the current official Anthropic recommendation for multi-turn conversations. opencodex already caches stable system/tool prefixes; this pass adds the missing moving conversation-history breakpoint by sending top-level `cache_control` only to native Anthropic API requests. OpenAI/ChatGPT, Gemini/Antigravity, Kimi, and Anthropic-compatible gateways such as Umans stay conservative: preserve and display cache telemetry, but do not inject unproven provider-specific fields. Tests will prove request shape and raw pass-through behavior before any runtime claim is made.
+The next implementation pass makes native Anthropic caching behave like the current official Anthropic recommendation for multi-turn conversations. openprovider already caches stable system/tool prefixes; this pass adds the missing moving conversation-history breakpoint by sending top-level `cache_control` only to native Anthropic API requests. OpenAI/ChatGPT, Gemini/Antigravity, Kimi, and Anthropic-compatible gateways such as Umans stay conservative: preserve and display cache telemetry, but do not inject unproven provider-specific fields. Tests will prove request shape and raw pass-through behavior before any runtime claim is made.
 
 ## Part 2: Diff-Level Plan
 
@@ -92,7 +92,7 @@ test("preserves prompt_cache_retention in the raw Responses passthrough body", (
 Rationale:
 
 - OpenAI official docs expose `prompt_cache_retention`.
-- opencodex should not parse/validate it yet, but must not drop it on raw Responses passthrough.
+- openprovider should not parse/validate it yet, but must not drop it on raw Responses passthrough.
 
 ### MODIFY: `devlog/_plan/260701_cache-audit-hardening/01_cache-surface-audit.md`
 

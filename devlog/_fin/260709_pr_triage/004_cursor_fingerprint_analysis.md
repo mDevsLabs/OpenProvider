@@ -1,6 +1,6 @@
 # 004 — Cursor Bridge Fingerprint/Header Profile Analysis
 
-## Our bridge (opencodex) header profile
+## Our bridge (openprovider) header profile
 
 ### live-transport.ts (run requests, line ~584)
 ```

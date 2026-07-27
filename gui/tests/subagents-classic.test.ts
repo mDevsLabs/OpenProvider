@@ -21,7 +21,7 @@ test("Subagents renders a single implementation with no Workspace branch", async
   expect(page.match(/^ {2}return \(/gm)?.length).toBe(1);
 
   // The page never owned a local toggle; that stays true.
-  expect(page).not.toContain("ocx-subagents-view");
+  expect(page).not.toContain("opr-subagents-view");
   expect(page).not.toContain("pws.workspaceToggle");
   expect(page).not.toContain("pws.classicToggle");
 });

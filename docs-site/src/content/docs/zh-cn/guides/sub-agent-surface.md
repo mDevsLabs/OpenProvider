@@ -61,10 +61,10 @@ OpenProvider 允许你为目录中的所有模型选择多代理协作界面。�
 ### CLI
 
 ```bash
-ocx v2 mode v1       # 强制所有模型使用 v1
-ocx v2 mode default  # 恢复上游固定值
-ocx v2 mode v2       # 强制所有模型使用 v2
-ocx v2 status        # 显示当前模式和 Codex 功能开关
+opr v2 mode v1       # 强制所有模型使用 v1
+opr v2 mode default  # 恢复上游固定值
+opr v2 mode v2       # 强制所有模型使用 v2
+opr v2 status        # 显示当前模式和 Codex 功能开关
 ```
 
 ### API

@@ -3,16 +3,16 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 // Source-contract regressions for the final fixes that let devlog
-// 260702_windows-deploy-stability close: the ocx.cmd shell-less restart (A), F9 systemd no-DBUS
+// 260702_windows-deploy-stability close: the opr.cmd shell-less restart (A), F9 systemd no-DBUS
 // SSH detection (E), and the F4 explicit-localhost bind symmetry (D). These files run top-level or
 // platform-gated logic, so guard the invariants at the source level (repo convention — see
-// ocx-launcher-source.test.ts / service.test.ts).
+// opr-launcher-source.test.ts / service.test.ts).
 const read = (rel: string) => readFileSync(join(import.meta.dir, "..", rel), "utf8");
 
 describe("update-job restart avoids the shell-less .cmd EINVAL (Windows, bun/source)", () => {
   const src = read("src/update/job.ts");
-  test("no ocx.cmd shim is spawned for restart", () => {
-    expect(src).not.toContain('"ocx.cmd"');
+  test("no opr.cmd shim is spawned for restart", () => {
+    expect(src).not.toContain('"opr.cmd"');
     expect(src).not.toMatch(/function ocxBin/);
   });
   test("bun/source restart uses the runtime executable + launcher (a real .exe, no shell)", () => {

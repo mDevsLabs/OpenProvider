@@ -59,7 +59,7 @@ and are not required for this release candidate.
 The dirty main worktree masks regressions, so verification ran in a detached
 clean worktree at the candidate SHA:
 
-    git worktree add --detach /tmp/ocx-verify-717d2ff 717d2ff
+    git worktree add --detach /tmp/opr-verify-717d2ff 717d2ff
     bun install --frozen-lockfile
     bun run privacy:scan   # passed
     bun x tsc --noEmit     # exit 0
@@ -101,6 +101,6 @@ Candidate SHA: `f34f742`.
     bun x tsc --noEmit      # exit 0
     bun run privacy:scan    # passed
     bun run prepublishOnly  # GUI build + package prep, exit 0
-    npm pack --dry-run      # bitkyc08-opencodex-2.6.14.tgz, 131 files, valid
+    npm pack --dry-run      # bitkyc08-openprovider-2.6.14.tgz, 131 files, valid
 
 Final gate: gpt-5.5 review of f34f742, then merge dev->main/preview + publish 2.6.14.

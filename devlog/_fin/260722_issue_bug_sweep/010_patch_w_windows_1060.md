@@ -41,7 +41,7 @@ After:
   probe 결과가 `"error"`였다면 문구를 "could not re-verify the SCM registration (status=<n>, output excerpt)"로.
 - `:764` `stopServiceIfInstalled`: `stopped = true`는 stop 명령이 실제 성공 신호를 반환했을 때만 설정.
 - `:796` `uninstallServiceIfInstalled`: best-effort 문서 계약대로 `uninstallWinswService()` 예외를 try/catch로 포획하고 경고 로그로 격하.
-- 에러 메시지 공통: `sc query` 대신 `sc.exe query opencodex-proxy-native` 안내(PowerShell alias 모호성 제거), `status=<n>` + sanitized 출력 발췌 포함.
+- 에러 메시지 공통: `sc query` 대신 `sc.exe query openprovider-proxy-native` 안내(PowerShell alias 모호성 제거), `status=<n>` + sanitized 출력 발췌 포함.
 
 ## Diff 3 — `tests/winsw.test.ts:123` 이후 회귀 케이스 추가
 

@@ -16,7 +16,7 @@ describe("Codex config injection", () => {
   test("omits provider-level Responses WebSocket support by default", () => {
     const block = buildProviderTableBlock(10100);
 
-    expect(block).toContain("[model_providers.opencodex]");
+    expect(block).toContain("[model_providers.openprovider]");
     expect(block).toContain('wire_api = "responses"');
     expect(block).toContain("requires_openai_auth = true");
     expect(block).not.toContain("supports_websockets");
@@ -37,7 +37,7 @@ describe("Codex config injection", () => {
   test("can inject Codex provider API auth header from environment for non-loopback proxy mode", () => {
     const block = buildProviderTableBlock(10100, false, true);
 
-    expect(block).toContain('env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }');
+    expect(block).toContain('env_http_headers = { "x-openprovider-api-key" = "OPENCODEX_API_AUTH_TOKEN" }');
   });
 
   test("injected base_url matches the actual bind: literal 127.0.0.1 for loopback/wildcard (Windows resolves localhost to ::1 first)", () => {
@@ -53,12 +53,12 @@ describe("Codex config injection", () => {
 
   test("strips stale root context-window overrides on injection so the catalog drives model context (gpt-5.5 regression)", () => {
     const cleaned = stripRootContextWindowOverrides([
-      'model_provider = "opencodex"',
+      'model_provider = "openprovider"',
       "model_context_window = 1000000",
       "model_auto_compact_token_limit = 900000",
       'model = "gpt-5.5"',
       "",
-      "[model_providers.opencodex]",
+      "[model_providers.openprovider]",
       "# a nested table key must survive",
       "model_context_window = 272000",
       "",
@@ -68,7 +68,7 @@ describe("Codex config injection", () => {
     expect(cleaned).not.toMatch(/^model_context_window = 1000000$/m);
     expect(cleaned).not.toMatch(/^model_auto_compact_token_limit = 900000$/m);
     // Non-context-window root keys are untouched.
-    expect(cleaned).toContain('model_provider = "opencodex"');
+    expect(cleaned).toContain('model_provider = "openprovider"');
     expect(cleaned).toContain('model = "gpt-5.5"');
     // Table-nested keys (after the first [table]) are preserved.
     expect(cleaned).toContain("model_context_window = 272000");
@@ -79,8 +79,8 @@ describe("Codex config injection", () => {
       'model = "gpt-5.5"',
       'model_context_window = 1000000',
       'model_auto_compact_token_limit = 900000',
-      'model_catalog_json = "/tmp/opencodex-catalog.json"',
-      'model_provider = "opencodex"',
+      'model_catalog_json = "/tmp/openprovider-catalog.json"',
+      'model_provider = "openprovider"',
       "",
       "[features]",
       "fast_mode = true",
@@ -96,7 +96,7 @@ describe("Codex config injection", () => {
 
   test("removes root routed model names when restoring native Codex", () => {
     const stripped = stripOpencodexConfig([
-      'model_provider = "opencodex"',
+      'model_provider = "openprovider"',
       'model = "opencode-go/minimax-m3"',
       'model_verbosity = "high"',
       "",
@@ -109,7 +109,7 @@ describe("Codex config injection", () => {
     expect(stripped).toContain('model_verbosity = "high"');
   });
 
-  test("preserves non-opencodex routed model names during fallback restore", () => {
+  test("preserves non-openprovider routed model names during fallback restore", () => {
     const stripped = stripOpencodexConfig([
       'model_provider = "proxy"',
       'model = "openrouter/foo"',
@@ -130,8 +130,8 @@ describe("Codex config injection", () => {
     const profile = buildProfileFile(10100, null);
 
     expect(profile).toContain('openai_base_url = "http://127.0.0.1:10100/v1"');
-    expect(profile).not.toContain('model_provider = "opencodex"');
-    expect(profile).not.toContain("[model_providers.opencodex]");
+    expect(profile).not.toContain('model_provider = "openprovider"');
+    expect(profile).not.toContain("[model_providers.openprovider]");
     expect(profile).not.toContain("model_catalog_json");
     expect(profile).toContain("fast_mode = true");
   });
@@ -141,37 +141,37 @@ describe("Codex config injection", () => {
 
     expect(profile).toContain("OpenProvider Proxy at 192.168.1.20:10100");
     expect(profile).toContain('base_url = "http://192.168.1.20:10100/v1"');
-    expect(profile).toContain('model_provider = "opencodex"');
-    expect(profile).toContain("[model_providers.opencodex]");
+    expect(profile).toContain('model_provider = "openprovider"');
+    expect(profile).toContain("[model_providers.openprovider]");
   });
 
   test("non-loopback fallback profile mirrors websocket and API auth provider options", () => {
-    const profile = buildProfileFile(10100, "/tmp/opencodex-catalog.json", true, true);
+    const profile = buildProfileFile(10100, "/tmp/openprovider-catalog.json", true, true);
 
-    expect(profile).toContain('model_catalog_json = "/tmp/opencodex-catalog.json"');
+    expect(profile).toContain('model_catalog_json = "/tmp/openprovider-catalog.json"');
     expect(profile).toContain("supports_websockets = true");
-    expect(profile).toContain('env_http_headers = { "x-opencodex-api-key" = "OPENCODEX_API_AUTH_TOKEN" }');
+    expect(profile).toContain('env_http_headers = { "x-openprovider-api-key" = "OPENCODEX_API_AUTH_TOKEN" }');
   });
 
   test("honors an explicit unavailable catalog decision", () => {
-    const path = chooseCatalogPathForInjection('model_catalog_json = "/tmp/opencodex-catalog.json"\n', null);
+    const path = chooseCatalogPathForInjection('model_catalog_json = "/tmp/openprovider-catalog.json"\n', null);
 
     expect(path).toBeNull();
   });
 
   test("strips injected TOML sections without swallowing later indented tables", () => {
     const stripped = stripOpencodexConfig([
-      'model_provider = "opencodex"',
+      'model_provider = "openprovider"',
       "",
-      "# Auto-injected by opencodex",
-      " [model_providers.opencodex]",
+      "# Auto-injected by openprovider",
+      " [model_providers.openprovider]",
       'name = "OpenProvider Proxy"',
       'base_url = "http://localhost:10100/v1"',
       " [plugins.safe]",
       "enabled = true",
       "",
-      " [profiles.opencodex]",
-      'model_provider = "opencodex"',
+      " [profiles.openprovider]",
+      'model_provider = "openprovider"',
       " [profiles.work]",
       'model = "gpt-5.5"',
       "",
@@ -181,8 +181,8 @@ describe("Codex config injection", () => {
     expect(stripped).toContain("enabled = true");
     expect(stripped).toContain("[profiles.work]");
     expect(stripped).toContain('model = "gpt-5.5"');
-    expect(stripped).not.toContain("[model_providers.opencodex]");
-    expect(stripped).not.toContain("[profiles.opencodex]");
+    expect(stripped).not.toContain("[model_providers.openprovider]");
+    expect(stripped).not.toContain("[profiles.openprovider]");
   });
 });
 
@@ -204,7 +204,7 @@ describe("Design B openai_base_url injection", () => {
 
     expect(keptUserBaseUrl).toBe(false);
     const lines = content.split("\n");
-    const markerIdx = lines.findIndex(l => l.includes("Auto-injected by opencodex"));
+    const markerIdx = lines.findIndex(l => l.includes("Auto-injected by openprovider"));
     const keyIdx = lines.findIndex(l => l.startsWith("openai_base_url"));
     const tableIdx = lines.findIndex(l => l.trim() === "[features]");
     expect(markerIdx).toBeGreaterThanOrEqual(0);
@@ -217,7 +217,7 @@ describe("Design B openai_base_url injection", () => {
     const second = setRootOpenaiBaseUrl(first, 10190).content;
 
     expect(second.match(/openai_base_url/g)?.length).toBe(1);
-    expect(second.match(/Auto-injected by opencodex/g)?.length).toBe(1);
+    expect(second.match(/Auto-injected by openprovider/g)?.length).toBe(1);
     expect(second).toContain('openai_base_url = "http://127.0.0.1:10190/v1"');
   });
 
@@ -239,7 +239,7 @@ describe("Design B openai_base_url injection", () => {
     const injected = setRootOpenaiBaseUrl("model = \"gpt-5.5\"\n\n[features]\nfast_mode = true\n", 10100).content;
     const stripped = stripInjectedOpenaiBaseUrl(injected);
     expect(stripped).not.toContain("openai_base_url");
-    expect(stripped).not.toContain("Auto-injected by opencodex");
+    expect(stripped).not.toContain("Auto-injected by openprovider");
 
     const userOwned = 'openai_base_url = "https://my-own-gateway.example/v1"\n\n[features]\n';
     expect(stripInjectedOpenaiBaseUrl(userOwned)).toBe(userOwned);
@@ -249,7 +249,7 @@ describe("Design B openai_base_url injection", () => {
     const injected = setRootOpenaiBaseUrl([
       'model = "opencode-go/minimax-m3"',
       'model_verbosity = "high"',
-      'model_catalog_json = "/tmp/opencodex-catalog.json"',
+      'model_catalog_json = "/tmp/openprovider-catalog.json"',
       "",
       "[features]",
       "fast_mode = true",
@@ -266,33 +266,33 @@ describe("Design B openai_base_url injection", () => {
 
   test("upgrade path: legacy table + root re-tag coexisting with Design B form all strip cleanly", () => {
     const legacy = [
-      'model_provider = "opencodex"',
-      "# Auto-injected by opencodex",
+      'model_provider = "openprovider"',
+      "# Auto-injected by openprovider",
       'openai_base_url = "http://127.0.0.1:10100/v1"',
       'model = "gpt-5.5"',
       "",
-      "# Auto-injected by opencodex",
-      "[model_providers.opencodex]",
+      "# Auto-injected by openprovider",
+      "[model_providers.openprovider]",
       'name = "OpenProvider Proxy"',
       'base_url = "http://127.0.0.1:10100/v1"',
       "",
     ].join("\n");
     const stripped = stripOpencodexConfig(legacy);
 
-    expect(stripped).not.toContain("opencodex");
+    expect(stripped).not.toContain("openprovider");
     expect(stripped).not.toContain("openai_base_url");
     expect(stripped).toContain('model = "gpt-5.5"');
   });
 
   test("legacy marker directly before the provider table survives the root strip order (removeOcxSection keeps its anchor)", () => {
     // No Design B form present — stripInjectedOpenaiBaseUrl must not eat the legacy EOF marker
-    // in a way that leaves the [model_providers.opencodex] table behind.
+    // in a way that leaves the [model_providers.openprovider] table behind.
     const legacyOnly = [
-      'model_provider = "opencodex"',
+      'model_provider = "openprovider"',
       'model = "gpt-5.5"',
       "",
-      "# Auto-injected by opencodex",
-      "[model_providers.opencodex]",
+      "# Auto-injected by openprovider",
+      "[model_providers.openprovider]",
       'name = "OpenProvider Proxy"',
       'base_url = "http://127.0.0.1:10100/v1"',
       'wire_api = "responses"',
@@ -300,8 +300,8 @@ describe("Design B openai_base_url injection", () => {
     ].join("\n");
     const stripped = stripOpencodexConfig(legacyOnly);
 
-    expect(stripped).not.toContain("opencodex");
-    expect(stripped).not.toContain("[model_providers.opencodex]");
+    expect(stripped).not.toContain("openprovider");
+    expect(stripped).not.toContain("[model_providers.openprovider]");
     expect(stripped).toContain('model = "gpt-5.5"');
   });
 });

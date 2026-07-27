@@ -10,7 +10,7 @@
 
 - Scene architecture: `.lp-scenes` wrappers + named `view-timeline: --scene`;
   sticky `.lp-scene-inner` stages는 pill header 아래에 붙고, stage 전체 높이를 사용.
-- Exit motion: `ocx-scene-sink` on exit range (scale .94 / opacity .12), hero
+- Exit motion: `opr-scene-sink` on exit range (scale .94 / opacity .12), hero
   exit에서 field push-in.
 - Kinetic typography: `.lp-kline` text-wipe (`clip-path`) staggered by cover ranges.
 - Quickstart split: quick scene 안에는 2-line terminal만 유지, full 4-line terminal은

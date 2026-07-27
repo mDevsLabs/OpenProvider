@@ -23,7 +23,7 @@ The old codex-rs-derived assumption was:
 - Workspace accounts always have no reset credits.
 - Workspace accounts should show a disabled reset menu.
 
-That assumption is not true for current ChatGPT team accounts. Current opencodex behavior:
+That assumption is not true for current ChatGPT team accounts. Current openprovider behavior:
 - If `resetCredits` is a number, show a clickable ticket badge for any plan.
 - If `resetCredits > 0`, use the amber badge.
 - If `resetCredits === 0`, use the muted badge and allow the empty-state popup.

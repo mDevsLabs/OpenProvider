@@ -99,7 +99,7 @@ function stubModelDiscoveryFor(...origins: string[]): void {
 }
 
 beforeEach(() => {
-  isolatedCodexHome = installIsolatedCodexHome("ocx-server-auth-codex-");
+  isolatedCodexHome = installIsolatedCodexHome("opr-server-auth-codex-");
 });
 
 afterEach(() => {

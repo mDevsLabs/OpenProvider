@@ -11,7 +11,7 @@
 Issues:
 - #71 (guigeng, EN): v2.6.x behavior is INTENTIONAL — Design B injection (src/codex/inject.ts:95-105)
   points codex's built-in openai provider at the proxy via one root openai_base_url line instead of
-  a [model_providers.opencodex] table, so threads keep native provider tags (history-safe; README
+  a [model_providers.openprovider] table, so threads keep native provider tags (history-safe; README
   "History-safe injection"). Old-style sections are migrated. Answer + ask if anything actually
   broke; not a bug on its face.
 - #72 (22nsuk, KR): (1) resource_exhausted transport errors — real report, matches PR #73 scope;

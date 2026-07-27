@@ -3,7 +3,7 @@
 ## Baseline assets already present in cli-jaw
 
 Use these directly from `../cli-jaw/public/assets/providers` or copy them into
-opencodex when implementation starts:
+openprovider when implementation starts:
 
 - `openai.svg` -> `openai`, `openai-apikey`, `chatgpt`
 - `grok-color.svg` / `grok.svg` -> `xai`

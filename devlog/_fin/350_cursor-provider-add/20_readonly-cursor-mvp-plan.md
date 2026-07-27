@@ -4,7 +4,7 @@ Date: 2026-06-26
 
 ## Goal
 
-Implement a Cursor provider MVP in opencodex that can route normal text turns through Cursor while keeping the native Cursor exec bridge read-only by default.
+Implement a Cursor provider MVP in openprovider that can route normal text turns through Cursor while keeping the native Cursor exec bridge read-only by default.
 
 Safety boundary:
 
@@ -16,7 +16,7 @@ Safety boundary:
 
 - `devlog/350_cursor-provider-add/00_overview.md`
 - `devlog/350_cursor-provider-add/01_cursor-anatomy.md`
-- `devlog/350_cursor-provider-add/02_opencodex-fit.md`
+- `devlog/350_cursor-provider-add/02_openprovider-fit.md`
 - `devlog/350_cursor-provider-add/04_risks-and-decisions.md`
 - `devlog/350_cursor-provider-add/10_impl_transport.md`
 - `devlog/350_cursor-provider-add/11_impl_oauth.md`
@@ -33,7 +33,7 @@ Protected assets:
 - User filesystem.
 - Shell environment and credentials.
 - Local MCP servers.
-- Codex/opencodex config and OAuth tokens.
+- Codex/openprovider config and OAuth tokens.
 
 Main risk: Cursor server-originated exec requests gaining write/delete/shell/MCP capability.
 
@@ -223,7 +223,7 @@ Non-goals:
 
 ### NEW `src/adapters/cursor/message-mapper.ts`
 
-Purpose: map Cursor protobuf server messages to opencodex `AdapterEvent`s and route KV/exec replies through the transport.
+Purpose: map Cursor protobuf server messages to openprovider `AdapterEvent`s and route KV/exec replies through the transport.
 
 Responsibilities:
 
@@ -364,7 +364,7 @@ Live verification:
 
 ### Phase 5: OCX read-only smoke
 
-- Start opencodex locally.
+- Start openprovider locally.
 - Configure Cursor provider only if credential exists or OAuth login can be completed safely.
 - Send read-only prompt/request through OCX.
 - Verify no write/delete/shell/MCP request is sent or executed.

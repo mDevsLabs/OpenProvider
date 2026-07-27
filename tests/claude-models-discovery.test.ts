@@ -17,8 +17,8 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-claude-discovery-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-claude-discovery-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-claude-discovery-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-claude-discovery-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 
@@ -109,7 +109,7 @@ test("per-surface id style: ?ids= wins, claude-code UA gets readable, unknown UA
   saveConfig(configWithStaticModels());
   const server = startServer(0);
   try {
-    const readable = "claude-ocx-mock--test-model";
+    const readable = "claude-opr-mock--test-model";
     // 1) explicit ?ids=cli -> readable
     let json = await fetch(new URL("/v1/models?flavor=anthropic&ids=cli", server.url)).then(r => r.json()) as { data: { id: string }[] };
     expect(json.data.some(m => m.id === readable)).toBe(true);

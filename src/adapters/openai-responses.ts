@@ -162,7 +162,7 @@ const UNSUPPORTED_HOSTED_TOOLS: ReadonlyArray<{ match: (model: string) => boolea
  * Strip unsupported `reasoning` sub-parameters for native slugs that reject them (e.g. Spark).
  * codex-rs injects `reasoning.context` and `reasoning.summary` based on catalog flags; Spark's
  * backend rejects both. The catalog fix prevents `use_responses_lite` from being set, but this
- * is a defense-in-depth guard so stale on-disk catalogs don't break until the user runs `ocx sync`.
+ * is a defense-in-depth guard so stale on-disk catalogs don't break until the user runs `opr sync`.
  */
 function stripUnsupportedReasoningParams(body: unknown): unknown {
   if (!isPlainObject(body)) return body;
@@ -450,7 +450,7 @@ function repairOrphanedInputItems(body: unknown, dropReasoning: boolean): unknow
  * - the target is the ChatGPT backend (`authMode: "forward"`), whose Codex REST endpoint
  *   categorically rejects the parameter with `{"detail":"Unsupported parameter:
  *   previous_response_id"}` (strict allowlist; it also rejects `metadata` and
- *   `max_output_tokens`). Codex only sends the id on WS turns, and ocx converts those to
+ *   `max_output_tokens`). Codex only sends the id on WS turns, and opr converts those to
  *   internal HTTP requests, so forwarding it upstream is a guaranteed 400 — stripping is
  *   strictly better even when the local replay state missed. API-key mode keeps the field on
  *   unexpanded requests: the platform `/v1/responses` supports real server-side storage.

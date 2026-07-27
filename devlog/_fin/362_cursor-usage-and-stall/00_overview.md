@@ -25,12 +25,12 @@ Regression test added in cursor-protobuf-events.
 
 Symptom: "tool use 10개" -> Codex aborts with `upstream_stall_timeout` / "Incomplete
 response returned, reason: upstream_stall_timeout". (The empty MCP listing the user saw
-is expected: Codex's harness only has node_repl, no resources; opencodex's Cursor adapter
+is expected: Codex's harness only has node_repl, no resources; openprovider's Cursor adapter
 only reads provider.mcpServers.)
 
 Root cause (gpt-5.5 confirmed): commit 9ff7e23 deferred `tool_call_start` to completion
 for parallel-safe atomic emission. So while Cursor streams `partialToolCall` args for
-several parallel calls, `mapCursorProtobufServerMessage` returns [] and opencodex emits
+several parallel calls, `mapCursorProtobufServerMessage` returns [] and openprovider emits
 NOTHING outward. The bridge's stall watchdog (`bridge.ts`, default 90s, keyed on
 downstream adapter events) then fires `upstream_stall_timeout` though the upstream is
 alive.

@@ -15,7 +15,7 @@
 - 검토한 주요 대안: Overwrite old migration backups; auto-open device verification and rely on users switching windows; use aliases as lookup keys; expose a manual-only OAuth recovery button.
 - 선택한 방식: Mark new configs as current instead of weakening backup immutability; suppress automatic device-flow navigation and expose the code structurally; persist aliases only as optional display metadata; automatically cancel and retry one stale Codex login.
 - 다른 대안 대신 이 방식을 선택한 이유: It fixes the reported dead ends without changing credential identity, account ids, active selection, routing, or backup evidence.
-- 장점, 단점 및 영향: Existing data remains backward compatible and aliases may duplicate safely. Copilot login now needs an intentional link click, but the code stays visible and no browser focus theft occurs. The native/main Codex App slot remains non-renamable because it has no OpenCodex-owned persisted account row.
+- 장점, 단점 및 영향: Existing data remains backward compatible and aliases may duplicate safely. Copilot login now needs an intentional link click, but the code stays visible and no browser focus theft occurs. The native/main Codex App slot remains non-renamable because it has no OpenProvider-owned persisted account row.
 
 ## Verification
 

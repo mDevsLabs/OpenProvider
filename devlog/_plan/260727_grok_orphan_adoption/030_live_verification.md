@@ -6,7 +6,7 @@ the person who reported it. This phase verifies the real file and the real TUI.
 ## Preconditions
 
 The fix must be merged and the proxy restarted. **The user restarts it themselves via
-`ocx service`** — do not run `ocx restart` on their behalf (standing instruction).
+`opr service`** — do not run `opr restart` on their behalf (standing instruction).
 
 ## Step 1 — before/after on the real config
 
@@ -15,15 +15,15 @@ Capture the current state first, since the sweep is destructive to the orphans:
 ```bash
 cp ~/.grok/config.toml /tmp/grok-config-before-511.toml
 rg -c '^\[model\.' ~/.grok/config.toml          # expect 46 before
-rg -n '^default = ' ~/.grok/config.toml         # expect ocx-gpt-5-6-sol (the orphan)
+rg -n '^default = ' ~/.grok/config.toml         # expect opr-gpt-5-6-sol (the orphan)
 ```
 
 After the restart-driven sync:
 
 - `rg -c '^\[model\.'` drops to roughly half (one table per model);
-- no `[model.*]` table remains ABOVE the `>>> opencodex managed block` marker except
+- no `[model.*]` table remains ABOVE the `>>> openprovider managed block` marker except
   genuinely hand-written ones;
-- every surviving opencodex table has a `context_window`;
+- every surviving openprovider table has a `context_window`;
 - `default` names an alias that still exists (F2).
 
 A diff of before/after against `/tmp/grok-config-before-511.toml` is the artifact.
@@ -48,6 +48,6 @@ sweep that "converges" only on the synthetic fixture.
 
 ## Rollback
 
-`~/.grok/config.toml.bak-opencodex` is written once at first injection and may be stale.
+`~/.grok/config.toml.bak-openprovider` is written once at first injection and may be stale.
 `/tmp/grok-config-before-511.toml` from step 1 is the trustworthy restore point for this
 session.

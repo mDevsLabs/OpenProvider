@@ -11,7 +11,7 @@ RC1–RC5. The phase 100 "no WebSocket" decision stands and is reaffirmed here.
 
 > **Cross-link (amended, not reversed):** this verdict is about routed *reliability/performance*
 > — still correct. Native transport *parity* (satisfying Codex's `supports_websockets`
-> capability so `ocx` is a drop-in for the native OpenAI provider) is a different axis, tracked
+> capability so `opr` is a drop-in for the native OpenAI provider) is a different axis, tracked
 > in `devlog/120_codex-websocket-parity/`. See `120/02_transport-decision.md`.
 
 ## Phase 100 already decided this
@@ -20,19 +20,19 @@ RC1–RC5. The phase 100 "no WebSocket" decision stands and is reaffirmed here.
 > absent/false / Reason: upstream routed providers are HTTP/SSE, so websocket is not
 > end-to-end" — `devlog/100_codex-native-parity/00_overview.md:82-84`
 
-> "enabling websocket only between Codex and opencodex cannot make a provider/model
+> "enabling websocket only between Codex and openprovider cannot make a provider/model
 > websocket-capable when the upstream provider is not websocket-capable end-to-end … a
 > websocket first hop would still block on the same upstream SSE chunks, so it is unlikely to
 > improve first-token latency or throughput … setting `supports_websockets = true` would
-> advertise a native capability opencodex does not actually provide for routed models."
+> advertise a native capability openprovider does not actually provide for routed models."
 > — `devlog/100_codex-native-parity/40_responses-lite-websockets.md:102-108`
 
 ## Why WebSockets do not help
 
-opencodex sits **mid-chain**: `Codex CLI → opencodex → upstream provider`. The upstream
+openprovider sits **mid-chain**: `Codex CLI → openprovider → upstream provider`. The upstream
 (ChatGPT backend for native, or a chat/completions provider for routed) speaks **HTTP/SSE**.
 
-- A WS first hop (Codex↔opencodex) still **blocks on the upstream SSE** opencodex is reading.
+- A WS first hop (Codex↔openprovider) still **blocks on the upstream SSE** openprovider is reading.
   First-token latency and throughput are bounded by the upstream, unchanged by the hop's
   framing.
 - WS would add a second protocol surface (frame assembly, ping/pong, close codes) — *more*
@@ -52,7 +52,7 @@ opencodex sits **mid-chain**: `Codex CLI → opencodex → upstream provider`. T
   client below the application — it does not change whether a stream is terminated correctly,
   aborted on disconnect, or kept alive during a stall. None of RC1–RC5 are connection-count
   problems.
-- opencodex already disables proxy buffering (`X-Accel-Buffering: no`, `server.ts:211`) and
+- openprovider already disables proxy buffering (`X-Accel-Buffering: no`, `server.ts:211`) and
   sets `Cache-Control: no-cache` (`:209`), which are the SSE-relevant transport knobs.
 
 ## Where the real performance wins are
@@ -74,5 +74,5 @@ That is the performance win, and it comes from reliability fixes, not a new tran
 
 Do not invest in WebSockets or SSE multiplexing for this problem. Invest in the SSE
 lifecycle fixes in `30_patch-direction.md`. Revisit WS only if a provider ever exposes a
-real end-to-end WS endpoint opencodex can bridge without converting back to HTTP/SSE
+real end-to-end WS endpoint openprovider can bridge without converting back to HTTP/SSE
 internally (the phase 100 condition, `00_overview.md:87-89`).

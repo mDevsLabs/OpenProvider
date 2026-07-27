@@ -27,7 +27,7 @@ encrypted 분기가 없어 **조용히 스킵**(`:29`) — 평문 파트가 전�
 
 ## 복호화 경계 분석
 
-키는 OpenCodex에 없다. upstream PR openai/codex#26210(2026-06-05 merge)이 경계를 명시:
+키는 OpenProvider에 없다. upstream PR openai/codex#26210(2026-06-05 merge)이 경계를 명시:
 Responses 백엔드가 V2 message 툴 인자를 암호화, Codex는 ciphertext만 전달·보존,
 `InterAgentCommunication.content`는 의도적으로 빈 문자열(`String::new()` 현존 확인).
 복호화 능력은 OpenAI Responses 백엔드/세션 보안 컨텍스트에 있고 로컬 CLI에도 프록시에도 없다.

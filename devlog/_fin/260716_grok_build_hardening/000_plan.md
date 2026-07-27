@@ -3,7 +3,7 @@
 ## Objective
 
 공개된 공식 Grok Build 클라이언트(로컬 미러: `/Users/jun/Developer/codex/180_grok-build`)의
-auth/wire/cache 계약을 기준으로, OpenCodex의 xAI 서빙 경로에서 확인된 4개 High + 2개
+auth/wire/cache 계약을 기준으로, OpenProvider의 xAI 서빙 경로에서 확인된 4개 High + 2개
 Medium 격차를 닫는다. 근거는 2026-07-16 두 SOL 독립 감사(소스 인용 기반, verdict FAIL)와
 실제 프록시 스모크(GROK_SMOKE_OK, cached_tokens=128)이다.
 
@@ -14,7 +14,7 @@ Medium 격차를 닫는다. 근거는 2026-07-16 두 SOL 독립 감사(소스 �
   `src/providers/xai-transport.ts` + 각 테스트.
 - OUT: xAI Responses-native 업스트림 마이그레이션, usage `context_details`/cost-tick,
   타 프로바이더, dashboard UI, `git push`(로컬 커밋만; push는 사용자 승인 필요).
-- 실행 중인 ocx 프로세스(127.0.0.1:10100)는 서빙 경로 변경 후 재시작해야 반영된다
+- 실행 중인 opr 프로세스(127.0.0.1:10100)는 서빙 경로 변경 후 재시작해야 반영된다
   (레포 관례: green tests ≠ live proxy 반영).
 - 각 work-phase = 1 PABCD 사이클. 두 decade doc을 한 B에서 구현하지 않는다.
 
@@ -36,7 +36,7 @@ Medium 격차를 닫는다. 근거는 2026-07-16 두 SOL 독립 감사(소스 �
 |-----|-----------|------|------|
 | 010 | wp1_reasoning_fold | [reasoning, assistant] → 단일 assistant + reasoning_content 폴딩, parser-to-wire 회귀 | — (wire 형태가 이후 스모크의 기준) |
 | 020 | wp2_localcli_ownership | `~/.grok/auth.json` 임포트 자격증명 단일 소유권(refresh 전 재읽기/세대 채택) | — |
-| 030 | wp3_refresh_lock | `~/.opencodex/auth.json` cross-process 락 + 세대 재확인 + 토큰 교환 bounded retry | 020 (소유권 규칙 위에 직렬화) |
+| 030 | wp3_refresh_lock | `~/.openprovider/auth.json` cross-process 락 + 세대 재확인 + 토큰 교환 bounded retry | 020 (소유권 규칙 위에 직렬화) |
 | 040 | wp4_401_replay | OAuth xAI 요청 업스트림 401 → singleflight 강제 refresh + 1회 replay | 030 (replay가 락/세대 경로를 사용) |
 | 050 | wp5_header_parity | 공식 per-request 헤더 패리티 + 클라이언트 버전 호환 프로파일 | 010 (동일 transport 파일, 순서 고정) |
 
@@ -61,7 +61,7 @@ xAI 전송 계층의 락/401 replay/헤더 프로파일 변경을 각 phase D에
 
 - `bun test --isolate ./tests/xai-transport.test.ts` (+ phase별 신규 테스트 파일)
 - `bun run typecheck` (= `bun x tsc --noEmit`)
-- 서빙 phase 라이브 스모크: ocx 재시작 후
+- 서빙 phase 라이브 스모크: opr 재시작 후
   `curl -sS 127.0.0.1:10100/v1/responses -d '{"model":"xai/grok-4.5",...}'` → `status: completed`
 
 ## Acceptance criteria (활성화 시나리오 포함)
@@ -69,9 +69,9 @@ xAI 전송 계층의 락/401 replay/헤더 프로파일 변경을 각 phase D에
 - c1: 새 parser-to-wire 테스트가 `[reasoning(summary), assistant]`와
   `[reasoning(encrypted-only), assistant]` 두 입력에서 assistant 메시지 1개를 단언.
   활성화: 테스트가 parser 경계를 실제 통과(기존 테스트처럼 수동 조립 금지).
-- c2: Grok 저장소에 더 새로운 refresh 세대가 있을 때 OpenCodex가 IdP 호출 없이 채택.
+- c2: Grok 저장소에 더 새로운 refresh 세대가 있을 때 OpenProvider가 IdP 호출 없이 채택.
   활성화: temp HOME에 모의 `~/.grok/auth.json` 세대 교체 후 refresh 경로 호출.
 - c3: 동시 refresh 2건 → 토큰 엔드포인트 호출 1건. 활성화: mock fetch 카운터.
 - c4: mock 업스트림 401 → refresh 1회 + replay 1회, 두 번째 401은 그대로 전파.
-  활성화: 서빙 경로 통합 테스트 + ocx 재시작 후 라이브 스모크 completed.
+  활성화: 서빙 경로 통합 테스트 + opr 재시작 후 라이브 스모크 completed.
 - c5: 아웃바운드 헤더 스냅샷 테스트 + 라이브 스모크 completed.

@@ -5,7 +5,7 @@
 > Port: jawcode `packages/ai/src/providers/kiro.ts` `buildPayload`/`parseKiroPayload` (+ the 260628
 > live-confirmed fixes). Contract: codex `015/45_ki_codewhisperer_wire_stream_oauth.md`.
 
-## opencodex contract (verified from src/adapters/base.ts)
+## openprovider contract (verified from src/adapters/base.ts)
 ```ts
 interface ProviderAdapter {
   name: string;

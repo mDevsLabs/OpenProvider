@@ -188,7 +188,7 @@ export class UnsupportedOAuthProviderError extends Error {
 
 export class OAuthLoginRequiredError extends Error {
   constructor(provider: string) {
-    super(`Not logged in to ${provider}. Run: ocx login ${provider}`);
+    super(`Not logged in to ${provider}. Run: opr login ${provider}`);
     this.name = "OAuthLoginRequiredError";
   }
 }
@@ -509,7 +509,7 @@ export function buildModelsRequest(prov: OcxProviderConfig, apiKey: string | und
  * Refresh OAuth-managed provider presets (`models`, `noReasoningModels`, and a stale `defaultModel`)
  * from the registry so a proxy update that revises a provider's models — e.g. dropping deprecated
  * Claude snapshots or adding a new grok endpoint not in the live `/models` — reaches EXISTING
- * configs on the next `ocx start`, instead of only fresh installs. The live `/models` fetch stays
+ * configs on the next `opr start`, instead of only fresh installs. The live `/models` fetch stays
  * the primary source; this keeps the static fallback (and models-not-in-/models) current.
  *
  * Only touches providers that are registry-managed AND still `authMode: "oauth"`, and only the
@@ -719,7 +719,7 @@ export function getLoginStatus(provider: string): { loggedIn: boolean; email?: s
   };
 }
 
-/** Token-safe per-provider login state for the CLI `ocx status` logins section (no tokens, masked email). */
+/** Token-safe per-provider login state for the CLI `opr status` logins section (no tokens, masked email). */
 export function oauthLoginSummary(): Array<{ provider: string; loggedIn: boolean; email?: string }> {
   return listOAuthProviders().map(provider => {
     const status = getLoginStatus(provider);

@@ -14,7 +14,7 @@
 
 ## Evidence and contract
 
-- OpenCodex currently dispatches quota probes only for OpenAI, xAI, Anthropic, Cursor, and Antigravity in `src/providers/quota.ts`.
+- OpenProvider currently dispatches quota probes only for OpenAI, xAI, Anthropic, Cursor, and Antigravity in `src/providers/quota.ts`.
 - The official Kimi Code CLI at commit `3086e4703992fbbe7a41379405ee243713ad9ced` calls `GET https://api.kimi.com/coding/v1/usages` with OAuth Bearer authentication.
 - Official source: [`packages/oauth/src/managed-usage.ts` at commit `3086e470`](https://github.com/MoonshotAI/kimi-code/blob/3086e4703992fbbe7a41379405ee243713ad9ced/packages/oauth/src/managed-usage.ts#L1-L43) owns the URL and parser; [lines 291-319](https://github.com/MoonshotAI/kimi-code/blob/3086e4703992fbbe7a41379405ee243713ad9ced/packages/oauth/src/managed-usage.ts#L291-L319) own the Bearer fetch.
 - A live authenticated probe on 2026-07-18 returned HTTP 200 with:
@@ -23,7 +23,7 @@
   - `totalQuota.{limit,remaining}` for total subscription credits; it contains no duration or reset field, so it must not be labelled monthly.
   - `subType` as entitlement metadata. No gift meaning is inferred from it.
 - `boosterWallet` is officially Extra Usage monetary balance and is deliberately excluded from percentage quota bars.
-- Gift balances are exposed only by Kimi Desktop's separate web-membership API. The Kimi Code OAuth token received HTTP 401 from that API, so OpenCodex must never probe it under the existing provider login.
+- Gift balances are exposed only by Kimi Desktop's separate web-membership API. The Kimi Code OAuth token received HTTP 401 from that API, so OpenProvider must never probe it under the existing provider login.
 
 ## Scope boundary
 

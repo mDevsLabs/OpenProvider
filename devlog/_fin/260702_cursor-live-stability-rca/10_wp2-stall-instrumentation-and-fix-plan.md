@@ -8,7 +8,7 @@ Status: P phase draft.
 
 Generic task wording ("list files", "read the file") makes `cursor/composer-2.5`
 choose Cursor-native tools. Those turns stall: upstream goes silent after the
-first assistant text, ocx's stall watchdog trips `upstream_stall_timeout`
+first assistant text, opr's stall watchdog trips `upstream_stall_timeout`
 (`src/bridge.ts:149`, 90s), codex retries 5x, every upstream request ends
 `502 unreported ~98-106s`. Reproduced 12/12 across run 4 and run 6 (healthy
 catalog), while run 8 (same dir/sandbox, wording forces `exec_command`)
@@ -42,9 +42,9 @@ hangs by construction.
 
 - Start a second instance from the working tree:
   `OCX_DEBUG_FRAMES=1 bun run src/cli.ts start --port 10199` with stdout/err to
-  a scratch log (instance shares config; do NOT run `ocx stop`).
+  a scratch log (instance shares config; do NOT run `opr stop`).
 - Reproduce with the run-4 prompt:
-  `codex exec -m cursor/composer-2.5 -c model_providers.opencodex.base_url="http://localhost:10199/v1" ...`
+  `codex exec -m cursor/composer-2.5 -c model_providers.openprovider.base_url="http://localhost:10199/v1" ...`
 - Confirm which frame(s) arrive last before silence, and which toolCall case was
   swallowed.
 
@@ -60,7 +60,7 @@ mechanism, superseding the original Case A/B tree:
   `setupVmEnvironmentArgs`), each carrying a `uint32 id`.
 - The client must reply `AgentClientMessage.interactionResponse` with the
   matching id (`InteractionResponse` fields mirror the query cases).
-- ocx has ZERO handling of `interactionQuery` and NEVER sends
+- opr has ZERO handling of `interactionQuery` and NEVER sends
   `interactionResponse` (grep over non-generated sources). The server-side
   agent blocks on the answer → silence → watchdog (90s) → codex retry →
   upstream 502 (~100s).
@@ -85,7 +85,7 @@ Fix design:
      `AskQuestionResult` with `rejected` (agent proceeds autonomously); log the
      question at diagnostic level. (Future: bridge to Codex
      `request_user_input` when available.)
-   - `webSearchRequestQuery` → `approved` (ocx has a web-search sidecar/fetch
+   - `webSearchRequestQuery` → `approved` (opr has a web-search sidecar/fetch
      path) or `rejected` behind a config flag; start with `rejected` for
      determinism, revisit.
    - `switchModeRequestQuery` → `rejected` (stay in current mode).
@@ -117,7 +117,7 @@ Live-capture pivot: with full frame diagnostics on the debug instance
 (:10199, isolated OPENCODEX_HOME), the stall repro showed NO `interactionQuery`
 frames. The actual sequence before silence: `toolCallStarted(shellToolCall)` →
 `requestContextArgs` → `setBlobArgs`×3 → `execServerMessage: shellStreamArgs`
-→ checkpoint/toolCallDelta → heartbeats forever. ocx answered `shellStreamArgs`
+→ checkpoint/toolCallDelta → heartbeats forever. opr answered `shellStreamArgs`
 with start/stdout/stderr/exit only. jawcode's reference handler documents the
 missing piece verbatim: "Cursor can keep the turn pending when it receives only
 stream deltas. Send the final structured shellResult as completion
@@ -181,5 +181,5 @@ acknowledgement" — followed by an exec `streamClose` control frame
   the server-side agent (mitigate: capture real frames first, mirror jawcode
   reference implementation if present).
 - Declaring a reduced tool surface might change Cursor-side planning quality.
-- Debug instance shares ~/.opencodex config/usage files with the main instance
+- Debug instance shares ~/.openprovider config/usage files with the main instance
   (append-only usage: acceptable; no config writes planned).

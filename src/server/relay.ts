@@ -331,7 +331,7 @@ export function relaySseWithHeartbeat(
   if (!body) return null;
   const reader = body.getReader();
   const decoder = new TextDecoder();
-  const heartbeat = new TextEncoder().encode(": opencodex keepalive\n\n");
+  const heartbeat = new TextEncoder().encode(": openprovider keepalive\n\n");
   let timer: ReturnType<typeof setInterval> | undefined;
   let closed = false;
   let clientCancelled = false;

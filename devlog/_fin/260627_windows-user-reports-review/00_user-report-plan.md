@@ -16,11 +16,11 @@ Korean user report summary:
 
 Potential relationship to current fix:
 
-- The just-pushed lifecycle patch prevents stale processes after explicit `ocx service stop` / `ocx service uninstall`.
+- The just-pushed lifecycle patch prevents stale processes after explicit `opr service stop` / `opr service uninstall`.
 - It may not explain spontaneous runtime stops while using the proxy.
 - Suspect areas to review:
   - Windows Task Scheduler `.cmd` loop only restarts on non-zero exit; clean exits may end the loop.
-  - `ocx start` shutdown handlers restore native Codex when not `OCX_SERVICE`, but service/shim paths set `OCX_SERVICE=1`; verify Windows scheduled task and shim paths consistently set it.
+  - `opr start` shutdown handlers restore native Codex when not `OCX_SERVICE`, but service/shim paths set `OCX_SERVICE=1`; verify Windows scheduled task and shim paths consistently set it.
   - PID identity/readPid behavior on Windows may remove pid when command-line inspection is unavailable or transient.
   - Bun/Windows signal/process tree behavior may differ from macOS/Linux.
   - Service log path and user-visible diagnostics may be insufficient for Windows incident reports.
@@ -30,8 +30,8 @@ Potential relationship to current fix:
 Korean user report summary:
 
 ```text
-git clone https://github.com/lidge-jun/opencodex.git
-cd opencodex
+git clone https://github.com/lidge-jun/openprovider.git
+cd openprovider
 bun install
 bun run dev
 
@@ -55,7 +55,7 @@ Candidate fixes to consider:
 1. Documentation: make clone development explicit:
    - Backend/proxy only: `bun run dev`, then test `/healthz` or connect Codex.
    - GUI development: terminal 1 `bun run dev`; terminal 2 `cd gui && bun install && bun run dev`, open Vite URL, or build with `bun run build:gui` then `bun run dev`.
-   - For installed users: `ocx gui`.
+   - For installed users: `opr gui`.
 2. Server log: only print `GET / -> GUI dashboard` when bundled GUI assets are available; otherwise print `GET / -> setup/help fallback`.
 3. Root fallback UX: if GUI is unavailable, return a human-readable JSON or minimal HTML with exact commands instead of generic `Unknown endpoint`.
 4. Script ergonomics: add a root script such as `dev:gui`, `dev:all`, or `build:gui` guidance in README so clone users do not infer `bun run dev` serves the dashboard.

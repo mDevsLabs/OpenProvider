@@ -19,20 +19,20 @@ detector honours that variable, matching `src/oauth/local-token-detect.ts:64-68`
 
 ## F1b — the marker feedback loop (audit Critical, `002` §1)
 
-Worse than a false absent: a false PRESENT caused by our own dummy. opencodex writes
-`ANTHROPIC_AUTH_TOKEN=opencodex-proxy` into the shell env file and the launch env
+Worse than a false absent: a false PRESENT caused by our own dummy. openprovider writes
+`ANTHROPIC_AUTH_TOKEN=openprovider-proxy` into the shell env file and the launch env
 (`src/server/system-env.ts:30-35`, `src/cli/claude.ts:58-60`). A naive S5 reads that
 on the next launch as "user auth present" → resolves subscription → skips injection —
 while the stale marker still rides the spawn env and still triggers the host-managed
 assertion (`cli/claude.ts:79-81`). Reported mode and real environment diverge, which
 is precisely a "작동 안 된다" report nobody can diagnose. **Design answer:** the exact
-marker value is opencodex-owned state, never user auth; a subscription resolution
+marker value is openprovider-owned state, never user auth; a subscription resolution
 DELETES a stale marker before injection is considered. Owned by WP1 + WP2.
 
 ## F2 — running service silently overwrites hand-edited config.json (#488 item 1)
 
 The service holds config in memory and every `saveConfig` writes the whole object.
-A user who hand-edits `~/.opencodex/config.json` while the service runs loses the
+A user who hand-edits `~/.openprovider/config.json` while the service runs loses the
 edit at the next save — the report says it surfaces at stop/restart. For THIS unit
 the dangerous subtree is `claudeCode` (authMode and friends): a user who sets
 `authMode` by hand must not lose it. **Design answer:** a scoped
@@ -45,7 +45,7 @@ c-hardening.
 ## F3 — stale `~/.claude/settings.json` env hijack (cc-switch/CCR leftovers)
 
 A leftover `env` block in `~/.claude/settings.json` (ANTHROPIC_BASE_URL pointing at
-another proxy, model slots) can silently hijack routing away from opencodex. The
+another proxy, model slots) can silently hijack routing away from openprovider. The
 existing defence is `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1` (`cli/claude.ts:74-82`),
 which makes Claude Code strip provider-managed vars from settings — but it is only
 injected when a host token exists, because the flag without one is the F4 failure.
@@ -74,7 +74,7 @@ API key keeps `ANTHROPIC_AUTH_TOKEN` unset in auto mode.
 
 ## F8 — auto never reaches ordinary `claude` launches (audit High, `002` §4)
 
-`ocx claude` is not the only path that produces the proxy marker: the macOS
+`opr claude` is not the only path that produces the proxy marker: the macOS
 auto-connect shell-env file and the launchctl env both inject it, and both key on a
 stored `"proxy"` (`system-env.ts:32-35`, `:241-255`). An auto+absent user therefore
 gets nothing when they type plain `claude` — the feature would look broken for the

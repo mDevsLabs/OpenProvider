@@ -5,7 +5,7 @@
 - Symptom: image-heavy Codex session on `anthropic/claude-fable-5` fails every turn with
   `unexpected status 413 Payload Too Large: Provider error 413` from `http://127.0.0.1:10100/v1/responses`.
 - Forwarding point: `src/server/responses.ts:984` wraps the upstream non-OK body as
-  `Provider error <status>: ...` — the 413 is Anthropic's, not ocx's (local decompress cap is 256MB,
+  `Provider error <status>: ...` — the 413 is Anthropic's, not opr's (local decompress cap is 256MB,
   `src/server/request-decompress.ts:21`, and would produce a different message via
   `decodeRequestErrorResponse`, `src/server/responses.ts:404-410`).
 - Upstream contract (verified 2026-07-14, docs + anthropic-sdk/claude-code issues):
@@ -84,7 +84,7 @@ residual documented), 3 folded (base64-only candidates), 4 folded (test matrix e
 
 ## Accept criteria
 
-- Goalplan c1-c4 (`.codexclaw/goalplans/fix-ocx-413-payload-too-large-on-image-heavy-ant/goalplan.json`).
+- Goalplan c1-c4 (`.codexclaw/goalplans/fix-opr-413-payload-too-large-on-image-heavy-ant/goalplan.json`).
 - Gates: targeted test file, full `bun test --isolate ./tests/`, `bun x tsc --noEmit` — all exit 0, fresh output.
 - Sol reviewer verdict PASS at A and C.
 

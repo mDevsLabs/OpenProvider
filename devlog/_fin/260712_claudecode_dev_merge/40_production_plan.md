@@ -7,7 +7,7 @@
 
 ```yaml
 ---
-name: opencodex docs-site landing
+name: openprovider docs-site landing
 colors:
   primary: "#0d0d0d / #f4f4f4 (테마 반전)"
   accent: "#D97757 (Claude terracotta, 회전 면 전용 틴트)"

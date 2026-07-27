@@ -1,6 +1,6 @@
 /**
  * Reclaim a listen port after stop/update so restart can stay on the configured
- * port instead of hopping to an ephemeral one (Windows CLOSE_WAIT / leftover ocx).
+ * port instead of hopping to an ephemeral one (Windows CLOSE_WAIT / leftover opr).
  *
  * Killing is never the default: a process may be killed only when the caller
  * supplies a non-empty explicit PID allowlist for a process it just stopped.
@@ -29,7 +29,7 @@ export type ReclaimListenPortOptions = WaitForPortOptions & {
   /**
    * On Windows, force-delete IPv4 TCP rows for this local port via SetTcpEntry.
    * Default true on win32. Never kills foreign processes, never runs while a
-   * live foreign / protected ocx listener owns the port, and never runs when
+   * live foreign / protected opr listener owns the port, and never runs when
    * the listener scan failed.
    */
   dropTcpRows?: boolean;
@@ -161,7 +161,7 @@ export function listListenPids(port: number): number[] {
  * non-empty allowlist of PIDs the caller itself just stopped — then revalidates
  * immediately before each kill.
  * Never kills foreign processes. Never drops TCP rows while a live foreign or
- * protected ocx listener owns the port, or when the listener scan failed.
+ * protected opr listener owns the port, or when the listener scan failed.
  */
 export async function reclaimListenPort(
   port: number,
@@ -214,7 +214,7 @@ export async function reclaimListenPort(
           continue;
         }
         if (!mayKill || !allowedKillPids.has(pid)) {
-          // Healthy / intentional ocx proxy — never steal its port.
+          // Healthy / intentional opr proxy — never steal its port.
           protectedOcxListener = true;
           continue;
         }
@@ -238,7 +238,7 @@ export async function reclaimListenPort(
       }
 
       if (foreignLive || protectedOcxListener) {
-        // Foreign app or an unprotected live ocx listener owns the port: never
+        // Foreign app or an unprotected live opr listener owns the port: never
         // SetTcpEntry-reset their sockets, and fail reclaim once the deadline hits.
         await sleep(intervalMs);
         continue;

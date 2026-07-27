@@ -2,7 +2,7 @@
 
 ## 결론
 
-**조건부 가능**이다. jawcode의 정적 가격표와 OpenCodex 요청 로그에는 계산에 필요한
+**조건부 가능**이다. jawcode의 정적 가격표와 OpenProvider 요청 로그에는 계산에 필요한
 provider/model/usage가 있으며, 로그에는 combo의 attempt별 identity와 usage도 보존된다.
 단, 다음 두 조건을 구현 전 계약으로 고정해야 한다.
 
@@ -54,9 +54,9 @@ total: input + output + cacheRead + cacheWrite;
 
 ## 2. HIGH — 캐시 이중과금 없는 `OcxUsage → CostTokens` 변환
 
-### OpenCodex canonical 의미
+### OpenProvider canonical 의미
 
-OpenCodex는 `inputTokens`를 cache read/write를 **포함한 총 prompt**로 고정했고,
+OpenProvider는 `inputTokens`를 cache read/write를 **포함한 총 prompt**로 고정했고,
 `cachedInputTokens`는 read만의 부분집합, `cacheReadInputTokens`와
 `cacheCreationInputTokens`는 read/write 상세라고 문서화한다
 ([`src/types.ts:227-244`](../../../../src/types.ts:227)). `totalTokens`도
@@ -66,7 +66,7 @@ OpenCodex는 `inputTokens`를 cache read/write를 **포함한 총 prompt**로 �
 ([`gui/src/pages/Logs.tsx:62-81`](../../../../gui/src/pages/Logs.tsx:62)).
 
 그러나 jawcode 원식은 `tokens.input` 전체에 input 단가를 곱하고 cache 단가를 별도로 더한다.
-그러므로 jawcode의 `tokens.input`에 OpenCodex의 inclusive `inputTokens`를 넣어서는 안 된다.
+그러므로 jawcode의 `tokens.input`에 OpenProvider의 inclusive `inputTokens`를 넣어서는 안 된다.
 
 ### 확정 변환식
 
@@ -87,7 +87,7 @@ USD = (inputRate*U + cacheReadRate*R + cacheWriteRate*W + outputRate*O) / 1_000_
 처리하는 편이 낫다. `U`의 `max`는 계산 helper의 수학적 안전장치일 뿐, 품질 상태를
 `reported`로 승격하는 근거가 아니다.
 
-| 제공자 usage 계열 | OpenCodex에 들어오는 값의 실증 | 변환 |
+| 제공자 usage 계열 | OpenProvider에 들어오는 값의 실증 | 변환 |
 | --- | --- | --- |
 | OpenAI형 | Chat adapter는 `prompt_tokens → inputTokens`, `prompt_tokens_details.cached_tokens → cachedInputTokens`로 저장한다. 즉 cached는 input의 부분집합이다 ([`src/adapters/openai-chat.ts:423-432`](../../../../src/adapters/openai-chat.ts:423)). | `R=cacheReadInputTokens ?? cachedInputTokens ?? 0`, `W=cacheCreationInputTokens ?? 0`, `input=I-R-W`. 일반 OpenAI 응답에 write가 없으면 0이다. |
 | Anthropic형 | 원본 Anthropic `input_tokens`는 cache read/write를 **제외**한다. adapter가 `input_tokens + read + write`로 `inputTokens`를 만드는 것을 직접 확인했다 ([`src/adapters/anthropic.ts:292-307`](../../../../src/adapters/anthropic.ts:292)). read는 `cachedInputTokens`와 `cacheReadInputTokens` 양쪽에, write는 `cacheCreationInputTokens`에 저장된다 ([`src/adapters/anthropic.ts:300-305`](../../../../src/adapters/anthropic.ts:300)). | `R=cacheReadInputTokens` (동일한 read의 `cachedInputTokens`를 재가산 금지), `W=cacheCreationInputTokens`, `input=I-R-W`, 즉 원본 `input_tokens`로 복원된다. |
@@ -260,7 +260,7 @@ resolved model label을 이미 표시한다
   four-way breakdown 및 matched `jawcodeProvider/model`을 표시한다.
 - **toks/$ 분자**: `outputTokens`를 쓴다. 비용의 큰 부분이 prompt/cache인 요청에서
   `totalTokens / $`는 cache read로 total만 부풀려 “산출 효율”처럼 보이는 오해를 만든다.
-  output은 실제 생성 산출량이라 $와의 비교가 가장 직접적이다. reasoning은 OpenCodex에서
+  output은 실제 생성 산출량이라 $와의 비교가 가장 직접적이다. reasoning은 OpenProvider에서
   `outputTokens`에 포함되는 provider total이어야 하며 별도 `reasoningOutputTokens`를 다시
   더하지 않는다 (`totalTokens` 재가산 금지 계약은 [`src/types.ts:229-234`](../../../../src/types.ts:229)).
 - 계산식은 `outputTokens / cost.total`; `outputTokens <= 0` 혹은 `cost.total <= 0`면 `—`이다.

@@ -5,7 +5,7 @@
 - Work-phase: `wp2_localcli_ownership`
 - Class: C4 (OAuth rotating-refresh ownership); implementation is limited to the xAI credential path and its regression tests.
 - Goal: while an xAI credential is tagged `source: "local-cli"`, treat `~/.grok/auth.json` as the authority and adopt a newer disk generation before any IdP refresh.
-- Dependency: none. Phase 030 may add OpenCodex-store cross-process serialization after this ownership rule exists.
+- Dependency: none. Phase 030 may add OpenProvider-store cross-process serialization after this ownership rule exists.
 
 ## Threat / failure contract
 
@@ -13,8 +13,8 @@
 |---|---|
 | Asset | xAI access token, rotating refresh token, and continued Grok account session |
 | Entrypoints | login-time local import and request/guardian-driven refresh |
-| Trust boundary | Grok Build-owned `~/.grok/auth.json` → OpenCodex-owned `~/.opencodex/auth.json` → xAI token endpoint |
-| Failure | Grok CLI and OpenCodex independently spend the same refresh generation; one receives `invalid_grant`, or the last persisted stale generation forces re-login |
+| Trust boundary | Grok Build-owned `~/.grok/auth.json` → OpenProvider-owned `~/.openprovider/auth.json` → xAI token endpoint |
+| Failure | Grok CLI and OpenProvider independently spend the same refresh generation; one receives `invalid_grant`, or the last persisted stale generation forces re-login |
 | Official invariant | one `AuthManager` owns a store and holds `auth.json.lock` across the IdP exchange; a follower adopts the rotated disk token instead of calling the IdP (`/Users/jun/Developer/codex/180_grok-build/crates/codegen/xai-grok-shell/src/auth/manager.rs:64-68,1529-1561,1604-1642`) |
 | Contract proof | two managers sharing one store produce exactly one IdP call (`/Users/jun/Developer/codex/180_grok-build/crates/codegen/xai-grok-shell/src/auth/refresh/auth_backend_contract_tests.rs:351-388`) |
 
@@ -24,27 +24,27 @@ Choose **adopt while attached; explicit detach on unavoidable stale refresh**.
 
 1. A credential remains attached only while its persisted source is `"local-cli"`.
 2. Before either login-time refresh or normal refresh, re-read `~/.grok/auth.json`.
-3. If the Grok credential is authoritative under the monotonic expiry rule below and its access token is usable, persist/adopt it in OpenCodex and make **zero** discovery/token-endpoint calls.
-4. If Grok is also stale and OpenCodex must refresh to serve the request, call the IdP once with the currently selected Grok refresh token, persist the successor only to OpenCodex with `source: "oauth"`, and emit a one-time-per-refresh warning that this account has detached from Grok CLI ownership. Subsequent OpenCodex refreshes do not consult Grok storage.
-5. Never write `~/.grok/auth.json` from OpenCodex.
+3. If the Grok credential is authoritative under the monotonic expiry rule below and its access token is usable, persist/adopt it in OpenProvider and make **zero** discovery/token-endpoint calls.
+4. If Grok is also stale and OpenProvider must refresh to serve the request, call the IdP once with the currently selected Grok refresh token, persist the successor only to OpenProvider with `source: "oauth"`, and emit a one-time-per-refresh warning that this account has detached from Grok CLI ownership. Subsequent OpenProvider refreshes do not consult Grok storage.
+5. Never write `~/.grok/auth.json` from OpenProvider.
 
-Rationale: writing the successor into another application's store would need exact format preservation, permission preservation, atomic replacement, and interoperability with Grok's `auth.json.lock`. OpenCodex does not own that lock protocol, so even an atomic JSON rewrite could race Grok and corrupt or roll back unrelated fields. Detaching gives the rotated successor one durable owner after the exchange and preserves the official single-owner shape. The residual race is the **first detach exchange** if Grok refreshes concurrently; phase 020 reduces the common stale-copy race but cannot claim cross-application mutual exclusion. Phase 030's OpenCodex lock does not by itself coordinate with Grok's lock and must not be described as doing so.
+Rationale: writing the successor into another application's store would need exact format preservation, permission preservation, atomic replacement, and interoperability with Grok's `auth.json.lock`. OpenProvider does not own that lock protocol, so even an atomic JSON rewrite could race Grok and corrupt or roll back unrelated fields. Detaching gives the rotated successor one durable owner after the exchange and preserves the official single-owner shape. The residual race is the **first detach exchange** if Grok refreshes concurrently; phase 020 reduces the common stale-copy race but cannot claim cross-application mutual exclusion. Phase 030's OpenProvider lock does not by itself coordinate with Grok's lock and must not be described as doing so.
 
 The warning text is fixed for testability and must not contain token material:
 
 ```text
-[oauth:xai] Grok CLI credential was stale; refreshed into OpenCodex ownership. Grok CLI may require login again.
+[oauth:xai] Grok CLI credential was stale; refreshed into OpenProvider ownership. Grok CLI may require login again.
 ```
 
 ## Generation and identity rules
 
-`detectGrokCliToken()` remains a fresh read on every invocation. A detected credential is eligible only when it is the same identity as the stored OpenCodex account:
+`detectGrokCliToken()` remains a fresh read on every invocation. A detected credential is eligible only when it is the same identity as the stored OpenProvider account:
 
 - if both sides have `accountId`, they must match;
 - otherwise, if both sides have `email`, compare lower-cased values;
 - if neither comparable identity exists, allow adoption only for the active xAI account whose stored source is `"local-cli"` (the original import relationship is the binding).
 
-Generation authority is monotonic and is based on fixed token lifetime, not refresh-token inequality: a later `expires` means later issuance and therefore a later generation. Adopt disk only when its access token is currently usable (`disk.expires > Date.now() + REFRESH_SKEW_MS`) and either (a) both expiries exist and disk expires later, or (b) the expiries tie or either expiry is missing. The tie/missing case deliberately prefers the Grok-owned copy only while its access token proves usable. If disk has an earlier expiry, keep the OpenCodex generation even when the refresh strings differ. A merely different refresh token is never evidence of newness and is never selected as refresh input by itself; when disk is stale, older, or ineligible, refresh the stored OpenCodex generation.
+Generation authority is monotonic and is based on fixed token lifetime, not refresh-token inequality: a later `expires` means later issuance and therefore a later generation. Adopt disk only when its access token is currently usable (`disk.expires > Date.now() + REFRESH_SKEW_MS`) and either (a) both expiries exist and disk expires later, or (b) the expiries tie or either expiry is missing. The tie/missing case deliberately prefers the Grok-owned copy only while its access token proves usable. If disk has an earlier expiry, keep the OpenProvider generation even when the refresh strings differ. A merely different refresh token is never evidence of newness and is never selected as refresh input by itself; when disk is stale, older, or ineligible, refresh the stored OpenProvider generation.
 
 ## IN / OUT
 
@@ -61,7 +61,7 @@ Generation authority is monotonic and is based on fixed token lifetime, not refr
 - Implementing Grok's Rust file-lock protocol or claiming cross-app locking.
 - Generic local-CLI ownership changes for Anthropic or Kiro.
 - New config keys, GUI controls, or CLI flags.
-- Phase 030 OpenCodex-store locking, phase 040 401 replay, production code changes outside the file map below.
+- Phase 030 OpenProvider-store locking, phase 040 401 replay, production code changes outside the file map below.
 
 ## Config decision
 
@@ -78,7 +78,7 @@ No config surface is added.
 |---|---|---|
 | MODIFY | `src/oauth/local-token-detect.ts` | Extract/export identity and generation comparison helpers beside `detectGrokCliToken()`; retain read-only semantics and fresh HOME-based reads. |
 | MODIFY | `src/oauth/xai.ts` | Reconcile the local store before login-time refresh; detach stale local credentials after successful IdP refresh; expose the ownership warning constant/helper needed by the account refresh path. |
-| MODIFY | `src/oauth/index.ts` | Before refreshing an expired xAI `source:"local-cli"` account, re-read Grok credentials, identity-check, adopt a usable expiry-authoritative disk generation with zero IdP calls, or refresh the stored OpenCodex generation and persist the successor as `source:"oauth"`. |
+| MODIFY | `src/oauth/index.ts` | Before refreshing an expired xAI `source:"local-cli"` account, re-read Grok credentials, identity-check, adopt a usable expiry-authoritative disk generation with zero IdP calls, or refresh the stored OpenProvider generation and persist the successor as `source:"oauth"`. |
 | MODIFY | `tests/oauth-refresh.test.ts` | Add temp-HOME Grok fixture and request classification counters; cover normal refresh adoption, unchanged/stale detach, identity mismatch, and persistence. |
 | NEW | none | Reuse the existing OAuth refresh suite and modules; do not create a parallel ownership service or config schema. |
 
@@ -210,7 +210,7 @@ export async function loginXai(
         }
       }
     } else if (importLocal === "only") {
-      throw new Error("No Grok CLI token found at ~/.grok/auth.json. Run 'ocx login xai' for browser OAuth.");
+      throw new Error("No Grok CLI token found at ~/.grok/auth.json. Run 'opr login xai' for browser OAuth.");
     }
   }
 
@@ -226,7 +226,7 @@ import { generatePKCE } from "./pkce";
 import type { LocalTokenImportMode, OAuthController, OAuthCredentials } from "./types";
 
 export const XAI_LOCAL_CLI_DETACH_WARNING =
-  "[oauth:xai] Grok CLI credential was stale; refreshed into OpenCodex ownership. Grok CLI may require login again.";
+  "[oauth:xai] Grok CLI credential was stale; refreshed into OpenProvider ownership. Grok CLI may require login again.";
 
 export async function loginXai(
   ctrl: OAuthController,
@@ -251,7 +251,7 @@ export async function loginXai(
         }
       }
     } else if (importLocal === "only") {
-      throw new Error("No Grok CLI token found at ~/.grok/auth.json. Run 'ocx login xai' for browser OAuth.");
+      throw new Error("No Grok CLI token found at ~/.grok/auth.json. Run 'opr login xai' for browser OAuth.");
     }
   }
 
@@ -434,13 +434,13 @@ Exact test names:
 2. `newer-expiry Grok access token is adopted when refresh generation is unchanged`
    - same refresh token, later usable expiry;
    - assert zero fetches and updated access/expiry persistence.
-3. `stale Grok generation refreshes once and detaches to OpenCodex ownership`
+3. `stale Grok generation refreshes once and detaches to OpenProvider ownership`
    - both stores carry the same expired generation;
    - mock one discovery GET plus one token POST returning rotated credentials;
    - spy on `console.warn`;
    - assert exactly one token POST, warning text, successor persisted with `source:"oauth"`, and Grok file bytes remain unchanged.
 4. `stale different Grok generation with earlier expiry is not adopted`
-   - OpenCodex has expired `rt-ours`; Grok has different `rt-disk` with an earlier expiry;
+   - OpenProvider has expired `rt-ours`; Grok has different `rt-disk` with an earlier expiry;
    - inspect the normal refresh token POST body and assert `refresh_token=rt-ours`, never `rt-disk`;
    - assert no adoption write occurs before refresh, exactly one normal discovery GET plus one token POST occurs, and the successor source is `oauth`.
 5. `mismatched Grok identity is not adopted into a local-cli account`
@@ -456,25 +456,25 @@ Test hygiene: restore `console.warn`, `fetch`, `HOME`, and `OPENCODEX_HOME` in `
 
 | ID | Criterion | Activation scenario | Required proof |
 |---|---|---|---|
-| AC-020-1 | Every normal refresh of xAI `source:"local-cli"` re-reads Grok storage before IdP exchange. | Expired OpenCodex generation; temp-HOME Grok file replaced with a fresh different refresh token after OpenCodex persistence. | Returned/stored Grok token; zero fetch calls. |
-| AC-020-2 | Same refresh generation with a newer usable expiry is adopted. | OpenCodex stale expiry, Grok later expiry. | Zero fetch calls; access and expiry updated. |
-| AC-020-3 | Refresh-token inequality alone never changes authority. | Grok refresh differs but its expiry is earlier than the stored OpenCodex expiry. | Disk is not adopted; the normal refresh spends the stored OpenCodex refresh token; no unnecessary IdP calls beyond that one discovery GET and one token POST. |
-| AC-020-4 | Successful stale refresh detaches ownership. | Both stores stale and one mocked IdP exchange succeeds. | OpenCodex source becomes `oauth`; warning emitted; Grok bytes unchanged. |
+| AC-020-1 | Every normal refresh of xAI `source:"local-cli"` re-reads Grok storage before IdP exchange. | Expired OpenProvider generation; temp-HOME Grok file replaced with a fresh different refresh token after OpenProvider persistence. | Returned/stored Grok token; zero fetch calls. |
+| AC-020-2 | Same refresh generation with a newer usable expiry is adopted. | OpenProvider stale expiry, Grok later expiry. | Zero fetch calls; access and expiry updated. |
+| AC-020-3 | Refresh-token inequality alone never changes authority. | Grok refresh differs but its expiry is earlier than the stored OpenProvider expiry. | Disk is not adopted; the normal refresh spends the stored OpenProvider refresh token; no unnecessary IdP calls beyond that one discovery GET and one token POST. |
+| AC-020-4 | Successful stale refresh detaches ownership. | Both stores stale and one mocked IdP exchange succeeds. | OpenProvider source becomes `oauth`; warning emitted; Grok bytes unchanged. |
 | AC-020-5 | Identity mismatch cannot contaminate an account. | Fresh Grok token belongs to a different `user_id`. | No adoption; stored account ID remains unchanged. |
 | AC-020-6 | Existing login controls retain semantics. | default login with usable Grok token; `forceLogin:true`; stale fallback; `importLocal:"only"`. | default imports, force login skips, stale successful refresh returns `source:"oauth"`, only-mode preserves failure contract. |
 | AC-020-7 | Existing account singleflight remains intact. | Two simultaneous calls for one expired xAI account. | One detach token POST; identical access result. |
-| AC-020-8 | No external-store mutation is introduced. | Snapshot Grok file before stale refresh. | Byte-identical after success and failure; no `.lock`, backup, or temp sibling created by OpenCodex. |
+| AC-020-8 | No external-store mutation is introduced. | Snapshot Grok file before stale refresh. | Byte-identical after success and failure; no `.lock`, backup, or temp sibling created by OpenProvider. |
 
 ## Risk / rollback
 
 - **Rollback unit:** revert the single phase-020 implementation commit with `git revert <phase-020-commit>`. Do not hand-edit credential files and do not revert sibling phase commits as part of this rollback.
-- **Persisted state:** credentials already detached by a successful refresh remain valid when tagged `source:"oauth"`; the tag accurately says OpenCodex owns the newly issued rotating refresh generation, and rollback must not relabel it `local-cli` or copy it back to Grok. Credentials adopted from disk and still tagged `local-cli` also remain ordinary valid OAuth credentials; after rollback they retain the pre-phase behavior until their next refresh.
+- **Persisted state:** credentials already detached by a successful refresh remain valid when tagged `source:"oauth"`; the tag accurately says OpenProvider owns the newly issued rotating refresh generation, and rollback must not relabel it `local-cli` or copy it back to Grok. Credentials adopted from disk and still tagged `local-cli` also remain ordinary valid OAuth credentials; after rollback they retain the pre-phase behavior until their next refresh.
 - **`needsReauth`:** phase 020 preserves the existing rule that only terminal refresh failures set `needsReauth`. Reverting code does not clear an already-set marker and must not do so automatically: the underlying grant may actually be revoked or reused. A detached credential whose refresh succeeded is persisted without setting `needsReauth`; rollback leaves that successful credential usable.
-- **Rollback verification:** run the focused OAuth refresh suite and typecheck after the revert; inspect `~/.opencodex/auth.json` only through redacted status/test fixtures to confirm detached entries remain `source:"oauth"`; verify a detached xAI credential refreshes without reading `~/.grok/auth.json`; verify an account already marked `needsReauth` still requires login; and confirm `~/.grok/auth.json` bytes are unchanged.
+- **Rollback verification:** run the focused OAuth refresh suite and typecheck after the revert; inspect `~/.openprovider/auth.json` only through redacted status/test fixtures to confirm detached entries remain `source:"oauth"`; verify a detached xAI credential refreshes without reading `~/.grok/auth.json`; verify an account already marked `needsReauth` still requires login; and confirm `~/.grok/auth.json` bytes are unchanged.
 
 ## Verification commands
 
-Run from `/Users/jun/Developer/new/700_projects/opencodex`:
+Run from `/Users/jun/Developer/new/700_projects/openprovider`:
 
 ```bash
 bun test --isolate ./tests/oauth-refresh.test.ts
@@ -497,7 +497,7 @@ The commands follow `package.json` scripts: `test = bun test --isolate ./tests/`
 - [ ] Confirm the real Grok JSON key/value fields still match `https://auth.x.ai::`, `key`, `refresh_token`, `expires_at`, `user_id`, and `email`.
 - [ ] Confirm `OAuthCredentials` still exposes only `accountId` and `email` as comparable identity fields, and that `hasComparableGrokIdentity()` is exported and used by the active-account fallback gate.
 - [ ] Confirm generation authority remains expiry-monotonic: later disk expiry wins; tie/missing expiry chooses disk only when disk access is usable; refresh-token inequality never establishes newness.
-- [ ] Run the stale-different-generation regression: disk has a different refresh token and earlier expiry; assert no adoption, refresh body uses the stored OpenCodex token, and there are zero extra IdP calls beyond the normal one discovery GET plus one token POST.
+- [ ] Run the stale-different-generation regression: disk has a different refresh token and earlier expiry; assert no adoption, refresh body uses the stored OpenProvider token, and there are zero extra IdP calls beyond the normal one discovery GET plus one token POST.
 - [ ] Confirm no implementation writes under `~/.grok`, and that warning output is redacted.
 - [ ] Rehearse rollback with a temporary branch/fixture: revert only the phase commit, retain detached `source:"oauth"` and `needsReauth` state, run focused tests/typecheck, and verify Grok bytes remain unchanged.
 - [ ] Execute every verification command above on the final implementation HEAD and attach exit status/test counts to phase evidence.

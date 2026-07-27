@@ -5,7 +5,7 @@ import { createInterface } from "node:readline/promises";
 import { getConfigDir } from "../config";
 
 const REPO = "mDevsLabs/OpenProvider";
-/** Fires exactly once from the first interactive `ocx start`. */
+/** Fires exactly once from the first interactive `opr start`. */
 const MARKER = ".star-prompted";
 
 /**
@@ -35,7 +35,7 @@ function starRepo(): { ok: boolean; error?: string } {
 }
 
 /**
- * First interactive `ocx start`: a one-time `[Y/n]` "star on GitHub?" prompt.
+ * First interactive `opr start`: a one-time `[Y/n]` "star on GitHub?" prompt.
  * On yes, stars the repo via the user's `gh` auth. No-op under the background
  * service, for non-TTY/piped runs, when already prompted, or when `gh` is
  * unavailable. Never throws.
@@ -52,7 +52,7 @@ export async function maybeShowStarPrompt(): Promise<void> {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     let yes = false;
     try {
-      const ans = (await rl.question("\n  \x1b[38;5;141m⭐ Enjoying opencodex? Star it on GitHub?\x1b[0m [Y/n] ")).trim().toLowerCase();
+      const ans = (await rl.question("\n  \x1b[38;5;141m⭐ Enjoying openprovider? Star it on GitHub?\x1b[0m [Y/n] ")).trim().toLowerCase();
       yes = ans === "" || ans === "y" || ans === "yes";
     } finally {
       rl.close();

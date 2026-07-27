@@ -13,7 +13,7 @@
 | 1 | 두 devlog 유닛 완료 검증 (커밋/done-doc/테스트) | DONE — authmode는 090/091 done doc 존재, windows는 080 작성 |
 | 2 | sol 적대 감사 (McClintock) | GO-WITH-FIXES → blocker 1 (WinSW fail-open status) |
 | 3 | blocker 수정: `unknown` 상태 + SCM probe + fail-closed | 99b2f3ad |
-| 4 | #168 `ocx update --help` 부작용 수정 (양 진입로) | a4f06beb |
+| 4 | #168 `opr update --help` 부작용 수정 (양 진입로) | a4f06beb |
 | 5 | PR #167 sol 리뷰 (Peirce) → stdio 포트 + close | a4f06beb + PR close |
 | 6 | Models.tsx 활성 모델 상단 정렬 커밋 | e3e34a9b |
 | 7 | devlog _fin 아카이브 | 0a8e1c66 |
@@ -39,7 +39,7 @@
 
 - focused bun test: 69 / 58 / 48 / 20 pass, 0 fail (수정 라운드별).
 - tsc root+gui 매 라운드 clean.
-- 실기: `ocx update --help` 두 진입로 usage + exit 0 + 부작용 없음.
+- 실기: `opr update --help` 두 진입로 usage + exit 0 + 부작용 없음.
 - CI: Cross-platform 29712048661 ✓, service-lifecycle 29712075697 ✓ (0fecab87).
 - 로컬 전체 스위트의 54건 실패는 라이브 프록시(127.0.0.1:10100) 포트 충돌 +
   병렬 부하 플레이크: 실패 파일 전부 격리/소배치 실행 시 pass, CI 그린.

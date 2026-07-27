@@ -5,7 +5,7 @@
    - codex-rs built-in `openai` provider hardcodes supports_websockets=true
      (model-provider-info/src/lib.rs:352); Design B (openai_base_url override) means codex
      ALWAYS tries the Responses-WS transport against the proxy.
-   - opencodex config has websockets:false, but the /v1/responses upgrade handler
+   - openprovider config has websockets:false, but the /v1/responses upgrade handler
      (src/server.ts:2384) accepts upgrades UNCONDITIONALLY — the flag only controls
      catalog/config-toml flag injection (moot under Design B).
    - When the proxy closes a socket (restart/drain, account invalidation close 4001) codex

@@ -20,7 +20,7 @@ import { accountNeedsReauth, copyTextToClipboard, type DoctorCopyFeedback } from
 // Single definition lives with the controller that owns this data (WP3).
 export type { CodexAccountEntry } from "../hooks/useCodexAccountPool";
 
-const DOCTOR_CMD = "ocx doctor";
+const DOCTOR_CMD = "opr doctor";
 
 /**
  * Global ChatGPT / Codex account pool (main + extras), extracted from the Codex

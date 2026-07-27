@@ -21,7 +21,7 @@
   rail alpha 0.55 for the frosted fake-glass look.
 - SVG: Lucide-path stroke icons inline in bento cell h3 (plug/key/users/picker/
   bot/search) + sitemap group heads (rocket/book/code/folder), currentColor.
-- Motion: alternating ocx-slide-left/right on bento cells (odd/even), quick-copy
+- Motion: alternating opr-slide-left/right on bento cells (odd/even), quick-copy
   from left, terminal from right, stage settle scale+translate — all view()
   timeline inside prefers-reduced-motion: no-preference.
 

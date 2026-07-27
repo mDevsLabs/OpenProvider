@@ -3,7 +3,7 @@
 Builds on `00_review.md` (scoping). This is the implementation plan for a
 read-only diagnostic (Phase 1) and a scoped, opt-in repair (Phase 2). Phase 1
 is the recommended first PR; Phase 2 is deferred behind explicit invocation.
-No code is written in this phase. The codex-rs and opencodex facts below were
+No code is written in this phase. The codex-rs and openprovider facts below were
 independently audited by two parallel subagents (one on gpt-5.5) and are cited
 with file:line evidence.
 
@@ -13,9 +13,9 @@ with file:line evidence.
   `openai-bundled` marketplace path registered in Codex config is stale or
   missing, and whether the common bundled plugins are present.
 - Out of scope by default: any automatic mutation of Codex plugin marketplaces.
-  `ocx ensure` must never re-add or refresh marketplaces. Matches the reporter's
+  `opr ensure` must never re-add or refresh marketplaces. Matches the reporter's
   explicit request and the `00_review.md` recommendation.
-- Phase 2 (`ocx repair codex-plugins`) is allowed only as an opt-in command the
+- Phase 2 (`opr repair codex-plugins`) is allowed only as an opt-in command the
   user runs deliberately.
 
 ## Why this is a real failure (root cause)
@@ -45,12 +45,12 @@ auto-upgraded. So nothing self-heals this; a diagnostic is genuinely useful.
 
 Add a `codexPlugins` diagnostic. Two homes, in order of preference:
 
-1. Extend `ocx status --json` with an optional `codexPlugins` section on the
+1. Extend `opr status --json` with an optional `codexPlugins` section on the
    existing `CliStatusJson` (`schemaVersion: 1`, sectioned object) in
    `src/cli-status.ts`. Low-friction, already JSON-shaped, already prints paths,
    and `codexShim.summary` is an existing precedent for a string-summary block.
-2. A dedicated `ocx doctor` command only if status grows too heavy. There is no
-   `ocx doctor` today; `doctor` exists only as a Codex subcommand the shim
+2. A dedicated `opr doctor` command only if status grows too heavy. There is no
+   `opr doctor` today; `doctor` exists only as a Codex subcommand the shim
    passes through. Prefer option 1 for the first PR.
 
 ### What it reports (path-focused, secret-safe)
@@ -82,7 +82,7 @@ is net-new if we want to hide usernames.
 - Codex config path: `CODEX_CONFIG_PATH` from `src/codex-paths.ts`
   (`CODEX_HOME/config.toml`); `CODEX_HOME` resolves from `$CODEX_HOME` or
   `~/.codex`.
-- Parse `[marketplaces.openai-bundled]` -> `source_type` / `source`. opencodex
+- Parse `[marketplaces.openai-bundled]` -> `source_type` / `source`. openprovider
   has only root-key TOML helpers (`readRootTomlString`/`parseTomlString`) that
   do NOT read nested tables, and there is no TOML library dependency. So this
   needs a minimal nested-table reader. Note `src/codex-inject.ts` does line-
@@ -101,11 +101,11 @@ Reads files and, optionally, shells out to a READ-ONLY
 `MARKETPLACE  ROOT` text table (or "No plugin marketplaces in scope."). Parsing
 text is brittle, so prefer reading `config.toml` directly and treat the CLI
 output as a secondary cross-check only. Never calls `marketplace add`, never
-writes `config.toml`, never invoked from `ocx ensure`.
+writes `config.toml`, never invoked from `opr ensure`.
 
 ## Phase 2 - opt-in repair (deferred)
 
-`ocx repair codex-plugins` (explicit only):
+`opr repair codex-plugins` (explicit only):
 
 - detect the current bundled marketplace dir under the installed Codex app.
 - `codex plugin marketplace add <current-openai-bundled-path>` (the `add`
@@ -153,17 +153,17 @@ Separate PR after Phase 1. Medium risk: mutates Codex plugin config -> opt-in.
   `source_type == Git` (manager.rs:1571-1587; marketplace_upgrade.rs:149-150).
   Local bundled marketplaces are NOT auto-resynced or re-added.
 
-## opencodex evidence (audited subagent)
+## openprovider evidence (audited subagent)
 
 - `src/codex-paths.ts`: `CODEX_HOME` resolved once at module load (env or
   `~/.codex`, line 25) and `CODEX_CONFIG_PATH = CODEX_HOME/config.toml` (26). No
   TOML parser; only `tomlString` (31), `parseTomlString` (35),
   `readRootTomlString` (46, root lines only), `resolveCodexConfigPath` (57). No
   `toml`/`@iarna`/`smol-toml` dependency in package.json.
-- No `ocx doctor`/`ocx plugin` command: `src/cli.ts` switch (363-489) has no
+- No `opr doctor`/`opr plugin` command: `src/cli.ts` switch (363-489) has no
   such case; `src/codex-shim.ts` lists `doctor` (18) and `plugin` (25) only in
   `CODEX_INTERNAL_COMMANDS` (pass-through, used at 123/157/182).
-- `ocx status`: `CliStatusJson` (`schemaVersion: 1`, src/cli-status.ts:13) and
+- `opr status`: `CliStatusJson` (`schemaVersion: 1`, src/cli-status.ts:13) and
   `collectStatus()` (107) assemble JSON at 128-162; `paths` block (30-34/145-149)
   and `codexShim.summary` (46/161) are precedents for adding a `codexPlugins`
   block.
@@ -193,7 +193,7 @@ Separate PR after Phase 1. Medium risk: mutates Codex plugin config -> opt-in.
   mocked `[marketplaces.openai-bundled]` table. Set `CODEX_HOME` to a fixture
   `.codex` dir in a spawned process; follow `tests/cli-status-json.test.ts`.
 - Assert read-only: no write to `config.toml`, no `marketplace add`, not
-  reachable from `ocx ensure`.
+  reachable from `opr ensure`.
 - Cross-platform: assert "not applicable" on macOS/Linux.
 - Manual (Windows): bump the app-version path to simulate an update and confirm
   the diagnostic flags the stale `openai-bundled` source and suggests the repair.
@@ -207,7 +207,7 @@ Separate PR after Phase 1. Medium risk: mutates Codex plugin config -> opt-in.
 ## Suggested issue reply
 
 Yes to Phase 1 read-only diagnostics; happy to take a small reporter PR scoped
-to diagnostics only. `ocx ensure` will not mutate plugin marketplaces. Phase 2
+to diagnostics only. `opr ensure` will not mutate plugin marketplaces. Phase 2
 repair is acceptable later as an explicit opt-in command, decided separately.
 One correction for scoping: the bundled-plugin set should be treated as data -
 the upstream Rust allowlist currently defines only `chrome@openai-bundled` and

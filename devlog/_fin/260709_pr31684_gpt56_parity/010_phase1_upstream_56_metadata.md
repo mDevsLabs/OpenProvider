@@ -21,15 +21,15 @@ runtime; tsc needs the flag).
 - NEW `function upstreamNativeEntry(slug: string): RawEntry | null` — deep-clone of the
   map entry with adaptations:
   - `delete e.minimal_client_version` (a pinned client-version gate would HIDE the
-    model on older installed clients; ocx targets whatever client is installed —
+    model on older installed clients; opr targets whatever client is installed —
     matches current synthesis, which never emits the field).
   - `delete e.prefer_websockets` unless `wsEnabled` is passed true by the caller
     (deletion mirrors the existing supports_websockets central override; a
-    prefer_websockets=true leak while ocx WS is off would make the client prefer an
-    endpoint ocx has disabled).
+    prefer_websockets=true leak while opr WS is off would make the client prefer an
+    endpoint opr has disabled).
   - keep `auto_compact_token_limit: null` as-is; `ensureStrictCatalogFields` ->
     `ensureAutoCompactTokenLimit` fills 334800 (0.9 * 372k), consistent with every
-    other native entry ocx emits (stated deviation from upstream null).
+    other native entry opr emits (stated deviation from upstream null).
 - `deriveEntry` native path (else-branch, ~L555): when `!slug.includes("/")` and
   `upstreamNativeEntry(slug)` exists, use IT as the base entry (desc/priority args
   still apply: priority from caller only when featured; otherwise KEEP the upstream
@@ -39,7 +39,7 @@ runtime; tsc needs the flag).
   ladders now come from the snapshot (fixes luna-ultra G1 and sol-default G2).
   The no-template fallback path (~L567) also prefers `upstreamNativeEntry`.
 - `mergeCatalogEntriesForSync` native `.map` path: for slugs in
-  `UPSTREAM_NATIVE_ENTRIES`, when the preserved entry LOOKS ocx-synthesized
+  `UPSTREAM_NATIVE_ENTRIES`, when the preserved entry LOOKS opr-synthesized
   (`entry.display_name === entry.slug`) replace it with `upstreamNativeEntry(slug)`
   (priority logic unchanged). Genuine catalog entries (real display names, e.g. a
   future installed codex that already ships 5.6) are preserved untouched — the
@@ -102,7 +102,7 @@ REVIEW-SYNTHESIS-01 record:
 - **B3 (Medium, ACCEPTED with rationale):** `display_name === slug` also matches
   codex-rs fallback-metadata entries and hand-made fixtures. Recorded intent: any 5.6
   entry whose display_name equals its slug is at best fallback-quality (codex-rs
-  model_info fallback or ocx synthesis) and SHOULD be upgraded to the pinned upstream
+  model_info fallback or opr synthesis) and SHOULD be upgraded to the pinned upstream
   snapshot; genuine catalog entries always carry marketing display names. Documented
   here + code comment; discriminator kept.
 - **B4 (Low, ACCEPTED):** line refs drifted (ensureGpt56ReasoningLevels is

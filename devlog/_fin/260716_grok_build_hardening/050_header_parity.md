@@ -83,7 +83,7 @@ Never substitute an adapter hook.
 | `x-grok-conv-id` | Stable hash when `promptCacheKey.trim()` is nonblank. |
 | `x-grok-session-id` | Same stable opaque hash and omission rule as conv-id. |
 | `x-grok-req-id` | Fresh UUIDv4 inside every transport-fetch invocation. Caller override wins. |
-| `User-Agent` | Always `opencodex-grok/${version}` in OAuth and API-key modes. Caller override wins. |
+| `User-Agent` | Always `openprovider-grok/${version}` in OAuth and API-key modes. Caller override wins. |
 | `x-grok-client-identifier`, `x-grok-client-version` | OAuth only. |
 | `X-XAI-Token-Auth`, `x-authenticateresponse` | OAuth only. |
 | model override, agent ID, turn index, deployment ID, user ID, client mode | **OMIT**; no truthful local value exists. |
@@ -104,7 +104,7 @@ export const XAI_GROK_CLI_BASE_URL = "https://cli-chat-proxy.grok.com/v1";
 
 export const XAI_GROK_COMPATIBILITY = {
   version: "0.2.93",
-  userAgent: "opencodex-grok/0.2.93",
+  userAgent: "openprovider-grok/0.2.93",
   headers: {
     clientIdentifier: "x-grok-client-identifier",
     clientVersion: "x-grok-client-version",
@@ -121,7 +121,7 @@ export const XAI_GROK_CLIENT_VERSION = XAI_GROK_COMPATIBILITY.version;
 export const XAI_CONV_ID_HEADER = XAI_GROK_COMPATIBILITY.headers.conversationId;
 
 const XAI_GROK_CLI_HEADERS: Readonly<Record<string, string>> = {
-  [XAI_GROK_COMPATIBILITY.headers.clientIdentifier]: "opencodex",
+  [XAI_GROK_COMPATIBILITY.headers.clientIdentifier]: "openprovider",
   [XAI_GROK_COMPATIBILITY.headers.clientVersion]: XAI_GROK_CLIENT_VERSION,
   [XAI_GROK_COMPATIBILITY.headers.tokenAuth]: "xai-grok-cli",
   [XAI_GROK_COMPATIBILITY.headers.authenticateResponse]: "authenticate-response",
@@ -446,9 +446,9 @@ describe("xAI outbound compatibility headers", () => {
     expect(lower(seen[0])).toEqual({
       authorization: "Bearer oauth-token",
       "content-type": "application/json",
-      "user-agent": `opencodex-grok/${XAI_GROK_CLIENT_VERSION}`,
+      "user-agent": `openprovider-grok/${XAI_GROK_CLIENT_VERSION}`,
       "x-authenticateresponse": "authenticate-response",
-      "x-grok-client-identifier": "opencodex",
+      "x-grok-client-identifier": "openprovider",
       "x-grok-client-version": XAI_GROK_CLIENT_VERSION,
       "x-grok-conv-id": deriveXaiConvId("codex-session-abc"),
       "x-grok-req-id": expect.stringMatching(UUID_V4),
@@ -464,7 +464,7 @@ describe("xAI outbound compatibility headers", () => {
     expect(lower(seen[0])).toEqual({
       authorization: "Bearer xai-api-key",
       "content-type": "application/json",
-      "user-agent": `opencodex-grok/${XAI_GROK_CLIENT_VERSION}`,
+      "user-agent": `openprovider-grok/${XAI_GROK_CLIENT_VERSION}`,
       "x-grok-conv-id": deriveXaiConvId("codex-session-abc"),
       "x-grok-req-id": expect.stringMatching(UUID_V4),
       "x-grok-session-id": deriveXaiConvId("codex-session-abc"),
@@ -488,7 +488,7 @@ describe("xAI outbound compatibility headers", () => {
     expect(seen[1].get("x-grok-conv-id")).toBe(seen[0].get("x-grok-conv-id"));
     expect(seen[1].get("x-grok-session-id")).toBe(seen[0].get("x-grok-session-id"));
     for (const headers of seen) {
-      expect(headers.get("user-agent")).toBe(`opencodex-grok/${XAI_GROK_CLIENT_VERSION}`);
+      expect(headers.get("user-agent")).toBe(`openprovider-grok/${XAI_GROK_CLIENT_VERSION}`);
       for (const name of OMITTED) expect(headers.has(name)).toBe(false);
     }
   });
@@ -526,7 +526,7 @@ describe("xAI outbound compatibility headers", () => {
       await effective.fetch!(request.url, { headers: request.headers });
       expect(seen[0].has("x-grok-conv-id")).toBe(false);
       expect(seen[0].has("x-grok-session-id")).toBe(false);
-      expect(seen[0].get("user-agent")).toBe(`opencodex-grok/${XAI_GROK_CLIENT_VERSION}`);
+      expect(seen[0].get("user-agent")).toBe(`openprovider-grok/${XAI_GROK_CLIENT_VERSION}`);
       expect(seen[0].get("x-grok-req-id")).toMatch(UUID_V4);
       for (const name of OMITTED) expect(seen[0].has(name)).toBe(false);
     }
@@ -562,8 +562,8 @@ let upstream: ReturnType<typeof Bun.serve> | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-xai-parity-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-xai-parity-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-xai-parity-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-xai-parity-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 
@@ -741,7 +741,7 @@ Implemented 2026-07-16 on top of `1bf9de02` without changing the landed 010-040 
   OAuth-only official compatibility headers, stable hashed conversation/session affinity, and a
   fresh UUIDv4 request ID generated inside every resolved xAI transport-fetch invocation.
 - Kept agent, deployment, model-override, turn, client-mode, and user identity headers omitted:
-  opencodex has no truthful local values for those official fields.
+  openprovider has no truthful local values for those official fields.
 - Added the executor argument to `fetchWithHeaderTimeout` and passed the current resolved provider
   executor at all three serving call sites. `rebuildAndRefetch` performs the lookup at invocation
   time, preserving 401 refresh and 429 rotation behavior.

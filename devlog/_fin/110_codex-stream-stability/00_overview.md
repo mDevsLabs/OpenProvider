@@ -1,8 +1,8 @@
-# 110.00 — Overview: Codex Stream Errors over the opencodex Proxy
+# 110.00 — Overview: Codex Stream Errors over the openprovider Proxy
 
 ## Symptom (user report)
 
-With `ocx` running, driving the **Codex CLI** through the proxy produces frequent
+With `opr` running, driving the **Codex CLI** through the proxy produces frequent
 *stream errors*. The reporter suspected an SSE or WebSocket transport problem, asked whether
 SSE multiplexing / WS would improve performance, observed that bolting WS onto the
 `chat/completions` adapter "seems pointless," and asked whether the real cause is that
@@ -18,16 +18,16 @@ are a separate, approval-gated implementation phase.
 1. It is **not a transport-protocol problem**. It is an **SSE lifecycle / reliability**
    problem. WebSockets and SSE multiplexing do not address any of the root causes. The
    phase 100 "no WebSocket" decision stands (see `20_transport-evaluation.md`).
-2. opencodex has **two response paths**, and the errors have **different causes on each**:
+2. openprovider has **two response paths**, and the errors have **different causes on each**:
    - **Passthrough** (native `gpt-*`): the ChatGPT backend body is relayed verbatim, so a
-     terminal `response.completed` cannot be dropped by opencodex. Errors here are
+     terminal `response.completed` cannot be dropped by openprovider. Errors here are
      **header fidelity** + **no abort/cancel** (disconnect/leak).
-   - **Bridge** (routed models, e.g. `opencode-go/deepseek-v4-pro`): opencodex parses an
+   - **Bridge** (routed models, e.g. `opencode-go/deepseek-v4-pro`): openprovider parses an
      upstream chat/completions stream and **re-encodes** it into Responses SSE. Errors here
      are **missing terminal event**, **idle timeout**, and **fidelity gaps**.
 3. "Is passthrough happening?" — **Yes for native `gpt-*`** (default config). For **routed
    models it is structurally impossible** (the upstream is chat/completions, not a
-   Responses-native endpoint), so opencodex *must* bridge. The fix is bridge fidelity, not
+   Responses-native endpoint), so openprovider *must* bridge. The fix is bridge fidelity, not
    "forcing passthrough."
 
 ## The two paths
@@ -44,7 +44,7 @@ are a separate, approval-gated implementation phase.
 
 The Codex CLI consumes the proxy's SSE with a strict Rust parser. Every failure surfaces as
 `ApiError::Stream(...)`. The authoritative trigger set
-(`/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs`, see `10_…`):
+(`/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs`, see `10_…`):
 
 - `:459` **stream closed before `response.completed`** — stream ended with no terminal event
 - `:466` **idle timeout waiting for SSE** — no event within `idle_timeout`
@@ -87,6 +87,6 @@ The Codex CLI consumes the proxy's SSE with a strict Rust parser. Every failure 
 
 ## Documents
 
-- `10_root-cause-analysis.md` — Codex `ApiError::Stream` trigger table ↔ opencodex RC1–RC5
+- `10_root-cause-analysis.md` — Codex `ApiError::Stream` trigger table ↔ openprovider RC1–RC5
 - `20_transport-evaluation.md` — SSE multiplexing / WebSocket verdict
 - `30_patch-direction.md` — P0/P1/P2 file-level patch direction + verification plan

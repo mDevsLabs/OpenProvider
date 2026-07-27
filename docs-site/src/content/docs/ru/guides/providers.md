@@ -72,15 +72,15 @@ account id, OpenAI beta/originator/session — см. [Адаптеры](/ru/refe
 команда получает учётные данные ChatGPT и одновременно создаёт запись провайдера в режиме `forward`.
 
 ```bash
-ocx login xai          # xAI Grok
-ocx login anthropic    # Anthropic Claude (Pro/Max)
-ocx login kimi         # Moonshot Kimi
-ocx login kiro         # импорт учётных данных kiro-cli (с фолбэком на токен)
-ocx login google-antigravity
-ocx login cursor       # отдельный PKCE-вход Cursor
-ocx login github-copilot  # device flow GitHub → токен Copilot (Copilot Pro/Business)
-ocx login chatgpt      # отдельный OAuth-вход ChatGPT
-ocx logout <provider>
+opr login xai          # xAI Grok
+opr login anthropic    # Anthropic Claude (Pro/Max)
+opr login kimi         # Moonshot Kimi
+opr login kiro         # импорт учётных данных kiro-cli (с фолбэком на токен)
+opr login google-antigravity
+opr login cursor       # отдельный PKCE-вход Cursor
+opr login github-copilot  # device flow GitHub → токен Copilot (Copilot Pro/Business)
+opr login chatgpt      # отдельный OAuth-вход ChatGPT
+opr logout <provider>
 ```
 
 | Провайдер | Адаптер | Базовый URL | Примечания |
@@ -156,14 +156,14 @@ Providers, сохраняется в `provider.apiKeyPool`, становится
 
 ### Переключение аккаунтов из терминала
 
-Используйте `ocx account list`, `ocx account current` и `ocx account use`, чтобы просматривать и
+Используйте `opr account list`, `opr account current` и `opr account use`, чтобы просматривать и
 переключать те же пулы Codex, OAuth и API-ключей, не открывая дашборд. Команды, JSON-вывод и
 поведение в новых сессиях описаны в разделе
-[Справочник CLI](/ru/reference/cli/#ocx-account-subcommand).
+[Справочник CLI](/ru/reference/cli/#opr-account-subcommand).
 
 ### Превью-маршруты GPT-5.6
 
-GPT-5.6 Sol/Terra/Luna заранее внесены в резервные списки провайдеров, чтобы `ocx sync` сохранял
+GPT-5.6 Sol/Terra/Luna заранее внесены в резервные списки провайдеров, чтобы `opr sync` сохранял
 модели видимыми, даже когда живые каталоги отстают:
 
 | Маршрут Codex | Предзаданные id моделей | Контекст, видимый Codex |
@@ -185,13 +185,13 @@ Luna есть `max`, но нет `ultra`). Маршрутизируемые за
 `openai-responses`, `anthropic`, `google` (режимы AI Studio, Vertex и Antigravity/Cloud Code
 Assist), `azure` / `azure-openai`, `kiro` и `cursor`. Проприетарный API без одной из этих
 реализаций — например, нативный Amazon Bedrock — напрямую не поддерживается.
-**GitHub Copilot** — это OAuth-провайдер (`ocx login github-copilot`), который обменивает вход
+**GitHub Copilot** — это OAuth-провайдер (`opr login github-copilot`), который обменивает вход
 через device flow GitHub на короткоживущий API-токен Copilot, а не принимает вставленный API-ключ.
 **GitLab Duo** остаётся шлюзом с ключом/токеном подписки на своей OpenAI-совместимой конечной
 точке. **Cloudflare AI Gateway** требует подставить в URL id аккаунта и шлюза.
 
 Cursor отслеживается отдельно как экспериментальный адаптер. `adapter: "cursor"` появляется в
-`ocx init` и в селекторе Add Provider дашборда как экспериментальная запись локальной конфигурации
+`opr init` и в селекторе Add Provider дашборда как экспериментальная запись локальной конфигурации
 с метаданными статического резервного каталога моделей Cursor. Когда настроен токен доступа Cursor,
 OpenProvider использует живой транспорт HTTP/2 Cursor. Его резервный список версии v2.7.1 включает
 `gpt-5.6-sol` / `terra` / `luna` (контекст 1M) плюс `grok-4.5` / `grok-4.5-fast` (500K); живое
@@ -232,7 +232,7 @@ Ollama Cloud — это размещённая в облаке (не локал�
 ## Любая OpenAI-совместимая конечная точка
 
 Если провайдер поддерживает Chat Completions, с ним справится адаптер `openai-chat` — выберите
-**Custom** в дашборде или `custom` в `ocx init` и введите базовый URL. Все поля провайдера
+**Custom** в дашборде или `custom` в `opr init` и введите базовый URL. Все поля провайдера
 (`headers`, `noReasoningModels`, `noVisionModels`, `models`, …) описаны в
 [справочнике по конфигурации](/ru/reference/configuration/).
 

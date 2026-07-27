@@ -592,7 +592,7 @@ export function createAnthropicAdapter(provider: OcxProviderConfig, cacheRetenti
     async buildRequest(parsed: OcxParsedRequest, incoming?: IncomingMeta) {
       if (typeof provider.apiKey !== "string" || provider.apiKey.trim() === "") {
         if (isOAuth) {
-          throw new Error("anthropic oauth token missing — run ocx login anthropic");
+          throw new Error("anthropic oauth token missing — run opr login anthropic");
         }
         throw new Error("anthropic provider requires a non-empty apiKey (authMode: key)");
       }

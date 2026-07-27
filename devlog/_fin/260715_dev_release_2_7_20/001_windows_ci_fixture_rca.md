@@ -3,7 +3,7 @@
 ## Red evidence
 
 - Candidate: `c048705248be6e55d4ab12745186d9351bbeb6dc`
-- Cross-platform CI: `https://github.com/lidge-jun/opencodex/actions/runs/29420930374`
+- Cross-platform CI: `https://github.com/lidge-jun/openprovider/actions/runs/29420930374`
 - Failed job: Windows full suite, job `87370883261`
 - Failures: the computer-use success/error-payload cases and record-screen start-success case in `tests/cursor-desktop-exec.test.ts`.
 - Symptom: the external executor exited with code 1 and `The system cannot find the path specified.` instead of returning the fixture JSON.

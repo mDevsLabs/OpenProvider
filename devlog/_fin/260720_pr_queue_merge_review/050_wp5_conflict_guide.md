@@ -12,8 +12,8 @@ content conflict 3파일의 구체적 해소안. 기여자(Wibias) 또는 mainta
 > multi-fetch 후 유효하지 않음. SHA를 명시적으로 보존하는 절차로 교체.
 
 ```
-git worktree add /tmp/ocx-merge-sim origin/main --detach
-cd /tmp/ocx-merge-sim
+git worktree add /tmp/opr-merge-sim origin/main --detach
+cd /tmp/opr-merge-sim
 git fetch origin pull/169/head
 pr169=$(git rev-parse FETCH_HEAD)
 git fetch origin pull/171/head
@@ -49,7 +49,7 @@ bun test tests/provider-workspace-state.test.ts tests/provider-workspace-auth.te
 
 `devlog/_plan/260720_pr_queue_merge_review/051_conflict_resolution.md`에
 파일별로: 충돌 hunk 요약, 수용안, 검증 명령. 완료 후
-`git worktree remove --force /tmp/ocx-merge-sim`로 스크래치 정리(티어다운
+`git worktree remove --force /tmp/opr-merge-sim`로 스크래치 정리(티어다운
 증거를 C에 기록).
 
 ## C-ACTIVATION-GROUNDING-01 시나리오 (A-gate fold #9)

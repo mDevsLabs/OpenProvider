@@ -7,7 +7,7 @@ import type { OcxConfig } from "../src/types";
 
 const dirs: string[] = [];
 function tempDir(): string {
-  const d = mkdtempSync(join(tmpdir(), "ocx-agents-"));
+  const d = mkdtempSync(join(tmpdir(), "opr-agents-"));
   dirs.push(d);
   return d;
 }
@@ -25,18 +25,18 @@ function generatedBodies(config: OcxConfig, dir: string): string[] {
 
 describe("buildClaudeAgentDefs (devlog 070 + audit 071)", () => {
   test("roster + pinned self from settings.json; [1m] marking; name collision suffix", () => {
-    const windows = { "claude-ocx-native--gpt-5.6-sol": 372_000, "claude-ocx-cursor--gpt-5.6-sol": 1_000_000 };
+    const windows = { "claude-opr-native--gpt-5.6-sol": 372_000, "claude-opr-cursor--gpt-5.6-sol": 1_000_000 };
     const dir = tempDir();
-    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-ocx-native--gpt-5.6-sol[1m]" }));
+    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-opr-native--gpt-5.6-sol[1m]" }));
     const defs = buildClaudeAgentDefs(cfg({
       subagentModels: ["gpt-5.6-sol", "cursor/gpt-5.6-sol"],
       claudeCode: {},
     }), windows, dir);
     const byName = Object.fromEntries(defs.map(d => [d.name, d]));
-    expect(byName["ocx-gpt-5-6-sol"]!.model).toBe("claude-ocx-native--gpt-5.6-sol[1m]"); // 372k >= 350k default
-    expect(byName["ocx-gpt-5-6-sol-2"]!.model).toBe("claude-ocx-cursor--gpt-5.6-sol[1m]"); // collision suffix
+    expect(byName["opr-gpt-5-6-sol"]!.model).toBe("claude-opr-native--gpt-5.6-sol[1m]"); // 372k >= 350k default
+    expect(byName["opr-gpt-5-6-sol-2"]!.model).toBe("claude-opr-cursor--gpt-5.6-sol[1m]"); // collision suffix
     // Self pins the picker-saved default (inherit disproven live — devlog 072).
-    expect(byName["ocx-self"]!.model).toBe("claude-ocx-native--gpt-5.6-sol[1m]");
+    expect(byName["opr-self"]!.model).toBe("claude-opr-native--gpt-5.6-sol[1m]");
     expect(defs).toHaveLength(3);
     // Dispatcher directive (live repro: model:"fable" override broke inherit).
     for (const d of defs) expect(d.description).toContain("`model` argument is ignored");
@@ -44,7 +44,7 @@ describe("buildClaudeAgentDefs (devlog 070 + audit 071)", () => {
 
   test("placeholder guidance recommends haiku, never sonnet (issue #252)", () => {
     const dir = tempDir();
-    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-ocx-native--gpt-5.6-sol" }));
+    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-opr-native--gpt-5.6-sol" }));
     const defs = buildClaudeAgentDefs(cfg({ subagentModels: ["gpt-5.6-sol"] }), {}, dir);
     expect(defs.length).toBeGreaterThan(0);
     for (const d of defs) {
@@ -60,7 +60,7 @@ describe("buildClaudeAgentDefs (devlog 070 + audit 071)", () => {
     const seeded = buildClaudeAgentDefs(cfg(), {}, dir);
     expect(seeded.length).toBe(5); // 5 defaults, no self (unresolvable)
     const explicit = buildClaudeAgentDefs(cfg({ subagentModels: [], claudeCode: { model: "mock/big" } }), {}, dir);
-    expect(explicit.map(d => d.name)).toEqual(["ocx-self"]);
+    expect(explicit.map(d => d.name)).toEqual(["opr-self"]);
     expect(explicit[0]!.model).toBe("mock/big"); // config fallback when settings absent
   });
 
@@ -78,16 +78,16 @@ describe("buildClaudeAgentDefs (devlog 070 + audit 071)", () => {
     expect(fields.name).toBe(def!.name);
     expect(fields.model).toBe(def!.model);
     expect(typeof fields.description).toBe("string");
-    expect(body).toContain("generated-by: opencodex");
-    expect(body).toContain(`ocx-route: ${def!.model}`);
+    expect(body).toContain("generated-by: openprovider");
+    expect(body).toContain(`opr-route: ${def!.model}`);
     expect(body).toContain("IDENTITY: your ACTUAL underlying model");
   });
 
   test("generated routed agents refuse the default blocked skill before its bundle expands", () => {
     const dir = tempDir();
-    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-ocx-native--gpt-5.6-sol" }));
+    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-opr-native--gpt-5.6-sol" }));
     const bodies = generatedBodies(cfg({ subagentModels: ["gpt-5.6-sol"] }), dir);
-    expect(bodies).toHaveLength(2); // roster + ocx-self
+    expect(bodies).toHaveLength(2); // roster + opr-self
     for (const body of bodies) {
       expect(body).toContain("Do not invoke blocked Claude Code skills");
       expect(body).toContain(JSON.stringify("claude-api"));
@@ -96,7 +96,7 @@ describe("buildClaudeAgentDefs (devlog 070 + audit 071)", () => {
 
   test("generated blocked-skill guard mirrors custom names and honors explicit opt-out", () => {
     const customDir = tempDir();
-    writeFileSync(join(customDir, "settings.json"), JSON.stringify({ model: "claude-ocx-native--gpt-5.6-sol" }));
+    writeFileSync(join(customDir, "settings.json"), JSON.stringify({ model: "claude-opr-native--gpt-5.6-sol" }));
     const customBodies = generatedBodies(cfg({
       subagentModels: ["gpt-5.6-sol"],
       claudeCode: { blockedSkills: [" My-Skill "] },
@@ -109,7 +109,7 @@ describe("buildClaudeAgentDefs (devlog 070 + audit 071)", () => {
     }
 
     const offDir = tempDir();
-    writeFileSync(join(offDir, "settings.json"), JSON.stringify({ model: "claude-ocx-native--gpt-5.6-sol" }));
+    writeFileSync(join(offDir, "settings.json"), JSON.stringify({ model: "claude-opr-native--gpt-5.6-sol" }));
     const offBodies = generatedBodies(cfg({
       subagentModels: ["gpt-5.6-sol"],
       claudeCode: { blockedSkills: [] },
@@ -163,21 +163,21 @@ describe("buildClaudeAgentDefs (devlog 070 + audit 071)", () => {
 });
 
 describe("syncClaudeAgentDefs ownership contract (audit 071 #2/#3)", () => {
-  test("writes, overwrites, and prunes ONLY marker-verified ocx files", () => {
+  test("writes, overwrites, and prunes ONLY marker-verified opr files", () => {
     const dir = tempDir();
-    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-ocx-native--gpt-5.6-sol" }));
+    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-opr-native--gpt-5.6-sol" }));
     const defs = buildClaudeAgentDefs(cfg({ subagentModels: ["gpt-5.6-sol"] }), {}, dir);
     expect(syncClaudeAgentDefs(defs, dir)!.length).toBe(2);
     const agentsDir = join(dir, "agents");
     // User-authored file with our prefix but no marker: untouched by prune AND by write.
-    writeFileSync(join(agentsDir, "ocx-custom.md"), "---\nname: ocx-custom\n---\nuser file");
-    writeFileSync(join(agentsDir, "ocx-gpt-5-6-sol.md"), "user replaced this — no marker");
+    writeFileSync(join(agentsDir, "opr-custom.md"), "---\nname: opr-custom\n---\nuser file");
+    writeFileSync(join(agentsDir, "opr-gpt-5-6-sol.md"), "user replaced this — no marker");
     const second = syncClaudeAgentDefs(buildClaudeAgentDefs(cfg({ subagentModels: [] }), {}, dir), dir)!;
-    expect(second).toEqual(["ocx-self.md"]);
+    expect(second).toEqual(["opr-self.md"]);
     const remaining = readdirSync(agentsDir).sort();
-    // ocx-self rewritten; unowned ocx-custom + user-replaced sol file both preserved.
-    expect(remaining).toEqual(["ocx-custom.md", "ocx-gpt-5-6-sol.md", "ocx-self.md"]);
-    expect(readFileSync(join(agentsDir, "ocx-gpt-5-6-sol.md"), "utf8")).toBe("user replaced this — no marker");
+    // opr-self rewritten; unowned opr-custom + user-replaced sol file both preserved.
+    expect(remaining).toEqual(["opr-custom.md", "opr-gpt-5-6-sol.md", "opr-self.md"]);
+    expect(readFileSync(join(agentsDir, "opr-gpt-5-6-sol.md"), "utf8")).toBe("user replaced this — no marker");
   });
 
   // Capability probe: Windows without elevated symlink rights throws EPERM. Detect once
@@ -200,7 +200,7 @@ describe("syncClaudeAgentDefs ownership contract (audit 071 #2/#3)", () => {
     const victim = join(dir, "victim.md");
     writeFileSync(victim, "precious");
     try {
-      symlinkSync(victim, join(agentsDir, "ocx-linked.md"));
+      symlinkSync(victim, join(agentsDir, "opr-linked.md"));
     } catch (err) {
       // Windows without Developer Mode / elevated privileges cannot create symlinks.
       if (process.platform === "win32" && (err as NodeJS.ErrnoException).code === "EPERM") {
@@ -210,12 +210,12 @@ describe("syncClaudeAgentDefs ownership contract (audit 071 #2/#3)", () => {
     }
     syncClaudeAgentDefs([], dir); // prune pass
     expect(readFileSync(victim, "utf8")).toBe("precious");
-    expect(readdirSync(agentsDir)).toContain("ocx-linked.md");
+    expect(readdirSync(agentsDir)).toContain("opr-linked.md");
   });
 
   test("injectClaudeAgentDefs prunes owned files when disabled (audit 071 #3)", () => {
     const dir = tempDir();
-    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-ocx-native--gpt-5.6-sol" }));
+    writeFileSync(join(dir, "settings.json"), JSON.stringify({ model: "claude-opr-native--gpt-5.6-sol" }));
     injectClaudeAgentDefs(cfg({ subagentModels: ["gpt-5.6-sol"] }), {}, dir);
     expect(readdirSync(join(dir, "agents")).length).toBe(2);
     injectClaudeAgentDefs(cfg({ subagentModels: ["gpt-5.6-sol"], claudeCode: { injectAgents: false } }), {}, dir);

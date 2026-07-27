@@ -8,5 +8,5 @@
 | 4 | Med | false-green 테스트 경로 | 수용 — 쿼리>UA 우선순위 / unknown UA 기본 해시 / ids=cli URL / 폴백 헬퍼 null 케이스 / readable [1m] 변형 / readable 티어 슬롯 마킹 테스트 추가 |
 | 5 | Low | UA 문자열 변경 시 조용한 해시 회귀 | 수용(기록) — 주 경로(캐시 선기록)는 ?ids=cli로 결정적. UA 정규식은 보조 |
 
-검증 확인: 디코드([1m] 선스트립 → claude-ocx 우선 해석), count_tokens 경로, 컨텍스트 맵의
+검증 확인: 디코드([1m] 선스트립 → claude-opr 우선 해석), count_tokens 경로, 컨텍스트 맵의
 readable 키 등록/티어 마킹은 현행 코드로 이미 건전 (감사 원문 결론).

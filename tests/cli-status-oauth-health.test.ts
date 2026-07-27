@@ -14,7 +14,7 @@ beforeEach(() => {
   tmp = join(tmpdir(), `cli-status-oauth-health-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(tmp, { recursive: true });
   process.env.HOME = tmp;
-  process.env.OPENCODEX_HOME = join(tmp, "ocx");
+  process.env.OPENCODEX_HOME = join(tmp, "opr");
 });
 
 afterEach(() => {
@@ -31,7 +31,7 @@ describe("formatOAuthHealthForStatus", () => {
       provider: "openai",
       accountId: "acct_abcdefghijklmnopqrstuvwxyz",
       health: { status: "reauth_required", reason: "refresh_failed" },
-      action: "run `ocx login openai`",
+      action: "run `opr login openai`",
     }]);
     expect(text).toContain("OAuth health: warning");
     expect(text).toContain("account-…wxyz");

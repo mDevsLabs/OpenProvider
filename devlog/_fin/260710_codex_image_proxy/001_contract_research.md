@@ -15,7 +15,7 @@ Current Codex does not expose the Responses hosted `image_generation` tool for t
 6. Relative paths append to the active provider base: `/Users/jun/Developer/codex/121_openai-codex/codex-rs/codex-api/src/provider.rs:52-85`.
 7. Codex expects an Images response whose `data` entries contain required `b64_json`: `/Users/jun/Developer/codex/121_openai-codex/codex-rs/codex-api/src/images.rs:55-70`.
 
-opencodex injects `openai_base_url = http://<host>:<port>/v1` and an equivalent provider table (`src/codex/inject.ts:76-96`). The relative call therefore becomes `/v1/images/generations` or `/v1/images/edits`. Neither route exists before the generic guard (`src/server/index.ts:292-350`).
+openprovider injects `openai_base_url = http://<host>:<port>/v1` and an equivalent provider table (`src/codex/inject.ts:76-96`). The relative call therefore becomes `/v1/images/generations` or `/v1/images/edits`. Neither route exists before the generic guard (`src/server/index.ts:292-350`).
 
 ## Competing hypotheses
 
@@ -35,7 +35,7 @@ Rejected. `responses_lite_uses_standalone_web_search_and_image_generation` and `
 
 Falsifier: Codex should hard-code another endpoint or the proxy should already match `images/*` before its guard.
 
-Supported. `ImagesClient` appends exactly `images/generations` or `images/edits`, while opencodex handles neither and emits the observed 404.
+Supported. `ImagesClient` appends exactly `images/generations` or `images/edits`, while openprovider handles neither and emits the observed 404.
 
 ## ima2-gen contrast
 
@@ -45,7 +45,7 @@ Supported. `ImagesClient` appends exactly `images/generations` or `images/edits`
 - It parses `image_generation_call.result` from Responses SSE/JSON (`lib/responsesParse.ts:326-349,430+`).
 - Its direct `/v1/images/generations` route belongs to a different provider pipeline, not GPT OAuth (`structure/03-server-api.md:70`).
 
-Therefore opencodex must not translate the Codex standalone call into ima2-gen's hosted-tool workflow. Codex itself owns the local tool call and expects a normal Images response.
+Therefore openprovider must not translate the Codex standalone call into ima2-gen's hosted-tool workflow. Codex itself owns the local tool call and expects a normal Images response.
 
 ## Official public OpenAI contract
 
@@ -66,7 +66,7 @@ They confirm:
 
 The public edit mismatch is a reason to preserve request bytes/content type, not to rewrite Codex JSON into multipart. Forward-mode behavior is governed by the source-proven Codex private contract. No claim is made that public docs prove the private backend.
 
-## Existing opencodex patterns
+## Existing openprovider patterns
 
 - Data-plane gate order: `src/server/index.ts:295-316`.
 - Account selection and auth override: `src/codex/auth-context.ts:74-151`.

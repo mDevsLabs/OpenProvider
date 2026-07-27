@@ -79,7 +79,7 @@ async function readAnthropicBody(req: Request): Promise<unknown> {
 const PASSTHROUGH_STRIP_HEADERS = new Set([
   "connection", "keep-alive", "transfer-encoding", "upgrade", "te", "trailer",
   "proxy-authenticate", "proxy-authorization", "host", "content-length",
-  "accept-encoding", "x-opencodex-api-key", "origin",
+  "accept-encoding", "x-openprovider-api-key", "origin",
 ]);
 
 function hasAnthropicNativeCredential(req: Request): boolean {
@@ -529,7 +529,7 @@ export async function handleClaudeMessages(
     if (isRec(anthropicBody) && typeof anthropicBody.model === "string") {
       anthropicBody.model = stripOneMillionMarker(anthropicBody.model);
     }
-    // ocx-route override (devlog 072): injected agent bodies pin their model via a
+    // opr-route override (devlog 072): injected agent bodies pin their model via a
     // system-prompt directive because 2.1.207 ignores custom ids in agent
     // frontmatter. Must run BEFORE the native-passthrough branch — the CLI sends
     // these subagent turns under a fallback claude model id.
@@ -616,7 +616,7 @@ export async function handleClaudeMessages(
 
   const headers = new Headers({ "content-type": "application/json" });
   for (const name of FORWARD_HEADERS) {
-    // The caller's bearer is the proxy admission token (ocx claude placeholder), never a
+    // The caller's bearer is the proxy admission token (opr claude placeholder), never a
     // ChatGPT credential — forwarding it upstream turns into {"detail":"Unauthorized"}.
     if (name === "authorization") continue;
     const value = req.headers.get(name);
@@ -794,7 +794,7 @@ export async function handleClaudeCountTokens(req: Request, config: OcxConfig): 
     model = stripped;
     raw.model = model;
   }
-  // ocx-route override (devlog 072): keep count_tokens consistent with messages.
+  // opr-route override (devlog 072): keep count_tokens consistent with messages.
   const countRoute = extractOcxRouteDirective(raw);
   if (countRoute) {
     model = stripOneMillionMarker(countRoute);

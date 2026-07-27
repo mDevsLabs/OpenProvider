@@ -11,7 +11,7 @@ refresh token, race writes to auth.json, or miss a fresher Kiro CLI token.
 
 ## Scope
 
-Implement the hardening that is correct inside current opencodex ownership:
+Implement the hardening that is correct inside current openprovider ownership:
 
 - general per-provider singleflight around `getValidAccessToken` refresh work
 - Kiro-only SQLite reload before refreshing: if installed Kiro CLI has a fresh
@@ -65,7 +65,7 @@ and mock `globalThis.fetch`.
 - Singleflight map always clears after success/failure.
 - Existing valid credentials remain fast-path and do not touch SQLite/fetch.
 - Kiro reload path never weakens credential precedence at login time; it only
-  prevents stale refresh races once an opencodex Kiro credential already exists.
+  prevents stale refresh races once an openprovider Kiro credential already exists.
 
 ## Commit
 

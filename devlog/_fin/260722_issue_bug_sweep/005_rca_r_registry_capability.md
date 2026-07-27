@@ -7,7 +7,7 @@
 
 ### 증상 재현 (코드 검사로 확정)
 
-`ocx models`는 configured provider를 직접 읽어 `defaultModel`을 먼저 출력(`src/cli/models.ts:19,51`) —
+`opr models`는 configured provider를 직접 읽어 `defaultModel`을 먼저 출력(`src/cli/models.ts:19,51`) —
 카탈로그 진입과 무관. 반면 대시보드·`/v1/models`는 `gatherRoutedModels()` 경유라 0행.
 
 ### 데이터 플로우 (파일:라인)
@@ -24,7 +24,7 @@
 **google-vertex의 인벤토리 소스가 현 코드에 연결돼 있지 않다** — static 시드도, Vertex 전용 discovery도 없어
 generic OpenAI형 discovery가 호환되지 않는 엔드포인트를 두드리고 조용히 빈 목록으로 격하된다.
 (Vertex 전용 `publishers/*/models` REST는 존재하므로 "소스 부재"가 아니라 "미구현 호환 갭"이 정확한 원인.)
-defaultModel을 카탈로그 멤버로 안 치는 것은 의도된 설계라 `ocx models`와의 분열이 발생.
+defaultModel을 카탈로그 멤버로 안 치는 것은 의도된 설계라 `opr models`와의 분열이 발생.
 auth 모드·adapter 특례는 부차적: 인증이 완벽해도 그 URL은 카탈로그를 반환하지 않는다.
 
 ### 수정 방향 (021 패치 단위 입력)

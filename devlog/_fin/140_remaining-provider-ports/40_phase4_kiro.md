@@ -7,7 +7,7 @@
 
 ## Goal
 
-Stream kiro (AWS CodeWhisperer agent) through opencodex via import-first auth + the shared AWS
+Stream kiro (AWS CodeWhisperer agent) through openprovider via import-first auth + the shared AWS
 eventstream decoder. Requires anti-detection fingerprint headers for upstream acceptance.
 
 ## What we port (jawcode)
@@ -22,7 +22,7 @@ eventstream decoder. Requires anti-detection fingerprint headers for upstream ac
 - **Streaming** (`kiro.ts:31,591`): reuses `decodeEventStream` from `aws-eventstream.ts` → **the Phase 30 module**.
 - **Models** (`special.ts:82-91`): 8 static (`kiro-auto`, `claude-sonnet-4.5`, `claude-haiku-4.5`, `deepseek-3.2`, `minimax-m2.5`, `glm-5`, `qwen3-coder-next`, …).
 
-## opencodex fit
+## openprovider fit
 
 - **NEW** `src/oauth/kiro.ts` (SQLite read + refresh; import-only, no PKCE) → register in `OAUTH_PROVIDERS`.
 - **NEW** `src/adapters/kiro.ts` (`buildRequest` payload+fingerprint headers+conversation-id; `parseStream` via the **shared `src/lib/eventstream-decoder.ts` from Phase 30**).
@@ -32,7 +32,7 @@ eventstream decoder. Requires anti-detection fingerprint headers for upstream ac
 
 1. **A:** `src/oauth/kiro.ts` — SQLite token read (mac+linux paths) + manual-paste fallback + desktop refresh; register in `OAUTH_PROVIDERS`. Test both import paths.
 2. **B:** `src/adapters/kiro.ts` — `buildPayload` port + fingerprint/User-Agent + conversation-id hash; `parseStream` over `decodeEventStream` (Phase 30) + `parseKiroPayload` heuristics; wire `resolveAdapter`; 8-model lookup.
-3. **C:** `ocx login kiro` (import) → single-turn text on `kiro-auto`; assert stream + 401→refresh; `tsc`/`bun test`.
+3. **C:** `opr login kiro` (import) → single-turn text on `kiro-auto`; assert stream + 401→refresh; `tsc`/`bun test`.
 
 ## Risks
 

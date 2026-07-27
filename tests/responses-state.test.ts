@@ -47,12 +47,12 @@ function isExactGuidanceItem(item: unknown, text: string): boolean {
 
 describe("Responses previous_response_id state", () => {
   // Sandbox OPENCODEX_HOME: the state store now snapshots to disk, and these tests must never
-  // touch the real ~/.opencodex.
+  // touch the real ~/.openprovider.
   let home: string;
   const priorHome = process.env["OPENCODEX_HOME"];
 
   beforeEach(() => {
-    home = mkdtempSync(join(tmpdir(), "ocx-state-test-"));
+    home = mkdtempSync(join(tmpdir(), "opr-state-test-"));
     process.env["OPENCODEX_HOME"] = home;
     clearResponseStateMemoryForTests();
   });
@@ -654,12 +654,12 @@ describe("Responses previous_response_id state", () => {
   test("recovers only old response-state temps owned by dead processes", () => {
     const old = new Date(Date.now() - 60 * 60 * 1_000);
     const deadPid = process.pid === 4242 ? 4243 : 4242;
-    const stale = join(home, `responses-state.json.ocx.${deadPid}.1.tmp`);
-    const live = join(home, "responses-state.json.ocx.5252.2.tmp");
-    const current = join(home, `responses-state.json.ocx.${process.pid}.3.tmp`);
-    const young = join(home, "responses-state.json.ocx.6262.4.tmp");
-    const unrelated = join(home, "responses-state.json.ocx.7272.tmp");
-    const directory = join(home, "responses-state.json.ocx.8282.5.tmp");
+    const stale = join(home, `responses-state.json.opr.${deadPid}.1.tmp`);
+    const live = join(home, "responses-state.json.opr.5252.2.tmp");
+    const current = join(home, `responses-state.json.opr.${process.pid}.3.tmp`);
+    const young = join(home, "responses-state.json.opr.6262.4.tmp");
+    const unrelated = join(home, "responses-state.json.opr.7272.tmp");
+    const directory = join(home, "responses-state.json.opr.8282.5.tmp");
     for (const path of [stale, live, current, young, unrelated]) writeFileSync(path, "private state");
     mkdirSync(directory);
     for (const path of [stale, live, current, unrelated, directory]) utimesSync(path, old, old);
@@ -676,7 +676,7 @@ describe("Responses previous_response_id state", () => {
 
   test("stale temp recovery is best-effort when unlink fails", () => {
     const deadPid = process.pid === 4242 ? 4243 : 4242;
-    const path = join(home, `responses-state.json.ocx.${deadPid}.1.tmp`);
+    const path = join(home, `responses-state.json.opr.${deadPid}.1.tmp`);
     writeFileSync(path, "private state");
     const old = new Date(Date.now() - 60 * 60 * 1_000);
     utimesSync(path, old, old);
@@ -692,8 +692,8 @@ describe("Responses previous_response_id state", () => {
 
   test("stale temp recovery stops at injectable enumeration and cleanup caps", () => {
     const old = new Date(Date.now() - 60 * 60 * 1_000);
-    const first = "responses-state.json.ocx.7001.1.tmp";
-    const second = "responses-state.json.ocx.7002.2.tmp";
+    const first = "responses-state.json.opr.7001.1.tmp";
+    const second = "responses-state.json.opr.7002.2.tmp";
     for (const name of [first, second]) {
       const path = join(home, name);
       writeFileSync(path, "private state");

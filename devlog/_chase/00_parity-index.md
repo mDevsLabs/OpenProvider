@@ -1,6 +1,6 @@
 # parity 분석 인덱스 (3 upstream)
 
-opencodex 프록시 레이어가 따라잡는 세 upstream의 parity 스냅샷. 각 문서는
+openprovider 프록시 레이어가 따라잡는 세 upstream의 parity 스냅샷. 각 문서는
 분석 시점의 upstream HEAD를 박아둔다. 재분석 시 HEAD를 갱신하고 delta만 본다.
 
 ## 분석 baseline HEAD (2026-07-01 분석)
@@ -14,12 +14,12 @@ opencodex 프록시 레이어가 따라잡는 세 upstream의 parity 스냅샷. 
 > jawcode 로컬 HEAD는 분석 직후 `a06f814`(docs-only, `docs(chase): close 10.062 → _fin`)로
 > 한 커밋 앞섰다. 코드 변경 없음 — 분석 baseline은 마지막 코드 커밋 `27311f6`이 정확하다.
 
-opencodex baseline (분석 시): registry provider **48개**, adapter 종류 6
+openprovider baseline (분석 시): registry provider **48개**, adapter 종류 6
 (`openai-chat`×37, `anthropic`×4, `google`×3, `openai-responses`×2, `kiro`×1, `azure-openai`×1).
 
 ## 세 upstream의 성격이 다르다 (parity 축도 다름)
 
-| upstream | 성격 | opencodex와의 관계 | parity 축 |
+| upstream | 성격 | openprovider와의 관계 | parity 축 |
 |---|---|---|---|
 | jawcode | TS 멀티-프로바이더 AI 패키지 (47 provider 모듈) | **직접 포팅 출처** (1차 SOT) | provider-by-provider wire/auth 1:1 대조 |
 | cli-proxy-api | Go OAuth IDE 프록시 (antigravity/codex/claude/kimi/vertex/xai) | wire/auth/quirks **외부 교차검증** (2차) | executor/translator/signature 동작 대조 |

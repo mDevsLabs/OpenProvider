@@ -44,7 +44,7 @@ refresh가 실패하며 `needsReauth: true`가 영속화되고 Anthropic 모델�
 
 ### 라이프사이클 맵 (파일:라인)
 
-- 저장: `~/.opencodex/auth.json` (`src/config.ts:268`, `src/oauth/store.ts:30`); temp+rename 원자 쓰기(`config.ts:72`), 프로세스 내 직렬화 + 크로스 프로세스 락(`store.ts:185`) — **단 락이 외부 Anthropic refresh 요청까지 소유권을 유지하지는 않음**
+- 저장: `~/.openprovider/auth.json` (`src/config.ts:268`, `src/oauth/store.ts:30`); temp+rename 원자 쓰기(`config.ts:72`), 프로세스 내 직렬화 + 크로스 프로세스 락(`store.ts:185`) — **단 락이 외부 Anthropic refresh 요청까지 소유권을 유지하지는 않음**
 - 획득: 기본 로그인이 Windows `~/.claude/.credentials.json`에서 Claude Code 자격을 import하고 `source:"local-cli"` 라벨 (`src/oauth/local-token-detect.ts:82`, `src/oauth/anthropic.ts:119`); refresh는 회전된 refresh token 수용·영속 (`anthropic.ts:148`)
 - 트리거: 1분 조기 만료 판정(`src/oauth/index.ts:193`) + Anthropic 자체 5분 차감(`anthropic.ts:59`) = 실효 ~6분 조기; 모델 리스팅이 토큰 리졸버를 불러 대시보드 로드 즉시 refresh 가능(`index.ts:330`)
 - needsReauth SET: generic refresh 에러 텍스트에 `invalid_grant|refresh_token_reused|revoked|access_denied|expired_token` 포함 시 영구 마킹 (`index.ts:250,309`); **xAI만** generation-aware `markAccountNeedsReauthIfGeneration` 사용(`index.ts:272`) — Anthropic은 비-generation 경로
@@ -52,8 +52,8 @@ refresh가 실패하며 `needsReauth: true`가 영속화되고 Anthropic 모델�
 
 ### 원인 가설 (순위)
 
-1. **(고신뢰) Claude Code 공유 refresh-token 회전 레이스** — OpenCodex가 같은 회전 토큰의 사본을 보유; Claude Code가 먼저 refresh하면 OpenCodex의 이전 토큰은 single-use 무효 → 다음 refresh가 invalid_grant → 영구 마킹. 삭제 후 재추가가 즉시 낫는 이유: 최신 Claude Code 자격을 다시 import하기 때문. xAI에는 local-CLI 재읽기/adopt/detach + refresh-intent 락이 있는데 Anthropic에는 없음(`index.ts:260`).
-2. (중) OpenCodex 동시 refresh 경쟁 — per-account 크로스 프로세스 refresh 락·generation CAS 부재(`index.ts:195,274`); 패자가 신규 generation 위에 무조건 마킹 가능.
+1. **(고신뢰) Claude Code 공유 refresh-token 회전 레이스** — OpenProvider가 같은 회전 토큰의 사본을 보유; Claude Code가 먼저 refresh하면 OpenProvider의 이전 토큰은 single-use 무효 → 다음 refresh가 invalid_grant → 영구 마킹. 삭제 후 재추가가 즉시 낫는 이유: 최신 Claude Code 자격을 다시 import하기 때문. xAI에는 local-CLI 재읽기/adopt/detach + refresh-intent 락이 있는데 Anthropic에는 없음(`index.ts:260`).
+2. (중) OpenProvider 동시 refresh 경쟁 — per-account 크로스 프로세스 refresh 락·generation CAS 부재(`index.ts:195,274`); 패자가 신규 generation 위에 무조건 마킹 가능.
 3. (중저) upstream의 실제 거절/차단 — 코드 자체가 서버측 차단 가능성 경고(`index.ts:71`); 리포트에 refresh 응답 로그가 없어 판별 불가.
 4. (저) 부팅 시 네트워크 미가용 — Task Scheduler가 네트워크 무관 즉시 시작(`service.ts:416`)이지만 fetch 실패는 terminal substring 불일치라 마킹으로 직행하지 않음.
 

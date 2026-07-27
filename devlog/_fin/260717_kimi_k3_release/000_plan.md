@@ -39,7 +39,7 @@ and `main` and publish npm `latest` as `2.7.23`.
   and the running proxy are not mutated.
 - The exact release SHA must pass Cross-platform CI before workflow dispatch.
 - Completion requires npm registry, npm `latest`, Git tag, GitHub Release,
-  branch alignment, and a fresh global-install `ocx help` smoke.
+  branch alignment, and a fresh global-install `opr help` smoke.
 
 ## Scope manifest
 

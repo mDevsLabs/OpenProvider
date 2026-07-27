@@ -12,7 +12,7 @@ type Family = typeof FAMILIES[number];
  * Family collapse lives under its own key: the Models page collapses PROVIDERS, and a
  * shared key would make folding "opus" here fold a provider of the same name there.
  */
-const FAMILY_COLLAPSE = makeCollapseStore("ocx.claudeDesktop.collapsedFamilies.v1");
+const FAMILY_COLLAPSE = makeCollapseStore("opr.claudeDesktop.collapsedFamilies.v1");
 
 interface Assignment {
   family: Family;
@@ -354,7 +354,7 @@ export default function ClaudeDesktop({ apiBase }: { apiBase: string }) {
         <EmptyState title={t("claudeDesktop.emptyTitle")}>{t("claudeDesktop.emptyHint")}</EmptyState>
       )}
 
-      <div className="ocx-group-stack" aria-label={t("claudeDesktop.assignmentsLabel")}>
+      <div className="opr-group-stack" aria-label={t("claudeDesktop.assignmentsLabel")}>
         {FAMILIES.map(family => {
           // Render-only narrowing: the lane header, effectiveDefaults and every assignment keep
           // reading the full list, so filtering can never change what Claude Desktop resolves.
@@ -365,32 +365,32 @@ export default function ClaudeDesktop({ apiBase }: { apiBase: string }) {
           return (
           <section
             key={family}
-            className={`ocx-group${isCollapsed ? " collapsed" : ""}`}
+            className={`opr-group${isCollapsed ? " collapsed" : ""}`}
             aria-labelledby={`claude-lane-${family}`}
             onDragOver={event => event.preventDefault()}
             onDrop={event => dropOnLane(event, family)}
           >
-            <header className={`ocx-group-head${isCollapsed ? "" : " open"}`}>
+            <header className={`opr-group-head${isCollapsed ? "" : " open"}`}>
               {/* The button goes INSIDE the heading: a heading is not phrasing content, so
                   nesting it the other way round is invalid. This keeps the family in the
                   a11y tree and gives the toggle its name. */}
-              <h3 id={`claude-lane-${family}`} className="ocx-group-heading">
+              <h3 id={`claude-lane-${family}`} className="opr-group-heading">
                 <button
                   type="button"
-                  className="ocx-group-toggle"
+                  className="opr-group-toggle"
                   aria-expanded={!isCollapsed}
                   aria-controls={`claude-lane-body-${family}`}
                   onClick={() => toggleFamily(family)}
                 >
                   <IconChevron
-                    className="ocx-chevron"
+                    className="opr-chevron"
                     width={14}
                     height={14}
                     aria-hidden="true"
                     style={{ transform: isCollapsed ? "none" : "rotate(90deg)" }}
                   />
-                  <span className="ocx-group-name">{t(FAMILY_KEYS[family])}</span>
-                  <span className="ocx-group-count">
+                  <span className="opr-group-name">{t(FAMILY_KEYS[family])}</span>
+                  <span className="opr-group-count">
                     {t(all.length === 1 ? "claudeDesktop.modelCountOne" : "claudeDesktop.modelCountMany", { count: all.length })}
                   </span>
                   {/* Collapsed legibility: the resolved default is what a user opens a
@@ -452,7 +452,7 @@ export default function ClaudeDesktop({ apiBase }: { apiBase: string }) {
                       onClick={() => setOpenRows(current => ({ ...current, [model.route]: !rowOpen }))}
                     >
                       <IconChevron
-                        className="ocx-chevron"
+                        className="opr-chevron"
                         width={12}
                         height={12}
                         aria-hidden="true"

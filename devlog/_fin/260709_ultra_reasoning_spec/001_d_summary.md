@@ -35,10 +35,10 @@
 - Died: "sol has its own patch series" — upstream `sol` is only the GPT-5.6 family codename
   (model-provider-info/src/lib.rs:43) and a realtime voice; ultra is the substantive series.
 - Residual: whether OpenAI's REAL backend catalog advertises `ultra` for gpt-5.6-sol is
-  unverified (no live catalog access; ocx synthesizes these entries from the gpt-5.5 template).
+  unverified (no live catalog access; opr synthesizes these entries from the gpt-5.5 template).
   If upstream later ships a different ladder for 5.6, `ensureGpt56ReasoningLevels` is the single
   place to amend. Evidence that would prove this wrong: a captured real `/models` response for
   gpt-5.6-* without ultra, or with a different order.
 - Residual: proactive multi-agent derivation is client-owned; if a Codex build older than
-  df1199fdd is pointed at ocx, selecting ultra sends raw "ultra" — parser normalization covers
+  df1199fdd is pointed at opr, selecting ultra sends raw "ultra" — parser normalization covers
   it (test-asserted), but no live end-to-end run with such a build was performed.

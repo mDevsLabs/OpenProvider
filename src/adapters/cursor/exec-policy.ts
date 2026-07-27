@@ -11,7 +11,7 @@ export const CURSOR_SANDBOX_FULL_ACCESS_RE = /sandbox_mode[^\n]{0,80}danger-full
  * The UNSET default is "off". `nativeLocalExec: "on"` is the only non-legacy setting that
  * authorizes Cursor server-driven local read/write/delete/ls/grep/shell/fetch execution.
  * `nativeLocalExec: "codex-sandbox"` is kept as a recognized legacy/deprecated spelling but is
- * fail-closed: opencodex has no trustworthy per-request attestation that caller-supplied
+ * fail-closed: openprovider has no trustworthy per-request attestation that caller-supplied
  * Responses instructions/system/developer prose reflects a real Codex sandbox state.
  */
 export function resolveCursorNativeExecMode(provider: OcxProviderConfig): CursorNativeExecMode {

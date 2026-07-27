@@ -24,11 +24,11 @@ Korean:
 - architecture.md:123 `#the-subagent-picker` → should be `#서브에이전트-선택기`
 - claude-code.md:230, sidecars.md:129 `#sidecars` → `#사이드카`
 - providers.md:157 `#cursor-provider-adapter-cursor` → `#cursor-프로바이더-adapter-cursor`
-- codex-integration.md:164 `#ocx-service` → `#ocx-service-subcommand` (also broken in English)
+- codex-integration.md:164 `#opr-service` → `#opr-service-subcommand` (also broken in English)
 
 Chinese:
 - providers.md:145 `#cursor-provider-adapter-cursor` → `#cursor-provideradapter-cursor`
-- codex-integration.md:157 `#ocx-service` → `#ocx-service-subcommand` (inherited from English)
+- codex-integration.md:157 `#opr-service` → `#opr-service-subcommand` (inherited from English)
 
 ## MEDIUM — Korean Quality
 

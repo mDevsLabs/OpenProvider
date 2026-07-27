@@ -4,7 +4,7 @@ Date: 2026-07-23. Goal-mode (HOTL) 사이클 1/3. QA 직전까지 프로덕션�
 
 ## Scope
 
-### 1. `ocx ensure` live-proxy 분기 grok 재주입 (c1)
+### 1. `opr ensure` live-proxy 분기 grok 재주입 (c1)
 
 현황: `handleEnsure()` live 분기(src/cli/index.ts:290-299)는 `syncModelsToCodex`+`injectSystemEnv`만 수행 — grok config는 start 경로에서만 주입됨. 리뷰어(Socrates R1) 수용 잔여.
 
@@ -12,13 +12,13 @@ Date: 2026-07-23. Goal-mode (HOTL) 사이클 1/3. QA 직전까지 프로덕션�
 
 - **오딧 블로커 1 (readiness race):** ensure의 spawned-child 경로는 `/healthz` 응답 직후 부모가 리턴하는데 자식의 grok 주입은 그보다 늦음 → ensure 부모가 `waitForProxy()` 성공 후 **직접** `syncGrokConfig(port, ...)`를 호출해 결정론적으로 주입 완료를 보장 (자식 주입과 멱등 충돌 없음 — 동일 블록 교체).
 - **오딧 블로커 3 (live hostname):** live 분기에서는 `config.hostname`이 아니라 `live.hostname`(proxy-liveness 런타임 기록)을 hostname으로 전달. spawned 분기는 방금 띄운 config 기준이므로 config.hostname 사용.
-- **오딧 제안 4 (관측성):** `syncGrokConfig`는 `GrokInjectResult`를 반환(테스트 가능); 명시적 `ocx ensure`에서 ok:false를 경고로 표면화. 테스트: `tests/grok-sync.test.ts` — deps 주입으로 fetch 목킹, ensure-경로 재주입/hostname 선택/실패 표면화 검증.
+- **오딧 제안 4 (관측성):** `syncGrokConfig`는 `GrokInjectResult`를 반환(테스트 가능); 명시적 `opr ensure`에서 ok:false를 경고로 표면화. 테스트: `tests/grok-sync.test.ts` — deps 주입으로 fetch 목킹, ensure-경로 재주입/hostname 선택/실패 표면화 검증.
 
-### 2. `ocx restart` 왕복 검증 (c2)
+### 2. `opr restart` 왕복 검증 (c2)
 
 restart = handleStop → handleEnsure. stop이 strip, ensure가 자식 spawn(start) 또는 live 재주입. 격리 환경(:10190)에서 start→restart 후 펜스 1개·모델 반영 확인.
 
-- **오딧 블로커 2 (service-installed restart) — 유예의 정확한 범위:** 이 결함은 grok 신규 코드가 아니라 **기존 `ocx restart` 자체의 결함**이다: handleStop이 설치된 service manager를 중지한 뒤 handleEnsure가 unmanaged detached child로 대체하므로, service-installed 환경에서 restart는 **자동 재시작/로그인-시작 보장(service persistence)을 상실**한다. 또한 그 unmanaged child가 죽으면 grok fence는 dead proxy를 가리킨 채 **다음 start/ensure가 호출될 때까지 무기한** 남는다 (짧다는 보장 없음). 이 환경에서 라이브 재현 불가(실 launchd 서비스가 프로덕션 :10100 소유). 유예 조건(오딧 합의): ① 이번 wp4 verifier는 **non-service 경로 전제**임을 receipts에 명시, ② service-installed `ocx restart`의 persistence 손실 + 무기한 stale-fence 가능성을 wp5 문서 known-limitations에 **release-known-limitation으로 명기**, ③ 후속 acceptance criterion("service-installed restart는 service manager를 통해 재시작하고 fence를 재보장한다")을 receipts에 후속 과제로 고정. 기존-결함 수정 자체는 goal 파일 스코프(restart 재설계)가 아니므로 별도 이슈 대상.
+- **오딧 블로커 2 (service-installed restart) — 유예의 정확한 범위:** 이 결함은 grok 신규 코드가 아니라 **기존 `opr restart` 자체의 결함**이다: handleStop이 설치된 service manager를 중지한 뒤 handleEnsure가 unmanaged detached child로 대체하므로, service-installed 환경에서 restart는 **자동 재시작/로그인-시작 보장(service persistence)을 상실**한다. 또한 그 unmanaged child가 죽으면 grok fence는 dead proxy를 가리킨 채 **다음 start/ensure가 호출될 때까지 무기한** 남는다 (짧다는 보장 없음). 이 환경에서 라이브 재현 불가(실 launchd 서비스가 프로덕션 :10100 소유). 유예 조건(오딧 합의): ① 이번 wp4 verifier는 **non-service 경로 전제**임을 receipts에 명시, ② service-installed `opr restart`의 persistence 손실 + 무기한 stale-fence 가능성을 wp5 문서 known-limitations에 **release-known-limitation으로 명기**, ③ 후속 acceptance criterion("service-installed restart는 service manager를 통해 재시작하고 fence를 재보장한다")을 receipts에 후속 과제로 고정. 기존-결함 수정 자체는 goal 파일 스코프(restart 재설계)가 아니므로 별도 이슈 대상.
 
 ### 3. heartbeat 결정 (c3)
 

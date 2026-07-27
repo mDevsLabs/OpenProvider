@@ -33,7 +33,7 @@ describe("update stops the running proxy before replacing files", () => {
     const installAt = launcherSource.indexOf('spawnSync(npm, ["install", "-g"');
     expect(stopAt).toBeGreaterThan(-1);
     expect(stopAt).toBeLessThan(installAt);
-    expect(launcherSource).toContain('existsSync(join(configDir(), "ocx.pid"))');
+    expect(launcherSource).toContain('existsSync(join(configDir(), "opr.pid"))');
     expect(launcherSource).toContain('existsSync(join(configDir(), "runtime-port.json"))');
   });
 
@@ -54,7 +54,7 @@ describe("update stops the running proxy before replacing files", () => {
   });
 
   test("both update paths surface a skipped history restore after the stop", () => {
-    // A codex-history-backup-*.json surviving `ocx stop` means the native-history restore
+    // A codex-history-backup-*.json surviving `opr stop` means the native-history restore
     // was skipped (locked state DB) — users must be told or their threads silently stay
     // hidden in the Codex app.
     expect(updateSource).toContain("export function historyRestoreIncomplete(");
@@ -87,7 +87,7 @@ describe("update stops the running proxy before replacing files", () => {
   });
 });
 
-describe("ocx update --help has no side effects (#168)", () => {
+describe("opr update --help has no side effects (#168)", () => {
   test("the Bun CLI short-circuits help before importing the update runner", () => {
     const caseAt = cliSource.indexOf('case "update"');
     const helpAt = cliSource.indexOf('printSubcommandUsage("update")');
@@ -111,7 +111,7 @@ describe("ocx update --help has no side effects (#168)", () => {
 
 describe("/healthz identity fields", () => {
   test("healthz advertises service identity, pid, and port", () => {
-    expect(serverSource).toContain('service: "opencodex"');
+    expect(serverSource).toContain('service: "openprovider"');
     expect(serverSource).toContain("pid: process.pid");
     expect(serverSource).toContain("port: listenPort");
   });

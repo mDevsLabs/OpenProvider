@@ -9,14 +9,14 @@ Codex:
 
 - Cursor sometimes emitted one `exec_command`, waited for the result, then continued
   one-at-a-time.
-- The assistant text sometimes described `mcp_opencodex-responses_exec_command` or
+- The assistant text sometimes described `mcp_openprovider-responses_exec_command` or
   MCP-shaped names instead of simply treating `exec_command` as the available Codex
   tool.
 - The delay between a tool closing and the next tool opening was much longer than on
   OpenAI/Codex-native surfaces.
 
 This is Cursor-specific. The bridge exposes Responses client tools to Cursor as
-`McpToolDefinition` entries with provider `opencodex-responses`; this is the Cursor
+`McpToolDefinition` entries with provider `openprovider-responses`; this is the Cursor
 tool protocol shape, not an external MCP server. Cursor then sends `execServerMessage`
 `mcpArgs` frames when it wants a Responses client tool call.
 
@@ -35,7 +35,7 @@ tool protocol shape, not an external MCP server. Cursor then sends `execServerMe
    current catalog. The right correction is a catalog-grounded nudge, not a fake tool
    alias.
 4. Cursor's stateless Responses bridge cannot return a real `mcpResult` into the same
-   Cursor run. Once Cursor asks for a Responses bridge tool, opencodex must surface the
+   Cursor run. Once Cursor asks for a Responses bridge tool, openprovider must surface the
    tool call to Codex, finalize the local Responses turn, cancel/suspend the Cursor h2
    run, then continue on the next `/v1/responses` request with the tool result in
    history.
@@ -68,7 +68,7 @@ disabled on tool-result continuation turns.
 
 The old nudge said the tool was "not MCP". Internally the Cursor protocol shape is
 MCP-like, so this wording can conflict with what Cursor exposes and make the assistant
-talk about `mcp_opencodex-responses_*`.
+talk about `mcp_openprovider-responses_*`.
 
 Verdict: accepted. Use the precise phrase: `exec_command` is the Codex Responses bridge
 exec tool exposed through Cursor's tool protocol; it is not an external MCP server tool.

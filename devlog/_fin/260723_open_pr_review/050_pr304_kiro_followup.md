@@ -15,7 +15,7 @@
   - d4f612ff fix(kiro): complete turns on clean text EOF (the real new fix — Codex turns
     hung after Kiro returned a complete plain-text answer; now accepts clean text EOF
     without a second upstream generation).
-  - 5317d4f2 fix(test): isolate suite from user Codex/opencodex state (`scripts/test.ts`
+  - 5317d4f2 fix(test): isolate suite from user Codex/openprovider state (`scripts/test.ts`
     sandboxing) — genuinely useful for CI hygiene.
   - kiro-credentials: adds `kirocli:oidc:*` (correct spelling) alongside legacy `odic` keys,
     `KIROCLI_DB_PATH`/`KIROCLI_TOKEN_KEY` selectors, ambiguous-token fail-fast diagnostics.

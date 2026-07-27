@@ -62,7 +62,7 @@ Rewrite local/remote `dev` so it contains only non-Cursor work from `main..origi
 - `33e04ba` fix(cursor): preserve native codex catalog rows
 - `43531ca` feat(cursor): enable live transport bridge
 - `dcef33b` feat(cursor): complete native exec bridge coverage
-- `b2d272f` docs(cursor): verify installed ocx entrypoint
+- `b2d272f` docs(cursor): verify installed opr entrypoint
 - `698bbba` fix(router): prefer OpenAI for bare GPT models
 - `d9d2c61` fix(cursor): preserve split connect frames
 - `14d4bc3` docs(cursor): record runtime safe verification
@@ -74,8 +74,8 @@ Rewrite local/remote `dev` so it contains only non-Cursor work from `main..origi
 - `e256b48` docs(devlog): 350.101 plan — cursor OAuth WP17 registry + CLI
 - `b248a98` feat(oauth): register Cursor as a standalone OAuth provider
 - `d2cb95c` docs(devlog): 350.102 — cursor OAuth gap closed + readiness
-- `35dda72` docs(devlog): 350.103 plan — OAuth login status in ocx status (WP19)
-- `d4d0453` feat(cli): show OAuth login status (incl cursor) in ocx status
+- `35dda72` docs(devlog): 350.103 plan — OAuth login status in opr status (WP19)
+- `d4d0453` feat(cli): show OAuth login status (incl cursor) in opr status
 - `81713ee` docs(devlog): 350.104 plan — token-precedence regression guard (WP20)
 - `be03142` test(cursor): guard token precedence (managed apiKey beats forwarded header)
 - `5968f5b` docs(devlog): 350.105 RCA — cursor not_found is model-name effort suffix + blob handshake

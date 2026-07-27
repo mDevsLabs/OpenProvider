@@ -67,7 +67,7 @@ slug is switched at runtime (`google-gemini-cli.ts:1-5`, `291`).
 Dynamic via `fetchAntigravityDiscoveryModels` when OAuth token present
 (`google.ts:47-66`, `markUnlistedOutsideDynamic: true`).
 
-### opencodex gap
+### openprovider gap
 
 Existing `google` adapter targets AI Studio URL
 (`google.ts:108-110`: `/v1beta/models/{id}:streamGenerateContent`) with flat Gemini body and
@@ -102,7 +102,7 @@ Existing `google` adapter targets AI Studio URL
   continuity.
 - No dynamic model discovery yet (`google.ts:36-44` comment).
 
-### opencodex gap
+### openprovider gap
 
 `google` adapter hardcodes AI Studio base URL and API key header. Vertex needs configurable
 base host, path prefix (`projects/…/locations/…`), and Bearer injection from ADC refresh.
@@ -141,9 +141,9 @@ base host, path prefix (`projects/…/locations/…`), and Bearer injection from
 - Discovery via models.dev key `amazon-bedrock` (`openai-compat.ts:2170-2204`) with cross-region
   id transform and EU variant duplication for Claude (`2184-2202`).
 
-### opencodex gap
+### openprovider gap
 
-No Bedrock adapter, no SigV4 signer, no eventstream parser in opencodex. Cannot reuse
+No Bedrock adapter, no SigV4 signer, no eventstream parser in openprovider. Cannot reuse
 `anthropic` adapter — request/response shapes differ despite similar message semantics.
 
 ---
@@ -186,7 +186,7 @@ No Bedrock adapter, no SigV4 signer, no eventstream parser in opencodex. Cannot 
 **8** static entries in `special.ts:82-91` (not in `models.json`). Default `kiro-auto`
 (`descriptors.ts:222`).
 
-### opencodex gap
+### openprovider gap
 
 Proprietary payload + IDE impersonation headers. Eventstream decoder could be **shared** with
 Bedrock port, but request builder and auth import path are Kiro-specific.
@@ -233,7 +233,7 @@ Bedrock port, but request builder and auth import path are Kiro-specific.
 **145** entries in `models.json`. Dynamic discovery when API key present
 (`special.ts:46-58` → `fetchCursorUsableModels`).
 
-### opencodex gap
+### openprovider gap
 
 Requires new adapter with HTTP/2 + protobuf + optional exec bridge. Cannot map to any existing
 five adapters. Highest risk: Codex tool calls vs Cursor native tool loop mismatch.
@@ -247,7 +247,7 @@ five adapters. Highest risk: Codex tool calls vs Cursor native tool loop mismatc
 `register-builtins.ts:358-371` (gemini-cli/antigravity), `366-371` (vertex), plus bedrock,
 cursor, kiro lazy loaders in the same file.
 
-## opencodex adapter interface (target shape)
+## openprovider adapter interface (target shape)
 
 Every port must satisfy (`adapters/base.ts:8-20`):
 

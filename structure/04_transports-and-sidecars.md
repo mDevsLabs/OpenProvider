@@ -54,7 +54,7 @@ one upstream attempt; client cancellation aborts the upstream and pool-only fail
 existing account-health state. Unknown Images subpaths still reach the JSON `/v1/*` 404 guard.
 
 On non-loopback binds, data-plane authentication and origin policy cover both Images routes just as
-they cover `/v1/responses`; clients must send the configured `x-opencodex-api-key`.
+they cover `/v1/responses`; clients must send the configured `x-openprovider-api-key`.
 
 The API-key `openai-responses` path also prevents the standalone client tool from colliding with the
 hosted Responses tool. When a request declares `image_gen.imagegen` (as a flat function or an
@@ -77,7 +77,7 @@ MCP, screen recording, and computer-use stay on their separate explicit executor
 - 기존 구현 및 제약 조건: the adapter preserved top-level `instructions`, system messages, and developer messages, then treated a `sandbox_mode ... danger-full-access` prose marker as an exec allow signal in `codex-sandbox` mode.
 - 검토한 주요 대안: keep marker-based authorization, require a future trustworthy attestation channel, or restrict authorization to server-local config.
 - 선택한 방식: keep marker detection only as diagnostic/context and make `nativeLocalExec: "on"` the only non-legacy mode that enables built-in local exec; unset, `off`, and `codex-sandbox` all deny.
-- 다른 대안 대신 이 방식을 선택한 이유: opencodex has no trustworthy per-request sandbox attestation in request text or headers, so any prompt-carried marker is spoofable by data-plane callers.
+- 다른 대안 대신 이 방식을 선택한 이유: openprovider has no trustworthy per-request sandbox attestation in request text or headers, so any prompt-carried marker is spoofable by data-plane callers.
 - 장점, 단점 및 영향: this closes prompt-to-native-exec escalation while preserving an explicit operator escape hatch; existing configs that relied on `codex-sandbox` must switch to `nativeLocalExec: "on"` for trusted local experiments.
 
 ## WebSocket
@@ -90,7 +90,7 @@ The WebSocket endpoint exists at `/v1/responses`, but discovery is opt-in:
 }
 ```
 
-`websocketsEnabled(config)` is true only for an explicit `true`. When false, opencodex removes
+`websocketsEnabled(config)` is true only for an explicit `true`. When false, openprovider removes
 `supports_websockets` from injected provider tables and routed catalog entries, keeping Codex on
 HTTP/SSE. When true, Codex may use Responses WebSocket frames handled by `src/server/ws-bridge.ts`.
 If Codex still attempts a WebSocket upgrade while the feature is disabled, `/v1/responses` rejects
@@ -162,7 +162,7 @@ It also repairs the opposite direction (260718): an assistant `tool_calls` round
 by an intervening user/developer barrier or an interrupted turn — is closed by deferring barrier
 messages until the round completes, reattaching real results to their original call occurrence,
 and synthesizing explicit "no tool result was recorded" answers only when no real result exists
-(Kimi/Moonshot 400 `ocx-mrqaiw05-269`; unit `devlog/_plan/260718_dangling_toolcall_hardening`).
+(Kimi/Moonshot 400 `opr-mrqaiw05-269`; unit `devlog/_plan/260718_dangling_toolcall_hardening`).
 
 Forward-mode OpenAI passthrough also repairs replayed `call_id` values longer than the Responses
 API's 64-character limit. Sidechat/fork replay can namespace routed-provider ids beyond that limit,

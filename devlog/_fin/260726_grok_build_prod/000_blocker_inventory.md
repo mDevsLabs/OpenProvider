@@ -7,8 +7,8 @@ tags: [grok-build, pr-403, review-blockers, production]
 # 000 — PR #403 리뷰 블로커 인벤토리 (실측)
 
 대상: `codex/260726-grok-build-prod` (PR #403 재기반), 로컬 `dev` @`5a550867` 위 15커밋.
-수집일: 2026-07-26. 출처: `gh api repos/lidge-jun/opencodex/pulls/403/comments`,
-`gh api repos/lidge-jun/opencodex/issues/403/comments` (메인테이너 리뷰 2026-07-24T13:05:24Z).
+수집일: 2026-07-26. 출처: `gh api repos/lidge-jun/openprovider/pulls/403/comments`,
+`gh api repos/lidge-jun/openprovider/issues/403/comments` (메인테이너 리뷰 2026-07-24T13:05:24Z).
 
 ## 리뷰 소스별 원본 개수
 
@@ -23,8 +23,8 @@ tags: [grok-build, pr-403, review-blockers, production]
 ## B1 — 비루프백 바인드에서 관리 블록이 실토큰을 덮어씀 (High)
 
 - 지적: 메인테이너 #2, codex P2 `src/grok/inject.ts:134`, CodeRabbit `docs/guides/grok-build.md:54`
-- 현재 코드: `buildGrokManagedBlock()`가 모든 모델에 `api_key = "opencodex-loopback"` 고정 방출
-  (`src/grok/inject.ts` 내 `lines.push(... 'api_key = "opencodex-loopback"')`).
+- 현재 코드: `buildGrokManagedBlock()`가 모든 모델에 `api_key = "openprovider-loopback"` 고정 방출
+  (`src/grok/inject.ts` 내 `lines.push(... 'api_key = "openprovider-loopback"')`).
 - 실제 결과: `src/server/auth-cors.ts`는 비루프백 바인드에서 실제 `OPENCODEX_API_AUTH_TOKEN`을
   요구하므로 자동 등록된 모델은 전부 401. 사용자가 손으로 키를 고쳐도 다음
   `start`/`ensure`/`restart`의 `syncGrokConfig()`가 블록을 통째로 재생성하며 되돌린다.
@@ -41,7 +41,7 @@ tags: [grok-build, pr-403, review-blockers, production]
   `handleStop()`(`src/cli/index.ts` 내 try/catch)은 이 예외를 경고만 찍고 계속 진행해,
   아래에서 `stripGrokConfig()`로 공유 `~/.grok/config.toml` 블록을 제거한다.
 - 실제 결과: 설치된 서비스는 살아 있는데 공유 라우팅 설정만 사라진다. 서비스가 프록시를 다시
-  띄우면 grok에는 모델이 없는 상태가 된다. `ocx restart`도 정지되지 않은 서비스 위에서 진행된다.
+  띄우면 grok에는 모델이 없는 상태가 된다. `opr restart`도 정지되지 않은 서비스 위에서 진행된다.
 - 판정: 유효. 소유권 불일치(정지 시도조차 못 한 상태)와 단순 정지 실패를 구분해야 한다.
   전자는 공유 자원 teardown을 건너뛰고 실패로 전파한다.
 
@@ -51,8 +51,8 @@ tags: [grok-build, pr-403, review-blockers, production]
 - 현재 코드: `userModelAliases()`의 정규식이
   `/^\s*\[\s*model\s*\.\s*(?:([A-Za-z0-9_-]+)|"…"|'…')\s*\]/gm` — 두 번째 세그먼트의 인용은
   처리하지만 **첫 세그먼트 `model`은 리터럴로만** 매칭한다.
-- 실제 결과: 사용자가 `["model"."ocx-mine"]` 또는 `['model'.ocx-mine]`를 소유하면 예약에서
-  누락되고, 우리가 `[model.ocx-mine]`를 또 방출해 같은 테이블을 재정의한다. grok의 TOML 파서는
+- 실제 결과: 사용자가 `["model"."opr-mine"]` 또는 `['model'.opr-mine]`를 소유하면 예약에서
+  누락되고, 우리가 `[model.opr-mine]`를 또 방출해 같은 테이블을 재정의한다. grok의 TOML 파서는
   `Cannot redefine key 'model'`로 설정 파일 전체를 거부한다 — 우리 블록뿐 아니라 사용자 설정까지 죽는다.
 - 판정: 유효. 첫 세그먼트도 정규화하고 두 인용 형태 회귀 테스트를 추가한다.
 
@@ -69,7 +69,7 @@ tags: [grok-build, pr-403, review-blockers, production]
 - 지적: codex P2 `src/grok/inject.ts:230`
 - 현재 코드: inject는 `content.endsWith("\n") ? "\n" : "\n\n"`로 구분자를 넣고,
   strip은 `prefix.endsWith("\n\n")`일 때 **한 개만** 되돌린다.
-- 실제 결과: 원래 마지막 개행이 없던 사용자 파일이 `ocx stop` 후 개행 하나를 얻는다.
+- 실제 결과: 원래 마지막 개행이 없던 사용자 파일이 `opr stop` 후 개행 하나를 얻는다.
   사용자 소유 파일의 바이트 불일치.
 - 판정: 유효. 주입한 구분자를 알 수 있어야 정확히 되돌릴 수 있다.
 
@@ -118,12 +118,12 @@ tags: [grok-build, pr-403, review-blockers, production]
 | # | 결함 | 귀속 |
 |---|------|------|
 | D1 | `handleStart`의 grok 동기화가 Desktop3P `try` 안에 중첩돼, 카탈로그 조회가 던지면 fence가 조용히 건너뛰어짐 (`src/cli/index.ts:263`) | 030 §5 |
-| D2 | `ocx stop`이 `stripGrokConfig`의 `!ok`(orphaned-marker 거부 등)를 삼키고 0으로 종료 (`src/cli/index.ts:447`) | 030 §2d |
+| D2 | `opr stop`이 `stripGrokConfig`의 `!ok`(orphaned-marker 거부 등)를 삼키고 0으로 종료 (`src/cli/index.ts:447`) | 030 §2d |
 | D3 | `serviceCommand("stop")`이 설치 여부 가드 없이 `ops.stop()` 실행 (`src/service.ts:1151`) | 030 §3 |
 | D4 | `POST /api/stop`의 `stopServiceIfInstalled()`가 무보호라 소유권 예외가 500으로 새고 프록시가 살아남음 | 030 §4 |
 | D5 | `[[model.x]]`, `[model.x.sub]` 철자가 우리 블록과 duplicate-key 충돌하는데 예약되지 않음 | 010 (B3 확장) |
-| D6 | 백업 `config.toml.bak-opencodex`가 최초 1회만 생성돼 임의로 낡을 수 있음 (`src/grok/inject.ts:186`) — orphaned-marker 안내가 이 파일을 가리킨다 | **미할당 잔여 위험** |
-| D7 | 루트 dotted 키(`model.ocx-mine.x = 1`), `[model]` + dotted 키 형태도 충돌하나 예약 대상 아님 | **미할당 잔여 위험** |
+| D6 | 백업 `config.toml.bak-openprovider`가 최초 1회만 생성돼 임의로 낡을 수 있음 (`src/grok/inject.ts:186`) — orphaned-marker 안내가 이 파일을 가리킨다 | **미할당 잔여 위험** |
+| D7 | 루트 dotted 키(`model.opr-mine.x = 1`), `[model]` + dotted 키 형태도 충돌하나 예약 대상 아님 | **미할당 잔여 위험** |
 
 D6/D7은 이번 PR 범위(리뷰 블로커 해소)를 넘어서므로 여기 기록만 하고, 후속 유닛에서 다룬다.
 D6은 사용자 데이터 복구 경로라 우선순위가 높다.

@@ -55,7 +55,7 @@ describe("anthropic provider hardening", () => {
     const adapter = createAnthropicAdapter(provider({ authMode: "oauth", apiKey: "" }));
 
     await expect(adapter.buildRequest(parsed())).rejects.toThrow(
-      "anthropic oauth token missing — run ocx login anthropic",
+      "anthropic oauth token missing — run opr login anthropic",
     );
   });
 

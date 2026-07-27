@@ -64,7 +64,7 @@ bun run privacy:scan
 
 ## 예상 후속 작업 (이번 스윕 범위 밖)
 
-- #433 이슈 제안 3·4번: `ocx account clear-cooldown` CLI와 cooldown 상태 가시화.
+- #433 이슈 제안 3·4번: `opr account clear-cooldown` CLI와 cooldown 상태 가시화.
   CLI/GUI 표면이라 별도 unit이 필요하다.
 - #418: 제보자가 provider를 비공개해 재현 경로가 없다. raw `spawn_agent` trace가
   확보되면 그때 착수한다.
@@ -125,9 +125,9 @@ bun run privacy:scan                   통과
 
 ### 범위 밖으로 남긴 것
 
-- #433 이슈 제안 3·4번(`ocx account clear-cooldown` CLI, cooldown 상태 가시화) — CLI/GUI 표면
+- #433 이슈 제안 3·4번(`opr account clear-cooldown` CLI, cooldown 상태 가시화) — CLI/GUI 표면
 - #418 — 제보자가 provider를 비공개해 재현 경로 없음
-- #417 / #241 — upstream-tracking, ocx 밖 원인
+- #417 / #241 — upstream-tracking, opr 밖 원인
 - #435 / #420 — 각각 PR #436, #430이 이미 커버
 - Cursor용 Grok 토큰 비율 정확도 — 근거를 갖춘 별도 unit이 필요 (#373 참조)
 

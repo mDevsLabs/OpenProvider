@@ -6,8 +6,8 @@ Accepted
 
 ## Context
 
-The dashboard needs buttons for `ocx sync` and OpenProvider self-update. `ocx sync` is safe to run in
-the proxy process because it refreshes Codex config/catalog state. `ocx update` is different: npm
+The dashboard needs buttons for `opr sync` and OpenProvider self-update. `opr sync` is safe to run in
+the proxy process because it refreshes Codex config/catalog state. `opr update` is different: npm
 installs may replace the package files currently serving the GUI, and the existing CLI update path
 can print to inherited stdio and exit the process.
 
@@ -34,7 +34,7 @@ state and the restarted proxy dies a few seconds later.
 - Restart handling can branch between service-managed installs and direct detached proxy starts.
 - A completed install can still finish with `status: "failed"` when the replacement proxy never
   becomes healthy or flaps during the stability window; the job log then points the user at
-  `ocx start` and the Bun `--allow-scripts` reinstall path.
+  `opr start` and the Bun `--allow-scripts` reinstall path.
 - The dashboard must poll both the job endpoint and `/healthz` while reconnecting.
 
 

@@ -145,7 +145,7 @@ Replace hand-written `PROVIDER_ALIASES` with registry-driven generation:
 
 ```ts
 const PROVIDER_ALIASES = deriveJawcodeAliases(REGISTRY);
-// { [opencodexId]: jawcodeBundle } for rows where jawcodeBundle is set
+// { [openproviderId]: jawcodeBundle } for rows where jawcodeBundle is set
 ```
 
 `allowedProviders = unique(jawcodeBundle values)` — same as today (`:34`).

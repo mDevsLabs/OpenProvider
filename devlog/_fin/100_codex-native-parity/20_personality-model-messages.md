@@ -19,10 +19,10 @@ before falling back to `base_instructions`.
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:346
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:446
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:452
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:474
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:346
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:446
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:452
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:474
 ```
 
 `supports_personality` is derived, not a raw field. Codex reports personality support only when:
@@ -37,26 +37,26 @@ Relevant upstream paths:
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:482
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:505
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:553
-/tmp/opencodex-codex-src/codex-rs/tui/src/chatwidget/settings.rs:288
-/tmp/opencodex-codex-src/codex-rs/tui/src/chatwidget/settings_popups.rs:23
-/tmp/opencodex-codex-src/codex-rs/tui/src/chatwidget/input_submission.rs:333
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:482
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:505
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:553
+/tmp/openprovider-codex-src/codex-rs/tui/src/chatwidget/settings.rs:288
+/tmp/openprovider-codex-src/codex-rs/tui/src/chatwidget/settings_popups.rs:23
+/tmp/openprovider-codex-src/codex-rs/tui/src/chatwidget/input_submission.rs:333
 ```
 
-## Current opencodex Behavior
+## Current openprovider Behavior
 
 Routed entries are cloned from a native template in:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:108
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:108
 ```
 
-For namespaced routed models, opencodex currently rewrites `base_instructions` identity text:
+For namespaced routed models, openprovider currently rewrites `base_instructions` identity text:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:122
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:122
 ```
 
 It does not rewrite `model_messages.instructions_template`.
@@ -108,7 +108,7 @@ investigation supersedes that: routed non-OpenAI models should strip `model_mess
 See:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/devlog/100_codex-native-parity/21_model-messages-strip-first.md
+/Users/jun/Developer/new/700_projects/openprovider/devlog/100_codex-native-parity/21_model-messages-strip-first.md
 ```
 
 Reason: `model_messages.instructions_template` is not a cosmetic field. Codex uses it before

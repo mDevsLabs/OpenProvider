@@ -50,7 +50,7 @@ CLI/config-only today.
 
 ```yaml
 ---
-name: opencodex-claude-desktop
+name: openprovider-claude-desktop
 surface: expert control panel inside a local dashboard
 ---
 ```

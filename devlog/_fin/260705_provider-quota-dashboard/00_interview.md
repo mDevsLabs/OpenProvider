@@ -58,9 +58,9 @@ same compact row layout, reset labels, bar, color rules, and percentage value.
 - Current pool quota presentation lives in `gui/src/pages/CodexAuth.tsx`.
 - Shared styling lives in `gui/src/styles.css` under `.quota-compact` and
   `.quota-row`.
-- opencodex OAuth providers include xAI, Anthropic, Kimi, Kiro,
+- openprovider OAuth providers include xAI, Anthropic, Kimi, Kiro,
   google-antigravity, Cursor, and ChatGPT in `src/oauth/index.ts`.
-- Existing opencodex quota code is ChatGPT/Codex-account specific: WHAM usage
+- Existing openprovider quota code is ChatGPT/Codex-account specific: WHAM usage
   for main/pool accounts. There is no generic provider quota backend yet.
 - `../jawcode/packages/ai/src/usage` has quota/usage providers for Claude,
   Gemini, GitHub Copilot, Google Antigravity, Kimi, MiniMax, OpenAI Codex, xAI,
@@ -80,6 +80,6 @@ Medium risks carried into Plan:
   tests must isolate network fetches and credential reads.
 - The existing quota component is local to Codex Auth; Plan must extract it
   before UI integration to prevent display drift.
-- opencodex's registry has a `local` preset concept, but runtime auth mode is
+- openprovider's registry has a `local` preset concept, but runtime auth mode is
   only key/forward/oauth. Reverse/local quota readers must be explicit quota
   adapters, not assumed to exist as a provider auth mode.

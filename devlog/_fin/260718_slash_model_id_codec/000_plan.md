@@ -11,7 +11,7 @@ lookup when the remainder still contains `/`. Providers whose NATIVE model ids c
 `/` (zenmux `moonshotai/kimi-k3-free`, openrouter `anthropic/...`, nvidia `n/...`,
 together, fireworks, vercel-ai-gateway) therefore produce two-slash Codex slugs
 (`zenmux/moonshotai/kimi-k3-free`) that fall back to default metadata — tagging is not
-reflected. Verified live in `~/.codex/opencodex-catalog.json`: the only 2-slash slug is
+reflected. Verified live in `~/.codex/openprovider-catalog.json`: the only 2-slash slug is
 `zenmux/moonshotai/kimi-k3-free`; Sol subagent confirmed against current Codex source
 and ZenMux's live `/api/v1/models` (2026-07-18).
 
@@ -42,7 +42,7 @@ Hard rules (from Sol research + collision analysis):
 - Goal: every routed model with a slash-containing native id appears in Codex with a
   one-slash slug and full tagging; proxy transparently calls upstream with the native id.
 - Non-goals: changing upstream provider APIs; migrating existing Codex-side caches
-  beyond the normal `ocx sync` / cache-invalidate flow; renaming providers.
+  beyond the normal `opr sync` / cache-invalidate flow; renaming providers.
 - Verifier: `bun test tests/` focused (router codec + catalog slug), `tsc` typecheck,
   plus activation evidence: built catalog entry for a slash-id model has exactly one `/`
   and routeModel decodes the encoded form to the native id.

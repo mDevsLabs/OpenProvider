@@ -8,7 +8,7 @@ Issue: #297, “bug(catalog): clamp in b7ce5aad strips max/ultra from all models
 
 The reported **mechanism is confirmed**: the final catalog-wide clamp derives one global effort set from every bare-slug entry in the installed Codex binary's bundled catalog, filters every emitted model (including routed models) against that set, and can therefore undo earlier `max` / `ultra` additions. The repository has a focused synthetic test proving exactly that outcome when the probed set ends at `xhigh`.
 
-The reported **current trigger is not confirmed and does not reproduce on this machine**. The installed `codex-cli 0.144.5` bundled catalog contains `max` on all three GPT-5.6 entries and `ultra` on Sol/Terra, so the bare-entry union is all six OpenCodex rungs. The clamp therefore preserves `max` / `ultra` here. Issue #297 does not state the reporter's Codex version or include `codex debug models --bundled` output, so an OpenCodex regression remains conditional on finding a binary whose parser accepts the synthetic labels while its bundled bare entries omit them.
+The reported **current trigger is not confirmed and does not reproduce on this machine**. The installed `codex-cli 0.144.5` bundled catalog contains `max` on all three GPT-5.6 entries and `ultra` on Sol/Terra, so the bare-entry union is all six OpenProvider rungs. The clamp therefore preserves `max` / `ultra` here. Issue #297 does not state the reporter's Codex version or include `codex debug models --bundled` output, so an OpenProvider regression remains conditional on finding a binary whose parser accepts the synthetic labels while its bundled bare entries omit them.
 
 ## Evidence and mechanism
 
@@ -68,7 +68,7 @@ export function loadBundledCodexCatalog(deps: BundledCatalogDeps = {}): RawCatal
     } catch { /* try next candidate */ }
 ```
 
-On this machine, that exact command path resolved to `/Users/jun/.nvm/versions/node/v24.17.0/bin/codex`; there was no `CODEX_CLI_PATH` override and no OpenCodex shim-state candidate. Read-only runtime evidence was:
+On this machine, that exact command path resolved to `/Users/jun/.nvm/versions/node/v24.17.0/bin/codex`; there was no `CODEX_CLI_PATH` override and no OpenProvider shim-state candidate. Read-only runtime evidence was:
 
 ```text
 $ codex --version
@@ -294,13 +294,13 @@ export function clampEntryToCodexSupportedEfforts(entry: RawEntry, supported: Se
         .map(level => ({ ...level }));
 ```
 
-That compatibility goal must be preserved: the original failure occurs while Codex deserializes the catalog, before any request reaches OpenCodex's native or routed wire-clamping logic.
+That compatibility goal must be preserved: the original failure occurs while Codex deserializes the catalog, before any request reaches OpenProvider's native or routed wire-clamping logic.
 
 ## Evaluation of the reporter's options
 
 ### Option A — seed from `CODEX_REASONING_LEVELS`
 
-**Functional effect:** This would keep all six OpenCodex labels regardless of the probed bundled catalog because the constant already contains `max` and `ultra`, and the entry clamp only removes labels absent from `supported`.
+**Functional effect:** This would keep all six OpenProvider labels regardless of the probed bundled catalog because the constant already contains `max` and `ultra`, and the entry clamp only removes labels absent from `supported`.
 
 ```ts
 // src/reasoning-effort.ts:4-12
@@ -431,7 +431,7 @@ export function mapReasoningEffort(provider: OcxProviderConfig, modelId: string,
       // alias (`provider/vendor-model`); the model object carries the native id.
       const modelName = model?.id ?? slug.slice(slug.indexOf("/") + 1);
       if (typeof e.base_instructions === "string") {
-        // Proxy-neutral: keep the GPT-5/OpenAI disclaimer but never advertise the opencodex proxy
+        // Proxy-neutral: keep the GPT-5/OpenAI disclaimer but never advertise the openprovider proxy
         // (leaking that into base_instructions is a non-first-party signature → ToS risk).
         e.base_instructions = e.base_instructions.replace(
           CODEX_GPT5_IDENTITY_LINE,
@@ -460,7 +460,7 @@ export function mapReasoningEffort(provider: OcxProviderConfig, modelId: string,
 
 ## Verdict
 
-**opencodex-bug: conditional, not confirmed on today's inspected binary.** The global stripping mechanism is proven from source and tests. The claimed present-day trigger is disproven for local `codex-cli 0.144.5` and remains unsupported for the reporter because no exact version/bundled-catalog output was provided. The behavior is correct and necessary for a binary such as 0.133.0 whose parser rejects unknown rungs.
+**openprovider-bug: conditional, not confirmed on today's inspected binary.** The global stripping mechanism is proven from source and tests. The claimed present-day trigger is disproven for local `codex-cli 0.144.5` and remains unsupported for the reporter because no exact version/bundled-catalog output was provided. The behavior is correct and necessary for a binary such as 0.133.0 whose parser rejects unknown rungs.
 
 Bucket judgment: reclassify #297 from Bucket 2 (“investigate now”) to Bucket 1 (“answer + close / needs exact-version reproduction”). A reply should show the 0.144.5 six-rung union and ask for the three runtime artifacts above; reopen or restore Bucket 2 only if they demonstrate a parser-capable/bundled-ladder mismatch.
 

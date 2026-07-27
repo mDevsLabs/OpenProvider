@@ -1,10 +1,10 @@
-# 140.00 — Overview: Remaining jawcode Provider Ports into opencodex
+# 140.00 — Overview: Remaining jawcode Provider Ports into openprovider
 
 ## What this phase is
 
-After prior opencodex port cycles, jawcode still ships **five live providers** that opencodex
+After prior openprovider port cycles, jawcode still ships **five live providers** that openprovider
 does not route today. This phase surveys jawcode's wire/auth/streaming implementations, maps
-each provider onto opencodex's **five-adapter** architecture, and produces a sequenced port
+each provider onto openprovider's **five-adapter** architecture, and produces a sequenced port
 plan. It is a **foundation cycle** (research + decision) — three docs (00–02) only.
 
 **No production code changes in this cycle.** Implementation is a later, approval-gated step
@@ -12,7 +12,7 @@ plan. It is a **foundation cycle** (research + decision) — three docs (00–02
 
 ## TL;DR
 
-1. opencodex resolves upstream calls through **exactly five adapters** today
+1. openprovider resolves upstream calls through **exactly five adapters** today
    (`server.ts:72-86`: `openai-chat`, `anthropic`, `openai-responses`, `google`, `azure-openai`).
    Every remaining port either **extends** one of those adapters (auth/URL/body variants) or
    requires a **new adapter id** plus `resolveAdapter()` wiring — there is no sixth slot yet.
@@ -31,7 +31,7 @@ plan. It is a **foundation cycle** (research + decision) — three docs (00–02
 
 ## The five-adapter constraint
 
-| Adapter | jawcode APIs it can cover (partially) | Auth modes opencodex supports today |
+| Adapter | jawcode APIs it can cover (partially) | Auth modes openprovider supports today |
 |---------|--------------------------------------|-------------------------------------|
 | `openai-chat` | OpenAI-compatible chat/completions | `key`, `oauth` (`oauth/index.ts:19-64`) |
 | `anthropic` | Anthropic Messages | `key`, `oauth` |
@@ -53,7 +53,7 @@ bridge in `server.ts` re-encodes to Responses SSE).
 | `amazon-bedrock` | `bedrock-converse-stream` | Yes | **New adapter** + AWS SigV4 |
 | `kiro` | `kiro-streaming` | Yes | **New adapter** + Kiro token import |
 
-**Explicitly out of this list:** `openai-codex` — already covered by opencodex native `openai`
+**Explicitly out of this list:** `openai-codex` — already covered by openprovider native `openai`
 forward + `openai-apikey` options. **`google-gemini-cli`** — excluded as dead per product
 direction (Antigravity supersedes it for Cloud Code Assist OAuth).
 
@@ -68,7 +68,7 @@ direction (Antigravity supersedes it for Cloud Code Assist OAuth).
 | Tool loop | functionCall in SSE | toolUse blocks | Server-driven exec messages |
 
 Cursor is the outlier: jawcode's `cursor.ts` is ~2.6k lines because the upstream is an **agent
-runtime** (`AgentService/Run` at `cursor.ts:357-368`), not a completion endpoint. opencodex
+runtime** (`AgentService/Run` at `cursor.ts:357-368`), not a completion endpoint. openprovider
 would need either a minimal exec stub or a deliberate "text-only, no server tools" subset.
 
 ## Relationship to prior phases
@@ -86,7 +86,7 @@ would need either a minimal exec stub or a deliberate "text-only, no server tool
 - **Out of scope (this cycle):** adapter implementation, OAuth CLI/GUI flows, catalog sync
   changes, tests, or config defaults. Those ship only after explicit approval.
 - **Evidence baseline:** jawcode at `packages/ai/src/providers/*.ts`, `types.ts:35-61`,
-  `descriptors.ts:287-304`; opencodex at `src/adapters/`, `src/oauth/`, `src/server.ts:72-86`.
+  `descriptors.ts:287-304`; openprovider at `src/adapters/`, `src/oauth/`, `src/server.ts:72-86`.
 
 ## Documents
 

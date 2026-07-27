@@ -5,7 +5,7 @@
   요청이 올바른 라우팅 모델로 도달한다 (사이클 1 성과).
 - **남은 레버는 정확히 두 개**: (1) 컨텍스트 윈도우 — Desktop이 전부 200k로 취급,
   (2) 추론 강도 — effort UI가 opus 매칭에 의해서만 뜨고 우리 광고(capabilities)는 무시됨.
-- **추가 단서 (02:2x)**: Anthropic 모델로 들어간 요청은 claude→ocx→claude 전 경로에서
+- **추가 단서 (02:2x)**: Anthropic 모델로 들어간 요청은 claude→opr→claude 전 경로에서
   추론강도가 전부 동작했다. 라이브 로그에서도 opus 형태 별칭(luna)에 high/xhigh가 wire까지
   도달함을 확인 — **opus 형태 id는 effort 직렬화가 이미 된다**. 따라서 effort의 잔여 문제는
   "opus 매칭이 안 되는 실제 anthropic 비-opus id"뿐이고(정상 동작), 핵심 미해결은 컨텍스트.
@@ -82,7 +82,7 @@
   2분기, (f) CLI 파서 — hybrid/discovery-only/static/충돌/**미지 플래그** 5분기.
 
 ### B7 — (Pro 답변 게이트) Desktop 앱 env/플래그 주입
-- Pro가 Desktop 프로세스의 env/managed-settings 소비를 확정하면: `ocx claude desktop`이
+- Pro가 Desktop 프로세스의 env/managed-settings 소비를 확정하면: `opr claude desktop`이
   안내 또는 주입 경로 추가. 확정 전 코드 변경 없음.
 
 ## 기록 예약 (감사 #8)

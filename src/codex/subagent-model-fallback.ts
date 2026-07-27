@@ -402,7 +402,7 @@ export function subagentFallbackGuidanceText(config: OcxConfig): string {
   const chain = config.subagentModelFallback ?? [];
   if (chain.length === 0) return "";
   const quoted = chain.map(model => `"${model}"`).join(", ");
-  return ` Subagent model fallback chain (priority order): ${quoted}. When the primary model is quota-exhausted, opencodex rewrites thread_spawn requests to the next available model automatically.`;
+  return ` Subagent model fallback chain (priority order): ${quoted}. When the primary model is quota-exhausted, openprovider rewrites thread_spawn requests to the next available model automatically.`;
 }
 
 const TOML_STRING_ARRAY = /^(model_fallback)\s*=\s*\[(.*)\]\s*$/s;

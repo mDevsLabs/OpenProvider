@@ -2,7 +2,7 @@
 
 ## Taxonomy
 
-opencodex has several unrelated cache surfaces. Treat them separately:
+openprovider has several unrelated cache surfaces. Treat them separately:
 
 1. Provider prompt cache
    - Anthropic: explicit `cache_control: { type: "ephemeral" }` on cacheable content blocks.
@@ -60,7 +60,7 @@ opencodex has several unrelated cache surfaces. Treat them separately:
 
 - Native Anthropic (`api.anthropic.com`) now sends root-level `cache_control: { type: "ephemeral" }` in addition to existing block-level system/tool cache markers, enabling automatic conversation-history caching on the official Anthropic Messages API.
 - Anthropic-compatible gateways remain conservative: Umans keeps block-level markers but does not receive the root-level automatic caching field until top-level support is proven.
-- OpenAI / ChatGPT Responses passthrough preserves raw `prompt_cache_key` and `prompt_cache_retention` fields; opencodex does not synthesize or validate retention policy in this pass.
+- OpenAI / ChatGPT Responses passthrough preserves raw `prompt_cache_key` and `prompt_cache_retention` fields; openprovider does not synthesize or validate retention policy in this pass.
 - Kimi and other generic OpenAI-compatible chat providers remain usage-only for cache behavior; `prompt_tokens_details.cached_tokens` is preserved when upstream reports it, but no unproven request fields are injected.
 - Google / Antigravity remains implicit-cache usage-only; `usageMetadata.cachedContentTokenCount` continues to map to `cachedInputTokens`.
 

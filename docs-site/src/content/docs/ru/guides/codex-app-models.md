@@ -37,7 +37,7 @@ cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.js
 
 ## Путь интеграции
 
-`ocx init`, `ocx start` и `ocx sync` поддерживают согласованность этих файлов Codex в
+`opr init`, `opr start` и `opr sync` поддерживают согласованность этих файлов Codex в
 разрешённом каталоге `CODEX_HOME`:
 
 ```text
@@ -138,7 +138,7 @@ OpenProvider добавляет трёхпозиционное переопре�
 | **base** (по умолчанию при установке) | Восстанавливает закрепления вышестоящего источника: Sol/Terra используют v2, Luna — v1, а незакреплённые модели следуют фиче-флагу Codex `multi_agent_v2`. |
 | **v2** | Принудительно переводит все модели на multi-agent-поверхность v2, отменяя закрепления вышестоящего источника (включая Luna). |
 
-Режим задаётся на странице Dashboard или Models, командой `ocx v2 mode v1|default|v2` либо
+Режим задаётся на странице Dashboard или Models, командой `opr v2 mode v1|default|v2` либо
 запросом `PUT /api/v2` с `{ "multiAgentMode": "v1" }`. Изменения применяются к новым сессиям Codex.
 
 :::caution
@@ -195,7 +195,7 @@ id `provider/model` через `subagentModels` или страницу Subagent
 интерфейс Codex:
 
 ```bash
-ocx sync
+opr sync
 ```
 
 Каждый раз, когда меняются видимость, priority или метаданные каталога, OpenProvider перезаписывает

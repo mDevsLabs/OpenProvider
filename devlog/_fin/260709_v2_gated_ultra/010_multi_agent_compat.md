@@ -18,10 +18,10 @@
 3. Cross-provider spawn poison: `InterAgentCommunication::new_encrypted`
    (protocol/src/protocol.rs:774) does NO local crypto — it parks plaintext in the
    `encrypted_content` slot and relies on the ChatGPT backend to mint real ciphertext.
-   Under a routed (ocx-served) parent the backend never sees the parent turn, so a
+   Under a routed (opr-served) parent the backend never sees the parent turn, so a
    native child replays plaintext in an encrypted slot and the backend kills the stream:
    "Encrypted function output content could not be decrypted or decoded" (observed as
-   502 terminal marks + agent error). Routed children are immune (ocx adapters never
+   502 terminal marks + agent error). Routed children are immune (opr adapters never
    ask the backend to decrypt). Repro: claude parent -> spawn gpt-5.5 = dead; same
    parent -> spawn opencode-go/glm-5.2 = fine.
 

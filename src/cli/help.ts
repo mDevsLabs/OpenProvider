@@ -11,46 +11,46 @@ type HelpEntry = {
 };
 
 const helpEntries: Record<string, HelpEntry> = {
-  init: { usage: "ocx init", summary: "Interactive setup for providers and Codex config injection." },
-  start: { usage: "ocx start [--port <port>]", summary: "Start the proxy server and sync models to Codex." },
-  stop: { usage: "ocx stop", summary: "Stop the proxy and restore native Codex config." },
+  init: { usage: "opr init", summary: "Interactive setup for providers and Codex config injection." },
+  start: { usage: "opr start [--port <port>]", summary: "Start the proxy server and sync models to Codex." },
+  stop: { usage: "opr stop", summary: "Stop the proxy and restore native Codex config." },
   restore: {
-    usage: "ocx restore [back]",
+    usage: "opr restore [back]",
     summary: "Restore native Codex config without stopping the proxy; `restore back` re-points codex at the running proxy.",
   },
   eject: {
-    usage: "ocx eject [back]",
+    usage: "opr eject [back]",
     summary: "Restore native Codex config without stopping the proxy; `eject back` re-points codex at the running proxy.",
   },
   "recover-history": {
-    usage: "ocx recover-history --legacy-openai",
+    usage: "opr recover-history --legacy-openai",
     summary: "Explicitly recover pre-backup syncResumeHistory rows.",
   },
   uninstall: {
-    usage: "ocx uninstall",
+    usage: "opr uninstall",
     summary: "Remove service/shim/config and restore native Codex.",
-    details: ["Alias: ocx remove"],
+    details: ["Alias: opr remove"],
   },
   remove: {
-    usage: "ocx remove",
+    usage: "opr remove",
     summary: "Remove service/shim/config and restore native Codex.",
-    details: ["Alias of: ocx uninstall"],
+    details: ["Alias of: opr uninstall"],
   },
   service: {
-    usage: "ocx service [install|start|stop|status|uninstall|remove]",
+    usage: "opr service [install|start|stop|status|uninstall|remove]",
     summary: "Run as a background service.",
     details: [
       "With no subcommand, installs/updates and starts the background service.",
-      "Use `ocx service status` to see diagnostics and log paths.",
+      "Use `opr service status` to see diagnostics and log paths.",
     ],
   },
   "codex-shim": {
-    usage: "ocx codex-shim <install|status|uninstall|remove>",
+    usage: "opr codex-shim <install|status|uninstall|remove>",
     summary: "Auto-start the proxy when `codex` launches.",
     details: ["Use `remove` as an alias for `uninstall`."],
   },
   tray: {
-    usage: "ocx tray <install|start|stop|status|uninstall|remove> [--json] [--no-start]",
+    usage: "opr tray <install|start|stop|status|uninstall|remove> [--json] [--no-start]",
     summary: "Install and control the Windows status tray icon.",
     details: [
       "The tray starts at Windows login and provides one-click proxy controls.",
@@ -58,38 +58,38 @@ const helpEntries: Record<string, HelpEntry> = {
       "--no-start (install only) installs the tray without launching it immediately.",
     ],
   },
-  ensure: { usage: "ocx ensure", summary: "Ensure the proxy is running and Codex config/cache are current." },
-  sync: { usage: "ocx sync", summary: "Fetch provider models and inject them into Codex config." },
-  "sync-cache": { usage: "ocx sync-cache", summary: "Refresh Codex's model cache from the active catalog." },
-  status: { usage: "ocx status", summary: "Check proxy server status." },
-  doctor: { usage: "ocx doctor", summary: "Diagnose environment/network issues (paths, WSL /mnt, proxy env, ChatGPT reachability)." },
+  ensure: { usage: "opr ensure", summary: "Ensure the proxy is running and Codex config/cache are current." },
+  sync: { usage: "opr sync", summary: "Fetch provider models and inject them into Codex config." },
+  "sync-cache": { usage: "opr sync-cache", summary: "Refresh Codex's model cache from the active catalog." },
+  status: { usage: "opr status", summary: "Check proxy server status." },
+  doctor: { usage: "opr doctor", summary: "Diagnose environment/network issues (paths, WSL /mnt, proxy env, ChatGPT reachability)." },
   debug: {
-    usage: "ocx debug [provider on|off|status|reset|logs [-f]|usage on|off|status|reset|logs [-f]]",
+    usage: "opr debug [provider on|off|status|reset|logs [-f]|usage on|off|status|reset|logs [-f]]",
     summary: "Show or toggle runtime provider debug logging on the running proxy.",
     details: [
-      "Provider: ocx debug provider on | off | status | reset | logs [-f]",
-      "Usage JSONL: ocx debug usage on | off | status | reset | logs [-f]",
+      "Provider: opr debug provider on | off | status | reset | logs [-f]",
+      "Usage JSONL: opr debug usage on | off | status | reset | logs [-f]",
       "Env default: OCX_DEBUG=1 (legacy OCX_DEBUG_FRAMES still works)",
     ],
   },
-  login: { usage: "ocx login <provider>", summary: "OAuth or API-key login for a provider." },
-  logout: { usage: "ocx logout <provider>", summary: "Remove a stored provider login." },
-  gui: { usage: "ocx gui", summary: "Open the opencodex dashboard." },
+  login: { usage: "opr login <provider>", summary: "OAuth or API-key login for a provider." },
+  logout: { usage: "opr logout <provider>", summary: "Remove a stored provider login." },
+  gui: { usage: "opr gui", summary: "Open the openprovider dashboard." },
   update: {
-    usage: "ocx update [--tag latest|preview]",
-    summary: "Update opencodex. Preview installs stay on the preview tag unless overridden.",
+    usage: "opr update [--tag latest|preview]",
+    summary: "Update openprovider. Preview installs stay on the preview tag unless overridden.",
   },
   provider: {
-    usage: "ocx provider <list|add|remove|show|set-default>",
+    usage: "opr provider <list|add|remove|show|set-default>",
     summary: "Non-interactive provider management.",
     details: [
       "Subcommands: list, add <name>, remove <name>, show <name>, set-default <name>",
       "Registry providers are auto-configured by name. Custom providers need --adapter and --base-url.",
-      "Run `ocx provider --help` for full usage and examples.",
+      "Run `opr provider --help` for full usage and examples.",
     ],
   },
   account: {
-    usage: "ocx account <list|current|use|refresh|auto-switch|remove|add-key> ...",
+    usage: "opr account <list|current|use|refresh|auto-switch|remove|add-key> ...",
     summary: "List and switch provider accounts and API-key pools (GUI parity).",
     details: [
       "list [provider]     Codex account pool, OAuth accounts and API keys (identifiers shown masked as the API returns them).",
@@ -103,7 +103,7 @@ const helpEntries: Record<string, HelpEntry> = {
     ],
   },
   models: {
-    usage: "ocx models [list] [--provider <name>] [--json] | add <provider> <modelId> [opts] | remove <id|provider/modelId> [--yes] | list-custom [--json]",
+    usage: "opr models [list] [--provider <name>] [--json] | add <provider> <modelId> [opts] | remove <id|provider/modelId> [--yes] | list-custom [--json]",
     summary: "List models and manage custom (manually registered) models.",
     details: [
       "List available models from static config with no subcommand (liveModels may add more at runtime).",
@@ -117,7 +117,7 @@ const helpEntries: Record<string, HelpEntry> = {
     ],
   },
   claude: {
-    usage: "ocx claude [claude args...]",
+    usage: "opr claude [claude args...]",
     summary: "Launch Claude Code wired to the proxy (env injection + gateway model discovery).",
     details: [
       "Ensures the proxy is running, then execs `claude` with ANTHROPIC_BASE_URL/ANTHROPIC_AUTH_TOKEN,",
@@ -127,23 +127,23 @@ const helpEntries: Record<string, HelpEntry> = {
       "User-exported ANTHROPIC_* variables always take precedence.",
       "",
       "Claude Desktop profile:",
-      "  ocx claude desktop [apply]                         Save and apply the four-family profile",
-      "  ocx claude desktop show [--json]                   Show routes, families, and defaults",
-      "  ocx claude desktop move <route> <family> [--default]",
-      "  ocx claude desktop default <family> <route|none>",
-      "  ocx claude desktop export <path|->                 Export versioned JSON (`-` = stdout)",
-      "  ocx claude desktop import <path> [--apply]         Validate and import JSON",
+      "  opr claude desktop [apply]                         Save and apply the four-family profile",
+      "  opr claude desktop show [--json]                   Show routes, families, and defaults",
+      "  opr claude desktop move <route> <family> [--default]",
+      "  opr claude desktop default <family> <route|none>",
+      "  opr claude desktop export <path|->                 Export versioned JSON (`-` = stdout)",
+      "  opr claude desktop import <path> [--apply]         Validate and import JSON",
       "Families: opus, fable, sonnet, haiku. New routes start in opus.",
       "`none` is valid only when that family is empty.",
       "Legacy apply flags remain supported: --static, --hybrid, --discovery-only.",
     ],
   },
   restart: {
-    usage: "ocx restart",
+    usage: "opr restart",
     summary: "Stop the proxy and restart it (background). Equivalent to stop + ensure.",
   },
   v2: {
-    usage: "ocx v2 <status|on|off|mode <v1|default|v2>|threads <n>>",
+    usage: "opr v2 <status|on|off|mode <v1|default|v2>|threads <n>>",
     summary: "Toggle the Codex multi_agent_v2 feature (multi-agent surface).",
     details: [
       "status                Show flag, multi-agent mode, and thread limit.",
@@ -154,7 +154,7 @@ const helpEntries: Record<string, HelpEntry> = {
     ],
   },
   health: {
-    usage: "ocx health [--json]",
+    usage: "opr health [--json]",
     summary: "Check proxy health. Exits 0 if healthy, 1 otherwise.",
     details: ["Use --json for structured output: {ok, pid, port}."],
   },
@@ -167,52 +167,52 @@ function packageVersion(): string {
 }
 
 export function printVersion(): void {
-  console.log(`opencodex ${packageVersion()}`);
+  console.log(`openprovider ${packageVersion()}`);
 }
 
 export function printUsage(): void {
-  console.log(`opencodex (ocx) — Universal provider proxy for Codex
+  console.log(`openprovider (opr) — Universal provider proxy for Codex
 
 Usage:
-  ocx init                    Interactive setup (provider + Codex config injection)
-  ocx start [--port <port>]   Start the proxy server (auto-syncs models to Codex)
-  ocx stop                    Stop the proxy AND restore native Codex (plain codex works again)
-  ocx restore                 Restore native Codex without stopping (alias: eject)
-  ocx restore back            Re-point codex at the running proxy (undo restore)
-  ocx recover-history --legacy-openai
+  opr init                    Interactive setup (provider + Codex config injection)
+  opr start [--port <port>]   Start the proxy server (auto-syncs models to Codex)
+  opr stop                    Stop the proxy AND restore native Codex (plain codex works again)
+  opr restore                 Restore native Codex without stopping (alias: eject)
+  opr restore back            Re-point codex at the running proxy (undo restore)
+  opr recover-history --legacy-openai
                                Explicitly recover pre-backup syncResumeHistory rows
-  ocx uninstall               Remove service/shim/config and restore native Codex (alias: remove)
-  ocx service [sub]           Run as a background service (default: install/update/start)
-  ocx codex-shim <sub>        Auto-start proxy when \`codex\` launches (install|status|uninstall|remove)
-  ocx tray <sub>              Windows status tray (install|start|stop|status|uninstall)
-  ocx ensure                  Ensure the proxy is running and Codex config/cache are current
-  ocx sync                    Fetch models from providers and inject into Codex config
-  ocx sync-cache              Refresh Codex's model cache from the active catalog
-  ocx status                  Check proxy server status
-  ocx doctor                  Diagnose environment/network issues (WSL, proxy, ChatGPT reachability)
-  ocx debug [provider|usage ...]
+  opr uninstall               Remove service/shim/config and restore native Codex (alias: remove)
+  opr service [sub]           Run as a background service (default: install/update/start)
+  opr codex-shim <sub>        Auto-start proxy when \`codex\` launches (install|status|uninstall|remove)
+  opr tray <sub>              Windows status tray (install|start|stop|status|uninstall)
+  opr ensure                  Ensure the proxy is running and Codex config/cache are current
+  opr sync                    Fetch models from providers and inject into Codex config
+  opr sync-cache              Refresh Codex's model cache from the active catalog
+  opr status                  Check proxy server status
+  opr doctor                  Diagnose environment/network issues (WSL, proxy, ChatGPT reachability)
+  opr debug [provider|usage ...]
                               provider/usage on|off|status|reset|logs [-f]
-  ocx login <provider>        OAuth login (xai) — opens browser, stores token in ~/.opencodex/auth.json
-  ocx logout <provider>       Remove a stored OAuth login
-  ocx gui                     Open the opencodex dashboard
-  ocx update [--tag <tag>]    Update opencodex (keeps preview installs on @preview)
-  ocx restart                  Stop and restart the proxy
-  ocx v2 <sub>                multi_agent_v2 surface (status|on|off|mode|threads)
-  ocx health [--json]          Check proxy health (exit 0=healthy, 1=not)
-  ocx provider <sub>          Manage providers (list|add|remove|show|set-default)
-  ocx account <sub>           Accounts/keys (list|current|use|refresh|auto-switch|remove|add-key)
-  ocx models <sub>            List models; manage custom models (add|remove|list-custom)
-  ocx claude [args...]        Launch Claude Code wired to the proxy (model discovery on)
-  ocx claude desktop [sub]    Manage and apply Claude Desktop's four-family profile
-  ocx help [command]          Show help
-  ocx --version | -v          Print version
+  opr login <provider>        OAuth login (xai) — opens browser, stores token in ~/.openprovider/auth.json
+  opr logout <provider>       Remove a stored OAuth login
+  opr gui                     Open the openprovider dashboard
+  opr update [--tag <tag>]    Update openprovider (keeps preview installs on @preview)
+  opr restart                  Stop and restart the proxy
+  opr v2 <sub>                multi_agent_v2 surface (status|on|off|mode|threads)
+  opr health [--json]          Check proxy health (exit 0=healthy, 1=not)
+  opr provider <sub>          Manage providers (list|add|remove|show|set-default)
+  opr account <sub>           Accounts/keys (list|current|use|refresh|auto-switch|remove|add-key)
+  opr models <sub>            List models; manage custom models (add|remove|list-custom)
+  opr claude [args...]        Launch Claude Code wired to the proxy (model discovery on)
+  opr claude desktop [sub]    Manage and apply Claude Desktop's four-family profile
+  opr help [command]          Show help
+  opr --version | -v          Print version
 
 Examples:
-  ocx init                    Set up provider and inject into Codex
-  ocx start                   Start on default port (10100)
-  ocx start --port 8080       Start on custom port
-  ocx help service            Show service command help
-  ocx sync                    Sync available models to Codex`);
+  opr init                    Set up provider and inject into Codex
+  opr start                   Start on default port (10100)
+  opr start --port 8080       Start on custom port
+  opr help service            Show service command help
+  opr sync                    Sync available models to Codex`);
 }
 
 export function hasHelpFlag(values: string[]): boolean {

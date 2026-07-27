@@ -6,10 +6,10 @@
 | --- | --- |
 | `bin/ocx.mjs` | Published npm `bin` entry (Node shim). Resolves the bundled Bun binary (`bun` dependency), lazy-runs its `install.js` if only the placeholder stub is present, then execs `src/cli/index.ts` under Bun. Lets `npm install -g` work without a separately-installed Bun. |
 | `src/lib/bun-runtime.ts` | Bundled-Bun resolution: `isRealBunBinary()` (size gate vs the ~450-byte placeholder stub), `bundledBunPath()`, `durableBunPath()` (path baked into service/shim artifacts). |
-| `src/cli/index.ts` | `ocx` / `opencodex` CLI: init, start, stop, restore/eject, sync, status, login/logout, gui, service, update. After help/version early exits, ordinary commands run the bounded best-effort Codex-shim auto-restore policy before dispatch. Keeps the `#!/usr/bin/env bun` shebang for from-source dev (`bun run src/cli/index.ts`). |
+| `src/cli/index.ts` | `opr` / `openprovider` CLI: init, start, stop, restore/eject, sync, status, login/logout, gui, service, update. After help/version early exits, ordinary commands run the bounded best-effort Codex-shim auto-restore policy before dispatch. Keeps the `#!/usr/bin/env bun` shebang for from-source dev (`bun run src/cli/index.ts`). |
 | `src/server/index.ts` | Bun server entrypoint: `startServer`, `/v1/responses` HTTP + WebSocket routing, exact `POST /v1/images/generations` and `POST /v1/images/edits` routing, `/v1/models`, `/v1/*` JSON 404 guard, GUI fallback, and facade re-exports for split server modules. |
 | `src/server/images.ts` | Standalone Images data plane: forward-provider selection, Codex account affinity, bounded opaque request relay, single-attempt upstream fetch, pool health recording, and safe response/cancellation relay. |
-| `src/config.ts` | `~/.opencodex/config.json`, defaults, PID path, env-value resolution, `websocketsEnabled()`. |
+| `src/config.ts` | `~/.openprovider/config.json`, defaults, PID path, env-value resolution, `websocketsEnabled()`. |
 | `src/router.ts` | Provider/model selection before adapter dispatch. |
 | `src/types.ts` | Shared config, parsed request, adapter, and event types. |
 | `src/reasoning-effort.ts` | Codex reasoning-level definitions (`low`/`medium`/`high`/`xhigh`), per-model effort mapping, and catalog effort sanitization. |
@@ -33,7 +33,7 @@ their own files.
 
 ## Lifecycle
 
-`ocx start` refuses a duplicate PID, starts the proxy, writes `~/.opencodex/ocx.pid`, syncs Codex
+`opr start` refuses a duplicate PID, starts the proxy, writes `~/.openprovider/opr.pid`, syncs Codex
 config/catalog, then serves until shutdown. Normal shutdown restores native Codex. Service mode sets
 `OCX_SERVICE=1`, so managed restarts do not repeatedly restore/reinject; explicit service stop and
 uninstall still restore.

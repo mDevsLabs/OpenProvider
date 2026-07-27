@@ -11,5 +11,5 @@
 | 7 | Low | [1m] 대소문자 (CLI는 /i) | 수용 — strip/detect를 /\[1m\]$/i 공용 헬퍼로 통일 (context-windows, inbound, claude-messages) |
 
 잔여 리스크 (기록): /v1/models는 클라이언트 env를 알 수 없어, 어떤 주입 경로도 안 거친
-수동 사용자가 372k 변형 행을 고르면 1M 회계+컴팩션 부재. manualEnv/ocx claude/systemEnv
+수동 사용자가 372k 변형 행을 고르면 1M 회계+컴팩션 부재. manualEnv/opr claude/systemEnv
 세 경로 모두 env를 주입하므로 안내된 경로에서는 발생 불가 — docs에 명시.

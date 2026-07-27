@@ -183,7 +183,7 @@ function findCallIndex(calls: LoggedCall[], name: string, matcher: (call: Logged
 }
 
 function runRelease(version: string, scenario: ReleaseScenario = {}) {
-  const shimDir = mkdtempSync(join(tmpdir(), "ocx-release-helper-"));
+  const shimDir = mkdtempSync(join(tmpdir(), "opr-release-helper-"));
   const logPath = join(shimDir, "release-log.jsonl");
   writeFileSync(logPath, "", "utf8");
 

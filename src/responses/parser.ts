@@ -182,7 +182,7 @@ function buildTools(tools: unknown[] | undefined): OcxTool[] | undefined {
       });
     }
     else if (typeof t.name === "string" && t.type !== "web_search" && t.type !== "image_generation") {
-      // Any OTHER named tool (e.g. a native/computer-use tool type opencodex doesn't explicitly
+      // Any OTHER named tool (e.g. a native/computer-use tool type openprovider doesn't explicitly
       // model) is client-executed — pass it through as a function so the routed model can read and
       // call it naturally; the bridge relays its call as a function_call. Previously such tools were
       // silently dropped, so the model never saw them.

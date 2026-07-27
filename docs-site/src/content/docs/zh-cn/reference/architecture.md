@@ -11,7 +11,7 @@ OpenProvider 运行在单个 Bun 进程中。请求以 OpenAI Responses 格式�
 
 ```
 src/
-├── cli/                # ocx command dispatch, init, status, provider commands
+├── cli/                # opr command dispatch, init, status, provider commands
 ├── server/             # Bun.serve, /v1/* proxy, /api/* management API, WS bridge
 ├── codex/              # Codex config injection, catalog sync, auth/account integration
 ├── providers/          # provider metadata, API-key pool, quota and labels

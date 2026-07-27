@@ -13,7 +13,7 @@ about detection surface. Every codebase claim is grounded to a file:line; every 
 
 | Layer | File | Keyed by | Refresh entry point | Concurrency safety |
 |---|---|---|---|---|
-| Single-account OAuth | `src/oauth/store.ts` (`~/.opencodex/auth.json`) | provider name | `getValidAccessToken()` `src/oauth/index.ts:115` | in-memory `tokenRefreshes` map dedup `src/oauth/index.ts:17` |
+| Single-account OAuth | `src/oauth/store.ts` (`~/.openprovider/auth.json`) | provider name | `getValidAccessToken()` `src/oauth/index.ts:115` | in-memory `tokenRefreshes` map dedup `src/oauth/index.ts:17` |
 | Multi-account Codex pool | `src/codex-account-store.ts` (`codex-accounts.json`) | account id | `getValidCodexToken(id)` `src/codex-account-store.ts:278` | file lock + generation CAS + refresh-grant fingerprint `:224,:139,:50` |
 
 The reported "tokens keep expiring" bug lives in the **multi-account** layer: an account that the
@@ -24,7 +24,7 @@ generalizing still buys pre-expiry (latency) refresh and a home for any future p
 
 ## Per-provider table
 
-Legend: "skew" = how long *before* nominal expiry opencodex treats the token as needing refresh.
+Legend: "skew" = how long *before* nominal expiry openprovider treats the token as needing refresh.
 
 | Provider | Access TTL source | Existing skew (code) | Refresh-token behavior | Refresh fn |
 |---|---|---|---|---|
@@ -39,7 +39,7 @@ Legend: "skew" = how long *before* nominal expiry opencodex treats the token as 
 ## ChatGPT/Codex refresh-token rotation (the failure mode, verified)
 
 OpenAI's `auth.openai.com/oauth/token` **rotates** the refresh token: each refresh returns a new
-`refresh_token`, and reusing an old one invalidates the token family. opencodex already handles the
+`refresh_token`, and reusing an old one invalidates the token family. openprovider already handles the
 rotation correctly on the write side — the pool store persists the returned `refresh_token`
 (`src/codex-account-store.ts:375`) under a file lock + generation CAS, and de-dupes concurrent
 refreshers of the same grant via `refreshGrantFingerprint` (`:50,:264`). What it does NOT do is
@@ -48,7 +48,7 @@ permanent code.
 
 The permanent failure codes (mirrors `codex-lb`'s `PERMANENT_FAILURE_CODES`): `refresh_token_expired`,
 `refresh_token_reused`, `refresh_token_invalidated`, `invalid_grant`, `token_invalidated`,
-`token_expired`. opencodex's `TokenRefreshError` (`src/codex-account-store.ts:174`) already
+`token_expired`. openprovider's `TokenRefreshError` (`src/codex-account-store.ts:174`) already
 classifies `revoked`/`expired`/`unknown` from the error text (`:366`).
 
 > 출처: [OpenAI Codex — Authentication](https://developers.openai.com/codex/auth)
@@ -59,7 +59,7 @@ classifies `revoked`/`expired`/`unknown` from the error text (`:366`).
 
 - **Codex pool (chatgpt)**: the one that needs it. `codex-lb` uses a use-time top-up at
   `TOKEN_REFRESH_INTERVAL_DAYS = 8` plus a ~6h guardian tick refreshing accounts whose last refresh
-  is > 12h old. opencodex has no per-account `lastRefresh` timestamp today (fields are
+  is > 12h old. openprovider has no per-account `lastRefresh` timestamp today (fields are
   `accessToken/refreshToken/expiresAt/chatgptAccountId`), so the practical trigger is: refresh any
   pool account whose access token is within a lead window of `expiresAt` — this naturally cycles the
   refresh token before it can age out. (Adding an explicit `lastRefresh` is a Phase 1 option.)

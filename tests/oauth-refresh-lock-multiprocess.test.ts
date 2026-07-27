@@ -28,7 +28,7 @@ beforeEach(() => {
   tmp = join(tmpdir(), `oauth-lock-mp-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(tmp, { recursive: true });
   process.env.HOME = tmp;
-  process.env.OPENCODEX_HOME = join(tmp, "ocx");
+  process.env.OPENCODEX_HOME = join(tmp, "opr");
 });
 
 afterEach(() => {
@@ -82,7 +82,7 @@ describe("slow multi-process OAuth refresh lock", () => {
       env: {
         ...process.env,
         HOME: tmp,
-        OPENCODEX_HOME: join(tmp, "ocx"),
+        OPENCODEX_HOME: join(tmp, "opr"),
         ACCOUNT_ID: accountId,
         READY_PATH: readyPath,
         HOLD_MS: String(holdMs),

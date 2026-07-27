@@ -36,8 +36,8 @@ function writeSessionsFixture(codexHome: string): void {
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-api-storage-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-api-storage-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-api-storage-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-api-storage-"));
   process.env.OPENCODEX_HOME = testDir;
   saveConfig(baseConfig());
 });

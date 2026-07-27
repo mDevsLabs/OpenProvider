@@ -31,8 +31,8 @@ Date: 2026-07-18. Commit: c29a79ba (dev).
 
 ## Follow-up (user action)
 
-Reinstall/restart the local ocx service from this branch and run `ocx sync` (or restart
-the app) so `~/.codex/opencodex-catalog.json` picks up the one-slash slug; the stale
+Reinstall/restart the local opr service from this branch and run `opr sync` (or restart
+the app) so `~/.codex/openprovider-catalog.json` picks up the one-slash slug; the stale
 `zenmux/moonshotai/kimi-k3-free` entry is replaced on next sync.
 
 ## LOOP-PESSIMIST-01

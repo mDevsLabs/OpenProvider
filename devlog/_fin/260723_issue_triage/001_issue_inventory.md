@@ -1,7 +1,7 @@
 # 001 — Issue Inventory (overnight 2026-07-22/23)
 
 Source: `gh issue list --state open` + `gh issue view` on 2026-07-23 KST,
-repo `lidge-jun/opencodex`. Overnight window: issues created 2026-07-22
+repo `lidge-jun/openprovider`. Overnight window: issues created 2026-07-22
 12:41Z–20:39Z (= 21:41 KST – 05:39 KST+1), plus #280 which received its
 resolving comment overnight (11:20Z).
 
@@ -9,7 +9,7 @@ resolving comment overnight (11:20Z).
 
 User had `cursor` as the only enabled provider; selecting bare `gpt-5.6-sol`
 failed closed with "No enabled OpenAI provider". Owner walked through
-`ocx provider add openai --sync` (preserving the Cursor config). Reporter
+`opr provider add openai --sync` (preserving the Cursor config). Reporter
 confirmed 2026-07-22 11:20Z: new + existing threads work; asked whether it was
 their own misconfiguration. → Bucket 1: final answer + close.
 
@@ -17,17 +17,17 @@ their own misconfiguration. → Bucket 1: final answer + close.
 
 GUI `/#claude` auto-connect saves `systemEnv: true` but no env injection
 happens on Linux: no `ANTHROPIC_BASE_URL` in new shells, no
-`~/.opencodex/claude-env.sh`. Reporter located the darwin-only guard in
+`~/.openprovider/claude-env.sh`. Reporter located the darwin-only guard in
 `src/server/system-env.ts`. Open question: Linux support vs GUI honesty.
 → Bucket 2, lane 5.
 
 ## #288 — spawn_agent 拒绝自定义模型 (Ark/glm-5.2) — Kling0012
 
-Codex Desktop on Windows; main session routes via OpenCodex to Volcengine ARK,
+Codex Desktop on Windows; main session routes via OpenProvider to Volcengine ARK,
 but `spawn_agent(model="Ark/glm-5.2")` fails instantly with
 `Unknown model ... Available models: gpt-5.6-terra, gpt-5.6-sol` — before any
 request reaches the proxy. Omitting `model` works (inherits parent).
-→ Bucket 2, lane 6 (A-audit demoted it from bucket-1 candidate: OpenCodex's
+→ Bucket 2, lane 6 (A-audit demoted it from bucket-1 candidate: OpenProvider's
 catalog featuring influences the spawn_agent allowlist — boundary unresolved).
 
 ## #289 — Volcengine Ark Agent Plan Responses URL에 /v1 중복 — lijianmac
@@ -41,7 +41,7 @@ Reporter proposes configurable responses path. → Bucket 2, lane 4.
 
 Custom-model parent spawning custom-model child: tool router receives empty
 args (`message` missing), rejects every attempt, parent retries until timeout.
-v2.7.31. Needs opencodex-vs-upstream determination (#92 family?).
+v2.7.31. Needs openprovider-vs-upstream determination (#92 family?).
 → Bucket 2, lane 6.
 
 ## #291 — [Feature] Providers 페이지 edit 버튼 — str0203
@@ -54,7 +54,7 @@ PATCH /api/providers). → Bucket 1: answer + close after reporter confirmation.
 
 `allowPrivateNetwork: true` lets data-plane requests through but model
 discovery (`GET /v1/models`) is still blocked for hosts resolving to reserved
-ranges (e.g. 198.18.0.0/15); dashboard shows "—" models, `ocx sync` logs
+ranges (e.g. 198.18.0.0/15); dashboard shows "—" models, `opr sync` logs
 SyntaxError. Manual curl succeeds. → Bucket 2, lane 3.
 
 ## #294 — [Feature] Claude account pool — str0203

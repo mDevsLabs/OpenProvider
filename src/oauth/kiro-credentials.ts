@@ -76,7 +76,7 @@ function parseExpires(value: unknown, present: boolean, hasRefreshToken: boolean
   }
   if (present) {
     console.warn(
-      `[ocx:kiro:credentials] credential expiry is present but unparseable; ${
+      `[opr:kiro:credentials] credential expiry is present but unparseable; ${
         hasRefreshToken ? "treating credential as expired" : "using the default TTL because no refresh token is available"
       }`,
     );

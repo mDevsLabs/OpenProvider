@@ -34,7 +34,7 @@
    - GUI lint + build
    - `bun build scripts/release.ts --target=bun --outdir=.tmp/ci-release-script-check` (release 헬퍼 컴파일)
    - CLI help 스모크: `bun run src/cli/index.ts help`
-   - npm-global 스모크: `npm install` → `npm run build:gui` → `npm pack` → packed GUI 확인 → global install → `ocx help`
+   - npm-global 스모크: `npm install` → `npm run build:gui` → `npm pack` → packed GUI 확인 → global install → `opr help`
 3. sol 서브에이전트 충돌 해소 감사 (VERDICT PASS 필요)
 4. `claudecode` 푸시 → `dev`를 claudecode로 fast-forward → `origin/dev` 푸시
    - 머지 커밋은 claudecode/origin/dev 양쪽을 조상으로 가지므로 dev·origin/dev 모두 ff 가능 (dev-측 별도 머지 커밋 불필요, 감사 확인 #5). first-parent 체인이 claudecode를 따라가지만 --first-parent 의존 툴링 없음 확인됨.

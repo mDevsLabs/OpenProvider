@@ -8,7 +8,7 @@ let tmp: string;
 let prevConfigDir: string | undefined;
 
 beforeAll(() => {
-  tmp = mkdtempSync(join(tmpdir(), "ocx-claude-detect-"));
+  tmp = mkdtempSync(join(tmpdir(), "opr-claude-detect-"));
   prevConfigDir = process.env.CLAUDE_CONFIG_DIR;
 });
 

@@ -38,11 +38,11 @@ percentage window.
 
 ### Phase 1 — jawcode-style OAuth quota
 
-Port/adapt quota providers that map naturally to opencodex OAuth credentials:
+Port/adapt quota providers that map naturally to openprovider OAuth credentials:
 
 - Anthropic Claude OAuth.
 - xAI/Grok OAuth.
-- Kimi OAuth, if the jawcode endpoint still works with opencodex credentials.
+- Kimi OAuth, if the jawcode endpoint still works with openprovider credentials.
 - Google Antigravity OAuth/CLI-backed usage where available.
 - ChatGPT/OpenAI Codex by reusing the existing WHAM quota path.
 

@@ -8,7 +8,7 @@
 2. Streaming delivers the signature as a `signature_delta` inside `content_block_delta`
    just before `content_block_stop`.
 
-## opencodex current state
+## openprovider current state
 - src/adapters/anthropic.ts parseStream handles text_delta/thinking_delta/input_json_delta
   ONLY — `signature_delta` never captured; `redacted_thinking` blocks never surfaced.
 - bridge.ts emits reasoning items with no encrypted_content -> Codex replays reasoning

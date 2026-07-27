@@ -38,7 +38,7 @@ as `"auto"`, an unrelated edit no longer converts the user to sticky subscriptio
 ## The reason line (same row)
 
 Under the existing select, one muted line that answers "what will actually happen on
-the next `ocx claude` run":
+the next `opr claude` run":
 
 - origin manual → `t("claude.effectiveMode.manual", { mode })`
 - auto-present → `t("claude.effectiveMode.autoPresent", { source })` with the source

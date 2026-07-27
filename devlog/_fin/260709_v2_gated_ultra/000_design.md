@@ -1,4 +1,4 @@
-# 050 — opencodex v2-gated ultra + toggle surface (wp5)
+# 050 — openprovider v2-gated ultra + toggle surface (wp5)
 
 ## Decision (user-confirmed, 260709)
 
@@ -7,13 +7,13 @@
 | max-native (anthropic/*, gpt-5.6 family) | max + ultra | max only (ultra stripped, incl. native ultra on 5.6-sol/terra) |
 | mock-max (gpt-5.5 / 5.4 / 5.4-mini / 5.3-codex-spark, routed models) | ultra only | neither (ladder ends at xhigh/high) |
 
-Mock max is NEVER visible in the picker regardless of v2 (current shipped ocx
+Mock max is NEVER visible in the picker regardless of v2 (current shipped opr
 behavior already never invents a visible max: `applyReasoningLevels` appends max
 only when the provider advertises it; `ensureUltraReasoningLevel` deliberately
 appends ultra alone — wire clamps ultra->max->highest native). This phase adds
 the v2 gate; it does not add any max emission.
 
-## Repo: /Users/jun/Developer/new/700_projects/opencodex
+## Repo: /Users/jun/Developer/new/700_projects/openprovider
 
 ### NEW src/codex/features.ts
 
@@ -47,7 +47,7 @@ Catalog build stays read-only w.r.t. config.
 
 ### NEW src/cli/v2.ts + MODIFY src/cli/index.ts dispatch
 
-`ocx v2 status|on|off`:
+`opr v2 status|on|off`:
 
 - status: print enabled state + resulting picker policy line.
 - on/off: shell out to `codex features enable|disable multi_agent_v2`
@@ -98,7 +98,7 @@ Catalog build stays read-only w.r.t. config.
    verbatim catalog->cache copy (:1338). CLI/PUT flow follows the
    /api/disabled-models template: `refreshCodexCatalogBestEffort`
    (management-api.ts:56-63) -> `refreshCodexModelCatalog` (refresh.ts:37-46)
-   = syncCatalogModels THEN invalidate. CLI reuses the `ocx sync` routine
+   = syncCatalogModels THEN invalidate. CLI reuses the `opr sync` routine
    (cli/index.ts:467-470), never the invalidate-only sync-cache.
 3. Purity/test isolation: `buildCatalogEntries` is documented pure
    (codex-catalog-golden.test.ts:5). The v2 state is resolved ONLY at the
@@ -138,7 +138,7 @@ membership — so a ladder without max hard-fails subagent max spawns. Policy ch
 
 Live failure reproduced: subagent probes on gpt-5.5 died with 502 "Encrypted
 function output content could not be decrypted or decoded" on every forked-turn
-replay (request log burst 17:47-17:48, requestIds ocx-mrd9k*/l*). Same account —
+replay (request log burst 17:47-17:48, requestIds opr-mrd9k*/l*). Same account —
 the binding that breaks is the encrypted payload itself on an unprovisioned
 ChatGPT account (openai/codex#26753 closed not-planned, #27331).
 
@@ -150,7 +150,7 @@ inter-agent messages = V1-equivalent privacy, fine for a single-user proxy.
 Limits: cannot repair threads that already carry encrypted items (respawn
 probes after deploy); unverified against a backend that keys encryption on
 tool NAME instead of the marker (no such evidence upstream; #26753's error
-text blames the schema). Needs publish + ocx restart like the rest.
+text blames the schema). Needs publish + opr restart like the rest.
 
 ## Hotfix (260709): clamp misfired on routed models
 
@@ -161,7 +161,7 @@ off-snapshot bare native and hit the conservative xhigh clamp. Fix: guard on
 the originally requested id (logCtx.requestedModel, captured pre-strip); any
 namespaced request skips the clamp entirely — routed efforts belong to their
 adapters (anthropic passes max through natively). gpt-5.5-style bare natives
-keep the clamp. Needs an ocx restart to land (the live service demonstrably
+keep the clamp. Needs an opr restart to land (the live service demonstrably
 runs from this tree — the max->xhigh markers in the log are this code).
 
 ## Amendment 2 FALSIFIED + reverted (260709 18:1x)
@@ -177,5 +177,5 @@ backend blobs fail decrypt on replay anyway (17:47 burst). The envelope is a
 client<->backend E2E protocol the proxy cannot mediate. Strip REVERTED
 (encrypted-tools.ts + tests deleted, responses.ts call removed). Verdict:
 multi_agent_v2 subagent spawns on ChatGPT-account natives are not proxy-rescuable;
-the working state is `ocx v2 off` (V1 subagents, ultra hidden per the gate) until
+the working state is `opr v2 off` (V1 subagents, ultra hidden per the gate) until
 upstream provisions the account/backend path (#26753 closed not-planned).

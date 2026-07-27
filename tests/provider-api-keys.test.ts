@@ -24,8 +24,8 @@ function baseConfig(): OcxConfig {
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-provider-keys-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-provider-keys-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-provider-keys-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-provider-keys-"));
   process.env.OPENCODEX_HOME = testDir;
   saveConfig(baseConfig());
 });

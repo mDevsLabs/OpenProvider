@@ -5,12 +5,12 @@ Design B is parked as an optional alternative, not pending work.
 
 ## Landed (functional goal met)
 
-- **Design A hardening** (Loop 1): recoverable history-restore retry + surfaced skips + `ocx restore
+- **Design A hardening** (Loop 1): recoverable history-restore retry + surfaced skips + `opr restore
   back` — commits `73e12b8`, `c63b5b5`. Verified: `isRecoverableHistoryError`/`withHistoryRetry`
   (`codex-history-provider.ts:148,356`), restore-warning + forward-sync (`codex-inject.ts:292,385`).
 - **Routing-fallback fix** (the real defect behind Design B): Codex silently fell back to the
   `openai` provider because no ROOT `model_provider` was injected. Fixed by `744cc9e` — `codex-inject.ts`
-  `setRootModelProvider()` (:120-135) now writes `model_provider = "opencodex"` at the TOML root so
+  `setRootModelProvider()` (:120-135) now writes `model_provider = "openprovider"` at the TOML root so
   `codex exec` routes through the proxy. History remap for Codex App visibility already sets old
   chats to `model_provider = 'openai'` (`codex-history-provider.ts:345`).
 
@@ -18,7 +18,7 @@ Design B is parked as an optional alternative, not pending work.
 
 `02_openai-override-design.md` proposes a DIFFERENT architecture: emit `[model_providers.openai]`
 and DROP the root `model_provider` line (relying on Codex's default `openai` id). This was a "loop-2
-decision" alternative. The current opencodex-root approach already solves the routing + visibility
+decision" alternative. The current openprovider-root approach already solves the routing + visibility
 problem, so Design B is a simplification/unification option, not a fix for a live defect. Revive only
 if the openai-id approach is later preferred (e.g. to drop the history remap). Not pending work.
 

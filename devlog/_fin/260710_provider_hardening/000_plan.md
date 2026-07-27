@@ -2,7 +2,7 @@
 
 Goal: harden all 50 provider registry entries + owning adapter paths, one PABCD
 work-phase per adapter family, sequential. Session 019f4840-5714-7b33-b0c5-8c6c82b3cfb1,
-goalplan slug `harden-all-50-provider-proxy-paths-in-opencodex`.
+goalplan slug `harden-all-50-provider-proxy-paths-in-openprovider`.
 
 ## Hardening definition (user constraints)
 

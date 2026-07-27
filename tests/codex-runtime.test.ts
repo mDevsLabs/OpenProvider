@@ -18,7 +18,7 @@ import {
 } from "../src/codex/runtime";
 
 function tempConfigDir(): string {
-  return mkdtempSync(join(tmpdir(), "ocx-runtime-"));
+  return mkdtempSync(join(tmpdir(), "opr-runtime-"));
 }
 
 describe("parseCodexVersionOutput / compareCodexVersions", () => {
@@ -254,7 +254,7 @@ describe("resolveCodexRuntime", () => {
 
   test("creates missing config directory on first runtime/clamp persist", () => {
     const parent = tempConfigDir();
-    const configDir = join(parent, "nested", "opencodex-home");
+    const configDir = join(parent, "nested", "openprovider-home");
     expect(existsSync(configDir)).toBe(false);
     persistCodexRuntime({
       command: "C:\\keep\\codex.exe",
@@ -289,7 +289,7 @@ describe("resolveCodexRuntime", () => {
 
   test("catalog clamp clears diagnostics inside deps.configDir when probe fails", async () => {
     const { clampCatalogModelsToCodexSupport } = await import("../src/codex/catalog/effort");
-    const nested = join(tempConfigDir(), "nested", "opencodex-home");
+    const nested = join(tempConfigDir(), "nested", "openprovider-home");
     const configured = join(nested, "codex.exe");
     persistEffortClamp({
       runtimePath: configured,

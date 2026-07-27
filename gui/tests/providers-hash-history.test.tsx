@@ -190,14 +190,14 @@ describe("useAppRouteState (real hook)", () => {
 
   test("stale layout-preference keys are cleared on mount", async () => {
     const seed = new Window({ url: "http://localhost/#dashboard" });
-    seed.localStorage.setItem("ocx-global-view", "workspace");
-    seed.localStorage.setItem("ocx-providers-view", "classic");
+    seed.localStorage.setItem("opr-global-view", "workspace");
+    seed.localStorage.setItem("opr-providers-view", "classic");
     seed.localStorage.setItem("keep-me", "yes");
 
     await mountAt("#dashboard", seed.localStorage as unknown as Storage);
 
-    expect(seed.localStorage.getItem("ocx-global-view")).toBeNull();
-    expect(seed.localStorage.getItem("ocx-providers-view")).toBeNull();
+    expect(seed.localStorage.getItem("opr-global-view")).toBeNull();
+    expect(seed.localStorage.getItem("opr-providers-view")).toBeNull();
     // Unrelated keys must survive the cleanup.
     expect(seed.localStorage.getItem("keep-me")).toBe("yes");
   });

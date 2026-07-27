@@ -221,7 +221,7 @@ export async function multiAgentGuidanceText(
       : undefined;
 
     if (isInjectionDebugEnabled() && effective.excluded.length > 0) {
-      injectionDebugLog(`[opencodex] multi-agent guidance excluded: ${effective.excluded
+      injectionDebugLog(`[openprovider] multi-agent guidance excluded: ${effective.excluded
         .map(item => `${item.configured}:${item.reason}`)
         .join(", ")}`);
     }

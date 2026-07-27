@@ -2,7 +2,7 @@
 
 ## Dashboard serving
 
-The bundled React dashboard is built into `gui/dist` and served by the same Bun proxy. `ocx gui`
+The bundled React dashboard is built into `gui/dist` and served by the same Bun proxy. `opr gui`
 starts the proxy when needed and opens `http://localhost:<port>`.
 
 ## API ownership
@@ -22,9 +22,9 @@ starts the proxy when needed and opens `http://localhost:<port>`.
 | OpenAI account mode | Report one OpenAI Codex card with Pool/Direct controls and one API-key card. Mode PATCH persists live without restart or catalog identity changes; Pool owns account/quota controls and Direct uses caller/main login only. Main-account DTOs report real credential presence and terminal `needsReauth` state instead of treating missing/invalid native auth as an unknown quota. |
 | Subagents | Read/write the featured `subagentModels` list capped at five ids. |
 | V2 / Multi-agent mode | `GET/PUT /api/v2` — reports/sets the codex `multi_agent_v2` feature flag, the 3-state `multiAgentMode` override (`v1`/`default`/`v2`), and the logical maximum thread count. Selecting `v2` enables the native flag and migrates `[agents] max_threads` to the v2 key; selecting `v1` disables it and migrates the same value back. `default` leaves the native flag unchanged. PUT accepts `enabled`, `multiAgentMode`, and/or the compatibility-named `maxConcurrentThreadsPerSession`; contradictory mode/flag pairs are rejected before writes. Every transition is rollback-safe and resyncs the catalog. |
-| Logs & Debug | One sidebar entry (`/#logs`) with two tabs. Logs tab: request/runtime logs for local diagnosis. Debug tab (`/#logs/debug`; legacy `/#debug` deep links redirect there): provider + usage toggles, refresh/follow log viewer. `GET/PUT /api/debug`; `GET /api/debug/logs` and `GET /api/debug/usage-logs` (monotonic `after` cursor, legacy `since` accepted). CLI: `ocx debug provider|usage …` (both streams via running proxy API). |
-| Usage | `GET /api/usage` aggregate read-only summary derived from `~/.opencodex/usage.jsonl`; measured / reported / unreported / unsupported / estimated counts, daily zero-filled grid, model and provider breakdowns. Never exposes prompts. |
-| System | `GET /api/system/memory` — service-process runtime/memory identity (pid, Bun version/revision, platform, RSS/heap scalars, `bun:jsc` heap discriminator, streamMode + eager-relay gate decision, watchdog snapshot sliced to the last 60 samples). Scalar-only payload; rides the standard management auth gate and must never move to unauthenticated `/healthz`. Consumed by `ocx doctor`'s Memory/runtime section. |
+| Logs & Debug | One sidebar entry (`/#logs`) with two tabs. Logs tab: request/runtime logs for local diagnosis. Debug tab (`/#logs/debug`; legacy `/#debug` deep links redirect there): provider + usage toggles, refresh/follow log viewer. `GET/PUT /api/debug`; `GET /api/debug/logs` and `GET /api/debug/usage-logs` (monotonic `after` cursor, legacy `since` accepted). CLI: `opr debug provider|usage …` (both streams via running proxy API). |
+| Usage | `GET /api/usage` aggregate read-only summary derived from `~/.openprovider/usage.jsonl`; measured / reported / unreported / unsupported / estimated counts, daily zero-filled grid, model and provider breakdowns. Never exposes prompts. |
+| System | `GET /api/system/memory` — service-process runtime/memory identity (pid, Bun version/revision, platform, RSS/heap scalars, `bun:jsc` heap discriminator, streamMode + eager-relay gate decision, watchdog snapshot sliced to the last 60 samples). Scalar-only payload; rides the standard management auth gate and must never move to unauthenticated `/healthz`. Consumed by `opr doctor`'s Memory/runtime section. |
 | Stop | `POST /api/stop` — restore native Codex, stop any installed service, and exit the proxy. |
 
 Provider writes must not round-trip masked API keys as real secrets. Dashboard actions that change
@@ -39,7 +39,7 @@ even though transport logs may additionally report the resolved base model. Deta
 User aliases are display metadata only. Codex pool aliases live on `CodexAccount`, OAuth aliases on
 `ProviderAccount`, and API-key aliases reuse the existing key `label`; account ids, credential
 identity, active selection, and routing never consult these fields. The matching CLI is
-`ocx account alias <provider> <id> <display-name|->` (`rename` is accepted as a synonym).
+`opr account alias <provider> <id> <display-name|->` (`rename` is accepted as a synonym).
 
 ## Sidebar stop button
 
@@ -52,7 +52,7 @@ endpoint restores native Codex config, stops any installed service to prevent re
 The dashboard sidebar exposes a **Startup safety** page. Its warning state is derived from active
 Codex routing plus the actual service and launcher-shim installation state; the
 `codexAutoStart` preference alone is never presented as proof of restart protection. The page shows
-copyable repair commands (`ocx service install`, `ocx codex-shim install`, and `ocx restore`). On
+copyable repair commands (`opr service install`, `opr codex-shim install`, and `opr restore`). On
 Windows it can also install an owned, per-user system tray. The resident tray owns only its icon,
 home-scoped singleton, and HKCU Run registration; fixed proxy actions delegate to the CLI so drain,
 service conflict handling, native restore, and PID identity remain centralized. Tray presence never
@@ -71,7 +71,7 @@ network failures as a visible warning instead of silently looking idle again.
 
 ## Usage accounting
 
-`src/usage/log.ts` writes append-only JSONL to `~/.opencodex/usage.jsonl` with file mode `0o600`.
+`src/usage/log.ts` writes append-only JSONL to `~/.openprovider/usage.jsonl` with file mode `0o600`.
 `src/usage/summary.ts` turns that file into the `/api/usage` shape — totals, daily zero-filled
 grid, model and provider breakdowns, and `measured / reported / unreported / unsupported / estimated` counts.
 Missing usage is never treated as zero. The dashboard Usage tab renders the same shape, and the
@@ -93,9 +93,9 @@ work cannot delay health/provider/settings state or run every five seconds.
 - 다른 대안 대신 이 방식을 선택한 이유: It bounds resident heap and avoids a second persistence format while keeping unrelated endpoints responsive.
 - 장점, 단점 및 영향: Unchanged queries are cheap and memory stays bounded; a changed large log still consumes rebuild CPU, but cooperatively and at most once per observed revision/query.
 
-For diagnosing upstream-shape / usage-extraction issues run `ocx debug usage on` (or set
+For diagnosing upstream-shape / usage-extraction issues run `opr debug usage on` (or set
 `OPENCODEX_USAGE_DEBUG=1` before start). The proxy then writes a rolling debug record per finalized
-request to `~/.opencodex/usage-debug.jsonl` (mode `0o600`, auto-trimmed to the most-recent 100 lines
+request to `~/.openprovider/usage-debug.jsonl` (mode `0o600`, auto-trimmed to the most-recent 100 lines
 once it exceeds 200) with the upstream content-type, body kind (`sse / json / other / none`), a 2KB
 body sample, and the extracted usage. Off by default; the hot path is guarded so production stays
 untouched.
@@ -103,8 +103,8 @@ untouched.
 ## Provider debug logging
 
 Provider transport diagnostics (dropped SSE frames, adapter dial/stream events, etc.) are opt-in:
-`ocx debug provider on` / `ocx debug provider off` on the running proxy, the Debug-page toggle, or `OCX_DEBUG=1` on
+`opr debug provider on` / `opr debug provider off` on the running proxy, the Debug-page toggle, or `OCX_DEBUG=1` on
 the next start (legacy `OCX_DEBUG_FRAMES` still enables the same path). Lines
-use the `[ocx:<adapter>:<event>]` prefix, go to the proxy terminal, and are buffered for
-`ocx debug provider logs` / `ocx debug provider logs -f`. Usage JSONL tails with
-`ocx debug usage logs [-f]`. Separate from provider buffered logs above.
+use the `[opr:<adapter>:<event>]` prefix, go to the proxy terminal, and are buffered for
+`opr debug provider logs` / `opr debug provider logs -f`. Usage JSONL tails with
+`opr debug usage logs [-f]`. Separate from provider buffered logs above.

@@ -44,7 +44,7 @@ of cross-platform hazards.
 
 1. (High) `codexExecInvocation()` is NOT generally reusable: bare `claude`/`codex` return
    `shell:false` (still ENOENT for npm `.cmd` shims), and `shell:true` + args array has no
-   argument escaping — unacceptable for `ocx claude`'s arbitrary user args. → 020 now
+   argument escaping — unacceptable for `opr claude`'s arbitrary user args. → 020 now
    specifies a real Windows launcher (`src/lib/win-exec.ts`): PATH+PATHEXT candidate
    resolution, cross-spawn-style `cmd.exe /d /s /c` invocation with
    `windowsVerbatimArguments: true` and per-arg CMD escaping for `.cmd`/`.bat` targets;
@@ -111,9 +111,9 @@ Activation scenarios (C-ACTIVATION-GROUNDING-01), one owning test per conditiona
 |----------|-------------|
 | 010 Windows base-dir elided | tests/claude-inbound.test.ts new: text-block carrier with `C:\Users\...\claude-api` |
 | 010 POSIX unchanged / non-blocked / drive-relative | existing carrier tests + 2 new cases |
-| 020 D2 `ocx claude` win32 `.cmd` resolution | tests/claude-cli.test.ts: injected spawn+platform, asserts cmd.exe argv |
+| 020 D2 `opr claude` win32 `.cmd` resolution | tests/claude-cli.test.ts: injected spawn+platform, asserts cmd.exe argv |
 | 020 D2 arg preservation (spaces/quotes/metachars) | tests/claude-cli.test.ts: escaping case |
-| 020 D3 `ocx v2 on/off` win32 | new/extended v2 CLI test: invocation shape |
+| 020 D3 `opr v2 on/off` win32 | new/extended v2 CLI test: invocation shape |
 | 020 D3 management-api feature toggle win32 | tests/claude-management-api.test.ts (or equivalent): injected exec |
 | 020 D4 computerUseCommand win32 + quoted path + metachars | tests/cursor-desktop-exec.test.ts: injected spawn |
 | 020 D4 recordScreenCommand win32 | tests/cursor-desktop-exec.test.ts: second command case |
@@ -136,7 +136,7 @@ build time (doc said 225-231).
 
 **Honest residual (follow-up):** every win32 behavior is proven at invocation-shape /
 pure-function level via injected platform/env/exists seams from this macOS host.
-A real-Windows smoke test (`ocx claude`, `ocx v2 on/off`, blocked-skill elision under
+A real-Windows smoke test (`opr claude`, `opr v2 on/off`, blocked-skill elision under
 Claude Code on Windows, desktopExecutor command) remains the one verification this
 environment cannot produce. Bun's Windows honoring of `windowsVerbatimArguments` is
 documented but not locally provable.

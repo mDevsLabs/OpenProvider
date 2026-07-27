@@ -4,7 +4,7 @@
 |---|-----|------|------|
 | 1 | High | [1m] 변형이 1M native(gpt-5.4 등) 누락 | 수용 — nativeOpenAiContextWindow 포함 |
 | 2 | High | cmdClaude에 별칭 레지스트리 없음 → resolveInboundModel 불가 | 수용 — 기동 프록시 GET /v1/models(anthropic)의 id→max_input_tokens 맵 사용(레지스트리 불요) |
-| 3 | High | 티어 슬롯이 ocx claude 경로만 | 수용 — system-env(launchctl/shell/추적) + 수동 안내 3경로 |
+| 3 | High | 티어 슬롯이 opr claude 경로만 | 수용 — system-env(launchctl/shell/추적) + 수동 안내 3경로 |
 | 4 | High | 도구 이름만 해시 → 동명이스키마 충돌 | 수용 — 번역된 tools 안정 직렬화 전체 해시 |
 | 5 | High | phase decade 로드맵 부재 + 예약번호 규약 위반 | 부분 수용 — 단일 work-phase로 재규정 + loop-spec 헤더 명시, 예약번호 011/012/090 정정 |
 | 6 | High | 픽커 [1m] id 수용의 E2E 증거 없음 | 수용 — C 게이트에 사용자 라이브 스모크 + 실패 시 축소 경로 명시 |
@@ -28,8 +28,8 @@
 ## 라운드 3 (Curie, FAIL, 블로커 5)
 | # | Sev | 요지 | 처분 |
 |---|-----|------|------|
-| 1 | High | 맵이 legacy claude-ocx-* 키 누락 | 수용 — 4형식 키(+aliasForNative/aliasForRoute) 등록 + 테스트 |
-| 2 | High | non-loopback 바인드 시 관리 API 인증 필요 | 수용 — apiKeys 존재 시 x-opencodex-api-key 헤더 동봉 |
+| 1 | High | 맵이 legacy claude-opr-* 키 누락 | 수용 — 4형식 키(+aliasForNative/aliasForRoute) 등록 + 테스트 |
+| 2 | High | non-loopback 바인드 시 관리 API 인증 필요 | 수용 — apiKeys 존재 시 x-openprovider-api-key 헤더 동봉 |
 | 3 | Med | 콜드 catalog 경합/지연 | 수용 — 3초 bounded timeout + 무부여 fallback + 콜드스타트 테스트 |
 | 4 | Med | 별칭 충돌 시 후자 덮어쓰기 | 수용 — first-wins dedupe 공유 헬퍼 + 충돌 테스트 |
 | 5 | Med | manualEnv가 raw 값 표시 | 수용 — effectiveTierEnv 맵 반환 + GUI 렌더 |

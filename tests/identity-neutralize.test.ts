@@ -23,9 +23,9 @@ describe("identity neutralization — central helper", () => {
     expect(neutralizeIdentity(SYS)).toBe(NEUTRAL_IDENTITY_LINE);
   });
 
-  test("never emits the opencodex proxy identity", () => {
+  test("never emits the openprovider proxy identity", () => {
     const out = neutralizeIdentity(`${SYS}\n\nmore context`);
-    expect(out).not.toMatch(/opencodex proxy/i);
+    expect(out).not.toMatch(/openprovider proxy/i);
     expect(out).not.toMatch(/served through/i);
     expect(out).not.toMatch(/running via/i);
   });
@@ -47,7 +47,7 @@ describe("identity neutralization — adapters never leak proxy identity", () =>
     const messages = JSON.parse(body).messages as { role: string; content: string }[];
     const sys = messages.find(m => m.role === "system")!;
     expect(sys.content).toContain(NEUTRAL_IDENTITY_LINE);
-    expect(sys.content).not.toMatch(/opencodex proxy/i);
+    expect(sys.content).not.toMatch(/openprovider proxy/i);
     expect(sys.content).not.toContain(SYS);
   });
 
@@ -56,7 +56,7 @@ describe("identity neutralization — adapters never leak proxy identity", () =>
     const { body } = await createGoogleAdapter(provider).buildRequest(parsed("gemini-3-pro", "google"));
     const sysText = JSON.parse(body).systemInstruction.parts.map((p: { text: string }) => p.text).join("");
     expect(sysText).toContain(NEUTRAL_IDENTITY_LINE);
-    expect(sysText).not.toMatch(/opencodex proxy/i);
+    expect(sysText).not.toMatch(/openprovider proxy/i);
     expect(sysText).not.toContain(SYS);
   });
 
@@ -79,7 +79,7 @@ describe("identity neutralization — adapters never leak proxy identity", () =>
       const provider = { adapter: "kiro", baseUrl: "https://runtime.us-east-1.kiro.dev", authMode: "oauth", apiKey: "tok-123" } as unknown as OcxProviderConfig;
       const { body } = await createKiroAdapter(provider).buildRequest(parsed("claude-sonnet-4.5", "kiro"));
       const serialized = typeof body === "string" ? body : JSON.stringify(body);
-      expect(serialized).not.toMatch(/opencodex proxy/i);
+      expect(serialized).not.toMatch(/openprovider proxy/i);
       expect(serialized).not.toContain(SYS);
     });
   });

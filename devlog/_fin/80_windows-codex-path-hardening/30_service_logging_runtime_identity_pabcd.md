@@ -33,9 +33,9 @@ Non-goals:
 Ask a read-only auditor to verify:
 
 - Wrapper script generation can write logs before child start.
-- Log path is stable under `%LOCALAPPDATA%` or the existing opencodex config dir.
+- Log path is stable under `%LOCALAPPDATA%` or the existing openprovider config dir.
 - The child stdout/stderr capture does not deadlock or hide output.
-- `ocx service status` can show the log path without requiring admin-only commands.
+- `opr service status` can show the log path without requiring admin-only commands.
 
 ### B — Build
 
@@ -46,7 +46,7 @@ Implementation checklist:
   - wrapper start timestamp;
   - selected Bun path;
   - Bun version if cheaply available;
-  - opencodex package version;
+  - openprovider package version;
   - CLI path;
   - config dir;
   - `CODEX_HOME`;
@@ -54,7 +54,7 @@ Implementation checklist:
   - child exit code;
   - restart decision.
 - Capture child stdout/stderr into the service log or clearly linked per-run child logs.
-- Make `ocx service status` print the log path.
+- Make `opr service status` print the log path.
 - Keep logs token-safe: no API keys, OAuth tokens, Authorization headers, or full config dumps.
 
 Suggested commit:
@@ -75,9 +75,9 @@ bun x tsc --noEmit
 Manual Windows smoke:
 
 ```powershell
-ocx service install
-ocx service start
-ocx service status
+opr service install
+opr service start
+opr service status
 # Confirm status prints the log path.
 Get-Content <printed-log-path> -Tail 80
 ```
@@ -85,7 +85,7 @@ Get-Content <printed-log-path> -Tail 80
 ### D — Done Criteria
 
 - Wrapper start and child exit are logged.
-- Bun path/version, opencodex version, CLI path, config dir, and CODEX_HOME are logged.
-- `ocx service status` points users to the log path.
+- Bun path/version, openprovider version, CLI path, config dir, and CODEX_HOME are logged.
+- `opr service status` points users to the log path.
 - Tests assert required log/script fragments.
 - No secrets appear in generated logs or tests.

@@ -32,7 +32,7 @@ async function* replayAdapterEvents(events: AdapterEvent[]): AsyncGenerator<Adap
 
 function log(overrides: Partial<RequestLogEntry>): RequestLogEntry {
   return {
-    requestId: "ocx-test",
+    requestId: "opr-test",
     timestamp: 1,
     model: "gpt-test",
     provider: "openai",
@@ -67,10 +67,10 @@ describe("request log metadata", () => {
 
   test("addFinalRequestLog preserves firstOutputMs; unset stays absent", () => {
     const captured: RequestLogEntry[] = [];
-    addFinalRequestLog("ocx-ttft", 0, { model: "m", provider: "p", firstOutputMs: 12 }, 200, undefined, entry => captured.push(entry));
+    addFinalRequestLog("opr-ttft", 0, { model: "m", provider: "p", firstOutputMs: 12 }, 200, undefined, entry => captured.push(entry));
     expect(captured[0]?.firstOutputMs).toBe(12);
     const captured2: RequestLogEntry[] = [];
-    addFinalRequestLog("ocx-nostream", 0, { model: "m", provider: "p" }, 200, undefined, entry => captured2.push(entry));
+    addFinalRequestLog("opr-nostream", 0, { model: "m", provider: "p" }, 200, undefined, entry => captured2.push(entry));
     expect(captured2[0]).not.toHaveProperty("firstOutputMs");
   });
 
@@ -244,7 +244,7 @@ describe("request log metadata", () => {
   test("records the Claude surface on the final log entry", () => {
     const entries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-claude",
+      "opr-test-claude",
       Date.now(),
       { model: "claude-sonnet-4-5", provider: "openai", surface: "claude" },
       200,
@@ -259,7 +259,7 @@ describe("request log metadata", () => {
   test("cursor rows: adapter drives estimated status and the input estimate fills in:0 (devlog 130 B2)", () => {
     const entries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-cursor",
+      "opr-test-cursor",
       Date.now(),
       {
         model: "gpt-5.6-luna",
@@ -281,7 +281,7 @@ describe("request log metadata", () => {
   test("accurate providers stay untouched when no input estimate is stashed", () => {
     const entries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-anthropic",
+      "opr-test-anthropic",
       Date.now(),
       {
         model: "claude-fable-5",
@@ -300,7 +300,7 @@ describe("request log metadata", () => {
   });
 
   test("generates compact request ids", () => {
-    expect(nextRequestLogId(1_700_000_000_000)).toMatch(/^ocx-[a-z0-9]+-[a-z0-9]+$/);
+    expect(nextRequestLogId(1_700_000_000_000)).toMatch(/^opr-[a-z0-9]+-[a-z0-9]+$/);
     expect(nextRequestLogId(1_700_000_000_000)).not.toBe(nextRequestLogId(1_700_000_000_000));
   });
 
@@ -330,7 +330,7 @@ describe("request log metadata", () => {
   test("final 403 logs use permission/subscription codes instead of invalid_api_key", () => {
     const entries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-403-perm",
+      "opr-test-403-perm",
       Date.now(),
       {
         model: "kimi-k2.7-code",
@@ -349,7 +349,7 @@ describe("request log metadata", () => {
 
     const subEntries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-403-sub",
+      "opr-test-403-sub",
       Date.now(),
       {
         model: "kimi-k2.7-code",
@@ -410,7 +410,7 @@ describe("request log metadata", () => {
         service_tier: "auto",
         status: "completed",
       }), { status: 200, headers: { "content-type": "application/json" } }),
-      "ocx-test-json",
+      "opr-test-json",
       Date.now(),
       logCtx,
       entry => entries.push(entry),
@@ -445,7 +445,7 @@ describe("request log metadata", () => {
           output_tokens_details: { reasoning_tokens: 5 },
         },
       }), { status: 200, headers: { "content-type": "application/json" } }),
-      "ocx-test-json-usage",
+      "opr-test-json-usage",
       Date.now(),
       { model: "gpt-5.5", provider: "openai" },
       entry => entries.push(entry),
@@ -475,7 +475,7 @@ describe("request log metadata", () => {
         model: "gpt-5.5",
         usage: { prompt_tokens: 42, completion_tokens: 7 },
       }), { status: 200, headers: { "content-type": "application/json" } }),
-      "ocx-test-json-chat-completions",
+      "opr-test-json-chat-completions",
       Date.now(),
       { model: "gpt-5.5", provider: "chatgpt" },
       entry => entries.push(entry),
@@ -501,7 +501,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-sse-usage",
+      "opr-test-sse-usage",
       Date.now(),
       { model: "gpt-5.5", provider: "openai" },
       entry => entries.push(entry),
@@ -528,7 +528,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-kiro-sse-usage",
+      "opr-test-kiro-sse-usage",
       Date.now(),
       { model: "kiro/claude-sonnet-4.5", provider: "kiro-p9d8524" },
       entry => entries.push(entry),
@@ -564,7 +564,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-cursor-rate-limit",
+      "opr-test-cursor-rate-limit",
       Date.now(),
       { model: "cursor/gpt-5", provider: "cursor" },
       entry => entries.push(entry),
@@ -598,7 +598,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-web-search-client-close",
+      "opr-test-web-search-client-close",
       Date.now(),
       { model: "k3", provider: "kimi" },
       entry => entries.push(entry),
@@ -618,7 +618,7 @@ describe("request log metadata", () => {
   test("addFinalRequestLog remaps legacy 502 client-close messages to 499", () => {
     const entries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-legacy-client-close",
+      "opr-test-legacy-client-close",
       Date.now(),
       {
         model: "k3",
@@ -696,7 +696,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-cursor-redact",
+      "opr-test-cursor-redact",
       Date.now(),
       { model: "cursor/gpt-5", provider: "cursor" },
       entry => entries.push(entry),
@@ -713,7 +713,7 @@ describe("request log metadata", () => {
     const entries: RequestLogEntry[] = [];
     const response = responseWithDeferredRequestLog(
       new Response("provider says nope", { status: 400, headers: { "content-type": "text/plain" } }),
-      "ocx-test-plain-upstream-error",
+      "opr-test-plain-upstream-error",
       Date.now(),
       { model: "opencode-free/deepseek-v4-flash-free", provider: "opencode-free" },
       entry => entries.push(entry),
@@ -736,7 +736,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-kiro-sse-log-usage",
+      "opr-test-kiro-sse-log-usage",
       Date.now(),
       { model: "kiro/claude-sonnet-4.5", provider: "kiro-p9d8524", usageLogInputTokens: 240_000 },
       entry => entries.push(entry),
@@ -765,7 +765,7 @@ describe("request log metadata", () => {
     }]), "kiro/claude-opus-5");
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-kiro-context-checkpoint",
+      "opr-test-kiro-context-checkpoint",
       Date.now(),
       { model: "kiro/claude-opus-5", provider: "kiro-p9d8524", usageLogInputTokens: 200 },
       entry => entries.push(entry),
@@ -786,7 +786,7 @@ describe("request log metadata", () => {
     const entries: RequestLogEntry[] = [];
     const response = responseWithDeferredRequestLog(
       new Response(null, { status: 200 }),
-      "ocx-test-kiro-fallback-log-usage",
+      "opr-test-kiro-fallback-log-usage",
       Date.now(),
       { model: "kiro/claude-opus-4.8", provider: "kiro-p442fff", usageLogInputTokens: 133_900 },
       entry => entries.push(entry),
@@ -818,7 +818,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-stall-timeout",
+      "opr-test-stall-timeout",
       Date.now(),
       { model: "cursor/kimi-k2.7-code", provider: "cursor" },
       entry => entries.push(entry),
@@ -852,7 +852,7 @@ describe("request log metadata", () => {
     });
     const response = responseWithDeferredRequestLog(
       new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-      "ocx-test-adapter-eof",
+      "opr-test-adapter-eof",
       Date.now(),
       { model: "cursor/kimi-k2.7-code", provider: "cursor" },
       entry => entries.push(entry),
@@ -873,7 +873,7 @@ describe("request log metadata", () => {
 describe("request log restart hydrate", () => {
   test("projects persisted usage rows into /api/logs entries", () => {
     const persisted: PersistedUsageEntry = {
-      requestId: "ocx-revive",
+      requestId: "opr-revive",
       timestamp: 1_800_000_000_000,
       provider: "chatgpt-pabcdef",
       model: "gpt-5.6-sol",
@@ -892,7 +892,7 @@ describe("request log restart hydrate", () => {
       upstreamError: "socket connection was closed unexpectedly",
     };
     expect(requestLogEntryFromPersistedUsage(persisted)).toEqual({
-      requestId: "ocx-revive",
+      requestId: "opr-revive",
       timestamp: 1_800_000_000_000,
       provider: "chatgpt-pabcdef",
       model: "gpt-5.6-sol",
@@ -918,7 +918,7 @@ describe("request log restart hydrate", () => {
 
     const persisted: PersistedUsageEntry[] = [
       {
-        requestId: "ocx-old",
+        requestId: "opr-old",
         timestamp: 1,
         provider: "openai",
         model: "gpt-a",
@@ -929,7 +929,7 @@ describe("request log restart hydrate", () => {
         totalTokens: 2,
       },
       {
-        requestId: "ocx-sticky-502",
+        requestId: "opr-sticky-502",
         timestamp: 2,
         provider: "openai",
         model: "gpt-b",
@@ -945,9 +945,9 @@ describe("request log restart hydrate", () => {
     ];
 
     expect(hydrateRequestLogsFromDisk(() => persisted)).toBe(2);
-    expect(getRequestLogEntries().map(e => e.requestId)).toEqual(["ocx-old", "ocx-sticky-502"]);
+    expect(getRequestLogEntries().map(e => e.requestId)).toEqual(["opr-old", "opr-sticky-502"]);
     expect(getRequestLogEntries()[1]).toMatchObject({
-      requestId: "ocx-sticky-502",
+      requestId: "opr-sticky-502",
       status: 502,
       errorCode: "upstream_server_error",
       upstreamError: "Provider unreachable",
@@ -962,7 +962,7 @@ describe("request log restart hydrate", () => {
   test("hydrate keeps only the newest MAX_LOG_SIZE rows from a long usage.jsonl", () => {
     clearRequestLogsForTests();
     const persisted: PersistedUsageEntry[] = Array.from({ length: 205 }, (_, i) => ({
-      requestId: `ocx-${i}`,
+      requestId: `opr-${i}`,
       timestamp: i,
       provider: "openai",
       model: "gpt",
@@ -972,8 +972,8 @@ describe("request log restart hydrate", () => {
     }));
     expect(hydrateRequestLogsFromDisk(() => persisted)).toBe(200);
     const ids = getRequestLogEntries().map(e => e.requestId);
-    expect(ids[0]).toBe("ocx-5");
-    expect(ids.at(-1)).toBe("ocx-204");
+    expect(ids[0]).toBe("opr-5");
+    expect(ids.at(-1)).toBe("opr-204");
   });
 
   test("hydrate swallows usage.jsonl read failures instead of crashing startup", () => {

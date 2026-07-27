@@ -14,13 +14,13 @@ import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-const BEGIN_MARKER = "# >>> opencodex managed block — do not edit (removed by `ocx stop`) >>>";
-const END_MARKER = "# <<< opencodex managed block <<<";
+const BEGIN_MARKER = "# >>> openprovider managed block — do not edit (removed by `opr stop`) >>>";
+const END_MARKER = "# <<< openprovider managed block <<<";
 
 export interface GrokStatusModel {
   /** Alias of the emitted `[model.<alias>]` table. */
   alias: string;
-  /** The model id opencodex routes for. */
+  /** The model id openprovider routes for. */
   id: string;
   contextWindow?: number;
 }

@@ -10,7 +10,7 @@ Add a real `All / Codex / Claude` filter to the Usage page. The selected surface
 
 ## Trigger
 
-The Usage page currently filters only by time range. Users who run both Codex and Claude through opencodex cannot separate their traffic.
+The Usage page currently filters only by time range. Users who run both Codex and Claude through openprovider cannot separate their traffic.
 
 ## Non-goals
 
@@ -32,7 +32,7 @@ The Usage page currently filters only by time range. Users who run both Codex an
 ## Design read
 
 ```yaml
-name: opencodex-usage-surface-filter
+name: openprovider-usage-surface-filter
 colors:
   primary: existing semantic tokens
   accent: existing active segmented-control fill

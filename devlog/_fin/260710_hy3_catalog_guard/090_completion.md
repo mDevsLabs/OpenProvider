@@ -4,10 +4,10 @@
 
 - Published commit: `4ccc6da687dc50ba3782cd6cef6f23d89918856e`
   (`fix(opencode-go): hide unavailable hy3 from catalogs (#82)`) on `origin/dev`.
-- GitHub issue: `https://github.com/lidge-jun/opencodex/issues/82`, closed as
+- GitHub issue: `https://github.com/lidge-jun/openprovider/issues/82`, closed as
   completed on 2026-07-10 after a corrective reply.
 - Corrective reply:
-  `https://github.com/lidge-jun/opencodex/issues/82#issuecomment-4933180996`.
+  `https://github.com/lidge-jun/openprovider/issues/82#issuecomment-4933180996`.
 - Release status was stated accurately: the complete fix is on `dev`, not v2.7.4,
   and is intended for the next release.
 

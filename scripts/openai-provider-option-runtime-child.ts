@@ -1,9 +1,9 @@
 import { chmodSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const [opencodexHome, codexHome, capturePath] = Bun.argv.slice(2);
-if (!opencodexHome || !codexHome || !capturePath) {
-  throw new Error("runtime child requires opencodex home, codex home, and capture path");
+const [openproviderHome, codexHome, capturePath] = Bun.argv.slice(2);
+if (!openproviderHome || !codexHome || !capturePath) {
+  throw new Error("runtime child requires openprovider home, codex home, and capture path");
 }
 
 for (const key of Object.keys(process.env)) {
@@ -11,12 +11,12 @@ for (const key of Object.keys(process.env)) {
     delete process.env[key];
   }
 }
-process.env.OPENCODEX_HOME = opencodexHome;
+process.env.OPENCODEX_HOME = openproviderHome;
 process.env.CODEX_HOME = codexHome;
 process.env.OPENCODEX_API_AUTH_TOKEN = "fixture-admission";
 process.env.NO_PROXY = "127.0.0.1,localhost,::1";
 process.env.no_proxy = "127.0.0.1,localhost,::1";
-mkdirSync(opencodexHome, { recursive: true, mode: 0o700 });
+mkdirSync(openproviderHome, { recursive: true, mode: 0o700 });
 mkdirSync(codexHome, { recursive: true, mode: 0o700 });
 const authPath = join(codexHome, "auth.json");
 const jwtPart = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");

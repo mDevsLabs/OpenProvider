@@ -14,7 +14,7 @@ test("ApiKeys renders the single stacked layout (no layout toggle, no workspace 
 
   expect(page).not.toContain("viewMode");
   expect(page).not.toContain("readViewMode");
-  expect(page).not.toContain("ocx-apikeys-view");
+  expect(page).not.toContain("opr-apikeys-view");
   expect(page).not.toContain("ApiKeysWorkspace");
   expect(page).not.toContain("apikeys-workspace");
   expect(page).not.toContain("pws.workspaceToggle");

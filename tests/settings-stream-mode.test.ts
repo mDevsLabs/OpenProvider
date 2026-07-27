@@ -49,7 +49,7 @@ function getSettings(config: OcxConfig): Promise<Response | null> {
 
 beforeEach(() => {
   invalidateStartupHealthCache();
-  TEST_DIR = mkdtempSync(join(tmpdir(), "ocx-settings-stream-"));
+  TEST_DIR = mkdtempSync(join(tmpdir(), "opr-settings-stream-"));
   process.env.OPENCODEX_HOME = TEST_DIR;
 });
 

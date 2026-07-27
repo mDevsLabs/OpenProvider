@@ -1,6 +1,6 @@
 # 007 — Provider and model ID delta
 
-> Comparison base: OpenCodex `0167b415` and the fingerprinted 2026-07-17 local jawcode snapshot.
+> Comparison base: OpenProvider `0167b415` and the fingerprinted 2026-07-17 local jawcode snapshot.
 
 ## Provider namespace
 

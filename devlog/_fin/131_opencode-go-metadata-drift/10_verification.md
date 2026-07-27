@@ -86,11 +86,11 @@ Existing dirty files preserved outside the worktree:
 - `/Users/jun/Developer/new/700_projects/jawcode/.agents/`
 - `/Users/jun/Developer/new/700_projects/jawcode/.claude/`
 
-## opencodex
+## openprovider
 
 Repository:
 
-- `/Users/jun/Developer/new/700_projects/opencodex`
+- `/Users/jun/Developer/new/700_projects/openprovider`
 
 Branch:
 
@@ -99,11 +99,11 @@ Branch:
 Implementation result:
 
 - `JAWCODE_MODELS_JSON=/Users/jun/Developer/new/700_projects/jawcode/devlog/_worktrees/opencode-go-contract/packages/ai/src/models.json bun run generate:jawcode-metadata`
-  was executed and verified. It introduced no `opencode-go` metadata delta because opencodex
+  was executed and verified. It introduced no `opencode-go` metadata delta because openprovider
   stores context/output/modalities only; endpoint and price changes live in GJC/jawcode.
 - The generated-file diff was intentionally reduced back to zero to avoid unrelated dynamic
   `openrouter` metadata churn from the jawcode worktree.
-- The no-code-runtime rationale is recorded in `20_opencodex-integration.md`.
+- The no-code-runtime rationale is recorded in `20_openprovider-integration.md`.
 
 Verification:
 
@@ -113,11 +113,11 @@ Verification:
 - OpenCode Go generated metadata sample check passed: `metadata_checked=5 bad=0`.
 - `bun test tests` passed: 88 tests, 0 failures, 287 assertions.
 - `bun x tsc --noEmit` passed.
-- local `ocx` catalog smoke passed and the proxy was stopped afterward.
+- local `opr` catalog smoke passed and the proxy was stopped afterward.
 
-Runtime `ocx` smoke:
+Runtime `opr` smoke:
 
-- `ocx start` started the proxy on `http://localhost:10100`.
+- `opr start` started the proxy on `http://localhost:10100`.
 - `GET http://127.0.0.1:10100/healthz` returned `health ok`.
 - `GET http://127.0.0.1:10100/v1/models?client_version=0.141.0` returned Codex catalog
   rows with corrected OpenCode Go limits:
@@ -133,7 +133,7 @@ Runtime `ocx` smoke:
   - `opencode-go/qwen3.7-plus`: `context_window=1000000`,
     `max_context_window=1000000`, `auto_compact_token_limit=900000`,
     `input_modalities=["text","image"]`.
-- Final state confirmed with `ocx stop`: no running proxy found and opencodex was removed
+- Final state confirmed with `opr stop`: no running proxy found and openprovider was removed
   from Codex config.
 
 ## PR / CI
@@ -142,11 +142,11 @@ Opened PRs:
 
 - GJC upstream: `https://github.com/Yeachan-Heo/gajae-code/pull/915`
 - jawcode: `https://github.com/lidge-jun/jawcode/pull/1`
-- opencodex: `https://github.com/lidge-jun/opencodex/pull/1`
+- openprovider: `https://github.com/lidge-jun/openprovider/pull/1`
 
 Initial CI status after PR creation:
 
 - GJC PR #915: checks pending (`Affected path validation / plan`, `gjc-state-gates / integrity`,
   `gjc-state-gates / read`, `gjc-state-gates / runtime`, `gjc-state-gates / static`).
 - jawcode PR #1: checks pending (`Affected path validation`, `jwc-state-gates`).
-- opencodex PR #1: no checks reported on the branch at creation time.
+- openprovider PR #1: no checks reported on the branch at creation time.

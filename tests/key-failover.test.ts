@@ -37,7 +37,7 @@ function pool3(): OcxProviderConfig["apiKeyPool"] {
 }
 
 beforeEach(() => {
-  home = mkdtempSync(join(tmpdir(), "ocx-keyfailover-"));
+  home = mkdtempSync(join(tmpdir(), "opr-keyfailover-"));
   process.env.OPENCODEX_HOME = home;
   clearKeyCooldowns();
 });

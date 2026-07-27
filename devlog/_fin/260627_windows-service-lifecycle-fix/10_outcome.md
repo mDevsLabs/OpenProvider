@@ -3,8 +3,8 @@
 ## Changes
 
 - Added `src/process-control.ts` with shared process liveness and `killProxy` process-tree termination.
-- Updated `src/service.ts` so direct `ocx service stop` stops the service manager, attempts tracked PID kill, then restores native Codex.
-- Updated `src/service.ts` so direct `ocx service uninstall` stops the service manager, attempts tracked PID kill, then deletes service assets and restores native Codex.
+- Updated `src/service.ts` so direct `opr service stop` stops the service manager, attempts tracked PID kill, then restores native Codex.
+- Updated `src/service.ts` so direct `opr service uninstall` stops the service manager, attempts tracked PID kill, then deletes service assets and restores native Codex.
 - Updated `src/cli.ts` top-level uninstall ordering to stop service manager, kill tracked proxy, then remove service assets.
 - Added focused regression tests for service stop/uninstall ordering, kill failure non-skip behavior, top-level uninstall ordering, and process-control helpers.
 

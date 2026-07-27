@@ -1,7 +1,7 @@
 # 60 — web_search → parseResponse fix (kiro-only live failure)
 
 ## Symptom
-Real Codex CLI → opencodex proxy (`localhost:10100`) → kiro showed `Reconnecting… 1/5…5/5`
+Real Codex CLI → openprovider proxy (`localhost:10100`) → kiro showed `Reconnecting… 1/5…5/5`
 then `We're currently experiencing high demand, which may cause temporary errors.` **for kiro
 only** — every other provider worked. Reproduced headlessly with `codex exec -m
 kiro/claude-sonnet-4.6` (exit 1).
@@ -10,7 +10,7 @@ kiro/claude-sonnet-4.6` (exit 1).
 1. Minimal `curl` to `/v1/responses` with a kiro model **succeeded** (200, streamed exact text)
    → adapter + eventstream + Responses bridge are fine for a plain request.
 2. Captured the **real** 53 KB Codex request via a throwaway capture server (codex `-c
-   model_providers.opencodex.base_url=…`). Diff vs the minimal request: 17 `tools` (incl.
+   model_providers.openprovider.base_url=…`). Diff vs the minimal request: 17 `tools` (incl.
    hosted `web_search`), 21 KB instructions, `reasoning:{effort:"none"}`.
 3. Replayed the captured request to the running proxy → **HTTP 500**
    `{"error":{"message":"web-search sidecar requires a non-streaming adapter"}}`.

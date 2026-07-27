@@ -22,7 +22,7 @@ This entry records three things done together:
 
 ### 1. GitHub topics (was: empty)
 
-Applied via `gh repo edit lidge-jun/opencodex --add-topic ...`. Final set (12):
+Applied via `gh repo edit lidge-jun/openprovider --add-topic ...`. Final set (12):
 
 ```
 ai-tools, anthropic, claude, codex, codex-cli, developer-tools,
@@ -53,7 +53,7 @@ privacy-scan-safe placeholders in doctor fixtures`.
 
 ## Verification (fresh evidence)
 
-- `gh repo view lidge-jun/opencodex --json repositoryTopics` →
+- `gh repo view lidge-jun/openprovider --json repositoryTopics` →
   `["ai-tools","claude","codex","gemini","llm","openai","proxy","typescript","anthropic","codex-cli","developer-tools","kiro"]`.
 - `git branch --show-current` → `dev`; `git log --oneline -1` → `f7b7227`.
 - Old local dev tip preserved at `backup/dev-prereset-20260701` (`f9de872`).
@@ -70,4 +70,4 @@ part of this entry:
     extended thinking unintentionally.
   - `src/adapters/openai-chat.ts`: stream EOF without `[DONE]` is treated as a
     clean done (should fail-closed against truncation).
-- CLI help vs README drift (`ocx login <xai|anthropic|kimi>` vs help text).
+- CLI help vs README drift (`opr login <xai|anthropic|kimi>` vs help text).

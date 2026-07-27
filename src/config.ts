@@ -49,7 +49,7 @@ export function renameAtomicFile(
 }
 
 /**
- * Write a file atomically (temp + rename) so concurrent writers — e.g. `ocx stop` and the
+ * Write a file atomically (temp + rename) so concurrent writers — e.g. `opr stop` and the
  * proxy's own shutdown handler both restoring Codex — can never leave a half-written file.
  */
 export interface AtomicWriteIO {
@@ -88,7 +88,7 @@ export function atomicWriteFile(path: string, content: string, io: AtomicWriteIO
   truncate: target => truncateSync(target, 0),
   unlink: unlinkSync,
 }): void {
-  const tmp = `${path}.ocx.${process.pid}.${++_atomicSeq}.tmp`;
+  const tmp = `${path}.opr.${process.pid}.${++_atomicSeq}.tmp`;
   let hardened = false;
   try {
     io.write(tmp, content);
@@ -172,7 +172,7 @@ function isAlreadyExistsError(error: unknown): boolean {
  * - `"rollback"`: parses as a valid pre-migration (v1) config — a
  *   user-intentional rollback point that must never be silently destroyed.
  *
- * Shared by the startup migration backup path and `ocx init` cleanup so both
+ * Shared by the startup migration backup path and `opr init` cleanup so both
  * apply the same preservation policy (issue #257 / sol review 260722).
  */
 export function classifyOpenAiTierBackup(backupBytes: Uint8Array): "stale" | "rollback" {
@@ -214,7 +214,7 @@ export function backupConfigBeforeOpenAiTierMigration(
       // clearly not a user-intentional rollback point:
       //   - unparseable JSON: written by a different tool or truncated
       //   - already at tier version 2: the backup is from a post-migration config (e.g.
-      //     ocx init wrote a fresh v2 config, making the old backup obsolete)
+      //     opr init wrote a fresh v2 config, making the old backup obsolete)
       // A backup that parses as a valid pre-migration (v1) config is kept as-is and
       // we throw a collision error, because silently replacing a user-created rollback
       // point would be surprising and potentially destructive.
@@ -228,7 +228,7 @@ export function backupConfigBeforeOpenAiTierMigration(
       return "reused";
     }
   }
-  const temp = `${backup}.ocx.${process.pid}.${++_atomicSeq}.tmp`;
+  const temp = `${backup}.opr.${process.pid}.${++_atomicSeq}.tmp`;
   let published = false;
   let cleanupAttempted = false;
 
@@ -315,7 +315,7 @@ let resolvedConfigDirCache: { raw: string | undefined; path: string } | null = n
 function resolveConfigDir(): string {
   const raw = process.env["OPENCODEX_HOME"]?.trim() || undefined;
   if (resolvedConfigDirCache && resolvedConfigDirCache.raw === raw) return resolvedConfigDirCache.path;
-  const path = raw ? resolve(expandUserPath(raw)) : join(homedir(), ".opencodex");
+  const path = raw ? resolve(expandUserPath(raw)) : join(homedir(), ".openprovider");
   resolvedConfigDirCache = { raw, path };
   return path;
 }
@@ -325,7 +325,7 @@ function resolveConfigPath(): string {
 }
 
 function resolvePidPath(): string {
-  return join(resolveConfigDir(), "ocx.pid");
+  return join(resolveConfigDir(), "opr.pid");
 }
 
 function resolveRuntimePortPath(): string {
@@ -1121,7 +1121,7 @@ function warnConfigRepaired(configPath: string, error: z.ZodError): void {
   if (warnedConfigFallbacks.has(configPath)) return;
   warnedConfigFallbacks.add(configPath);
   const fields = error.issues.map(i => i.path.join(".") || "config").join(", ");
-  console.error(`opencodex config at ${configPath}: repaired missing field(s) [${fields}] with defaults. Your providers and accounts are preserved.`);
+  console.error(`openprovider config at ${configPath}: repaired missing field(s) [${fields}] with defaults. Your providers and accounts are preserved.`);
 }
 
 export function readPidFileValue(): number | null {
@@ -1141,7 +1141,7 @@ export function removeRuntimePort(expectedPid?: number): void {
 
 /**
  * Snapshot-guarded stale-state purge: remove the pid/runtime files only when their content
- * still matches what the caller saw BEFORE its liveness probe. A concurrent `ocx start` can
+ * still matches what the caller saw BEFORE its liveness probe. A concurrent `opr start` can
  * write fresh records mid-probe; an unconditional purge would erase the new proxy's state.
  */
 export function removePidIfValueIs(snapshot: number | null): void {
@@ -1173,7 +1173,7 @@ export function isOcxStartCommandLine(commandLine: string): boolean {
   const hasOcxEntrypoint = normalized.includes("src/cli.ts")
     || normalized.includes("src/cli/index.ts")
     || normalized.includes("@mdevs/openprovider")
-    || /(?:^|[\s/"'])(?:ocx|opencodex)(?:\.cmd)?(?:$|[\s"'])/.test(normalized);
+    || /(?:^|[\s/"'])(?:opr|openprovider)(?:\.cmd)?(?:$|[\s"'])/.test(normalized);
   return hasOcxEntrypoint && /(?:^|[\s"'])start(?:$|[\s"'])/.test(normalized);
 }
 
@@ -1208,7 +1208,7 @@ export function readAlivePid(): number | null {
 }
 
 /**
- * Full identity check of a KNOWN candidate pid (alive + ocx-start command line).
+ * Full identity check of a KNOWN candidate pid (alive + opr-start command line).
  * Companion to {@link readAlivePid}: liveness discovery may be cheap, but any pid
  * handed to a destructive caller must pass this check — and must equal the candidate
  * it was asked about, so a pidfile rewrite between discovery and verification can
@@ -1271,7 +1271,7 @@ function warnAndBackupInvalidConfig(configPath: string, error: unknown): void {
     ? error.issues.map(issue => `${issue.path.join(".") || "config"}: ${issue.message}`).join("; ")
     : error instanceof Error ? error.message : String(error);
   const backupNote = backupPath ? ` A backup was written to ${backupPath}.` : "";
-  console.error(`Could not load opencodex config at ${configPath}: ${reason}. Using default config.${backupNote}`);
+  console.error(`Could not load openprovider config at ${configPath}: ${reason}. Using default config.${backupNote}`);
 }
 
 export function backupInvalidConfig(configPath: string): string | null {

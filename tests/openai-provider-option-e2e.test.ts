@@ -107,8 +107,8 @@ function responsesLifecycle(body: Record<string, unknown>): string {
 
 describe("OpenAI provider-option integration spine", () => {
   test("keeps Pool, Direct, and API ownership stable across transports and management", async () => {
-    const root = mkdtempSync(join(tmpdir(), "ocx-provider-option-e2e-"));
-    const opencodexHome = join(root, "opencodex");
+    const root = mkdtempSync(join(tmpdir(), "opr-provider-option-e2e-"));
+    const openproviderHome = join(root, "openprovider");
     const codexHome = join(root, "codex");
     const claudeConfigDir = join(root, "claude");
     const realClaudeDir = join(homedir(), ".claude");
@@ -147,10 +147,10 @@ describe("OpenAI provider-option integration spine", () => {
     ]);
 
     try {
-      for (const dir of [opencodexHome, codexHome, claudeConfigDir]) {
+      for (const dir of [openproviderHome, codexHome, claudeConfigDir]) {
         mkdirSync(dir, { recursive: true, mode: 0o700 });
       }
-      process.env.OPENCODEX_HOME = opencodexHome;
+      process.env.OPENCODEX_HOME = openproviderHome;
       process.env.CODEX_HOME = codexHome;
       process.env.CLAUDE_CONFIG_DIR = claudeConfigDir;
       const authPath = join(codexHome, "auth.json");
@@ -367,8 +367,8 @@ describe("OpenAI provider-option integration spine", () => {
       expect(await directPatch.json()).toEqual({ success: true, name: "openai", codexAccountMode: "direct" });
       expect((await local("/api/config").then(response => response.json()) as typeof configDto).providers.openai.codexAccountMode).toBe("direct");
       const directBaseline = {
-        config: hashTree(join(opencodexHome, "config.json")),
-        accounts: hashTree(join(opencodexHome, "codex-accounts.json")),
+        config: hashTree(join(openproviderHome, "config.json")),
+        accounts: hashTree(join(openproviderHome, "codex-accounts.json")),
         active: configModule.loadConfig().activeCodexAccountId,
         mainQuota: authApi.getAccountQuota(mainAccount.MAIN_CODEX_ACCOUNT_ID),
         addedQuota: authApi.getAccountQuota("fixture-pool"),
@@ -395,8 +395,8 @@ describe("OpenAI provider-option integration spine", () => {
       });
       expect(websocketRegistry.getTrackedCodexWebSocketCountForAccount("fixture-pool")).toBe(0);
       const directAfter = {
-        config: hashTree(join(opencodexHome, "config.json")),
-        accounts: hashTree(join(opencodexHome, "codex-accounts.json")),
+        config: hashTree(join(openproviderHome, "config.json")),
+        accounts: hashTree(join(openproviderHome, "codex-accounts.json")),
         active: configModule.loadConfig().activeCodexAccountId,
         mainQuota: authApi.getAccountQuota(mainAccount.MAIN_CODEX_ACCOUNT_ID),
         addedQuota: authApi.getAccountQuota("fixture-pool"),
@@ -496,8 +496,8 @@ describe("OpenAI provider-option integration spine", () => {
         && row.model === "gpt-5.6-sol-pro"
         && row.requestedModel === selected
         && row.resolvedModel === "gpt-5.6-sol")).toBe(true);
-      const usageLines = existsSync(join(opencodexHome, "usage.jsonl"))
-        ? readFileSync(join(opencodexHome, "usage.jsonl"), "utf8").trim().split("\n").filter(Boolean)
+      const usageLines = existsSync(join(openproviderHome, "usage.jsonl"))
+        ? readFileSync(join(openproviderHome, "usage.jsonl"), "utf8").trim().split("\n").filter(Boolean)
           .map(line => JSON.parse(line) as Record<string, unknown>)
         : [];
       for (const expected of [
@@ -506,12 +506,12 @@ describe("OpenAI provider-option integration spine", () => {
         { provider: "openai-apikey", model: "gpt-5.6-sol-pro", requestedModel: selected, resolvedModel: "gpt-5.6-sol" },
       ]) expect(usageLines.some(row => Object.entries(expected).every(([key, value]) => row[key] === value))).toBe(true);
 
-      const migrationRoot = mkdtempSync(join(tmpdir(), "ocx-provider-option-migration-"));
+      const migrationRoot = mkdtempSync(join(tmpdir(), "opr-provider-option-migration-"));
       try {
         const child = Bun.spawn([
           process.execPath,
           join(import.meta.dir, "fixtures/openai-provider-option-migration-child.ts"),
-          join(migrationRoot, "opencodex"),
+          join(migrationRoot, "openprovider"),
           join(migrationRoot, "codex"),
         ], { stdout: "pipe", stderr: "pipe", env: { ...process.env } });
         const [stdout, stderr, exitCode] = await Promise.all([

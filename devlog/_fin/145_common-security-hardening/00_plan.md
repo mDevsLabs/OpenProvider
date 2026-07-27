@@ -1,6 +1,6 @@
 # 145 — Common Security Hardening (outside Kiro parity)
 
-Goal: harden OpenCodex's shared security surfaces on `feat/kiro-on-dev` while
+Goal: harden OpenProvider's shared security surfaces on `feat/kiro-on-dev` while
 Kiro adapter parity continues separately in `143_kiro-gateway-parity`.
 
 This plan intentionally excludes Kiro-specific parity work such as CodeWhisperer
@@ -29,7 +29,7 @@ persist more diagnostic data than needed.
 | --- | --- | --- | --- |
 | Provider API keys and OAuth access/refresh tokens | Browser / local app -> proxy -> config/logs | Malicious local webpage, LAN host, compromised shell, bug report leak | Provider account and quota compromise |
 | Local management API and WebSocket routes | Browser Origin / host binding / API key boundary | Malicious webpage, DNS rebinding, LAN host when non-loopback bound | Config mutation, request driving, log/usage disclosure |
-| Usage and debug artifacts | Runtime -> `~/.opencodex/*.jsonl` -> GUI/API | Local user, synced backup, support bundle | Prompt, account, project, or secret metadata disclosure |
+| Usage and debug artifacts | Runtime -> `~/.openprovider/*.jsonl` -> GUI/API | Local user, synced backup, support bundle | Prompt, account, project, or secret metadata disclosure |
 | Provider config URLs and headers | User config -> outbound fetch | Malicious config or UI input | SSRF, private network probing, credential exfiltration |
 
 ## Work-phase map
@@ -77,5 +77,5 @@ not break legitimate local provider use cases such as Ollama.
 
 The goal is complete when phases 00/10/20/30/40/50/60/90 have each passed PABCD
 with devlog evidence, atomic commits, targeted tests, typecheck for code phases,
-and final independent review confirming common OpenCodex security surfaces are
+and final independent review confirming common OpenProvider security surfaces are
 hardened without taking over Kiro adapter parity work.

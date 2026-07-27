@@ -4,27 +4,27 @@
 
 RC1–RC3 and F1–F4 are provable by unit tests at the mechanism level, but the original symptom
 — *"엄청 발생"* (`ApiError::Stream` en masse) — is only fully reproducible with a **live Codex
-CLI** driving a **routed** model through `ocx` over a multi-turn session with interrupts. This
+CLI** driving a **routed** model through `opr` over a multi-turn session with interrupts. This
 doc defines that acceptance gate as a concrete, runnable checklist. It is a **verification
 plan**, not code; it closes 110 once executed in the user's environment.
 
 ## Preconditions
 
-- `ocx` running and reachable (default `http://localhost:10100`).
+- `opr` running and reachable (default `http://localhost:10100`).
 - A routed provider configured with real credentials (the historical repro config is
   `opencode-go/deepseek-v4-pro`; any chat/completions routed model reproduces the bridge path).
 - Codex CLI installed (`command -v codex`).
 
 ## Codex configuration
 
-`~/.codex/config.toml` — point Codex at `ocx` as an OpenAI-compatible Responses provider and
+`~/.codex/config.toml` — point Codex at `opr` as an OpenAI-compatible Responses provider and
 select a **routed** model so the **bridge** path (not native passthrough) is exercised:
 
 ```toml
-model_provider = "opencodex"
+model_provider = "openprovider"
 model = "opencode-go/deepseek-v4-pro"
 
-[model_providers.opencodex]
+[model_providers.openprovider]
 base_url = "http://localhost:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
@@ -55,10 +55,10 @@ requires_openai_auth = true
 #    "idle timeout waiting for SSE", "response.failed event received".
 
 # 2. Leaked upstream sockets after an interrupt (count should return to baseline):
-lsof -p "$(pgrep -f 'ocx|opencodex' | head -1)" 2>/dev/null | grep -c ESTABLISHED
+lsof -p "$(pgrep -f 'opr|openprovider' | head -1)" 2>/dev/null | grep -c ESTABLISHED
 
-# 3. ocx-side noise (should be quiet; with OCX_DEBUG_FRAMES=1, inspect any frame drops):
-OCX_DEBUG_FRAMES=1 ocx   # run ocx with frame-drop visibility during the session
+# 3. opr-side noise (should be quiet; with OCX_DEBUG_FRAMES=1, inspect any frame drops):
+OCX_DEBUG_FRAMES=1 opr   # run opr with frame-drop visibility during the session
 ```
 
 ## Pass criteria
@@ -70,7 +70,7 @@ OCX_DEBUG_FRAMES=1 ocx   # run ocx with frame-drop visibility during the session
 | 3 | No `"idle timeout waiting for SSE"` on the slow scenario | Codex log scan (scenario 3) |
 | 4 | ESTABLISHED upstream count returns to baseline after each interrupt | `lsof` before/after (scenario 2) |
 | 5 | Mid-stream upstream errors arrive **classified** (rate-limit/overload/context) | Codex error surface (scenario 5) |
-| 6 | No proxy-side unhandled rejection in the `ocx` process | `ocx` stderr |
+| 6 | No proxy-side unhandled rejection in the `opr` process | `opr` stderr |
 
 ## Recording
 

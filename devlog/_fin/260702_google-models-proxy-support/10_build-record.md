@@ -8,7 +8,7 @@
 1. **Effective-mode helper instead of raw `prov.googleMode`** — saved key-login configs
    don't carry `googleMode` (login-cli/enrich don't copy it), so `effectiveGoogleMode()`
    backfills from the provider registry by id, mirroring router.ts's backfill.
-2. **Proxy mirror covers `ocx ensure`/`ocx sync`** — `applyProxyEnv` is called in
+2. **Proxy mirror covers `opr ensure`/`opr sync`** — `applyProxyEnv` is called in
    `startServer()` AND `syncModelsToCodex()` (catalog sync runs outside the server process).
 3. **Cooldown reset via `clearModelCache`** — failure timestamps live in model-cache.ts and
    are cleared by the same helper tests already call.
@@ -46,7 +46,7 @@
 ### src/oauth/key-providers.ts — google key validation probe
 - **Changes**: `googleMode` added to `KeyLoginProvider` (derive already emits it); ai-studio
   google branch probes `/v1beta/models?pageSize=1` with `x-goog-api-key`.
-- **Impact**: `ocx login google` key validation.
+- **Impact**: `opr login google` key validation.
 - **Verification**: tsc + suite (no dedicated test; probe mirrors the tested request shape).
 
 ### src/types.ts + src/config.ts — `OcxConfig.proxy` + `applyProxyEnv`
@@ -60,7 +60,7 @@
 
 ### src/server.ts + src/cli.ts — applyProxyEnv call sites
 - **Changes**: `startServer()` right after `loadConfig()`; `syncModelsToCodex()` for
-  `ocx ensure`/`ocx sync` parent-process catalog fetches.
+  `opr ensure`/`opr sync` parent-process catalog fetches.
 - **Impact**: server daemon + CLI catalog sync.
 - **Verification**: full suite green.
 
@@ -68,7 +68,7 @@
 
 - `bun x tsc --noEmit` — zero errors.
 - `bun test ./tests/` — **1237 pass / 0 fail** (126 files), including 11 new tests.
-- **E2E smoke (real server, stub proxy, no real network)** — PASS: started `ocx` with a temp
+- **E2E smoke (real server, stub proxy, no real network)** — PASS: started `opr` with a temp
   `OPENCODEX_HOME` whose config sets only `proxy` + a google provider on a fake host; the
   models request arrived at the stub proxy in absolute-form
   (`http://google-stub.test/v1beta/models?pageSize=1000`, `x-goog-api-key` sent), proving
@@ -89,7 +89,7 @@ cursor work first or hunk-level staging. Deferred to the user (no proactive git 
 
 ## Scoped out (follow-ups)
 
-- `ocx doctor`: could additionally report whether config.proxy is applied (env presence
+- `opr doctor`: could additionally report whether config.proxy is applied (env presence
   rows already exist at src/doctor.ts:76).
 - oauth login flows don't call `applyProxyEnv` (login fetches to provider auth endpoints
   behind a proxy) — separate slice if requested.

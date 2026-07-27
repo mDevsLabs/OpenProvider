@@ -21,7 +21,7 @@ const entry: WindowsTrayEntry = {
   cli: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\src\\cli\\index.ts",
   script: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\src\\tray\\windows-tray.ps1",
   codexHome: "C:\\사용자 공간\\.codex",
-  OpenProviderHome: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\.opencodex",
+  OpenProviderHome: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\.openprovider",
 };
 
 describe("Windows tray packaging and command safety", () => {
@@ -51,11 +51,11 @@ describe("Windows tray packaging and command safety", () => {
   });
 
   test("never trusts state-selected executable or deletion paths", () => {
-    const home = "C:\\Users\\Test\\.opencodex";
+    const home = "C:\\Users\\Test\\.openprovider";
     expect(windowsTrayStatePathsOwned({
       OpenProviderHome: home,
-      script: join(home, "opencodex-tray.ps1"),
-      launcherPath: join(home, "opencodex-tray.vbs"),
+      script: join(home, "openprovider-tray.ps1"),
+      launcherPath: join(home, "openprovider-tray.vbs"),
     }, home)).toBe(true);
     expect(windowsTrayStatePathsOwned({
       OpenProviderHome: home,
@@ -63,7 +63,7 @@ describe("Windows tray packaging and command safety", () => {
     }, home)).toBe(false);
     expect(windowsTrayStatePathsOwned({
       OpenProviderHome: home,
-      script: join(home, "opencodex-tray.ps1"),
+      script: join(home, "openprovider-tray.ps1"),
       launcherPath: "C:\\victim\\document.txt",
     }, home)).toBe(false);
   });
@@ -84,8 +84,8 @@ describe("Windows tray packaging and command safety", () => {
   });
 
   test("normalizes equivalent homes to one owned Run value", () => {
-    expect(windowsTrayRunValue("C:\\Users\\Test\\.opencodex"))
-      .toBe(windowsTrayRunValue("C:\\Users\\Test\\.opencodex\\."));
+    expect(windowsTrayRunValue("C:\\Users\\Test\\.openprovider"))
+      .toBe(windowsTrayRunValue("C:\\Users\\Test\\.openprovider\\."));
   });
 
   test("treats an unexpected registry type or unreadable value as foreign", () => {
@@ -202,9 +202,9 @@ describe("Windows tray packaging and command safety", () => {
     expect(source).toContain("GetPathRoot");
     expect(source).toContain("$heartbeat.hostPid = $HostPid");
     expect(source).toContain('Start-OcxCommand @("__tray-restart")');
-    expect(source).toContain('Load-TrayIcon "opencodex-tray-online.ico"');
-    expect(source).toContain('Load-TrayIcon "opencodex-tray-warning.ico"');
-    expect(source).toContain('Load-TrayIcon "opencodex-tray-offline.ico"');
+    expect(source).toContain('Load-TrayIcon "openprovider-tray-online.ico"');
+    expect(source).toContain('Load-TrayIcon "openprovider-tray-warning.ico"');
+    expect(source).toContain('Load-TrayIcon "openprovider-tray-offline.ico"');
     expect(source).toContain("$notify.Icon = $offlineIcon");
     expect(source).not.toContain("$menu.add_Opening({ Update-TrayState })");
     expect(source).not.toContain("Invoke-Expression");
@@ -215,7 +215,7 @@ describe("Windows tray packaging and command safety", () => {
   test("ships branded multi-size Windows tray icons", () => {
     const assets = join(import.meta.dir, "..", "src", "tray", "assets");
     for (const name of ["online", "warning", "offline"]) {
-      const path = join(assets, `opencodex-tray-${name}.ico`);
+      const path = join(assets, `openprovider-tray-${name}.ico`);
       expect(existsSync(path)).toBe(true);
       const bytes = readFileSync(path);
       expect(bytes.readUInt16LE(0)).toBe(0);
@@ -248,7 +248,7 @@ describe("Windows tray packaging and command safety", () => {
   test("copies the tray script into the hardened home and gates all update lanes", () => {
     const root = join(import.meta.dir, "..");
     const tray = readFileSync(join(root, "src", "tray", "windows.ts"), "utf8");
-    expect(tray).toContain('join(getConfigDir(), "opencodex-tray.ps1")');
+    expect(tray).toContain('join(getConfigDir(), "openprovider-tray.ps1")');
     expect(tray).toContain('join(import.meta.dir, "assets", name)');
     expect(tray).toContain("installedTrayIconPaths()");
     expect(tray).toContain("const hardened = hardenSecretPath(temporary, { required: true })");

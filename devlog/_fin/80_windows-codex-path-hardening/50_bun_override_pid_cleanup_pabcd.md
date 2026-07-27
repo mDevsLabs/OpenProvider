@@ -45,7 +45,7 @@ Implementation checklist:
 - Add `OPENCODEX_BUN_PATH` support or an equivalent config field.
 - Validate override path exists and is executable enough for the current platform.
 - Log whether bundled Bun or override Bun is used.
-- Ensure `ocx service install` embeds or resolves the selected Bun consistently.
+- Ensure `opr service install` embeds or resolves the selected Bun consistently.
 - For explicit stop/uninstall, if PID file exists but Windows command-line inspection fails, attempt safe best-effort cleanup and log uncertainty.
 - Keep strict PID identity checks for status/reporting.
 
@@ -69,10 +69,10 @@ Manual Windows smoke:
 
 ```powershell
 $env:OPENCODEX_BUN_PATH = "C:\\path\\to\\bun.exe"
-ocx -v
-ocx service install
-ocx service start
-ocx service status
+opr -v
+opr service install
+opr service start
+opr service status
 # Confirm selected Bun path appears in diagnostics/logs.
 ```
 

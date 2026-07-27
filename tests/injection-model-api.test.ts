@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 function isolatedHome(): void {
-  tempHome = mkdtempSync(join(tmpdir(), "ocx-injection-"));
+  tempHome = mkdtempSync(join(tmpdir(), "opr-injection-"));
   process.env.OPENCODEX_HOME = tempHome;
 }
 

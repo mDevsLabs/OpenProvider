@@ -14,14 +14,14 @@
 - `src/chat/outbound.ts` (570 lines): Responses SSE → Chat Completions delta frames +
   non-stream completion object.
 - Also flips `GET /v1/models` from `requireApiAuth(data-plane)` to `requireResponsesApiAuth`.
-- New endpoint uses `requireResponsesApiAuth` (x-opencodex-api-key admission header),
+- New endpoint uses `requireResponsesApiAuth` (x-openprovider-api-key admission header),
   loopback exempt, origin check enforced, draining 503 handled — consistent with /v1/responses.
 
 ## Review findings
 
 - Auth model verified against `src/server/auth-cors.ts:168-184`: the /v1/models switch means
   a bearer `Authorization` alone no longer admits on remote binds; clients must use
-  `x-opencodex-api-key`. That is intentional (Authorization is reserved for the Codex Direct
+  `x-openprovider-api-key`. That is intentional (Authorization is reserved for the Codex Direct
   bearer domain) and documented in the new `docs/github-copilot-app.md` troubleshooting.
   Slight behavior change for any existing remote /v1/models caller using Authorization — worth
   one release-note line.

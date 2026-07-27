@@ -22,7 +22,7 @@ This unit adds the explanation to all three surfaces and records the gap here.
 ## Verified facts (source of truth for all copy)
 
 Codex's models-manager sorts the catalog by `priority` ASC; array order is discarded
-(`src/codex/catalog.ts:881` comment). Effective priorities produced by opencodex:
+(`src/codex/catalog.ts:881` comment). Effective priorities produced by openprovider:
 
 | Slot | Priority | Source |
 |------|----------|--------|

@@ -12,7 +12,7 @@ OpenAI 提供一条 bare `openai` Codex 登录路径和 `openai-apikey/<model>` 
 
 ## 配置注入
 
-`ocx init`、`ocx start` 和 `ocx sync` 都会调用注入器。在默认的 loopback 绑定下，它会保留 Codex
+`opr init`、`opr start` 和 `opr sync` 都会调用注入器。在默认的 loopback 绑定下，它会保留 Codex
 内置的 `openai` 提供商 id，并将该提供商指向 OpenProvider：
 
 ```toml
@@ -92,8 +92,8 @@ $CODEX_HOME/models_cache.json
 此检测，请显式设置 `CODEX_HOME`。
 
 在 Windows 上，Orca shell 可能同时把 `CODEX_HOME` 和 `ORCA_CODEX_HOME` 指向 Orca 的内置
-runtime home，而 ChatGPT/Codex App 仍读取 `%USERPROFILE%\\.codex`。`ocx status` 与
-`ocx doctor` 会检测这一明确的不一致，并以隐藏用户名的形式显示目标 home。如果后台服务是在原 Orca
+runtime home，而 ChatGPT/Codex App 仍读取 `%USERPROFILE%\\.codex`。`opr status` 与
+`opr doctor` 会检测这一明确的不一致，并以隐藏用户名的形式显示目标 home。如果后台服务是在原 Orca
 shell 中安装的，请先在原 shell 中卸载服务，再把 `CODEX_HOME` 设为 App home、取消
 `ORCA_CODEX_HOME`，重新同步/恢复并安装服务。
 
@@ -111,7 +111,7 @@ Codex 保持一致。OpenProvider 也提供 `/v1/responses` WebSocket。专用�
 
 ## 模型目录同步
 
-Codex 显示的模型来自一个磁盘上的目录（默认为 `$CODEX_HOME/OpenProvider-catalog.json`）。在启动时以及执行 `ocx sync` 时，OpenProvider 会：
+Codex 显示的模型来自一个磁盘上的目录（默认为 `$CODEX_HOME/OpenProvider-catalog.json`）。在启动时以及执行 `opr sync` 时，OpenProvider 会：
 
 1. **备份**一次原始目录到 `~/.OpenProvider/catalog-backup.json`（以便置顶操作可逆）。
 2. **获取**符合条件的提供商实时模型目录（缓存约 5 分钟；失败时先回退到上一份正常列表，再回退到
@@ -133,12 +133,12 @@ Codex 显示的模型来自一个磁盘上的目录（默认为 `$CODEX_HOME/Ope
 配置端口上没有任何监听，客户端只能显示原始的连接错误。请重启代理：
 
 ```bash
-ocx start              # 前台运行
-ocx service install    # 常驻：登录时自动启动，崩溃后自动重启
+opr start              # 前台运行
+opr service install    # 常驻：登录时自动启动，崩溃后自动重启
 ```
 
-`ocx status` 可查看代理是否在运行，未运行时也会给出同样的重启提示；
-`ocx doctor` 会报告重启安全性（service/shim 覆盖情况）。
+`opr status` 可查看代理是否在运行，未运行时也会给出同样的重启提示；
+`opr doctor` 会报告重启安全性（service/shim 覆盖情况）。
 
 ## subagent 选择器
 
@@ -171,15 +171,15 @@ streaming 请求来验证凭据。输入使用真正的 Responses item 数组
 
 ## 恢复原生 Codex
 
-OpenProvider 绝不会把你困住。**`ocx stop` 是完全恢复原生 Codex 的单一命令** ——
+OpenProvider 绝不会把你困住。**`opr stop` 是完全恢复原生 Codex 的单一命令** ——
 它会停止 proxy、停止后台服务（如已安装），并剥除所有注入的行和路由的目录条目，使普通的 `codex`
 完全像 OpenProvider 从未存在过一样工作：
 
 ```bash
-ocx stop       # 停止 proxy + 服务，恢复原生 Codex
-ocx restore    # 不停止 proxy 仅恢复  (别名: ocx eject)
-ocx restore back # 让普通 Codex 重新指向仍在运行的 proxy
+opr stop       # 停止 proxy + 服务，恢复原生 Codex
+opr restore    # 不停止 proxy 仅恢复  (别名: opr eject)
+opr restore back # 让普通 Codex 重新指向仍在运行的 proxy
 ```
 
-当 OpenProvider 作为受管的 [后台服务](/zh-cn/reference/cli/#ocx-service) 运行时，它会设置 `OCX_SERVICE=1`，这样由服务驱动的重启**不会**反复改写 Codex 配置——只有显式的 `ocx stop` / `ocx service stop` 才会恢复原生 Codex。
+当 OpenProvider 作为受管的 [后台服务](/zh-cn/reference/cli/#opr-service) 运行时，它会设置 `OCX_SERVICE=1`，这样由服务驱动的重启**不会**反复改写 Codex 配置——只有显式的 `opr stop` / `opr service stop` 才会恢复原生 Codex。
 

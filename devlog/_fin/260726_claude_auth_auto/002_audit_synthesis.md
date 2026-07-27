@@ -9,15 +9,15 @@ audited `000`–`040` against the tree at `fb98fa03`. Final line: `VERDICT: FAIL
 ### 1. Critical — inherited proxy-marker feedback loop. ACCEPTED.
 
 Root cause: `buildClaudeEnv` clones `process.env` and preserves non-empty values
-(`src/cli/claude.ts:28-33`), and opencodex's own system-env file can export
-`ANTHROPIC_AUTH_TOKEN=opencodex-proxy` (`src/server/system-env.ts:30-35,
+(`src/cli/claude.ts:28-33`), and openprovider's own system-env file can export
+`ANTHROPIC_AUTH_TOKEN=openprovider-proxy` (`src/server/system-env.ts:30-35,
 :238-255`). Under naive S5 the next launch reads that as "auth present" →
 subscription → but the stale dummy marker rides along and still triggers the
 host-managed flag (`cli/claude.ts:79-81`). Reported mode and actual env diverge.
 
 Decision, three parts:
 
-- **The exact marker value `opencodex-proxy` is opencodex-owned state, never user
+- **The exact marker value `openprovider-proxy` is openprovider-owned state, never user
   auth.** S5 classifies it as `absent` (it is OUR dummy), and additionally the
   detector records `staleProxyMarker: true` when it sees it.
 - **Auto→subscription strips a stale marker**: `buildClaudeEnv` deletes
@@ -81,8 +81,8 @@ unknown + marker cleanup.
 
 ### 5. High — S4 is not Claude auth evidence. ACCEPTED.
 
-`getCredential("anthropic")` reads opencodex's PROVIDER credential store
-(`~/.opencodex/auth.json`) — the Claude CLI never consumes it, and the native path
+`getCredential("anthropic")` reads openprovider's PROVIDER credential store
+(`~/.openprovider/auth.json`) — the Claude CLI never consumes it, and the native path
 needs the credential on the incoming request (`claude-messages.ts:91-95`). S4 is
 REMOVED from the detector. The sources are S1, S2, S3, S5 — four, not five.
 
@@ -139,7 +139,7 @@ the decade docs before B.
 ### R2-1. Critical — marker cleanup ordered AFTER admission injection. ACCEPTED.
 
 `setDefault` preserves any existing non-empty token (`cli/claude.ts:31-33`), so with
-`base.ANTHROPIC_AUTH_TOKEN="opencodex-proxy"` AND `config.apiKeys` configured, the
+`base.ANTHROPIC_AUTH_TOKEN="openprovider-proxy"` AND `config.apiKeys` configured, the
 admission key is skipped at `:55-57` — and then my subscription cleanup deletes the
 dummy, leaving the child with NO token at all. That is a worse failure than the one I
 was fixing.
@@ -193,13 +193,13 @@ terminal.
 Decision: narrow the promise rather than build a watcher (out of scope for this
 unit).
 
-- `ocx claude` resolves LIVE every launch — that is the authoritative path and it
+- `opr claude` resolves LIVE every launch — that is the authoritative path and it
   already re-reads everything.
-- The shell-env file is documented as a snapshot refreshed by `ocx ensure`, restart,
+- The shell-env file is documented as a snapshot refreshed by `opr ensure`, restart,
   or a settings save; a settings save already triggers `applySystemEnvToggle`
   (`:816-818`), so the GUI has a working "re-apply now" affordance.
 - The GUI badge labels itself as daemon-side and EXCLUDES process-local S5 from its
-  reason, with a note that a terminal-exported key is only visible to `ocx claude`.
+  reason, with a note that a terminal-exported key is only visible to `opr claude`.
   A badge that silently disagrees with the CLI is exactly the report class this unit
   exists to kill.
 
@@ -219,7 +219,7 @@ missed direct writers (combo migration `combo-routes.ts:164-182`, CLI Desktop
 
 ### Non-blocking, accepted
 
-Obsolete `claude.authSource.ocx-anthropic-oauth` locale key removed from `030`;
+Obsolete `claude.authSource.opr-anthropic-oauth` locale key removed from `030`;
 baselines restated as `201de404`.
 
 ### WP2 split (reviewer's suggestion, accepted)
@@ -244,7 +244,7 @@ WP2 was too broad. New map:
 
 WP3b consumes the GET payload (WP2b) and the state mapping that carries
 `detectionScope` (WP3), so its dependency is `WP2b, WP3`, not `WP2`. And the manual
-snippet CAN disagree with `ocx claude`: daemon detection cannot see a terminal-only
+snippet CAN disagree with `opr claude`: daemon detection cannot see a terminal-only
 `ANTHROPIC_API_KEY`, so a daemon auto-absent snapshot says proxy while that terminal
 resolves subscription. The claim is retracted in `035`; the snippet carries the same
 daemon-scope caveat as the badge. Denying a real divergence would manufacture exactly
@@ -278,7 +278,7 @@ injected deps FIRST and binding `env` LAST, plus typing the injection as
 `020` header now names WP1b as a dependency; F8 in `001` is reassigned from WP2 to
 WP3b; the sentinel test validates type/value, not truthiness. Reviewer confirmed
 R2-1's ordering, R2-3's sentinel placement (PUT spreads `{ ...config.claudeCode }` at
-`agent-settings-routes.ts:672` and `ocx init` never creates the block), and the
+`agent-settings-routes.ts:672` and `opr init` never creates the block), and the
 launchctl predicate swap.
 
 ---

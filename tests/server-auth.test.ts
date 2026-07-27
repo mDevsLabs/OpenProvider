@@ -93,7 +93,7 @@ function stubModelDiscoveryFor(...origins: string[]): void {
 }
 
 beforeEach(() => {
-  isolatedCodexHome = installIsolatedCodexHome("ocx-server-auth-codex-");
+  isolatedCodexHome = installIsolatedCodexHome("opr-server-auth-codex-");
 });
 
 afterEach(() => {
@@ -248,7 +248,7 @@ describe("server local API auth", () => {
     })).toBe(false);
   });
 
-  test("loopback hostnames do not require opencodex API auth", () => {
+  test("loopback hostnames do not require openprovider API auth", () => {
     expect(isLoopbackHostname(undefined)).toBe(true);
     expect(isLoopbackHostname("")).toBe(true);
     expect(isLoopbackHostname("localhost")).toBe(true);
@@ -285,7 +285,7 @@ describe("server local API auth", () => {
     expect(hasValidApiAuth(new Request("http://localhost/api/config"), config("127.0.0.1"))).toBe(true);
   });
 
-  test("CORS preflight permits the opencodex API key header", () => {
+  test("CORS preflight permits the openprovider API key header", () => {
     const allowed = corsHeaders()["Access-Control-Allow-Headers"];
     expect(allowed).toContain("X-OpenProvider-API-Key");
     expect(allowed).toContain("ChatGPT-Account-Id");
@@ -406,7 +406,7 @@ describe("server local API auth", () => {
   test("root fallback explains missing dashboard build", () => {
     expect(rootFallbackPayload()).toMatchObject({
       status: "ok",
-      service: "opencodex",
+      service: "openprovider",
       dashboard: { available: false },
       endpoints: {
         health: "/healthz",

@@ -4,7 +4,7 @@
 
 - Conversation: https://chatgpt.com/c/6a3f8b7a-77dc-83e8-bb3e-2c030b486539
 - Final review session: `01KW4A08FZ4B5P9W7M5ECKBG6D`
-- Input package: `/tmp/opencodex-windows-80-final-review-260627/opencodex-windows-80-final-review.zip`
+- Input package: `/tmp/openprovider-windows-80-final-review-260627/openprovider-windows-80-final-review.zip`
 - Review mode: ChatGPT Pro Extended, requested web search for Bun server timeout/WebSocket behavior, Bun Windows stream crash reports, and Microsoft Task Scheduler semantics.
 
 ## Bottom line
@@ -35,7 +35,7 @@ Correction:
 
 2. Bun 1.3.14 Windows stream/runtime crash risk
    - Current package pins Bun 1.3.14.
-   - GPT Pro found a directly relevant Windows 11/opencodex Bun 1.3.14 native segfault report.
+   - GPT Pro found a directly relevant Windows 11/openprovider Bun 1.3.14 native segfault report.
    - Related Bun stream issues involve async `ReadableStream` and abort/close races.
 
 3. Weak Windows service wrapper/logging
@@ -81,8 +81,8 @@ Implement:
 
 - Log service wrapper start.
 - Log child start, child exit code, restart decision.
-- Log Bun path, Bun version, opencodex version, CLI path, config dir, and `CODEX_HOME`.
-- Surface service log path in `ocx service status`.
+- Log Bun path, Bun version, openprovider version, CLI path, config dir, and `CODEX_HOME`.
+- Surface service log path in `opr service status`.
 - Capture child stdout/stderr into the same service log or clearly linked log files.
 
 Tests:
@@ -101,7 +101,7 @@ Implement:
 - Set restart interval/count together.
 - Set battery behavior explicitly.
 - Set multiple-instance policy explicitly.
-- Preserve intentional stop semantics: `ocx service stop` must stop the wrapper first, then kill the tracked child, and must not immediately resurrect it.
+- Preserve intentional stop semantics: `opr service stop` must stop the wrapper first, then kill the tracked child, and must not immediately resurrect it.
 
 Nuance:
 
@@ -111,7 +111,7 @@ Nuance:
 Tests:
 
 - Static XML/settings assertions.
-- Manual Windows smoke: install, inspect task, kill only Bun child, confirm wrapper restart/log, then `ocx service stop` and verify no child remains.
+- Manual Windows smoke: install, inspect task, kill only Bun child, confirm wrapper restart/log, then `opr service stop` and verify no child remains.
 
 ### Patch 4 — Bun mitigation path
 
@@ -162,7 +162,7 @@ Implement:
   - GUI built -> `GET / -> GUI dashboard`;
   - GUI missing -> setup/fallback guidance.
 - Expand `rootFallbackPayload()` with exact clone commands.
-- Replace generic `gui/README.md` with OpenCodex-specific instructions.
+- Replace generic `gui/README.md` with OpenProvider-specific instructions.
 
 Tests:
 

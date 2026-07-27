@@ -12,7 +12,7 @@ const originalFetch = globalThis.fetch;
 const previousOpencodexHome = process.env.OPENCODEX_HOME;
 const previousCodexHome = process.env.CODEX_HOME;
 
-let opencodexHome: string;
+let openproviderHome: string;
 let codexHome: string;
 
 function testConfig(): OcxConfig {
@@ -61,9 +61,9 @@ function testConfig(): OcxConfig {
 }
 
 beforeEach(() => {
-  opencodexHome = mkdtempSync(join(tmpdir(), "ocx-quota-"));
+  openproviderHome = mkdtempSync(join(tmpdir(), "opr-quota-"));
   codexHome = mkdtempSync(join(tmpdir(), "codex-quota-"));
-  process.env.OPENCODEX_HOME = opencodexHome;
+  process.env.OPENCODEX_HOME = openproviderHome;
   process.env.CODEX_HOME = codexHome;
   mkdirSync(codexHome, { recursive: true });
   writeFileSync(join(codexHome, "auth.json"), JSON.stringify({
@@ -81,7 +81,7 @@ afterEach(() => {
   else process.env.OPENCODEX_HOME = previousOpencodexHome;
   if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
   else process.env.CODEX_HOME = previousCodexHome;
-  rmSync(opencodexHome, { recursive: true, force: true });
+  rmSync(openproviderHome, { recursive: true, force: true });
   rmSync(codexHome, { recursive: true, force: true });
 });
 
@@ -500,7 +500,7 @@ describe("fetchProviderQuotaReports", () => {
   });
 
   test("direct mode reports main without reading or repairing the added-account store", async () => {
-    const accountStore = join(opencodexHome, "codex-accounts.json");
+    const accountStore = join(openproviderHome, "codex-accounts.json");
     writeFileSync(accountStore, "invalid-added-account-store");
     const config = testConfig();
     config.providers.openai.codexAccountMode = "direct";

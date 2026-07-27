@@ -23,7 +23,7 @@ describe("CLI subcommand help", () => {
       const result = runCli(args);
       expect(result.status).toBe(0);
       expect(result.stderr).toBe("");
-      expect(result.stdout.trim()).toMatch(/^opencodex \d+\.\d+\.\d+/);
+      expect(result.stdout.trim()).toMatch(/^openprovider \d+\.\d+\.\d+/);
       expect(result.stdout.trim().split("\n")).toHaveLength(1);
     }
 
@@ -33,7 +33,7 @@ describe("CLI subcommand help", () => {
       encoding: "utf8",
     });
     expect(binResult.status).toBe(0);
-    expect(binResult.stdout.trim()).toMatch(/^opencodex \d+\.\d+\.\d+/);
+    expect(binResult.stdout.trim()).toMatch(/^openprovider \d+\.\d+\.\d+/);
     expect(binResult.stdout.trim().split("\n")).toHaveLength(1);
   });
 
@@ -41,17 +41,17 @@ describe("CLI subcommand help", () => {
     const result = runCli(["help", "start"]);
     expect(result.status).toBe(0);
     expect(result.stderr).toBe("");
-    expect(result.stdout).toContain("Usage: ocx start [--port <port>]");
+    expect(result.stdout).toContain("Usage: opr start [--port <port>]");
     expect(result.stdout).toContain("Start the proxy server and sync models to Codex.");
   });
 
   test("top-level help forms exit before Codex shim auto-restore can mutate launchers", () => {
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-help-shim-home-"));
-    const binDir = mkdtempSync(join(tmpdir(), "ocx-help-shim-bin-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-help-shim-home-"));
+    const binDir = mkdtempSync(join(tmpdir(), "opr-help-shim-bin-"));
     try {
       const wrapper = join(binDir, process.platform === "win32" ? "codex.cmd" : "codex");
-      const backup = join(binDir, process.platform === "win32" ? "codex.opencodex-real.cmd" : "codex.opencodex-real");
-      const statePath = join(opencodexHome, "codex-shim.json");
+      const backup = join(binDir, process.platform === "win32" ? "codex.openprovider-real.cmd" : "codex.openprovider-real");
+      const statePath = join(openproviderHome, "codex-shim.json");
       const replacement = "replacement that help must not promote\n";
       writeFileSync(wrapper, replacement, "utf8");
       writeFileSync(backup, "known-good prior launcher\n", "utf8");
@@ -67,15 +67,15 @@ describe("CLI subcommand help", () => {
       Bun.sleepSync(120);
 
       for (const args of [[], ["help"], ["--help"], ["-h"]]) {
-        const result = runCli(args, { OPENCODEX_HOME: opencodexHome, PATH: binDir });
+        const result = runCli(args, { OPENCODEX_HOME: openproviderHome, PATH: binDir });
         expect(result.status).toBe(0);
-        expect(result.stdout).toContain("opencodex (ocx)");
+        expect(result.stdout).toContain("openprovider (opr)");
         expect(readFileSync(wrapper, "utf8")).toBe(replacement);
         expect(readFileSync(backup)).toEqual(backupBefore);
         expect(readFileSync(statePath)).toEqual(stateBefore);
       }
     } finally {
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
       rmSync(binDir, { recursive: true, force: true });
     }
   });
@@ -91,13 +91,13 @@ describe("CLI subcommand help", () => {
     const result = runCli(["foobar", "--help"]);
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("Unknown command: foobar");
-    expect(result.stdout).toContain("opencodex (ocx)");
+    expect(result.stdout).toContain("openprovider (opr)");
   });
 
   test("status prints diagnostics without starting the proxy", () => {
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-status-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-status-"));
     try {
-      const configPath = join(opencodexHome, "config.json");
+      const configPath = join(openproviderHome, "config.json");
       writeFileSync(configPath, JSON.stringify({
         port: 9,
         providers: {
@@ -113,7 +113,7 @@ describe("CLI subcommand help", () => {
 
       const result = spawnSync(process.execPath, [cliPath, "status"], {
         cwd: repoRoot,
-        env: { ...process.env, OPENCODEX_HOME: opencodexHome },
+        env: { ...process.env, OPENCODEX_HOME: openproviderHome },
         encoding: "utf8",
       });
 
@@ -122,27 +122,27 @@ describe("CLI subcommand help", () => {
       expect(result.stdout).toContain("Health: http://127.0.0.1:9/healthz");
       expect(result.stdout).toContain("Dashboard: http://localhost:9/");
       expect(result.stdout).toContain(`Config: ${configPath}`);
-      expect(result.stdout).toContain(`PID file: ${join(opencodexHome, "ocx.pid")}`);
+      expect(result.stdout).toContain(`PID file: ${join(openproviderHome, "opr.pid")}`);
       expect(result.stdout).toContain("Runtime:");
       expect(result.stdout).toContain("Runtime source:");
       expect(result.stdout).toContain("Default provider: openai");
       expect(result.stdout).toContain("Codex autostart: disabled");
       expect(result.stdout).toContain("Service:");
-      expect(result.stdout).toContain(join(opencodexHome, "service.log"));
+      expect(result.stdout).toContain(join(openproviderHome, "service.log"));
       expect(result.stdout).toContain("Codex autostart shim");
     } finally {
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
     }
   });
 
   test("restore --help prints usage without mutating Codex config", () => {
-    const codexHome = mkdtempSync(join(tmpdir(), "ocx-help-"));
+    const codexHome = mkdtempSync(join(tmpdir(), "opr-help-"));
     try {
       const configPath = join(codexHome, "config.toml");
       const before = [
-        'model_provider = "opencodex"',
+        'model_provider = "openprovider"',
         "",
-        "[model_providers.opencodex]",
+        "[model_providers.openprovider]",
         'base_url = "http://localhost:10100/v1"',
         'wire_api = "responses"',
         "",
@@ -156,7 +156,7 @@ describe("CLI subcommand help", () => {
       });
 
       expect(result.status).toBe(0);
-      expect(result.stdout).toContain("Usage: ocx restore");
+      expect(result.stdout).toContain("Usage: opr restore");
       expect(result.stdout).not.toContain("Plain `codex` now runs natively");
       expect(readFileSync(configPath, "utf8")).toBe(before);
     } finally {
@@ -165,26 +165,26 @@ describe("CLI subcommand help", () => {
   });
 
   test("mutating command help exits before local state changes", () => {
-    const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-help-state-"));
-    const codexHome = mkdtempSync(join(tmpdir(), "ocx-help-codex-"));
+    const openproviderHome = mkdtempSync(join(tmpdir(), "opr-help-state-"));
+    const codexHome = mkdtempSync(join(tmpdir(), "opr-help-codex-"));
     try {
       const configPath = join(codexHome, "config.toml");
-      const markerPath = join(opencodexHome, "service-state.json");
-      const before = 'model_provider = "opencodex"\n';
+      const markerPath = join(openproviderHome, "service-state.json");
+      const before = 'model_provider = "openprovider"\n';
       writeFileSync(configPath, before, "utf8");
       writeFileSync(markerPath, '{"installed":true}', "utf8");
 
       const cases = [
-        { args: ["stop", "--help"], expected: "Usage: ocx stop" },
-        { args: ["uninstall", "--help"], expected: "Usage: ocx uninstall" },
-        { args: ["service", "uninstall", "--help"], expected: "Usage: ocx service" },
-        { args: ["codex-shim", "uninstall", "--help"], expected: "Usage: ocx codex-shim" },
+        { args: ["stop", "--help"], expected: "Usage: opr stop" },
+        { args: ["uninstall", "--help"], expected: "Usage: opr uninstall" },
+        { args: ["service", "uninstall", "--help"], expected: "Usage: opr service" },
+        { args: ["codex-shim", "uninstall", "--help"], expected: "Usage: opr codex-shim" },
       ];
 
       for (const testCase of cases) {
         const result = runCli(testCase.args, {
           CODEX_HOME: codexHome,
-          OPENCODEX_HOME: opencodexHome,
+          OPENCODEX_HOME: openproviderHome,
         });
         expect(result.status).toBe(0);
         expect(result.stdout).toContain(testCase.expected);
@@ -192,13 +192,13 @@ describe("CLI subcommand help", () => {
         expect(readFileSync(markerPath, "utf8")).toBe('{"installed":true}');
       }
     } finally {
-      rmSync(opencodexHome, { recursive: true, force: true });
+      rmSync(openproviderHome, { recursive: true, force: true });
       rmSync(codexHome, { recursive: true, force: true });
     }
   });
 
   test("recover-history --help prints usage without opening history database", () => {
-    const codexHome = mkdtempSync(join(tmpdir(), "ocx-help-"));
+    const codexHome = mkdtempSync(join(tmpdir(), "opr-help-"));
     try {
       const statePath = join(codexHome, "state_5.sqlite");
 
@@ -209,7 +209,7 @@ describe("CLI subcommand help", () => {
       });
 
       expect(result.status).toBe(0);
-      expect(result.stdout).toContain("Usage: ocx recover-history --legacy-openai");
+      expect(result.stdout).toContain("Usage: opr recover-history --legacy-openai");
       expect(result.stdout).toContain("Explicitly recover pre-backup syncResumeHistory rows.");
       expect(result.stdout).not.toContain("Recovered");
       expect(result.stderr).toBe("");
@@ -222,8 +222,8 @@ describe("CLI subcommand help", () => {
   test("start rejects unknown and partially numeric port arguments", () => {
     const cases = [
       { args: ["start", "--port", "123abc"], expected: "Invalid port number" },
-      { args: ["start", "--bad"], expected: "Usage: ocx start [--port <port>]" },
-      { args: ["start", "--port", "1234", "--extra"], expected: "Usage: ocx start [--port <port>]" },
+      { args: ["start", "--bad"], expected: "Usage: opr start [--port <port>]" },
+      { args: ["start", "--port", "1234", "--extra"], expected: "Usage: opr start [--port <port>]" },
     ];
 
     for (const testCase of cases) {
@@ -238,13 +238,13 @@ describe("CLI subcommand help", () => {
     const result = runCli(["start", "--port", "123abc", "--help"]);
     expect(result.status).toBe(0);
     expect(result.stderr).toBe("");
-    expect(result.stdout).toContain("Usage: ocx start [--port <port>]");
+    expect(result.stdout).toContain("Usage: opr start [--port <port>]");
   });
 
   test("invalid service and codex-shim usage include remove alias", () => {
     const cases = [
-      { args: ["service", "nope"], expected: "Usage: ocx service [install|start|stop|status|uninstall|remove]" },
-      { args: ["codex-shim", "nope"], expected: "Usage: ocx codex-shim <install|status|uninstall|remove>" },
+      { args: ["service", "nope"], expected: "Usage: opr service [install|start|stop|status|uninstall|remove]" },
+      { args: ["codex-shim", "nope"], expected: "Usage: opr codex-shim <install|status|uninstall|remove>" },
     ];
 
     for (const testCase of cases) {

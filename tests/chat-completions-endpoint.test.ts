@@ -16,8 +16,8 @@ const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-chat-completions-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-chat-completions-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-chat-completions-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-chat-completions-"));
   process.env.OPENCODEX_HOME = testDir;
   globalThis.fetch = originalFetch;
 });

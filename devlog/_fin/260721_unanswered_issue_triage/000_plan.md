@@ -8,7 +8,7 @@ This work validates the unanswered issues open on 2026-07-21 before changing cod
 - #181: provider deletion hides the server's actionable default-provider guard.
 - #198: usage/log cost estimates can be mistaken for actual billing.
 - #180 and #196: verify fixes already absorbed into `dev` instead of duplicating them.
-- #177 and #178: verify whether the vendors expose a model-inference contract that fits an OpenCodex provider.
+- #177 and #178: verify whether the vendors expose a model-inference contract that fits an OpenProvider provider.
 
 [Decision Log]
 - 목적과 의도: Validate each report against current `dev`, fix confirmed defects, and leave evidence-backed issue replies.
@@ -26,12 +26,12 @@ This work validates the unanswered issues open on 2026-07-21 before changing cod
 
 ## Result
 
-- #180 was already implemented on current `dev` as the complete `ocx account` command family. Its 41-case regression matrix passes; privacy-scan fixture strings were changed from token-shaped literals without changing behavior.
+- #180 was already implemented on current `dev` as the complete `opr account` command family. Its 41-case regression matrix passes; privacy-scan fixture strings were changed from token-shaped literals without changing behavior.
 - #196 was already absorbed on `dev`; the registry and three Qwen 3.8 reasoning replay tests pass.
 - #190 now budgets the exact serialized `McpTools` protobuf to 120,000 bytes and 330 definitions, prioritizes explicit/native and tool-search-loaded definitions, and classifies residual catalog exhaustion as HTTP 400 `tool_catalog_too_large` rather than a quota rate limit.
 - #181 now displays the management API's structured delete error, with a translated fallback for network, empty, or malformed responses.
 - #198 now labels dashboard cost values as API list-price equivalents rather than charges in English, Korean, German, and Chinese, with matching public documentation.
-- #177 and #178 remain feature requests: Warp documents an asynchronous Oz agent-run API, while Factory documents configuring upstream model gateways for its own client. Neither public contract is an OpenAI-compatible model-inference endpoint that can be registered as an OpenCodex provider without a new adapter contract.
+- #177 and #178 remain feature requests: Warp documents an asynchronous Oz agent-run API, while Factory documents configuring upstream model gateways for its own client. Neither public contract is an OpenAI-compatible model-inference endpoint that can be registered as an OpenProvider provider without a new adapter contract.
 
 ## Verification result
 

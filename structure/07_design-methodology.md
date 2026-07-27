@@ -1,6 +1,6 @@
 # 07 — Design Methodology for New Surfaces
 
-When adding or redesigning a GUI page, CLI wizard, or user-facing flow in opencodex,
+When adding or redesigning a GUI page, CLI wizard, or user-facing flow in openprovider,
 follow the PABCD Catalog Discovery stage ordering (CATALOG-DESIGN-FIRST-01):
 
 1. **Design/UX decisions first** (Product-Personality-Selection): mood, density, lightness,
@@ -12,7 +12,7 @@ follow the PABCD Catalog Discovery stage ordering (CATALOG-DESIGN-FIRST-01):
 
 This is the design-first invariant from the PABCD Initiative
 (`pabcd_initiative/skills/dev-pabcd/references/catalog-discovery.yaml`). It ensures
-design coherence across surfaces without requiring a runtime interview engine — opencodex
+design coherence across surfaces without requiring a runtime interview engine — openprovider
 is infrastructure plumbing, not a product-creation tool, so this is process discipline
 for contributors, not a runtime feature.
 
@@ -21,7 +21,7 @@ for contributors, not a runtime feature.
 | Surface | Current design | Notes |
 |---|---|---|
 | Dashboard | Data-dense, light, rounded, sans-serif | Default Bun/React template aesthetic |
-| `ocx init` CLI | Flat numbered menu, no personality | Could benefit from staged approach |
+| `opr init` CLI | Flat numbered menu, no personality | Could benefit from staged approach |
 | Add Provider modal | Functional form | Minimal styling |
 | Logs page | Dense table, monospace | Appropriate for log viewing |
 

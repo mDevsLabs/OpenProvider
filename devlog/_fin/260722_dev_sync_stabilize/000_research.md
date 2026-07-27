@@ -22,7 +22,7 @@ origin/dev 대비 21커밋 behind였고, `git pull --ff-only`로 3a5f984d에 동
 | 38f3789a/#250 | Kimi root object type 정규화 (openai-chat.ts, api.kimi.com 한정) | 중간 |
 | ad51994e/#248 | v1 compact reasoning sanitize (responses.ts) | 중간 |
 | b99bc416/#232 | Kiro OAuth resolve-before-paste | 중간 |
-| 04dfc7fc/#262 | ocx init openai passthrough 유지 (#261) | 중간 |
+| 04dfc7fc/#262 | opr init openai passthrough 유지 (#261) | 중간 |
 | 3a5f984d/#264 | MAINTAINERS.md + CODEOWNERS 문서화 | 없음 |
 
 닫힌(머지 안 된) PR: #260, #254, #243, #237, #233, #226, #225, #223, #221, #220.

@@ -45,7 +45,7 @@ describe("install scripts", () => {
   test("Node can import the package main without executing the CLI", () => {
     const result = spawnSync("node", [
       "-e",
-      "import('./bin/package-main.mjs').then(m => { if (m.cliCommand !== 'ocx') process.exit(2); })",
+      "import('./bin/package-main.mjs').then(m => { if (m.cliCommand !== 'opr') process.exit(2); })",
     ], {
       cwd: repoRoot,
       encoding: "utf8",
@@ -61,7 +61,7 @@ describe("install scripts", () => {
 
     expect(npmignore).toContain("gui/README.md");
     expect(guiNpmignore).toContain("README.md");
-    expect(guiReadme).toContain("opencodex dashboard");
+    expect(guiReadme).toContain("openprovider dashboard");
     expect(guiReadme).toContain("bun run dev:proxy");
     expect(guiReadme).toContain("bun run dev:gui");
     expect(guiReadme).not.toContain("This template provides a minimal setup");
@@ -72,8 +72,8 @@ describe("install scripts", () => {
 
     expect(script).toContain("Node.js 18+ is required");
     expect(script).toContain("npm install -g @mdevs/openprovider");
-    expect(script).toContain("command -v ocx");
-    expect(script).toContain("ocx help");
+    expect(script).toContain("command -v opr");
+    expect(script).toContain("opr help");
     expect(script).not.toContain("bun install -g @mdevs/openprovider");
     expect(script).not.toContain("bun.sh/install");
   });
@@ -84,9 +84,9 @@ describe("install scripts", () => {
     expect(script).toContain("Node.js 18+ is required");
     expect(script).toContain("& $npm.Source install -g @mdevs/openprovider");
     expect(script).toContain("$LASTEXITCODE");
-    expect(script).toContain("Get-Command ocx.cmd");
-    expect(script).toContain("Get-Command ocx");
-    expect(script).toContain("& $ocx.Source help");
+    expect(script).toContain("Get-Command opr.cmd");
+    expect(script).toContain("Get-Command opr");
+    expect(script).toContain("& $opr.Source help");
     expect(script).not.toContain("bun install -g @mdevs/openprovider");
     expect(script).not.toContain("bun.sh/install.ps1");
   });

@@ -109,7 +109,7 @@ export function defaultCollapsedFamilies(counts: Record<string, number>): Set<st
 ```
 
 Next to the existing `laneSearch`/`laneLimit` state (currently `:118-119`), with
-`const FAMILY_COLLAPSE = makeCollapseStore("ocx.claudeDesktop.collapsedFamilies.v1");`
+`const FAMILY_COLLAPSE = makeCollapseStore("opr.claudeDesktop.collapsedFamilies.v1");`
 at module scope:
 
 ```diff
@@ -166,11 +166,11 @@ container class changes so the CSS grid does not have to be overloaded:
 
 ```diff
 -      <div className="claude-lanes" aria-label={t("claudeDesktop.assignmentsLabel")}>
-+      <div className="ocx-group-stack" aria-label={t("claudeDesktop.assignmentsLabel")}>
++      <div className="opr-group-stack" aria-label={t("claudeDesktop.assignmentsLabel")}>
 ```
 
 The lane header becomes a real disclosure button. Replacing the current
-`<header className="ocx-group-head">` block (`:334-352`):
+`<header className="opr-group-head">` block (`:334-352`):
 
 ```tsx
 const isCollapsed = collapsedFamilies.has(family);
@@ -178,32 +178,32 @@ const familyDefault = effectiveDefaults[family];
 return (
   <section
     key={family}
-    className={`ocx-group${isCollapsed ? " collapsed" : ""}`}
+    className={`opr-group${isCollapsed ? " collapsed" : ""}`}
     aria-labelledby={`claude-lane-${family}`}
     onDragOver={event => event.preventDefault()}
     onDrop={event => dropOnLane(event, family)}
   >
-    <header className={`ocx-group-head${isCollapsed ? "" : " open"}`}>
+    <header className={`opr-group-head${isCollapsed ? "" : " open"}`}>
       {/* A heading is not phrasing content, so the button goes INSIDE the h3, not the
           other way round (audit blocker 9). The heading stays in the a11y tree and the
           family name becomes the button's accessible name. */}
-      <h3 id={`claude-lane-${family}`} className="ocx-group-heading">
+      <h3 id={`claude-lane-${family}`} className="opr-group-heading">
         <button
           type="button"
-          className="ocx-group-toggle"
+          className="opr-group-toggle"
           aria-expanded={!isCollapsed}
           aria-controls={`claude-lane-body-${family}`}
           onClick={() => toggleFamily(family)}
         >
           <IconChevron
-            className="ocx-chevron"
+            className="opr-chevron"
             width={14}
             height={14}
             aria-hidden="true"
             style={{ transform: isCollapsed ? "none" : "rotate(90deg)" }}
           />
-          <span className="ocx-group-name">{t(FAMILY_KEYS[family])}</span>
-          <span className="ocx-group-count">
+          <span className="opr-group-name">{t(FAMILY_KEYS[family])}</span>
+          <span className="opr-group-count">
             {t(all.length === 1 ? "claudeDesktop.modelCountOne" : "claudeDesktop.modelCountMany", { count: all.length })}
           </span>
           {/* Collapsed legibility: the resolved default is the one thing a user opens a
@@ -252,7 +252,7 @@ undefined. So WP1 introduces the shared names NOW, and WP4 only consumes them:
 
 | Shared (introduced here, used by both pages) | Desktop-specific (stays `.claude-*`) |
 |---|---|
-| `.ocx-group-stack`, `.ocx-group`, `.ocx-group-head`, `.ocx-group-toggle`, `.ocx-group-heading`, `.ocx-group-name`, `.ocx-group-count`, `.ocx-chevron` | `.claude-lane-default`, `.claude-lane-models`, `.claude-lane-search`, `.claude-lane-more`, `.claude-lane-empty`, `.claude-model-*`, `.claude-alias`, `.claude-move-row`, `.claude-default-radio`, `.claude-default-needed`, `.claude-effort-badge` |
+| `.opr-group-stack`, `.opr-group`, `.opr-group-head`, `.opr-group-toggle`, `.opr-group-heading`, `.opr-group-name`, `.opr-group-count`, `.opr-chevron` | `.claude-lane-default`, `.claude-lane-models`, `.claude-lane-search`, `.claude-lane-more`, `.claude-lane-empty`, `.claude-model-*`, `.claude-alias`, `.claude-move-row`, `.claude-default-radio`, `.claude-default-needed`, `.claude-effort-badge` |
 
 Rule: a class is shared only when the two pages need the SAME chrome (the collapsible
 group shell). Anything that means "Claude family assignment" keeps its `.claude-` name,
@@ -265,27 +265,27 @@ because Grok has no aliases to edit, no default radio and no move control. Exist
 +   Grok page's native/routed groups, so the two dense surfaces cannot drift apart.
 +   Replaces the 4-column kanban — with a real catalog, three lanes sat empty beside
 +   one 4000px column. */
-+.ocx-group-stack { display: flex; flex-direction: column; gap: 10px; }
++.opr-group-stack { display: flex; flex-direction: column; gap: 10px; }
 ```
 
 ```css
-.ocx-group-toggle {
+.opr-group-toggle {
   display: flex; flex: 1; align-items: baseline; gap: 10px; min-width: 0; padding: 0;
   border: 0; background: transparent; color: inherit; cursor: pointer; text-align: left;
 }
-.ocx-group-heading { flex: 1; min-width: 0; margin: 0; font-size: 14px; }
-.ocx-group-name { font-size: 14px; font-weight: 600; }
-.ocx-chevron { flex-shrink: 0; color: var(--muted); transition: transform var(--motion-fast); }
-.ocx-group-count { color: var(--muted); font-size: 11.5px; }
+.opr-group-heading { flex: 1; min-width: 0; margin: 0; font-size: 14px; }
+.opr-group-name { font-size: 14px; font-weight: 600; }
+.opr-chevron { flex-shrink: 0; color: var(--muted); transition: transform var(--motion-fast); }
+.opr-group-count { color: var(--muted); font-size: 11.5px; }
 .claude-lane-default {
   min-width: 0; overflow: hidden; color: var(--faint); font-size: 11px;
   text-overflow: ellipsis; white-space: nowrap;
 }
-.ocx-group-head.open { border-bottom: 1px solid var(--border-soft); }
-.ocx-group.collapsed .ocx-group-head { border-bottom: 0; }
+.opr-group-head.open { border-bottom: 1px solid var(--border-soft); }
+.opr-group.collapsed .opr-group-head { border-bottom: 0; }
 ```
 
-`.ocx-group` and `.ocx-group-head` inherit the current `.claude-lane` / `.claude-lane-head`
+`.opr-group` and `.opr-group-head` inherit the current `.claude-lane` / `.claude-lane-head`
 declarations (`styles.css:1295-1302`) verbatim — the rules are renamed, not rewritten,
 so the visual result is unchanged and the diff stays reviewable.
 
@@ -340,7 +340,7 @@ already mounts React with Happy DOM in `gui/tests/subagents-busy-race.test.tsx`)
 
 Plus a small source-shape guard in the same file: `styles.css` no longer declares
 `grid-template-columns: repeat(4` for the family container, and `ClaudeDesktop.tsx`
-references `ocx-group-stack` rather than `claude-lanes`.
+references `opr-group-stack` rather than `claude-lanes`.
 
 ## Verification (C)
 

@@ -1,7 +1,7 @@
 /**
  * Bundled Bun runtime resolution.
  *
- * opencodex ships the Bun runtime via the `bun` npm dependency (esbuild-style:
+ * openprovider ships the Bun runtime via the `bun` npm dependency (esbuild-style:
  * a tiny main package + platform-specific `@oven/bun-*` optionalDependencies,
  * finalized by the package's own postinstall `node install.js`). The npm `bin`
  * launcher (bin/ocx.mjs) and the durable service/shim integrations both need a
@@ -77,7 +77,7 @@ export function durableBunRuntime(): DurableBunRuntime {
 /**
  * Bun path to bake into durable artifacts (launchd/systemd/Task Scheduler and
  * the Codex auto-start shim). Prefer the bundled binary — it lives under the
- * npm global prefix and survives across `ocx update` — and fall back to the
+ * npm global prefix and survives across `opr update` — and fall back to the
  * current runtime, which is Bun when launched normally.
  */
 export function durableBunPath(): string {

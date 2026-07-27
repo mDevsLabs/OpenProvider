@@ -25,7 +25,7 @@
   추가 코드 불필요. 활성화: `resolveInboundModel("<alias>[1m]") === route` 단언 테스트.
 - 활성화 시나리오: /v1/models 응답에 1M 모델만 [1m] 행 존재 + 비-1M 부재 단언;
   [1m] id로 /v1/messages 요청 → 올바른 라우팅(기존 endpoint 테스트 확장).
-  **(R2#6)** [1m] 스트립→라우트 단언 두 별칭 계열 각각: `claude-ocx-*[1m]`(순수 디코드) /
+  **(R2#6)** [1m] 스트립→라우트 단언 두 별칭 계열 각각: `claude-opr-*[1m]`(순수 디코드) /
   `claude-opus-4-8-*[1m]`(buildDesktop3pRegistry 선행) 2테스트.
 - **(감사 #6) 라이브 E2E 게이트(C, HOTL 사용자 확인)**: 2.1.207 실물에서 픽커에 [1m] 행
   표시 → 선택 → /context 1M 표시 + 프록시 로그에 정상 라우팅 캡처. 픽커가 대괄호 id를
@@ -42,7 +42,7 @@
   4번째 인자(Map<string, number>, 키=슬롯에 적힌 문자열 그대로)로 전달(순수성 유지).
   **(감사 #2+#7 → R2#1/#2) 조회 소스는 관리 API GET /api/claude-code 확장**: 응답에
   `contextWindows: Record<string, number>` 추가 — 각 모델을 **bare native slug,
-  provider/id, desktop3pAlias, **그리고 legacy `claude-ocx-*`(aliasForNative/aliasForRoute,
+  provider/id, desktop3pAlias, **그리고 legacy `claude-opr-*`(aliasForNative/aliasForRoute,
   R3#1)** 네 형식 키 전부로 등록(슬롯이 어느 형식을 저장했든 exact 매칭). 키 등록은
   **first-wins dedupe(R3#4)** — desktop3p 레지스트리와 동일 정책을 공유 헬퍼
   (`buildClaudeContextWindows`)에 고정, 충돌 테스트 포함. **(R3#2→R4#1)** cmdClaude의

@@ -12,13 +12,13 @@
 
 ## 증상
 
-정상 동작 중인 Task Scheduler 서비스를 `ocx status`와 Dashboard Startup Safety가
+정상 동작 중인 Task Scheduler 서비스를 `opr status`와 Dashboard Startup Safety가
 stale / AT RISK로 표시한다. 실제 작업과 프록시는 멀쩡히 돌아간다. Windows 11 + 2.7.39.
 
 ## 근본 원인
 
 Windows가 등록된 작업을 export할 때 스키마 기본값에 해당하는 요소를 생략한다.
-OpenCodex는 XML의 유효 의미가 아니라 요소의 문자적 존재를 검사한다.
+OpenProvider는 XML의 유효 의미가 아니라 요소의 문자적 존재를 검사한다.
 
 `src/service.ts:471`의 섹션 추출기는 여는/닫는 태그 쌍을 전제한다.
 
@@ -204,7 +204,7 @@ r1은 #408이 import 부근과 321-330행만 건드린다고 적었으나, **현
 따라서 WP2 착수 시 다음을 반드시 먼저 수행한다.
 
 ```bash
-gh pr diff 408 --repo lidge-jun/opencodex > /tmp/pr408.diff
+gh pr diff 408 --repo lidge-jun/openprovider > /tmp/pr408.diff
 ```
 
 확인 항목:

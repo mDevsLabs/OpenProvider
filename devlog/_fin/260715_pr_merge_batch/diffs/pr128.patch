@@ -366,16 +366,16 @@ index 78445619..9dabc7db 100644
      mkdirSync(agentsDir, { recursive: true });
      const victim = join(dir, "victim.md");
      writeFileSync(victim, "precious");
--    symlinkSync(victim, join(agentsDir, "ocx-linked.md"));
+-    symlinkSync(victim, join(agentsDir, "opr-linked.md"));
 +    try {
-+      symlinkSync(victim, join(agentsDir, "ocx-linked.md"));
++      symlinkSync(victim, join(agentsDir, "opr-linked.md"));
 +    } catch (e: unknown) {
 +      if ((e as NodeJS.ErrnoException).code === "EPERM") return; // skip on Windows without elevated symlink rights
 +      throw e;
 +    }
      syncClaudeAgentDefs([], dir); // prune pass
      expect(readFileSync(victim, "utf8")).toBe("precious");
-     expect(readdirSync(agentsDir)).toContain("ocx-linked.md");
+     expect(readdirSync(agentsDir)).toContain("opr-linked.md");
 
 From 60e307d3f5497c91345914c8d0ce474742dba9fb Mon Sep 17 00:00:00 2001
 From: Wibias <37517432+Wibias@users.noreply.github.com>
@@ -1342,7 +1342,7 @@ index 6bf587d9..cf334a26 100644
 +    const entries: RequestLogEntry[] = [];
 +    const response = responseWithDeferredRequestLog(
 +      new Response("provider says nope", { status: 400, headers: { "content-type": "text/plain" } }),
-+      "ocx-test-plain-upstream-error",
++      "opr-test-plain-upstream-error",
 +      Date.now(),
 +      { model: "opencode-free/deepseek-v4-flash-free", provider: "opencode-free" },
 +      entry => entries.push(entry),

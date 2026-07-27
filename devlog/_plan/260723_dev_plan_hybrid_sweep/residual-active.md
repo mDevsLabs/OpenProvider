@@ -1,7 +1,7 @@
 # residual-active.md
 
 - Measured: 2026-07-23T08:45:22.361848Z
-- Worktree: /Users/jun/.codex/worktrees/f655/opencodex
+- Worktree: /Users/jun/.codex/worktrees/f655/openprovider
 - HEAD: dd8eda0f
 - Policy: HYBRID (core blocks; deferred polish + memo may move)
 ## MOVE_WITH_MEMO

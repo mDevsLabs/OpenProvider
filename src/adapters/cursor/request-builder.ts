@@ -112,8 +112,8 @@ function catalogLimitNote(kept: readonly OcxTool[], omitted: readonly OcxTool[])
   const remainder = omitted.length - names.length;
   const omittedSummary = `${names.join(", ")}${remainder > 0 ? `, and ${remainder} more` : ""}`;
   return recoverable
-    ? `[opencodex] Cursor's transport limit allows ${kept.length} of ${kept.length + omitted.length} client tools this turn. Omitted: ${omittedSummary}. Use tool_search for a needed omitted tool; tools returned by tool_search are prioritized on the next turn.`
-    : `[opencodex] Cursor's transport limit allows ${kept.length} of ${kept.length + omitted.length} client tools this turn. Omitted and unavailable this turn: ${omittedSummary}.`;
+    ? `[openprovider] Cursor's transport limit allows ${kept.length} of ${kept.length + omitted.length} client tools this turn. Omitted: ${omittedSummary}. Use tool_search for a needed omitted tool; tools returned by tool_search are prioritized on the next turn.`
+    : `[openprovider] Cursor's transport limit allows ${kept.length} of ${kept.length + omitted.length} client tools this turn. Omitted and unavailable this turn: ${omittedSummary}.`;
 }
 
 /**
@@ -188,7 +188,7 @@ export function generatedCursorConversationId(): string {
 /** Derive an opaque provider-scoped Cursor id from the upstream client's conversation identity. */
 export function cursorConversationIdFromClientThread(threadId: string, identityScope?: string): string {
   const digest = createHash("sha256")
-    .update("ocx:cursor:thread:")
+    .update("opr:cursor:thread:")
     .update(identityScope?.trim() || "local")
     .update("\0")
     .update(threadId)

@@ -25,7 +25,7 @@ WP1-WP4를 전부 착륙.
 - PR #167 리뷰(Peirce): 서비스/재시작 본체는 dev가 상위 집합으로 커버하므로
   `updateChildStdio()`/`logSpawnOutput()` stdio 파이프만 포트(세 자식 stop/
   installer/service reinstall 전부, `serviceReinstallArgs()` 유지).
-- 이슈 #168: `ocx update --help`가 실제 self-update를 실행하던 결함.
+- 이슈 #168: `opr update --help`가 실제 self-update를 실행하던 결함.
   src/cli/index.ts + bin/ocx.mjs 양 진입로에 help 단축. 실기 검증: 양쪽 모두
   usage 출력 + exit 0 + 부작용 없음.
 

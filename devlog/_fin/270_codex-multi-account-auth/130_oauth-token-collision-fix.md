@@ -9,7 +9,7 @@ Pool account OAuth login can invalidate the main Codex CLI token (`~/.codex/auth
 **Root Cause** (confirmed via openai/codex#10332 + hermes-agent#22903):
 - OpenAI uses **single-use refresh token rotation**: each refresh token can only be used once
 - When the browser is already logged into ChatGPT as the main account and the user clicks "Add pool account", the OAuth flow auto-completes with the main account's session
-- Result: opencodex gets tokens for the SAME account as codex-rs
+- Result: openprovider gets tokens for the SAME account as codex-rs
 - When either process refreshes its token, the other's refresh token is permanently invalidated
 - codex-rs sees `token_invalidated` on `codex_apps` MCP startup
 

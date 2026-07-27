@@ -1,11 +1,11 @@
-# Claude Code web_search: How It Works Through OpenCodex Proxy
+# Claude Code web_search: How It Works Through OpenProvider Proxy
 
 Date: 2026-07-12
 Status: FINDINGS COMPLETE
 
 ## Executive Summary
 
-Claude Code supports web search when routed through the OpenCodex proxy.
+Claude Code supports web search when routed through the OpenProvider proxy.
 The mechanism is a sidecar loop that intercepts web_search tool calls from
 non-OpenAI models and executes them via a gpt-5.6-luna mini model through the
 ChatGPT passthrough backend.
@@ -57,7 +57,7 @@ Sidecar Loop (loop.ts):
 | src/web-search/loop.ts | runWithWebSearch() - agentic search loop |
 | src/server/responses.ts:868 | Integration point in request handler |
 
-### Configuration (opencodex.toml)
+### Configuration (openprovider.toml)
 
 ```toml
 [webSearchSidecar]
@@ -86,7 +86,7 @@ The sidecar activates when ALL of these are true:
 
 ## Claude Code CLI Behavior
 
-When Claude Code runs via `ocx claude`:
+When Claude Code runs via `opr claude`:
 
 1. Claude Code sends Anthropic Messages API requests
 2. OCX proxy translates to Responses API internally
@@ -118,7 +118,7 @@ When using native Anthropic models (claude-opus-4-8, claude-fable-5):
 - No built-in web_search sidecar
 - Would need custom middleware
 
-### OpenCodex Advantage
+### OpenProvider Advantage
 - Built-in sidecar gives routed models web search capability
 - Uses existing ChatGPT passthrough for real server-side web_search
 - Transparent to the model - sees web_search as a function tool

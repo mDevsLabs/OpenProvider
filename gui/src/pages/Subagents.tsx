@@ -73,7 +73,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
       const d = await readJsonOrThrow<{ applied?: string[] }>(r, t("sub.saveFailed"));
       if (d?.applied) setChosen(d.applied);
       setOk(true);
-      setStatus(t("sub.saved", { n: d?.applied?.length ?? 0, cmd: "ocx sync" }));
+      setStatus(t("sub.saved", { n: d?.applied?.length ?? 0, cmd: "opr sync" }));
     } catch (error) {
       setOk(false);
       setStatus(error instanceof Error && error.message ? error.message : t("sub.networkError"));

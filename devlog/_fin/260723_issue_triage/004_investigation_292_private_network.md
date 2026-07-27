@@ -8,12 +8,12 @@ Issue: `allowPrivateNetwork: true` allegedly ignored by custom-provider `GET /v1
 
 The reported user-visible failure is credible, but the proposed cause is not present in the current `origin/dev` code. Model discovery does **not** call the destination policy at all, and the complete provider object (including `allowPrivateNetwork`) survives config loading and discovery enrichment. A discovery call made against `198.18.0.1` is attempted whether the flag is `true` or `false`. Therefore #292 is **not confirmed as an “allowPrivateNetwork ignored by the discovery guard” bug**.
 
-There are two adjacent OpenCodex defects:
+There are two adjacent OpenProvider defects:
 
 1. discovery has the opposite policy-parity problem: it performs a raw fetch without any destination-policy check; and
 2. a successful HTTP response with a non-JSON body is parsed with `Response.json()`, then reduced to the unhelpful log label `SyntaxError`.
 
-The second defect exactly explains the reported symptom. It indicates a 2xx non-JSON response (for example from a proxy, WAF, or block page), not an exception thrown by OpenCodex's destination guard.
+The second defect exactly explains the reported symptom. It indicates a 2xx non-JSON response (for example from a proxy, WAF, or block page), not an exception thrown by OpenProvider's destination guard.
 
 ## Evidence anchors
 
@@ -179,7 +179,7 @@ Thus the data plane does not evaluate a reduced/different custom-provider shape:
 
 ## Discovery call graph
 
-### `ocx sync`
+### `opr sync`
 
 The CLI dispatch is `src/cli/index.ts:550-552`:
 
@@ -199,7 +199,7 @@ export async function syncModelsToCodex(
   log: Pick<Console, "log" | "error"> | null = console,
   deps: CodexSyncDeps = defaultDeps,
 ): Promise<CodexSyncResult> {
-  applyProxyEnv(config); // `ocx ensure`/`ocx sync` fetch provider models outside the server process
+  applyProxyEnv(config); // `opr ensure`/`opr sync` fetch provider models outside the server process
   const p = port ?? config.port ?? 10100;
   let added = 0;
   let catalogPath: string | null = null;
@@ -350,7 +350,7 @@ try {
     const stale = getStaleCached(name);
     const fallback = stale ? "stale" : "configured";
     console.warn(
-      `[opencodex] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
+      `[openprovider] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
     );
     return stale ? withVertexDefaultSeed(applyConfigHintsToCachedModels(name, prov, stale, contextCap)) : configured;
   }
@@ -375,7 +375,7 @@ Any 2xx HTML/text block response throws a JavaScript `SyntaxError`. The catch re
   const stale = getStaleCached(name);
   const fallback = stale ? "stale" : "configured";
   console.warn(
-    `[opencodex] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
+    `[openprovider] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
   );
   return stale ? withVertexDefaultSeed(applyConfigHintsToCachedModels(name, prov, stale, contextCap)) : configured;
 }
@@ -468,11 +468,11 @@ Regression points:
 
 ## Verdict
 
-**OpenCodex bug, partially confirmed — but not with the issue's stated root cause.** The “discovery guard ignores `allowPrivateNetwork`” claim is false on current `origin/dev`: discovery has no guard, and the flag is neither dropped nor evaluated against a different shape. The user-visible empty-model/SyntaxError behavior is an OpenCodex diagnostic defect consistent with a 2xx non-JSON intermediary response. Separately, discovery's complete omission of destination-policy enforcement is a real policy-parity/security defect.
+**OpenProvider bug, partially confirmed — but not with the issue's stated root cause.** The “discovery guard ignores `allowPrivateNetwork`” claim is false on current `origin/dev`: discovery has no guard, and the flag is neither dropped nor evaluated against a different shape. The user-visible empty-model/SyntaxError behavior is an OpenProvider diagnostic defect consistent with a 2xx non-JSON intermediary response. Separately, discovery's complete omission of destination-policy enforcement is a real policy-parity/security defect.
 
 ## Recommended direction
 
-Patch `fetchProviderModels` at `src/codex/catalog.ts:1440-1445`: validate the effective model URL with the full `{ baseUrl, allowPrivateNetwork }` decision before fetch, then add content-type-aware/safe JSON failure diagnostics. Do not claim this alone restores the reporter's provider; request a same-process response status/content-type trace after the diagnostic patch because the existing `SyntaxError` points to an intermediary response, not an OpenCodex guard rejection.
+Patch `fetchProviderModels` at `src/codex/catalog.ts:1440-1445`: validate the effective model URL with the full `{ baseUrl, allowPrivateNetwork }` decision before fetch, then add content-type-aware/safe JSON failure diagnostics. Do not claim this alone restores the reporter's provider; request a same-process response status/content-type trace after the diagnostic patch because the existing `SyntaxError` points to an intermediary response, not an OpenProvider guard rejection.
 
 ## Effort estimate
 

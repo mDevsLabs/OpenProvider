@@ -35,7 +35,7 @@ Earlier v1 three-provider configurations migrate automatically into the single o
 
 ## Integration path
 
-`ocx init`, `ocx start`, and `ocx sync` keep these Codex files aligned under the resolved
+`opr init`, `opr start`, and `opr sync` keep these Codex files aligned under the resolved
 `CODEX_HOME` directory:
 
 ```text
@@ -132,7 +132,7 @@ OpenProvider adds a 3-state override for the `multi_agent_version` field on ever
 | **base** (install default) | Restore upstream pins: Sol/Terra use v2, Luna uses v1, and unpinned models follow the Codex `multi_agent_v2` feature flag. |
 | **v2** | Force every model to the v2 multi-agent surface, overriding upstream pins (including Luna). |
 
-Set the mode from the Dashboard or Models page, `ocx v2 mode v1|default|v2`, or `PUT /api/v2`
+Set the mode from the Dashboard or Models page, `opr v2 mode v1|default|v2`, or `PUT /api/v2`
 with `{ "multiAgentMode": "v1" }`. Changes apply to new Codex sessions.
 
 :::caution
@@ -183,7 +183,7 @@ particular, featured model overrides do not bypass v2's parent-model inheritance
 If the picker still shows stale entries, refresh the catalog and restart the target Codex surface:
 
 ```bash
-ocx sync
+opr sync
 ```
 
 OpenProvider rewrites `models_cache.json` with a deliberately stale cache wrapper whenever catalog

@@ -28,7 +28,7 @@ Sources: [llm-gateway-protocol](https://code.claude.com/docs/en/llm-gateway-prot
 | G12 | Gateways must forward/accept `anthropic-version` (currently `2023-06-01`) and `anthropic-beta` unchanged; treat beta values as open lists | "Forward `anthropic-version` and `anthropic-beta` unchanged" |
 | G13 | Streaming is mandatory for inference; a buffering gateway stalls the client | protocol reference |
 
-**D6 status: CONFIRMED with amendments.** Alias format `claude-ocx-<provider>--<slug>`
+**D6 status: CONFIRMED with amendments.** Alias format `claude-opr-<provider>--<slug>`
 satisfies G3 (begins with `claude`). 020's "flavor detection" gains a hard fact:
 discovery sends `?limit=1000` + Anthropic-style auth headers (G2/G7).
 
@@ -131,7 +131,7 @@ codeCommand.ts, createEnvVariables.ts, server.ts), CCR issues #504/#575/#744.
    (G2) — no pagination fields needed; detection signal = `anthropic-version`
    header OR `?limit=` + Bearer/x-api-key (G7); 3s budget → discovery branch must
    not await catalog network refresh (serve from cached registry) (G8);
-   `ocx claude` also sets `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` (G1);
+   `opr claude` also sets `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` (G1);
    slot injection uses `ANTHROPIC_DEFAULT_HAIKU_MODEL` (+ legacy
    `ANTHROPIC_SMALL_FAST_MODEL` for old versions) per E2; set AUTH_TOKEN only,
    never API_KEY too (E1); `HEAD /` must not 500 (E4 — static handler already

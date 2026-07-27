@@ -10,7 +10,7 @@
 
 ### 결정
 
-가드 실패를 전면 치명적으로 만들지 않는다(그러면 `ocx restart`가 막히고 로컬 정리도 못 한다). 대신 **공유 자원 정리만 건너뛴다.**
+가드 실패를 전면 치명적으로 만들지 않는다(그러면 `opr restart`가 막히고 로컬 정리도 못 한다). 대신 **공유 자원 정리만 건너뛴다.**
 
 ```diff
    let stopFailed = false;
@@ -44,7 +44,7 @@
 +  } else {
 +    console.error(
 +      "⚠️  Left the Grok Build managed block in place: the installed service could not be stopped "
-+      + "from this home, so it may still be serving those models. Re-run `ocx stop` from the "
++      + "from this home, so it may still be serving those models. Re-run `opr stop` from the "
 +      + "installing home, or remove the fenced block manually.",
 +    );
 +    process.exitCode = 1;
@@ -57,8 +57,8 @@
 
 데몬은 `OCX_SERVICE=1`일 때 `syncCleanup`에서 strip을 일부러 건너뛴다(`cli/index.ts:212`) — 재시작 사이에 블록을 유지하려는 설계다. 문제는 **영구 종료** 경로도 아무도 지우지 않는다는 점이다:
 
-- `ocx service stop` (`src/service.ts:1149`) — `stripGrokConfig` 호출 없음. 파일 전체에 해당 심볼이 없다.
-- `ocx service uninstall|remove` (`:1165`) — 동일.
+- `opr service stop` (`src/service.ts:1149`) — `stripGrokConfig` 호출 없음. 파일 전체에 해당 심볼이 없다.
+- `opr service uninstall|remove` (`:1165`) — 동일.
 - 대시보드 `POST /api/stop` (`src/server/management-api.ts:136`) — 동일. 게다가 `stopServiceIfInstalled()`이 **무방비**라, 소유권 불일치 시 핸들러가 통째로 throw되어 `restoreNativeCodex`도, 200 응답도, 드레인 타이머도 실행되지 않는다. CLI보다 나쁜 상태다.
 
 ### 변경 A — `src/service.ts`
@@ -77,7 +77,7 @@
        }
 +      // Intentional, permanent teardown: the service-mode daemon deliberately keeps the
 +      // Grok fence across respawns, so this path owns removing it. Otherwise the generated
-+      // [model.ocx-*] entries survive pointing at a dead endpoint.
++      // [model.opr-*] entries survive pointing at a dead endpoint.
 +      stripGrokConfigBestEffort();
        break;
 ```
@@ -87,12 +87,12 @@
 헬퍼는 동적 import로 두어 모듈 사이클을 피한다:
 
 ```ts
-/** Remove the opencodex-managed ~/.grok block; never fails a teardown command. */
+/** Remove the openprovider-managed ~/.grok block; never fails a teardown command. */
 function stripGrokConfigBestEffort(): void {
   try {
     const { stripGrokConfig } = require("./grok/inject") as typeof import("./grok/inject");
     const r = stripGrokConfig();
-    if (r.changed) console.log("↩️  Removed the opencodex managed block from Grok config.");
+    if (r.changed) console.log("↩️  Removed the openprovider managed block from Grok config.");
   } catch { /* best-effort */ }
 }
 ```
@@ -131,8 +131,8 @@ function stripGrokConfigBestEffort(): void {
 신규 `tests/grok-lifecycle.test.ts`:
 
 1. `handleStop skips the shared Grok strip when the ownership guard fails` — `src/cli/index.ts`에서 `async function handleStop`부터 다음 `async function`까지 슬라이스한 뒤, `sharedTeardownSafe = false`가 catch 안에 있고 `stripGrokConfig()` 호출이 `if (sharedTeardownSafe)` 블록 안에 있음을 단언.
-2. `ocx service stop strips the Grok fence after restoring Codex` — `service.ts`의 `case "stop":` 슬라이스에서 `stripGrokConfig` 존재와 `restoreNativeCodex` 뒤 순서를 단언.
-3. `ocx service uninstall strips the Grok fence` — 동일 패턴.
+2. `opr service stop strips the Grok fence after restoring Codex` — `service.ts`의 `case "stop":` 슬라이스에서 `stripGrokConfig` 존재와 `restoreNativeCodex` 뒤 순서를 단언.
+3. `opr service uninstall strips the Grok fence` — 동일 패턴.
 4. `POST /api/stop guards the service stop and strips the fence` — `management-api.ts` 슬라이스에서 `stopServiceIfInstalled()`가 try 안에 있고 `stripGrokConfig`가 존재함을 단언.
 5. `service-mode daemon shutdown still keeps the fence` — `cli/index.ts`의 `syncCleanup` 슬라이스에서 `!process.env.OCX_SERVICE` 가드가 유지됨을 단언 (회귀 방지: 크래시/respawn 예외를 없애면 안 된다).
 

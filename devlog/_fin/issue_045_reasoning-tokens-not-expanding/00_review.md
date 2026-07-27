@@ -21,7 +21,7 @@ output item's **`summary`** array (`summary_text` parts). The wall-clock
 "Worked for Xs" label is driven separately (elapsed time / `reasoning_tokens`
 usage), so it can appear even when there is no expandable summary content.
 
-opencodex emits two different reasoning shapes depending on the upstream signal:
+openprovider emits two different reasoning shapes depending on the upstream signal:
 
 1. `thinking_delta` (e.g. Anthropic-style thinking) →
    `src/bridge.ts` `closeCurrentReasoning()` emits
@@ -47,19 +47,19 @@ The openai-chat adapter maps an upstream `reasoning_content` field to
   `{ type: "reasoning_raw_delta" }`)
 - non-stream: `src/adapters/openai-chat.ts` ~L330 (`msg.reasoning_content` → same)
 
-So for chat-completions providers that DO return `reasoning_content`, opencodex
+So for chat-completions providers that DO return `reasoning_content`, openprovider
 delivers it as raw reasoning **content** with an empty **summary**, which Codex
 does not render as an expandable trace. This matches the report exactly.
 
 ### Two distinct sub-cases (both look identical to the user)
 
-- **(A) Provider returns `reasoning_content`** (DeepSeek-R-style): opencodex emits
+- **(A) Provider returns `reasoning_content`** (DeepSeek-R-style): openprovider emits
   a reasoning item with empty `summary` → timer shows, expand is empty. This is
-  the **opencodex-side formatting gap** and is fixable.
+  the **openprovider-side formatting gap** and is fixable.
 - **(B) Provider returns no reasoning at all** (many free models, incl. likely
   "DeepSeek v4 flash free" / "Mimo v2.5 free"): there is no reasoning to show;
   "Worked for Xs" is just elapsed time. This is a **model limitation**, not an
-  opencodex bug. The user's option 2 hypothesis is correct for these.
+  openprovider bug. The user's option 2 hypothesis is correct for these.
 
 To confirm which sub-case applies, capture a raw upstream chunk for the affected
 models (check whether `choices[].delta.reasoning_content` is ever present).
@@ -99,6 +99,6 @@ model to emit reasoning; free models that don't will only show the timer.
 
 - Effort: small (1 bridge case + 1 close helper + 1 test).
 - Risk: low. Touches only reasoning-item shaping; does not affect text/tool flow.
-- Reply to reporter: confirm sub-case A is an opencodex formatting gap (fix
+- Reply to reporter: confirm sub-case A is an openprovider formatting gap (fix
   planned); sub-case B is a model limitation. Ask for a raw chunk sample to
   confirm which models emit `reasoning_content`.

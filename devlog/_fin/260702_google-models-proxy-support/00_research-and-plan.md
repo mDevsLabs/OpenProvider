@@ -28,7 +28,7 @@ PR #55 attempts this but is unmergeable:
 models/subagents pages hang: every provider `/models` fetch runs the full
 `AbortSignal.timeout(8000)` (src/codex-catalog.ts:711) before failing. Nothing in src/
 applies HTTP_PROXY/HTTPS_PROXY (only src/doctor.ts:76 *reports* them). Key runtime fact:
-**ocx always runs on Bun** — the npm `bin/ocx.mjs` is a Node shim that execs a bundled Bun
+**opr always runs on Bun** — the npm `bin/ocx.mjs` is a Node shim that execs a bundled Bun
 (see bin/ocx.mjs header comment). So any proxy fix must work with *Bun's* fetch;
 undici `setGlobalDispatcher`/`EnvHttpProxyAgent` does not apply.
 
@@ -68,7 +68,7 @@ Findings land in `01_research-findings.md` when agents report back.
 ### Fix B — outbound proxy support (issue #54)
 
 - Depends on research: if Bun's fetch already honors HTTP(S)_PROXY env, the gap is
-  config/UX (users launch ocx without the env). Then: add a global `proxy` config option
+  config/UX (users launch opr without the env). Then: add a global `proxy` config option
   (and/or read env as fallback), thread it into provider fetch call sites via Bun's
   per-request `proxy` init option through one shared helper.
 - Secondary UX: failed provider fetches should not stall the UI for the full 8s
@@ -93,5 +93,5 @@ One logical commit per fix on top of `cursor-fixes`:
 ## Verification plan
 
 - `bun x tsc --noEmit` + `bun test ./tests/` green.
-- Manual: `ocx start` with a real Gemini API key → google models visible in catalog;
+- Manual: `opr start` with a real Gemini API key → google models visible in catalog;
   with `HTTPS_PROXY` set to a local mitm/dummy → provider fetches route through it.

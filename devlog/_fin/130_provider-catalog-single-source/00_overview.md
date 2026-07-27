@@ -2,9 +2,9 @@
 
 ## What this phase is
 
-opencodex advertises and configures LLM providers through **three hand-maintained catalogs**
+openprovider advertises and configures LLM providers through **three hand-maintained catalogs**
 that are supposed to stay aligned but are edited independently. When they drift, users see a
-provider in the GUI that `ocx init` cannot offer, or a configured provider that never receives
+provider in the GUI that `opr init` cannot offer, or a configured provider that never receives
 bundled jawcode model metadata in the Codex catalog.
 
 Docs 00–02 inventory every catalog entry across the three surfaces, document the two hotfixed
@@ -19,8 +19,8 @@ why manual triple-maintenance fails:
 
 | ID | Symptom | Root cause | Hotfix (this cycle) |
 |----|---------|------------|---------------------|
-| **BUG A** | `opencode-go` appeared in the GUI quick-pick (`AddProviderModal.tsx:35`) and had bundled metadata (`PROVIDER_ALIASES` → `opencode-go`), but **`ocx init` could not offer it** and `enrichProviderFromCatalog("opencode-go", …)` was a no-op | GUI `PRESETS` + metadata alias existed; `KEY_LOGIN_PROVIDERS` entry was missing | Added `opencode-go` to `KEY_LOGIN_PROVIDERS` (`key-providers.ts:75-77`) |
-| **BUG B** | `minimax` / `minimax-cn` were in `KEY_LOGIN_PROVIDERS` (`key-providers.ts:71-72`) but **had no metadata alias** → no bundled jawcode rows; jawcode also uses different provider id naming (`minimax` / `minimax-code` / `minimax-code-cn` vs opencodex `minimax` / `minimax-cn`) | Metadata generator never mapped opencodex ids to jawcode's `minimax` bundle | Added `minimax` / `minimax-cn` → `minimax` in `PROVIDER_ALIASES` (`generate-jawcode-metadata.ts:15-16`) and regenerated `jawcode-model-metadata.ts` |
+| **BUG A** | `opencode-go` appeared in the GUI quick-pick (`AddProviderModal.tsx:35`) and had bundled metadata (`PROVIDER_ALIASES` → `opencode-go`), but **`opr init` could not offer it** and `enrichProviderFromCatalog("opencode-go", …)` was a no-op | GUI `PRESETS` + metadata alias existed; `KEY_LOGIN_PROVIDERS` entry was missing | Added `opencode-go` to `KEY_LOGIN_PROVIDERS` (`key-providers.ts:75-77`) |
+| **BUG B** | `minimax` / `minimax-cn` were in `KEY_LOGIN_PROVIDERS` (`key-providers.ts:71-72`) but **had no metadata alias** → no bundled jawcode rows; jawcode also uses different provider id naming (`minimax` / `minimax-code` / `minimax-code-cn` vs openprovider `minimax` / `minimax-cn`) | Metadata generator never mapped openprovider ids to jawcode's `minimax` bundle | Added `minimax` / `minimax-cn` → `minimax` in `PROVIDER_ALIASES` (`generate-jawcode-metadata.ts:15-16`) and regenerated `jawcode-model-metadata.ts` |
 
 BUG A violated the explicit **GUI↔CLI parity contract** in `init.ts`. BUG B broke the metadata
 enrichment path in `codex-catalog.ts:90-99`.
@@ -34,7 +34,7 @@ the GUI uses**, plus a small hardcoded set:
 /**
  * The full CLI provider menu, built from the SAME registries the GUI uses (OAUTH_PROVIDERS +
  * KEY_LOGIN_PROVIDERS) plus the ChatGPT-forward, a few non-catalog key providers, and local servers —
- * so `ocx init` reaches provider parity with the GUI. Exported for verification.
+ * so `opr init` reaches provider parity with the GUI. Exported for verification.
  */
 ```
 
@@ -66,7 +66,7 @@ the three is derived from a shared canonical list today.
 | Surface | Primary location | Consumed by | Count (authoring time) |
 |---------|------------------|-------------|------------------------|
 | **A — GUI** | Static `PRESETS` (`AddProviderModal.tsx:29-43`) + `/api/key-providers` → `KEY_LOGIN_PROVIDERS` | Add-provider modal search/quick-pick | 13 featured static (excl. `custom`) + 31 key-login deduped → **43** selectable (when proxy up) |
-| **B — CLI / registry** | `OAUTH_PROVIDERS` (`oauth/index.ts:19-65`), `buildInitProviders()` (`init.ts:38-61`), `KEY_LOGIN_PROVIDERS` (`key-providers.ts:26-91`) | `ocx init`, `enrichProviderFromCatalog`, login CLI | 43 init rows (1 forward + 3 oauth + 5 hardcoded key + 31 key-login + 3 local) |
+| **B — CLI / registry** | `OAUTH_PROVIDERS` (`oauth/index.ts:19-65`), `buildInitProviders()` (`init.ts:38-61`), `KEY_LOGIN_PROVIDERS` (`key-providers.ts:26-91`) | `opr init`, `enrichProviderFromCatalog`, login CLI | 43 init rows (1 forward + 3 oauth + 5 hardcoded key + 31 key-login + 3 local) |
 | **C — Metadata** | `PROVIDER_ALIASES` (`generate-jawcode-metadata.ts:4-17`) → `src/generated/jawcode-model-metadata.ts` | `resolveJawcodeProvider` / `getJawcodeModelMetadata` → `applyJawcodeCatalogMetadata` (`codex-catalog.ts:90-99`) | 10 alias keys → 7 jawcode bundles |
 
 ## Scope & baseline

@@ -3,7 +3,7 @@ title: Configuration Reference
 description: Every field in ~/.OpenProvider/config.json — top-level options, providers, and sidecars.
 ---
 
-OpenProvider is configured by `~/.OpenProvider/config.json`. It's written by `ocx init` and the dashboard,
+OpenProvider is configured by `~/.OpenProvider/config.json`. It's written by `opr init` and the dashboard,
 but you can edit it directly; the proxy reloads it on start. If the file cannot be parsed (e.g.
 truncated or invalid JSON), OpenProvider backs it up to `config.json.invalid-<timestamp>`, prints a
 console warning, and starts with defaults. Missing files also fall back to a default (a single
@@ -40,7 +40,7 @@ differing backup and rewrites known legacy namespaced selected ids to bare ids.
 | `injectionPrompt?` | `string` | — | Custom override for the injected v2 guidance body. Replaces the built-in text; `{{model}}`, `{{effort}}`, and `{{roster}}` placeholders are substituted. Firing gates are unchanged. Settable via `PUT /api/injection-model` (`prompt` key). |
 | `multiAgentGuidanceEnabled?` | `boolean` | `true` | Controls only OpenProvider-authored multi-agent developer guidance. Unset/`true` preserves v1/v2 guidance; `false` suppresses both without changing the collaboration surface, `subagentModels`, routing, or effort caps. `GET/PUT /api/injection-model` exposes the effective value; PUT is a partial update. |
 | `disabledModels?` | `string[]` | — | Models hidden from Codex. Routed `provider/model` ids are excluded from the catalog and `/v1/models`; bare native GPT slugs (e.g. `gpt-5.4`) flip their catalog entry to `visibility: "hide"` and drop from the bare `/v1/models` list. Toggleable per model from the dashboard Models page. |
-| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3-state multi-agent surface override. `"v1"` forces all models to the v1 surface (overrides upstream pins); `"default"` respects upstream model pins (sol/terra=v2, luna=v1); `"v2"` forces all models to v2. Settable from the dashboard Models page or `ocx v2 mode`. |
+| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3-state multi-agent surface override. `"v1"` forces all models to the v1 surface (overrides upstream pins); `"default"` respects upstream model pins (sol/terra=v2, luna=v1); `"v2"` forces all models to v2. Settable from the dashboard Models page or `opr v2 mode`. |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | Per-provider Codex-visible context caps. A cap only lowers known context windows. |
 | `contextCapValue?` | `number` | `350000` | Value used by the dashboard's context-cap controls; changing it updates every enabled entry in `providerContextCaps`. |
 | `stallTimeoutSec?` | `number` | `300` | Seconds without upstream data before the bridge aborts and emits `response.incomplete`. Minimum 1. |
@@ -48,9 +48,9 @@ differing backup and rewrites known legacy namespaced selected ids to bare ids.
 | `shutdownTimeoutMs?` | `number` | `5000` | Graceful drain deadline before active turns are aborted. |
 | `websockets?` | `boolean` | `false` | Advertise `supports_websockets` so Codex uses the Responses WebSocket path. Omit or set `false` to keep HTTP/SSE. |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | Additional generated `ocx_…` credentials accepted by management and data-plane auth on non-loopback binds. Managed by the dashboard; entry fields are listed below. |
-| `codexAutoStart?` | `boolean` | `true` | Let the Codex shim run `ocx ensure` before launching Codex. `false` makes `ocx ensure` a no-op. |
+| `codexAutoStart?` | `boolean` | `true` | Let the Codex shim run `opr ensure` before launching Codex. `false` makes `opr ensure` a no-op. |
 | `codexShimAutoRestore?` | `boolean` | `true` | Restore a previously installed Codex shim when a completed external Codex update replaces it. Set `false`, or set `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` for a process-level opt-out. |
-| `syncResumeHistory?` | `boolean` | `true` | Reversible Codex App history compatibility mode. OpenProvider backs up original Codex thread metadata, remaps old OpenAI interactive rows to `OpenProvider`, and temporarily promotes OpenProvider-created `exec` rows to an app-visible source. `ocx stop` / `ocx restore` restore backed-up OpenAI rows and eject remaining OpenProvider user threads to OpenAI so native Codex can resume them after the proxy is removed from `config.toml`. Set `false` to opt out. |
+| `syncResumeHistory?` | `boolean` | `true` | Reversible Codex App history compatibility mode. OpenProvider backs up original Codex thread metadata, remaps old OpenAI interactive rows to `OpenProvider`, and temporarily promotes OpenProvider-created `exec` rows to an app-visible source. `opr stop` / `opr restore` restore backed-up OpenAI rows and eject remaining OpenProvider user threads to OpenAI so native Codex can resume them after the proxy is removed from `config.toml`. Set `false` to opt out. |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | ChatGPT/Codex pool account metadata managed by the Codex Auth dashboard. Secrets live separately in `codex-accounts.json`. |
 | `activeCodexAccountId?` | `string` | — | Manually selected Pool account. Selection clears existing thread affinity and applies to the next request; in-flight requests keep their captured account. |
 | `autoSwitchThreshold?` | `number` | `80` | Usage percent threshold for new-session auto-switching. The score uses the hottest known 5h, weekly, or 30d quota window. Set `0` to disable quota auto-switching. |
@@ -63,12 +63,12 @@ differing backup and rewrites known legacy namespaced selected ids to bare ids.
 | `corsAllowOrigins?` | `string[]` | `[]` | Additional exact origins allowed by CORS. Loopback origins are always allowed. |
 
 `maxConcurrentThreadsPerSession` is the camel-case field used by `PUT /api/v2`, not a
-`config.json` key. `ocx v2 threads <n>` persists the corresponding
+`config.json` key. `opr v2 threads <n>` persists the corresponding
 `max_concurrent_threads_per_session` value under `[features.multi_agent_v2]` in Codex's
 `$CODEX_HOME/config.toml`; enable v2 first so that table exists.
 
 If an older development build already ran `syncResumeHistory` before backup support existed, you can
-also force the same native-provider recovery with `ocx recover-history --legacy-openai`.
+also force the same native-provider recovery with `opr recover-history --legacy-openai`.
 
 :::note[Codex account pool]
 Use the dashboard's **Codex Auth** page to add pool accounts and refresh quotas. The config stores
@@ -79,7 +79,7 @@ on quota, cooldown, and health.
 
 ### claudeCode (OcxClaudeCodeConfig)
 
-Claude Code inbound settings consumed by the `/v1/messages` surface, the `ocx claude`
+Claude Code inbound settings consumed by the `/v1/messages` surface, the `opr claude`
 launcher, and the GUI Claude page. Native-passthrough body bounds (added with the
 body-occupancy guard):
 
@@ -122,11 +122,11 @@ Set the `OpenProvider_API_AUTH_TOKEN` environment variable before starting:
 
 ```bash
 export OpenProvider_API_AUTH_TOKEN="your-secret-token"
-ocx start
+opr start
 ```
 
 The proxy refuses to start without this variable when binding beyond loopback. If you install a
-background service for LAN access, export the same variable before `ocx service install` so launchd,
+background service for LAN access, export the same variable before `opr service install` so launchd,
 systemd, or Task Scheduler receives it. Clients must include the token in every request via the
 `x-OpenProvider-api-key` header:
 
@@ -245,7 +245,7 @@ Responses providers so passthrough stays byte-for-byte identical to upstream.
 
 ## Cursor provider (`adapter: "cursor"`)
 
-The Cursor bridge is experimental. After `ocx login cursor`, add or edit the `cursor` entry under
+The Cursor bridge is experimental. After `opr login cursor`, add or edit the `cursor` entry under
 `providers` in `~/.OpenProvider/config.json` (Windows: `%USERPROFILE%\.OpenProvider\config.json`).
 
 Cursor Router's complete optimization ladder is exposed as separate Codex model ids because Codex's
@@ -294,7 +294,7 @@ The field belongs on the **provider object** (`providers.cursor`), not at the to
 
 You can also set it from the [web dashboard](/guides/web-dashboard/): **Providers →
 Cursor → Edit JSON**, set `"nativeLocalExec"` to `"off"`, `"on"`, or `"codex-sandbox"`, save, then
-restart the proxy (`ocx restart` or `ocx stop` + `ocx start`).
+restart the proxy (`opr restart` or `opr stop` + `opr start`).
 
 The legacy `unsafeAllowNativeLocalExec: true` boolean is still accepted and is equivalent to
 `nativeLocalExec: "on"` when `nativeLocalExec` is unset; an explicit `nativeLocalExec` value always
@@ -490,7 +490,7 @@ providers store no key at all.
 :::note[Atomic writes]
 All config and catalog files (`config.toml`, `OpenProvider-catalog.json`) are written atomically via
 `atomicWriteFile` (temp file + rename). This prevents half-written files when concurrent writers —
-e.g. `ocx stop` and the proxy's own shutdown handler — both restore Codex at the same time.
+e.g. `opr stop` and the proxy's own shutdown handler — both restore Codex at the same time.
 :::
 
 

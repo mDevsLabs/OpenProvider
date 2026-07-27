@@ -125,10 +125,10 @@ replaceHash("providers")   // history 항목을 남기지 않는다
 
 ```text
 // use-app-route-state.ts 초기화 시점, ensureMigratedViewMode() 자리를 대체
-const STALE_VIEW_KEYS = ["ocx-global-view", "ocx-view", "ocx-providers-view",
-  "ocx-subagents-view", "ocx-storage-view", "ocx-codexauth-view", "ocx-apikeys-view",
-  "ocx-claudecode-view", "ocx-usage-view", "ocx-logs-view", "ocx-models-view",
-  "ocx-dashboard-view"];
+const STALE_VIEW_KEYS = ["opr-global-view", "opr-view", "opr-providers-view",
+  "opr-subagents-view", "opr-storage-view", "opr-codexauth-view", "opr-apikeys-view",
+  "opr-claudecode-view", "opr-usage-view", "opr-logs-view", "opr-models-view",
+  "opr-dashboard-view"];
 try { for (const k of STALE_VIEW_KEYS) localStorage.removeItem(k); } catch { /* ignore */ }
 ```
 
@@ -178,7 +178,7 @@ git diff --check
 2. `#providers/workspace`로 직접 이동 → `#providers`로 조용히 바뀌는지, 뒤로가기가
    정상인지 확인
 3. 4개 페이지가 전부 Workspace 레이아웃(Subagents만 Classic)으로 뜨는지 확인
-4. localStorage에 `ocx-*-view` 키가 남아있지 않은지 DevTools로 확인
+4. localStorage에 `opr-*-view` 키가 남아있지 않은지 DevTools로 확인
 
 ## 위험
 

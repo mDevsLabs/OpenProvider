@@ -11,7 +11,7 @@
 
 ## Objective
 
-Decide how opencodex should serve Claude Code (and other Anthropic-SDK clients) the
+Decide how openprovider should serve Claude Code (and other Anthropic-SDK clients) the
 way it already serves Codex — "use any LLM with Claude Code" — reusing the existing
 provider stack (OAuth store, account pool, adapters, key failover, vision/web-search
 sidecars) so login state carries over with zero extra auth work.
@@ -36,9 +36,9 @@ Questions this unit answers:
   says: no separate dashboard process.
 - **CCR's router slots map Claude Code's model slots**: `default`, `background`
   (haiku/small-fast slot), `think`, `longContext`, `webSearch`. This is the feature
-  users actually configure; opencodex needs an equivalent (env injection first,
+  users actually configure; openprovider needs an equivalent (env injection first,
   optional inbound modelMap later).
-- **opencodex already has the right seam**: `handleResponsesCompact`
+- **openprovider already has the right seam**: `handleResponsesCompact`
   (src/server/responses.ts) builds an internal `/v1/responses` Request and calls
   `handleResponses` — an Anthropic inbound can follow the same pattern with two
   translators (Anthropic req -> Responses req; Responses SSE/JSON -> Anthropic
@@ -55,10 +55,10 @@ Questions this unit answers:
 
 | # | Decision | Rationale |
 |---|----------|-----------|
-| D1 | Implement inbound `/v1/messages` INSIDE opencodex, same daemon/port | Reuses provider stack + login state; matches CCR one-port precedent; ccs-wrapper stays deprecated |
+| D1 | Implement inbound `/v1/messages` INSIDE openprovider, same daemon/port | Reuses provider stack + login state; matches CCR one-port precedent; ccs-wrapper stays deprecated |
 | D2 | Dashboard: integrate into existing GUI (new "Claude Code" section later; Logs/Usage work day one) | One daemon, one GUI; separate dashboard adds a process + auth surface for no gain |
 | D3 | Internal architecture: translate-and-replay through `handleResponses` (compact-handler pattern) | Avoids duplicating ~400 lines of routing/auth/failover; SSE translation needed either way |
-| D4 | Launcher: `ocx claude [args...]` injects `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, optional `ANTHROPIC_MODEL`/`ANTHROPIC_SMALL_FAST_MODEL` from `config.claudeCode`, auto-`ensure`s the proxy | Mirrors `ccr code` UX; zero manual env setup |
+| D4 | Launcher: `opr claude [args...]` injects `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, optional `ANTHROPIC_MODEL`/`ANTHROPIC_SMALL_FAST_MODEL` from `config.claudeCode`, auto-`ensure`s the proxy | Mirrors `ccr code` UX; zero manual env setup |
 | D5 | Model mapping v1 = env slot injection + optional `claudeCode.modelMap` (exact id, then date-stripped) | Covers CCR's `default`/`background` slots without new GUI work |
 | D6 | Picker visibility via the official gateway model discovery protocol (`GET /v1/models` + `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1`, Claude Code >= 2.1.129): expose routed models as claude-/anthropic-prefixed alias ids with honest `display_name`, resolve aliases back on inbound | CCR's typed `/model provider,model` comma-hack is the legacy path; discovery puts custom models IN the native picker (002_research_model_visibility.md) |
 
@@ -66,7 +66,7 @@ Questions this unit answers:
 
 - **Phase 1** — core inbound `/v1/messages` + count_tokens (C3):
   010_phase1_core_inbound.md
-- **Phase 2** — `ocx claude` launcher + gateway model discovery/aliases (C2-C3,
+- **Phase 2** — `opr claude` launcher + gateway model discovery/aliases (C2-C3,
   D6; starts with Tier-2 doc verification -> 003_evidence_discovery.md):
   020_phase2_cli_discovery.md
 - **Phase 3** — GUI "Claude Code" section + docs-site/README, 3-4 locales (C2):
@@ -87,7 +87,7 @@ Questions this unit answers:
 1. Thinking blocks: emit Anthropic `thinking` SSE without signature (CCR-style) and
    drop them on replay, or hide thinking entirely by default?
 2. Auth default for loopback: accept any `x-api-key` on 127.0.0.1 (current
-   opencodex behavior: no auth required on loopback) — confirm acceptable.
+   openprovider behavior: no auth required on loopback) — confirm acceptable.
 3. `count_tokens`: char-estimate (src/lib/token-estimate.ts) is approximate; is that
    good enough for Claude Code's context meter? (CCR precedent suggests yes.)
 4. Whether `/v1/messages?beta=true` query + `anthropic-beta` headers need any

@@ -9,7 +9,7 @@ decisions before the plan amendment and re-audit.
 - RCA: the 010 draft classified by capability (`providerCodexAccountMode` → registry
   `authKind`) instead of by the CONFIGURED credential surface. `xai` and
   `github-copilot` are `authKind:"oauth"` with `allowKeyAuthOverride:true`
-  (src/providers/registry.ts:326-327,822-827); `ocx provider add xai --api-key`
+  (src/providers/registry.ts:326-327,822-827); `opr provider add xai --api-key`
   persists `authMode:"key"` (src/cli/provider.ts:91). The server gates the keys
   family on config authMode (`isKeyAuthProvider`, src/providers/api-keys.ts:38-40)
   and the GUI resolves one surface per provider from config authMode
@@ -25,10 +25,10 @@ decisions before the plan amendment and re-audit.
 ## Blocker 2 [Medium] — parity matrix claimed a CLI chatgpt login path that does not exist
 
 - RCA: my original `001_gui_cli_parity_matrix.md` row said OAuth add-account is 🟡
-  covered by `ocx login chatgpt`; 004 repeated a similar claim for `ocx login
+  covered by `opr login chatgpt`; 004 repeated a similar claim for `opr login
   openai`. But `isPublicOAuthProvider` excludes `chatgpt`
   (src/oauth/index.ts:123-126), `openai` is not an OAuth provider at all, and
-  neither is a key-login provider — both `ocx login chatgpt` and `ocx login openai`
+  neither is a key-login provider — both `opr login chatgpt` and `opr login openai`
   print usage and exit 1 (src/oauth/login-cli.ts:35-42).
 - Decision: **ACCEPT**. Fix the 004 codex add-account row to ❌/OUT (no CLI path;
   dashboard flow only). Delete my stale duplicate 001/002 (superseded by 004/003;

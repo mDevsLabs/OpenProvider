@@ -20,12 +20,12 @@ function isFamily(value: string | undefined): value is DesktopFamily {
 
 function printDesktopHelp(): void {
   console.log(`Usage:
-  ocx claude desktop [apply] [--static|--hybrid|--discovery-only]
-  ocx claude desktop show [--json]
-  ocx claude desktop move <provider/model> <opus|fable|sonnet|haiku> [--default]
-  ocx claude desktop default <family> <provider/model|none>
-  ocx claude desktop export <path|->
-  ocx claude desktop import <path> [--apply]`);
+  opr claude desktop [apply] [--static|--hybrid|--discovery-only]
+  opr claude desktop show [--json]
+  opr claude desktop move <provider/model> <opus|fable|sonnet|haiku> [--default]
+  opr claude desktop default <family> <provider/model|none>
+  opr claude desktop export <path|->
+  opr claude desktop import <path> [--apply]`);
 }
 
 async function applyProfile(profile: DesktopProfile, mode: Desktop3pConfigMode): Promise<{ ok: boolean; path: string; reason?: string }> {
@@ -87,7 +87,7 @@ export async function handleClaudeDesktopCommand(argv: string[]): Promise<number
     const config = loadConfig();
     const state = await buildClaudeDesktopState(config);
     if (command === "show") {
-      if (argv.length > 2 || (argv[1] && argv[1] !== "--json")) throw new Error("Usage: ocx claude desktop show [--json]");
+      if (argv.length > 2 || (argv[1] && argv[1] !== "--json")) throw new Error("Usage: opr claude desktop show [--json]");
       if (argv[1] === "--json") console.log(JSON.stringify(state));
       else {
         for (const family of DESKTOP_FAMILIES) {
@@ -101,7 +101,7 @@ export async function handleClaudeDesktopCommand(argv: string[]): Promise<number
     }
     if (command === "move") {
       const [, route, familyRaw, ...flags] = argv;
-      if (!route || !isFamily(familyRaw) || flags.some(flag => flag !== "--default")) throw new Error("Usage: ocx claude desktop move <route> <family> [--default]");
+      if (!route || !isFamily(familyRaw) || flags.some(flag => flag !== "--default")) throw new Error("Usage: opr claude desktop move <route> <family> [--default]");
       if (!state.models.some(model => model.route === route && model.available)) throw new Error(`현재 사용할 수 없는 모델입니다: ${route}`);
       const profile = moveDesktopRoute(state.profile, route, familyRaw, flags.includes("--default"));
       config.claudeCode = { ...(config.claudeCode ?? {}), desktopProfile: profile };
@@ -111,7 +111,7 @@ export async function handleClaudeDesktopCommand(argv: string[]): Promise<number
     }
     if (command === "default") {
       const [, familyRaw, routeRaw] = argv;
-      if (!isFamily(familyRaw) || !routeRaw || argv.length !== 3) throw new Error("Usage: ocx claude desktop default <family> <route|none>");
+      if (!isFamily(familyRaw) || !routeRaw || argv.length !== 3) throw new Error("Usage: opr claude desktop default <family> <route|none>");
       const route = routeRaw === "none" ? null : routeRaw;
       if (route && !state.models.some(model => model.route === route && model.available)) throw new Error(`현재 사용할 수 없는 모델입니다: ${route}`);
       const profile = setDesktopFamilyDefault(state.profile, familyRaw, route);
@@ -122,7 +122,7 @@ export async function handleClaudeDesktopCommand(argv: string[]): Promise<number
     }
     if (command === "export") {
       const target = argv[1];
-      if (!target || argv.length !== 2) throw new Error("Usage: ocx claude desktop export <path|->");
+      if (!target || argv.length !== 2) throw new Error("Usage: opr claude desktop export <path|->");
       const json = JSON.stringify(state.profile, null, 2) + "\n";
       if (target === "-") process.stdout.write(json);
       else writeFileSync(resolve(target), json, { encoding: "utf8", mode: 0o600 });
@@ -131,7 +131,7 @@ export async function handleClaudeDesktopCommand(argv: string[]): Promise<number
     if (command === "import") {
       const source = argv[1];
       const flags = argv.slice(2);
-      if (!source || flags.some(flag => flag !== "--apply")) throw new Error("Usage: ocx claude desktop import <path> [--apply]");
+      if (!source || flags.some(flag => flag !== "--apply")) throw new Error("Usage: opr claude desktop import <path> [--apply]");
       const profile = parseDesktopProfile(JSON.parse(readFileSync(resolve(source), "utf8")));
       const reconciled = (await buildClaudeDesktopState(config, profile)).profile;
       config.claudeCode = { ...(config.claudeCode ?? {}), desktopProfile: reconciled };

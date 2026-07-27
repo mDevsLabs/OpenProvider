@@ -25,7 +25,7 @@ function latestSessionMetaPayload(path: string): Record<string, unknown> {
 }
 
 function makeFixture({ includeExec = false, includeLegacy = false } = {}) {
-  const dir = join(tmpdir(), `ocx-history-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  const dir = join(tmpdir(), `opr-history-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(dir, { recursive: true });
   const rollout = join(dir, "rollout.jsonl");
   writeFileSync(rollout, [
@@ -39,7 +39,7 @@ function makeFixture({ includeExec = false, includeLegacy = false } = {}) {
   writeFileSync(execRollout, [
     JSON.stringify({
       type: "session_meta",
-      payload: { id: "thread-2", model_provider: "opencodex", source: "exec", cwd: dir },
+      payload: { id: "thread-2", model_provider: "openprovider", source: "exec", cwd: dir },
     }),
     JSON.stringify({ type: "event_msg", timestamp: "2026-01-01T00:00:00.000Z", payload: { message: "y" } }),
   ].join("\n") + "\n");
@@ -47,7 +47,7 @@ function makeFixture({ includeExec = false, includeLegacy = false } = {}) {
   writeFileSync(legacyRollout, [
     JSON.stringify({
       type: "session_meta",
-      payload: { id: "thread-3", model_provider: "opencodex", source: "cli", cwd: dir },
+      payload: { id: "thread-3", model_provider: "openprovider", source: "cli", cwd: dir },
     }),
     JSON.stringify({ type: "event_msg", timestamp: "2026-01-01T00:00:00.000Z", payload: { message: "z" } }),
   ].join("\n") + "\n");
@@ -76,13 +76,13 @@ function makeFixture({ includeExec = false, includeLegacy = false } = {}) {
   if (includeExec) {
     db.run(`
       INSERT INTO threads (id, rollout_path, model_provider, source, first_user_message, has_user_event)
-      VALUES ('thread-2', ?, 'opencodex', 'exec', 'hello from exec', 0)
+      VALUES ('thread-2', ?, 'openprovider', 'exec', 'hello from exec', 0)
     `, execRollout);
   }
   if (includeLegacy) {
     db.run(`
       INSERT INTO threads (id, rollout_path, model_provider, source, first_user_message, has_user_event)
-      VALUES ('thread-3', ?, 'opencodex', 'cli', 'legacy remapped row', 1)
+      VALUES ('thread-3', ?, 'openprovider', 'cli', 'legacy remapped row', 1)
     `, legacyRollout);
   }
   db.close();
@@ -90,17 +90,17 @@ function makeFixture({ includeExec = false, includeLegacy = false } = {}) {
 }
 
 describe("Codex history provider sync", () => {
-  test("maps resumable Codex threads to opencodex via the latest session_meta", () => {
+  test("maps resumable Codex threads to openprovider via the latest session_meta", () => {
     const { dbPath, backupPath, rollout } = makeFixture();
 
-    const result = syncCodexHistoryProvider("opencodex", dbPath, backupPath);
+    const result = syncCodexHistoryProvider("openprovider", dbPath, backupPath);
 
     expect(result).toEqual({ rows: 1, files: 1 });
     const db = new Database(dbPath);
-    expect(db.query("SELECT model_provider FROM threads WHERE id = 'thread-1'").get()).toEqual({ model_provider: "opencodex" });
+    expect(db.query("SELECT model_provider FROM threads WHERE id = 'thread-1'").get()).toEqual({ model_provider: "openprovider" });
     expect(db.query("SELECT has_user_event FROM threads WHERE id = 'thread-1'").get()).toEqual({ has_user_event: 1 });
     db.close();
-    expect(latestSessionMetaPayload(rollout).model_provider).toBe("opencodex");
+    expect(latestSessionMetaPayload(rollout).model_provider).toBe("openprovider");
   });
 
   test("appends a new session_meta instead of rewriting line 1, preserving inode and prior content", () => {
@@ -109,7 +109,7 @@ describe("Codex history provider sync", () => {
     const before = readFileSync(rollout, "utf8");
     const beforeLineCount = before.split("\n").filter(Boolean).length;
 
-    const result = syncCodexHistoryProvider("opencodex", dbPath, backupPath);
+    const result = syncCodexHistoryProvider("openprovider", dbPath, backupPath);
 
     expect(result).toEqual({ rows: 1, files: 1 });
     // No temp+rename: the app caches the live append handle, so the inode must survive.
@@ -119,7 +119,7 @@ describe("Codex history provider sync", () => {
     expect(after.startsWith(before)).toBe(true);
     // Exactly one new session_meta line was appended, and it carries the new provider.
     expect(after.split("\n").filter(Boolean).length).toBe(beforeLineCount + 1);
-    expect(latestSessionMetaPayload(rollout).model_provider).toBe("opencodex");
+    expect(latestSessionMetaPayload(rollout).model_provider).toBe("openprovider");
     // The original first line is untouched.
     expect(JSON.parse(before.split("\n")[0])).toEqual(JSON.parse(after.split("\n")[0]));
   });
@@ -134,19 +134,19 @@ describe("Codex history provider sync", () => {
     }) + "\n");
     const before = readFileSync(rollout, "utf8");
 
-    const result = syncCodexHistoryProvider("opencodex", dbPath, backupPath);
+    const result = syncCodexHistoryProvider("openprovider", dbPath, backupPath);
 
     // DB row still flips, but the rollout is left untouched (no misleading append for a foreign id).
     expect(result.files).toBe(0);
     expect(readFileSync(rollout, "utf8")).toBe(before);
     const db = new Database(dbPath);
-    expect(db.query("SELECT model_provider FROM threads WHERE id = 'thread-1'").get()).toEqual({ model_provider: "opencodex" });
+    expect(db.query("SELECT model_provider FROM threads WHERE id = 'thread-1'").get()).toEqual({ model_provider: "openprovider" });
     db.close();
   });
 
-  test("rewrites line 1 in place (length-preserving) when reverting an opencodex-origin rollout, so a later first-line clone cannot resurrect opencodex", () => {
+  test("rewrites line 1 in place (length-preserving) when reverting an openprovider-origin rollout, so a later first-line clone cannot resurrect openprovider", () => {
     const { dbPath, backupPath, legacyRollout } = makeFixture({ includeLegacy: true });
-    // thread-3 / legacyRollout is an opencodex-origin row with no backup -> eject path (revert to openai).
+    // thread-3 / legacyRollout is an openprovider-origin row with no backup -> eject path (revert to openai).
     const firstLineBefore = readFileSync(legacyRollout, "utf8").split("\n")[0];
     const inodeBefore = statSync(legacyRollout).ino;
 
@@ -170,19 +170,19 @@ describe("Codex history provider sync", () => {
   });
 
   test("patches line 1 even when the first session_meta line is larger than the read chunk (big base_instructions)", () => {
-    const dir = join(tmpdir(), `ocx-bighead-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    const dir = join(tmpdir(), `opr-bighead-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`);
     mkdirSync(dir, { recursive: true });
     const rollout = join(dir, "rollout.jsonl");
     const big = "x".repeat(200_000); // > 64KiB read chunk, forces the probe to grow
     writeFileSync(rollout, [
-      JSON.stringify({ type: "session_meta", payload: { id: "big-1", model_provider: "opencodex", source: "cli", cwd: dir, base_instructions: big } }),
+      JSON.stringify({ type: "session_meta", payload: { id: "big-1", model_provider: "openprovider", source: "cli", cwd: dir, base_instructions: big } }),
       JSON.stringify({ type: "event_msg", timestamp: "2026-01-01T00:00:00.000Z", payload: { message: "live turn keep me" } }),
     ].join("\n") + "\n");
     const dbPath = join(dir, "state_5.sqlite");
     const backupPath = join(dir, "bk.json");
     const db = new Database(dbPath);
     db.run(`CREATE TABLE threads (id TEXT PRIMARY KEY, rollout_path TEXT NOT NULL, model_provider TEXT NOT NULL, source TEXT NOT NULL, first_user_message TEXT NOT NULL, has_user_event INTEGER NOT NULL DEFAULT 0)`);
-    db.run(`INSERT INTO threads VALUES ('big-1', ?, 'opencodex', 'cli', 'hi', 1)`, rollout);
+    db.run(`INSERT INTO threads VALUES ('big-1', ?, 'openprovider', 'cli', 'hi', 1)`, rollout);
     db.close();
     const firstLineBefore = readFileSync(rollout, "utf8").split("\n")[0];
 
@@ -196,7 +196,7 @@ describe("Codex history provider sync", () => {
 
   test("maps resumable Codex threads back to openai", () => {
     const { dbPath, backupPath, rollout } = makeFixture();
-    syncCodexHistoryProvider("opencodex", dbPath, backupPath);
+    syncCodexHistoryProvider("openprovider", dbPath, backupPath);
 
     const result = syncCodexHistoryProvider("openai", dbPath, backupPath);
 
@@ -211,7 +211,7 @@ describe("Codex history provider sync", () => {
   test("does not consume a history backup written for a different Codex state DB", () => {
     const first = makeFixture();
     const second = makeFixture();
-    syncCodexHistoryProvider("opencodex", first.dbPath, first.backupPath);
+    syncCodexHistoryProvider("openprovider", first.dbPath, first.backupPath);
 
     const result = syncCodexHistoryProvider("openai", second.dbPath, first.backupPath);
 
@@ -222,15 +222,15 @@ describe("Codex history provider sync", () => {
     db.close();
   });
 
-  test("promotes opencodex exec threads to app-visible cli source and restores from backup", () => {
+  test("promotes openprovider exec threads to app-visible cli source and restores from backup", () => {
     const { dbPath, backupPath, execRollout } = makeFixture({ includeExec: true });
 
-    const result = syncCodexHistoryProvider("opencodex", dbPath, backupPath);
+    const result = syncCodexHistoryProvider("openprovider", dbPath, backupPath);
 
     expect(result).toEqual({ rows: 2, files: 2 });
     let db = new Database(dbPath);
     expect(db.query("SELECT model_provider, source, has_user_event FROM threads WHERE id = 'thread-2'").get()).toEqual({
-      model_provider: "opencodex",
+      model_provider: "openprovider",
       source: "cli",
       has_user_event: 1,
     });
@@ -252,7 +252,7 @@ describe("Codex history provider sync", () => {
     expect(existsSync(backupPath)).toBe(false);
   });
 
-  test("ejects no-backup opencodex interactive rows to openai during native restore", () => {
+  test("ejects no-backup openprovider interactive rows to openai during native restore", () => {
     const { dbPath, backupPath } = makeFixture({ includeLegacy: true });
 
     const result = syncCodexHistoryProvider("openai", dbPath, backupPath);
@@ -267,7 +267,7 @@ describe("Codex history provider sync", () => {
     expect(existsSync(backupPath)).toBe(false);
   });
 
-  test("explicitly recovers legacy opencodex user rows to openai", () => {
+  test("explicitly recovers legacy openprovider user rows to openai", () => {
     const { dbPath, execRollout, legacyRollout } = makeFixture({ includeExec: true, includeLegacy: true });
 
     const result = restoreLegacyOpenaiHistory(dbPath);
@@ -390,7 +390,7 @@ describe("Design B migration helpers", () => {
   });
 
   test("countPendingOpencodexHistory returns zeros for a missing DB", () => {
-    const missing = join(tmpdir(), `ocx-none-${Date.now()}`, "state_5.sqlite");
+    const missing = join(tmpdir(), `opr-none-${Date.now()}`, "state_5.sqlite");
     const result = countPendingOpencodexHistory(missing, join(tmpdir(), "no-backup.json"));
     expect(result).toEqual({ pendingRows: 0, backupEntries: 0 });
   });
@@ -422,7 +422,7 @@ describe("Design B migration helpers", () => {
   });
 
   test("a missing DB with a leftover backup manifest does not satisfy the steady-state gate", () => {
-    const dir = join(tmpdir(), `ocx-reinstall-${process.pid}-${Date.now()}`);
+    const dir = join(tmpdir(), `opr-reinstall-${process.pid}-${Date.now()}`);
     mkdirSync(dir, { recursive: true });
     const missingDb = join(dir, "state_5.sqlite");
     const backupPath = join(dir, "codex-history-backup.json");

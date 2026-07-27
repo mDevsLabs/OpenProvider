@@ -126,7 +126,7 @@ export function useProvidersOAuth({
             finished = true;
             break;
           }
-          notify(t("prov.loginOk", { provider: oauthLabel(provider), cmd: "ocx sync" }), true);
+          notify(t("prov.loginOk", { provider: oauthLabel(provider), cmd: "opr sync" }), true);
           setLoginInfo(null);
           fetchConfig();
           const knownProviders = Object.keys(accountSets);

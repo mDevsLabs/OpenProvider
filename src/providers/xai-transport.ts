@@ -6,7 +6,7 @@ export const XAI_GROK_CLI_BASE_URL = "https://cli-chat-proxy.grok.com/v1";
 
 export const XAI_GROK_COMPATIBILITY = {
   version: "0.2.93",
-  userAgent: "opencodex-grok/0.2.93",
+  userAgent: "openprovider-grok/0.2.93",
   headers: {
     clientIdentifier: "x-grok-client-identifier",
     clientVersion: "x-grok-client-version",
@@ -28,7 +28,7 @@ export type OcxProviderTransport = OcxProviderConfig & {
 };
 
 const XAI_GROK_CLI_HEADERS: Readonly<Record<string, string>> = {
-  [XAI_GROK_COMPATIBILITY.headers.clientIdentifier]: "opencodex",
+  [XAI_GROK_COMPATIBILITY.headers.clientIdentifier]: "openprovider",
   [XAI_GROK_COMPATIBILITY.headers.clientVersion]: XAI_GROK_CLIENT_VERSION,
   [XAI_GROK_COMPATIBILITY.headers.tokenAuth]: "xai-grok-cli",
   [XAI_GROK_COMPATIBILITY.headers.authenticateResponse]: "authenticate-response",
@@ -85,7 +85,7 @@ export function deriveXaiConvId(promptCacheKey: string): string {
  * Resolve xAI's runtime transport without mutating persisted config. Conversation/session
  * affinity is stable for this resolved transport; request identity is generated per fetch.
  * Agent, deployment, model-override, turn, mode, and user identity headers are intentionally
- * omitted because opencodex has no truthful values for the official fields.
+ * omitted because openprovider has no truthful values for the official fields.
  */
 export function resolveProviderTransport(
   providerName: string,

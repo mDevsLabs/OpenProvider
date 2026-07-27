@@ -29,7 +29,7 @@ Readiness:
 Review package used for full-source pass:
 
 ```text
-/tmp/opencodex-full-source-and-devlog-review.zip
+/tmp/openprovider-full-source-and-devlog-review.zip
 commit: 35e4ff6ab32643488062764f0653ccf71e4e6877
 ```
 

@@ -3,7 +3,7 @@
  *
  * Claude Code's /model picker only lists discovery entries whose id literally
  * begins with `claude` or `anthropic`, so routed models are exposed as
- * `claude-ocx-<provider>--<model>` with an honest display_name. Aliases must be
+ * `claude-opr-<provider>--<model>` with an honest display_name. Aliases must be
  * deterministic, reversible, and STABLE across releases (picker selections
  * persist to Claude Code's settings.json `model` field).
  *
@@ -17,7 +17,7 @@
 
 import { desktop3pAlias } from "./desktop-3p";
 
-export const CLAUDE_ALIAS_PREFIX = "claude-ocx-";
+export const CLAUDE_ALIAS_PREFIX = "claude-opr-";
 const NATIVE_PSEUDO_PROVIDER = "native";
 
 /** Alias for a routed "<provider>/<model>" pair; null when not representable. */
@@ -51,7 +51,7 @@ export function resolveAlias(id: string): string | null {
 /**
  * Claude Code (CLI) surface alias — devlog 050 + audit 051 #2.
  *
- * The readable `claude-ocx-*` form when representable; otherwise the desktop-3p
+ * The readable `claude-opr-*` form when representable; otherwise the desktop-3p
  * hash so the model still appears in discovery (collisions follow the same
  * first-wins policy as the desktop registry — audit 051 #1). Real Anthropic
  * models pass through unchanged (they must keep hitting the sk-ant passthrough).

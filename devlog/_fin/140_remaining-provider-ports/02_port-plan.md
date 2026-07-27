@@ -29,7 +29,7 @@ adapter with modes; the table below shows both views.
 | Models | Static seed **13** from jawcode bundle + optional future discovery |
 | OAuth | **None** — ADC / service account / API key only |
 
-**Effort drivers:** ADC token cache + refresh in opencodex (port ~250 lines from
+**Effort drivers:** ADC token cache + refresh in openprovider (port ~250 lines from
 `google-auth.ts`), config schema, tests with mocked token endpoint.
 
 **Risk:** LOW–MEDIUM — wire matches existing `parseStream` SSE parser (`google.ts:119-184`).
@@ -82,7 +82,7 @@ diagnosed in jawcode (`amazon-bedrock.ts:355-374`).
 |--------|------|
 | Adapter | **New** `src/adapters/kiro.ts` |
 | Wire | Port `buildPayload` + `parseKiroPayload` (`kiro.ts:145-305`) |
-| Auth | **Import-first**, not full browser OAuth: read kiro-cli SQLite + refresh (`kiro.ts:392-487`, `utils/oauth/kiro.ts:1-50`); optional `ocx login kiro` = import path |
+| Auth | **Import-first**, not full browser OAuth: read kiro-cli SQLite + refresh (`kiro.ts:392-487`, `utils/oauth/kiro.ts:1-50`); optional `opr login kiro` = import path |
 | Headers | Port fingerprint User-Agent builder (`85-98`) — required for upstream acceptance |
 | Streaming | Reuse eventstream decoder shared with Bedrock port |
 | Models | Static **8** from `special.ts:82-91` |
@@ -109,7 +109,7 @@ needed before shipping.
 **Effort drivers:** Protobuf schema maintenance, bidirectional stream, exec loop (optional phase).
 
 **Risk:** VERY HIGH — without exec bridge, Cursor models that invoke native tools may stall;
-with exec bridge, opencodex becomes a partial Cursor CLI host.
+with exec bridge, openprovider becomes a partial Cursor CLI host.
 
 **Recommended sub-phases:** (1) login + single-turn text, (2) multi-turn state, (3) tool/exec
 parity (optional / separate approval).
@@ -164,7 +164,7 @@ Parallelization: 140.1 + 140.3 can run in parallel after plan approval (disjoint
 
 ---
 
-## opencodex config sketch (non-binding)
+## openprovider config sketch (non-binding)
 
 Illustrative only — not implemented this cycle:
 
@@ -202,7 +202,7 @@ Illustrative only — not implemented this cycle:
 |------|--------|------------|
 | Bridge RC1/RC3 (phase 110) on new adapters | Codex stream errors | Reuse `done` terminal + heartbeat patterns from existing adapters |
 | OAuth secret distribution (Antigravity) | Login blocked | Document env vars; no secrets in repo |
-| AWS/Kiro credential exposure in logs | Security | Follow opencodex redaction conventions from existing oauth store |
+| AWS/Kiro credential exposure in logs | Security | Follow openprovider redaction conventions from existing oauth store |
 | Cursor tool deadlock without exec | Hung streams | MVP: cap models to non-agent/composer-only; document limitation |
 | Bedrock model id drift | Wrong ARN | Live sync from models.dev or periodic jawcode bundle import |
 | Sixth adapter proliferation | Maintenance | Keep Google as one adapter with modes; share eventstream module |
@@ -213,8 +213,8 @@ Illustrative only — not implemented this cycle:
 
 | Provider | Minimal proof |
 |----------|---------------|
-| vertex | `ocx` stream with ADC; compare SSE parts to jawcode golden |
-| antigravity | `ocx login google-antigravity`; one tool call + thinking model |
+| vertex | `opr` stream with ADC; compare SSE parts to jawcode golden |
+| antigravity | `opr login google-antigravity`; one tool call + thinking model |
 | bedrock | Converse stream against `us.anthropic.claude-*`; SigV4 unit test |
 | kiro | Import kiro-cli token; `kiro-auto` single turn |
 | cursor | OAuth login; single-turn text on `composer-*`; multi-turn regression |

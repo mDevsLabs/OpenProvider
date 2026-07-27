@@ -50,7 +50,7 @@ Three-layer design — ingestion normalization, preflight validation, reactive r
 | LiteLLM (BerriAI) | Inbound size middleware (`max_request_size_mb`) → own 413 REJECT; 413→`request_too_large` mapping in Anthropic-compatible surface; no image mutation (`max_pixels` search: no anthropic-path resize) | `litellm/proxy/middleware/request_size_limit_middleware.py`, `anthropic_interface/exceptions/exception_mapping_utils.py` | 2 |
 | y-router | Thin CF Worker relay; PASSTHROUGH, platform/upstream 413 surfaces | web survey; no size-handling code found | 1 |
 | one-api / new-api | PASSTHROUGH; no resize/trim feature found | web survey | 1 |
-| opencodex (ours, pre-unit) | Count/dimension guard + 20MiB base64 budget with oldest-first textify (devlog/260714_anthropic_413_image_budget) | `src/adapters/anthropic-image-guard.ts` | 2 |
+| openprovider (ours, pre-unit) | Count/dimension guard + 20MiB base64 budget with oldest-first textify (devlog/260714_anthropic_413_image_budget) | `src/adapters/anthropic-image-guard.ts` | 2 |
 
 **Pattern:** proxies reject or pass through; only the official CLIENT mutates content
 (resize at ingestion, strip/compact on failure). Proxy-side graceful degradation (ours)

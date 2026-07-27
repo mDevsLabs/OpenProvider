@@ -13,10 +13,10 @@ Scope: `/v1/images/generations`, `/v1/images/edits`
 
 ## Entrypoints and trust boundaries
 
-1. Codex or another local client sends an Images request to opencodex.
-2. When opencodex is bound non-loopback, the request crosses a remote-to-local data-plane boundary protected by `OPENCODEX_API_AUTH_TOKEN`/configured keys and origin policy.
-3. opencodex selects a trusted configured forward provider and a thread-affined credential.
-4. The bounded opaque body and approved headers cross from opencodex to the ChatGPT backend.
+1. Codex or another local client sends an Images request to openprovider.
+2. When openprovider is bound non-loopback, the request crosses a remote-to-local data-plane boundary protected by `OPENCODEX_API_AUTH_TOKEN`/configured keys and origin policy.
+3. openprovider selects a trusted configured forward provider and a thread-affined credential.
+4. The bounded opaque body and approved headers cross from openprovider to the ChatGPT backend.
 5. The upstream response crosses back to the caller after header sanitization.
 
 ## Attacker capabilities

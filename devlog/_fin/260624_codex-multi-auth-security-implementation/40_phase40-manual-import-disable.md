@@ -58,7 +58,7 @@ Attacker:
 
 Trust boundary:
 
-- Browser/management client to opencodex API.
+- Browser/management client to openprovider API.
 
 Blast radius:
 

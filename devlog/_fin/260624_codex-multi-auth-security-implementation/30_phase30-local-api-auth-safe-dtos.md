@@ -13,7 +13,7 @@ Implement Patch 3 from `devlog/280_codex-multi-auth-security-patch-plan/00_patch
 - stop returning provider headers, API key prefixes, or unrestricted account emails from management DTOs;
 - keep loopback-only default behavior working without adding a new GUI login flow in this slice.
 
-This phase does not implement a full authenticated remote GUI UX. If a user chooses `hostname: "0.0.0.0"`, API clients must set `OPENCODEX_API_AUTH_TOKEN` before startup and send `x-opencodex-api-key`.
+This phase does not implement a full authenticated remote GUI UX. If a user chooses `hostname: "0.0.0.0"`, API clients must set `OPENCODEX_API_AUTH_TOKEN` before startup and send `x-openprovider-api-key`.
 
 ## Security Basis
 
@@ -26,9 +26,9 @@ This phase does not implement a full authenticated remote GUI UX. If a user choo
 - Default loopback binding (`undefined`, `127.0.0.1`, `localhost`, `::1`) continues to work without a local API key.
 - Non-loopback binding (`0.0.0.0` or other externally reachable host) fails startup/config validation unless `OPENCODEX_API_AUTH_TOKEN` is present.
 - When local API auth is required:
-  - `/api/*` management routes require `x-opencodex-api-key`;
-  - `/v1/responses` HTTP requires `x-opencodex-api-key`;
-  - `/v1/responses` WebSocket upgrade requires `x-opencodex-api-key`;
+  - `/api/*` management routes require `x-openprovider-api-key`;
+  - `/v1/responses` HTTP requires `x-openprovider-api-key`;
+  - `/v1/responses` WebSocket upgrade requires `x-openprovider-api-key`;
   - missing `Origin` does not bypass auth.
 - `/healthz` remains unauthenticated.
 - The auth gate uses constant-time comparison for the configured token.
@@ -45,7 +45,7 @@ This phase does not implement a full authenticated remote GUI UX. If a user choo
 
 ### `src/types.ts`
 
-No code change. Phase 30 uses env-only `OPENCODEX_API_AUTH_TOKEN` to avoid persisting local API credentials into `~/.opencodex/config.json`.
+No code change. Phase 30 uses env-only `OPENCODEX_API_AUTH_TOKEN` to avoid persisting local API credentials into `~/.openprovider/config.json`.
 
 ### MODIFY `src/server.ts`
 
@@ -73,9 +73,9 @@ Rules:
 - `isLoopbackHostname()` accepts `undefined`, `""`, `localhost`, `127.0.0.1`, and `::1`.
 - `isApiAuthRequired()` returns true only when host is non-loopback.
 - `assertServerAuthConfig()` throws before `Bun.serve()` if host is non-loopback and no token exists.
-- `hasValidApiAuth()` reads `x-opencodex-api-key`, rejects empty values, compares UTF-8 buffers using `timingSafeEqual`, and returns false for length mismatch.
-- `requireApiAuth(req, config, kind)` returns `Response | null`; management calls pass `kind: "management"` and receive `jsonResponse({ error: "opencodex API key required" }, 401)`, while data-plane calls pass `kind: "data-plane"` and receive `formatErrorResponse(401, "authentication_error", "opencodex API key required")`.
-- `corsHeaders()` must include `X-OpenCodex-API-Key` in `Access-Control-Allow-Headers`.
+- `hasValidApiAuth()` reads `x-openprovider-api-key`, rejects empty values, compares UTF-8 buffers using `timingSafeEqual`, and returns false for length mismatch.
+- `requireApiAuth(req, config, kind)` returns `Response | null`; management calls pass `kind: "management"` and receive `jsonResponse({ error: "openprovider API key required" }, 401)`, while data-plane calls pass `kind: "data-plane"` and receive `formatErrorResponse(401, "authentication_error", "openprovider API key required")`.
+- `corsHeaders()` must include `X-OpenProvider-API-Key` in `Access-Control-Allow-Headers`.
 
 Apply gate:
 
@@ -206,12 +206,12 @@ Add/modify backend tests:
 
 - `tests/server-auth.test.ts` (new):
   - loopback host does not require auth;
-  - non-loopback host requires matching `x-opencodex-api-key`;
+  - non-loopback host requires matching `x-openprovider-api-key`;
   - non-loopback without token throws in `assertServerAuthConfig`;
   - non-loopback with env token passes;
   - wrong/missing token fails constant-time gate helper;
   - `safeConfigDTO()` omits `apiAuthToken`, provider `apiKey`, and provider `headers`, and exposes `hasApiKey`/`hasHeaders`.
-  - CORS headers include `X-OpenCodex-API-Key`.
+  - CORS headers include `X-OpenProvider-API-Key`.
 - existing server route tests are not required because route handling is currently not E2E-tested; helper tests plus full typecheck/full suite are the first slice.
 
 Modify `tests/codex-auth-api.test.ts`:
@@ -256,8 +256,8 @@ Changed tests:
 Implemented behavior:
 
 - Non-loopback hostnames require env-only `OPENCODEX_API_AUTH_TOKEN` before `Bun.serve()`.
-- When non-loopback auth is required, `x-opencodex-api-key` is validated with constant-time comparison.
-- CORS allows `X-OpenCodex-API-Key`.
+- When non-loopback auth is required, `x-openprovider-api-key` is validated with constant-time comparison.
+- CORS allows `X-OpenProvider-API-Key`.
 - `/api/*`, `/v1/responses` HTTP, and `/v1/responses` WebSocket have auth gates; loopback remains unchanged.
 - `/api/config` now returns `safeConfigDTO()` with provider `hasApiKey`/`hasHeaders` booleans and no provider `apiKey` or `headers`.
 - Codex Auth account list masks main/pool emails by default.
@@ -325,7 +325,7 @@ Evidence:
 
 Residual risks accepted for this phase:
 
-- Remote non-loopback GUI clients still need a client-side way to attach `x-opencodex-api-key`; this phase protects the server boundary but does not build remote GUI auth UX.
+- Remote non-loopback GUI clients still need a client-side way to attach `x-openprovider-api-key`; this phase protects the server boundary but does not build remote GUI auth UX.
 - `/v1/models` and `/healthz` remain unauthenticated by design.
 - `/api/oauth/status` and transient login-state emails remain Patch 6 privacy work.
 - Fetch-handler route gate coverage is by helper tests plus code inspection, not a live Bun.serve E2E route test.

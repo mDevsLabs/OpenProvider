@@ -49,7 +49,7 @@ describe("kiro adapter — buildRequest", () => {
     for (const apiKey of [undefined, "", "   "]) {
       const keyless = { ...provider, apiKey } as unknown as OcxProviderConfig;
       await expect(createKiroAdapter(keyless).buildRequest(parsedWith([{ role: "user", content: "hi" }]))).rejects.toThrow(
-        "kiro token missing — run ocx login kiro",
+        "kiro token missing — run opr login kiro",
       );
     }
   });

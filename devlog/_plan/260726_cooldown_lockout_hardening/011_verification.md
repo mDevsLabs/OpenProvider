@@ -13,7 +13,7 @@
 
 ## 전체 스위트 5건 실패 귀속 (중요)
 
-실패: `codex-journal` 4건 + `ocx status --json codexPlugins` 1건.
+실패: `codex-journal` 4건 + `opr status --json codexPlugins` 1건.
 
 이 워크트리에는 이번 유닛과 무관한 동시 작업이 있다: `src/codex/journal.ts`,
 `src/codex/inject.ts`, `src/codex/injected-marker.ts`(신규), `src/cli/index.ts`,
@@ -55,7 +55,7 @@ load-bearing이 아닌 이중 방어로 남기고, 주석과 테스트 이름을
 **5. WS 경로 (Desktop 표면)** — 실제 프레임을 만들어 관찰:
 
 ```json
-{"type":"error","status":429,"error":{"type":"rate_limit_error","message":"Selected Codex account (account-…3c21) is cooling down until 2026-07-26T12:00:00.000Z (source: retry-after). Run 'ocx account list openai' to find the id, then 'ocx account clear-cooldown openai <id>' to lift it, ..."}}
+{"type":"error","status":429,"error":{"type":"rate_limit_error","message":"Selected Codex account (account-…3c21) is cooling down until 2026-07-26T12:00:00.000Z (source: retry-after). Run 'opr account list openai' to find the id, then 'opr account clear-cooldown openai <id>' to lift it, ..."}}
 ```
 
 `leaks raw id? false`, `has escape cmd? true`.
@@ -68,6 +68,6 @@ load-bearing이 아닌 이중 방어로 남기고, 주석과 테스트 이름을
 
 ## 남은 갭 (이번 유닛 범위 밖)
 
-G4(Desktop 커버리지 없이 주입 허용)는 손대지 않았다. `ocx init`이 launchd 서비스
+G4(Desktop 커버리지 없이 주입 허용)는 손대지 않았다. `opr init`이 launchd 서비스
 설치 여부와 무관하게 주입을 진행하고, shim은 Desktop을 커버하지 못한다. 이는
 "프록시 부재" 갈래의 근본 원인이고 별도 유닛이 필요하다.

@@ -4,12 +4,12 @@
 
 - **Loop archetype:** spec-satisfaction repair (verifier defines done).
 - **Trigger:** user request — reflect openai/codex PR #31684 (`bot/update-models-json`,
-  `codex-rs/models-manager/models.json`) into the ocx gpt-5.6 patch, and make native
+  `codex-rs/models-manager/models.json`) into the opr gpt-5.6 patch, and make native
   GPT models toggleable on/off in the Models surface.
-- **Goal:** (WP1) ocx's synthesized gpt-5.6 native entries match the upstream bundled
+- **Goal:** (WP1) opr's synthesized gpt-5.6 native entries match the upstream bundled
   models.json snapshot; (WP2) native GPT slugs can be disabled/enabled from the GUI
   Models page through the existing `disabledModels` choke point.
-- **Non-goals:** codex-rs changes; gpt-5.4 1M context override change (deliberate ocx
+- **Non-goals:** codex-rs changes; gpt-5.4 1M context override change (deliberate opr
   decision, upstream says 272k — keep); routed-model behavior; account pool.
 - **Verifier:** `bun x tsc --noEmit`; `bun test tests/codex-catalog.test.ts
   tests/codex-catalog-golden.test.ts tests/codex-catalog-sync-hardening.test.ts`; full
@@ -47,7 +47,7 @@ for everyday tasks", high "Greater reasoning depth for complex problems", xhigh 
 high reasoning depth for complex problems", max "Maximum reasoning depth for the
 hardest problems", ultra "Maximum reasoning with automatic task delegation".
 
-## ocx gaps (evidence)
+## opr gaps (evidence)
 
 - **G1 ladder wrong for luna:** `ensureGpt56ReasoningLevels` (src/codex/catalog.ts:517)
   appends max+ultra for ALL `gpt-5.6-*`; upstream luna has NO ultra.
@@ -76,12 +76,12 @@ hardest problems", ultra "Maximum reasoning with automatic task delegation".
 - Sync source for default-path users is the binary's bundled catalog EVERY sync, so
   visibility flips are re-applied deterministically from config each sync (sync
   rewrites the file from source + config every time).
-- ocx synthesis signature: `display_name === slug` (deriveEntry sets it). Real upstream
+- opr synthesis signature: `display_name === slug` (deriveEntry sets it). Real upstream
   entries use "GPT-5.6-Sol" style -> used as the replace-vs-preserve discriminator.
 
 ## Work-phase map (dependency order)
 
-1. **WP1 (010):** upstream snapshot bundled into ocx + catalog synthesis parity.
+1. **WP1 (010):** upstream snapshot bundled into opr + catalog synthesis parity.
    Foundations: the data + build paths WP2 filters operate on.
 2. **WP2 (020):** native GPT on/off toggles across sync, /v1/models, management API,
    GUI. Consumes WP1's entry sources.

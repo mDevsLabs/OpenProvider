@@ -92,7 +92,7 @@ function terminalFrames(frames: SseFrame[]): SseFrame[] {
 function wrapForLog(response: Response, entries: RequestLogEntry[]): Response {
   return responseWithDeferredRequestLog(
     response,
-    "ocx-web-search-timeout-contract",
+    "opr-web-search-timeout-contract",
     Date.now(),
     { model: "routed/model", provider: "routed" },
     entry => entries.push(entry),

@@ -5,7 +5,7 @@ function healthz(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status });
 }
 
-const OURS = { status: "ok", service: "opencodex", version: "2.6.17", uptime: 12, pid: 4242, port: 10100 };
+const OURS = { status: "ok", service: "openprovider", version: "2.6.17", uptime: 12, pid: 4242, port: 10100 };
 
 describe("isOpencodexHealthz", () => {
   test("accepts the explicit service marker", () => {
@@ -118,7 +118,7 @@ describe("findLiveProxy", () => {
         String(url).includes("58195") ? healthz(legacyBody) : healthz({ status: "ok" })) as typeof fetch,
     });
 
-    // The record's pid 1111 may be dead/reused — synthesizing it would let `ocx stop`
+    // The record's pid 1111 may be dead/reused — synthesizing it would let `opr stop`
     // kill an unrelated process via the taskkill/kill fallback.
     expect(live).toEqual({ pid: null, port: 58195, hostname: undefined });
   });

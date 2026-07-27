@@ -1,7 +1,7 @@
 # 비전 사이드카 긴급 복구 + 사이드이펙트 전면 정리 (260707)
 
 비상: Codex 앱 "This model does not support image inputs" — 사이드카 시작도 못 함.
-Session 019f34f2-3c06-7250-a2ee-dd3707f8130d, 최소 3 PABCD 사이클, ocx 무재시작.
+Session 019f34f2-3c06-7250-a2ee-dd3707f8130d, 최소 3 PABCD 사이클, opr 무재시작.
 
 ## WP1 — 비전 복구 (DONE, fb363e6)
 
@@ -41,7 +41,7 @@ thinking에서 tool-use 400 위험 → extractIterationThinking으로 첫 콜의
 - [N] 반복 실패 쿼리로 forceAnswer 미도달 시 response.incomplete 종료 가능 (loop.ts:256)
 - [N] structured-output 배치 결과 JSON 문자열 클램프로 invalid JSON 가능 (format-result.ts:63)
 - [N] 웹서치 턴 forceEmptyResponseId + 상태 미저장 → previous_response_id 연속성 갭 (responses.ts:474)
-- [B] authorization이 opencodex API key일 때 사이드카가 ChatGPT 토큰으로 오인 → 실패 시 fail-closed 마커 (수용)
+- [B] authorization이 openprovider API key일 때 사이드카가 ChatGPT 토큰으로 오인 → 실패 시 fail-closed 마커 (수용)
 - [B] input_image file_id / input_file 참조는 사이드카 미커버(파싱 단계 텍스트 강등) (parser.ts:37)
 - [B] previous_response_id 상태가 raw input 저장 → 이미지 턴 재확장 시 재묘사 비용 (state.ts:125)
 - [B] compaction v1 보존 메시지에서 이미지 블록 탈락 (compaction.ts:68)

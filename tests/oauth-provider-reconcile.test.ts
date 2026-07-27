@@ -18,7 +18,7 @@ afterEach(() => {
 
 describe("OAuth provider reconciliation", () => {
   test("migrates a saved Antigravity 3.5 preset without touching credentials or user fields", async () => {
-    const home = mkdtempSync(join(tmpdir(), "ocx-gemini-36-reconcile-"));
+    const home = mkdtempSync(join(tmpdir(), "opr-gemini-36-reconcile-"));
     homes.push(home);
     process.env.OPENCODEX_HOME = home;
     await saveCredential("google-antigravity", {

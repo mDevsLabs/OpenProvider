@@ -104,12 +104,12 @@ expected alias shape. Mirrors the image-guard precedent.
    A `"grok"` value would be silently dropped at write time unless both are updated.
 
 4. *Grok attribution — capability verified, provenance is best-effort.* I first claimed
-   Grok traffic is detectable from the fence's `api_key = "opencodex-loopback"`.
+   Grok traffic is detectable from the fence's `api_key = "openprovider-loopback"`.
    Reviewer round 1: `handleChatCompletions` (`src/server/chat-completions.ts:47-80`)
    has no attribution check and non-loopback admission
-   (`src/server/auth-cors.ts:184-188`) accepts only `x-opencodex-api-key` — so a static
+   (`src/server/auth-cors.ts:184-188`) accepts only `x-openprovider-api-key` — so a static
    client string cannot prove Grok origin. Reviewer round 2 pressed further: I then
-   proposed a dedicated `x-opencodex-grok: 1` header, but had NOT verified Grok can
+   proposed a dedicated `x-openprovider-grok: 1` header, but had NOT verified Grok can
    even send a custom header, and the fence emits only
    `model/base_url/api_backend/api_key/name` (`src/grok/inject.ts:152-160`).
 
@@ -119,7 +119,7 @@ expected alias shape. Mirrors the image-guard precedent.
    (`crates/codegen/xai-grok-pager/docs/user-guide/11-custom-models.md:89,111`), with a
    global `[models].extra_headers` default that a per-model entry overrides per key
    (`apply_global_extra_headers` in `config.rs`). So the fence CAN add
-   `extra_headers = { "x-opencodex-grok" = "1" }`.
+   `extra_headers = { "x-openprovider-grok" = "1" }`.
 
    **Provenance honesty (both rounds accepted).** Even so, a static header on a
    loopback bind is not cryptographic proof: any client on the same loopback can send
@@ -133,7 +133,7 @@ expected alias shape. Mirrors the image-guard precedent.
 `"grok"` and an explicit `"codex"` predicate that excludes `claude-desktop`; (b) update
 BOTH serializers and `parseUsageSurface`; (c) keep historical unlabelled entries in the
 legacy `codex` bucket (no retroactive relabel); (d) add a dedicated
-`x-opencodex-grok: 1` header to the fence and read it in `handleChatCompletions` to set
+`x-openprovider-grok: 1` header to the fence and read it in `handleChatCompletions` to set
 `surface: "grok"`; (e) add the `grok` filter tag + icon.
 
 ## D4 — context shows `200k` for models that are larger

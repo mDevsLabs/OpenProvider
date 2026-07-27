@@ -2,7 +2,7 @@
 
 ## 배경 / 증거
 
-- 사고 로그: `ocx-mrqaiw05-269` (2026-07-18 20:35:31 KST), model `k3[1m]`, provider `kimi`
+- 사고 로그: `opr-mrqaiw05-269` (2026-07-18 20:35:31 KST), model `k3[1m]`, provider `kimi`
   (Kimi Code OAuth, `https://api.kimi.com/coding/v1`, openai-chat 어댑터), 400
   `invalid_request_error`: assistant `tool_calls` 중 `request_user_input:353`에 대응하는
   tool 메시지 부재.
@@ -103,7 +103,7 @@ Sol 독립 감사 결과 eager flush(끼어든 메시지 전에 합성 결과를
 - id 하드닝: assistant tool_call의 id가 비어있으면 `call_ocx_minted_<n>`을 발급(기존 id와
   충돌 검사). 결과 매칭은 occurrence 큐에서 선형 탐색.
 - 합성 결과 문구(실행 상태 미상을 명시, 사용자 의도 사칭 금지):
-  `[ocx] no tool result was recorded for "<name>"; execution status unknown — do not treat this as success, failure, or user-provided input.`
+  `[opr] no tool result was recorded for "<name>"; execution status unknown — do not treat this as success, failure, or user-provided input.`
 
 ### 테스트 매트릭스 (개정)
 

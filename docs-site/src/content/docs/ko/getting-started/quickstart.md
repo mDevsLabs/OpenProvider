@@ -8,10 +8,10 @@ description: 첫 프로바이더를 설정하고 명령어 세 개로 OpenAI Cod
 ## 1. 설정 마법사 실행
 
 ```bash
-ocx init
+opr init
 ```
 
-`ocx init`은 다음 과정을 안내합니다:
+`opr init`은 다음 과정을 안내합니다:
 
 1. **프로바이더 선택** — 내장 레지스트리 프리셋 50개 중 하나를 고르거나, `custom`을 선택해
    base URL과 adapter를 직접 입력합니다.
@@ -22,7 +22,7 @@ ocx init
    `$CODEX_HOME/config.toml`(기본값 `~/.codex/config.toml`) 루트에 `openai_base_url`을 추가해
    Codex의 내장 `openai` 프로바이더가 프록시를 바라보게 합니다. LAN 등 외부 주소에 바인딩한
    구성에서는 API 인증 헤더가 포함된 전용 프로바이더 항목을 대신 사용합니다.
-6. **자동 시작 shim을 설치할까요?** — 켜 두면 `codex`를 실행할 때 먼저 `ocx ensure`가 실행됩니다.
+6. **자동 시작 shim을 설치할까요?** — 켜 두면 `codex`를 실행할 때 먼저 `opr ensure`가 실행됩니다.
 
 결과는 `$OpenProvider_HOME/config.json`(기본값 `~/.OpenProvider/config.json`)에 저장됩니다.
 
@@ -36,13 +36,13 @@ Codex에 제공하며, Cursor는 adapter가 제공하는 별도 메타데이터�
 ## 2. 프록시 시작
 
 ```bash
-ocx start            # 기본 포트 10100
-ocx start --port 8080
+opr start            # 기본 포트 10100
+opr start --port 8080
 ```
 
 시작 시 OpenProvider는:
 
-- PID를 `~/.OpenProvider/ocx.pid`에 기록하고(두 번 실행되는 것을 거부),
+- PID를 `~/.OpenProvider/opr.pid`에 기록하고(두 번 실행되는 것을 거부),
 - 지원하는 프로바이더에서는 실시간 모델을 조회하고, 네이티브 및 라우팅 항목을 **Codex 모델
   카탈로그에 동기화**하며,
 - `http://localhost:<port>/v1`에서 수신 대기합니다.
@@ -53,8 +53,8 @@ ocx start --port 8080
 확인:
 
 ```bash
-ocx status
-ocx gui       # 현재 포트에서 대시보드 열기
+opr status
+opr gui       # 현재 포트에서 대시보드 열기
 ```
 
 ## 3. Codex 사용
@@ -84,7 +84,7 @@ codex -m "openrouter/openai/gpt-5.6-luna" "Summarize this trace"
 ## Sub-agent 모델 선택(선택 사항)
 
 새 구성에는 `gpt-5.5`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-5.4-mini`가
-Codex의 sub-agent 선택기에 기본으로 표시됩니다. `ocx gui`에서 네이티브 모델과 라우팅 모델을
+Codex의 sub-agent 선택기에 기본으로 표시됩니다. `opr gui`에서 네이티브 모델과 라우팅 모델을
 합쳐 최대 다섯 개까지 바꾸거나 순서를 조정할 수 있습니다. 선호하는 sub-agent 모델과 reasoning
 effort도 지정할 수 있으며, OpenProvider는 이 값을 v1 협업 요청의 안내 메시지에 반영합니다.
 
@@ -93,8 +93,8 @@ effort도 지정할 수 있으며, OpenProvider는 이 값을 v1 협업 요청�
 일부 프로바이더는 실제 계정 로그인을 지원합니다(OAuth, 자동 갱신):
 
 ```bash
-ocx login xai          # 또는 anthropic, kimi, kiro, google-antigravity, cursor
-ocx logout xai
+opr login xai          # 또는 anthropic, kimi, kiro, google-antigravity, cursor
+opr logout xai
 ```
 
 기본 OpenAI 경로는 **키가 필요 없습니다** — 기존 `codex login` 자격 증명을 그대로 포워딩합니다.
@@ -105,9 +105,9 @@ OpenAI API 키를 따로 쓰려면 `openai-apikey` 프로바이더를 추가하�
 ## 중지 및 복원
 
 ```bash
-ocx stop          # 프록시를 중지하고 네이티브 Codex 복원
-ocx restore       # 프록시는 둔 채 네이티브 Codex 복원(별칭: ocx eject)
-ocx restore back  # 실행 중인 프록시로 Codex를 다시 연결
+opr stop          # 프록시를 중지하고 네이티브 Codex 복원
+opr restore       # 프록시는 둔 채 네이티브 Codex 복원(별칭: opr eject)
+opr restore back  # 실행 중인 프록시로 Codex를 다시 연결
 ```
 
 ## 다음

@@ -6,7 +6,7 @@ import { injectGrokConfig } from "../src/grok/inject";
 import { readGrokStatus } from "../src/grok/status";
 
 function tempGrokHome(): { root: string; grokHome: string } {
-  const root = mkdtempSync(join(tmpdir(), "ocx-grok-status-"));
+  const root = mkdtempSync(join(tmpdir(), "opr-grok-status-"));
   const grokHome = join(root, ".grok");
   mkdirSync(grokHome);
   return { root, grokHome };

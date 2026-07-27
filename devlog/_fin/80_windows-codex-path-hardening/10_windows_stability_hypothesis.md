@@ -2,7 +2,7 @@
 
 ## Premise
 
-macOS has been stable under the same opencodex usage pattern, while Windows users report frequent interruptions during use. That strongly suggests the fault is not ordinary provider routing logic or config injection alone. The likely boundary is where Windows differs from macOS:
+macOS has been stable under the same openprovider usage pattern, while Windows users report frequent interruptions during use. That strongly suggests the fault is not ordinary provider routing logic or config injection alone. The likely boundary is where Windows differs from macOS:
 
 - Bun runtime behavior on Windows;
 - long-lived SSE/WebSocket connection lifetime under Bun;
@@ -15,7 +15,7 @@ macOS has been stable under the same opencodex usage pattern, while Windows user
 Commit `929d756` fixes explicit service lifecycle cleanup:
 
 ```text
-ocx service stop/uninstall
+opr service stop/uninstall
   -> stop Task Scheduler wrapper
   -> kill tracked proxy PID via taskkill /T /F
   -> restore/delete

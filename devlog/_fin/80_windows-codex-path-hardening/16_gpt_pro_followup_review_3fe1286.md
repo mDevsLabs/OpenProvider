@@ -2,7 +2,7 @@
 
 Session: 01KW4RM1V6T5HRWYD27BAS1JQB
 Conversation: https://chatgpt.com/c/6a3f8b7a-77dc-83e8-bb3e-2c030b486539?mweb_fallback=1
-Submitted package: /tmp/opencodex-gptpro-review-20260627.zip
+Submitted package: /tmp/openprovider-gptpro-review-20260627.zip
 Branch pushed before review: dev
 Commit reviewed: 3fe12867e350c181343447c10f6a458eeb718f44
 
@@ -50,7 +50,7 @@ GPT Pro says runtime path diagnostics help, but users still lack a supported `OP
 
 Minimal next patch:
 - Add validated `OPENCODEX_BUN_PATH` override shared by CLI launcher and service installation.
-- Log `bun --version` and opencodex version in service log/status.
+- Log `bun --version` and openprovider version in service log/status.
 
 ## P2 findings
 

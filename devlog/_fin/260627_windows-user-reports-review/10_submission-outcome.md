@@ -4,11 +4,11 @@
 
 - Pushed `dev` to origin: `d3303bf..929d756`.
 - Local `dev` and `origin/dev` both point to `929d756314761da1b82107bc0314a5fd290cd7ff`.
-- GitHub dev URL: https://github.com/lidge-jun/opencodex/tree/dev
+- GitHub dev URL: https://github.com/lidge-jun/openprovider/tree/dev
 
 ## Review package
 
-- Zip: `/tmp/opencodex-windows-user-reports-review-260627/opencodex-windows-user-reports-review-dev-929d756.zip`
+- Zip: `/tmp/openprovider-windows-user-reports-review-260627/openprovider-windows-user-reports-review-dev-929d756.zip`
 - Includes:
   - `00_user-report-plan.md`
   - Windows lifecycle fix devlog plan/outcome

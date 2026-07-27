@@ -8,13 +8,13 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 
-const [opencodexHome, codexHome] = Bun.argv.slice(2);
-if (!opencodexHome || !codexHome) {
+const [openproviderHome, codexHome] = Bun.argv.slice(2);
+if (!openproviderHome || !codexHome) {
   throw new Error("provider-option migration child requires two home paths");
 }
-mkdirSync(opencodexHome, { recursive: true, mode: 0o700 });
+mkdirSync(openproviderHome, { recursive: true, mode: 0o700 });
 mkdirSync(codexHome, { recursive: true, mode: 0o700 });
-process.env.OPENCODEX_HOME = opencodexHome;
+process.env.OPENCODEX_HOME = openproviderHome;
 process.env.CODEX_HOME = codexHome;
 
 const forward = {
@@ -71,7 +71,7 @@ const originalConfig = {
   },
 };
 const original = JSON.stringify(originalConfig, null, 2) + "\n";
-const configPath = join(opencodexHome, "config.json");
+const configPath = join(openproviderHome, "config.json");
 const v1BackupPath = `${configPath}.pre-openai-tiers-v1.bak`;
 const v2BackupPath = `${configPath}.pre-openai-tiers-v2.bak`;
 const v1Sentinel = "historical-v1-sentinel\n";

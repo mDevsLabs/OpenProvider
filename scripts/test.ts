@@ -11,10 +11,10 @@ export interface IsolatedTestEnvironment {
 export function createIsolatedTestEnvironment(
   baseEnv: Record<string, string | undefined> = process.env,
 ): IsolatedTestEnvironment {
-  const root = mkdtempSync(join(tmpdir(), "opencodex-test-"));
-  const opencodexHome = join(root, ".opencodex");
+  const root = mkdtempSync(join(tmpdir(), "openprovider-test-"));
+  const openproviderHome = join(root, ".openprovider");
   const codexHome = join(root, ".codex");
-  mkdirSync(opencodexHome, { recursive: true });
+  mkdirSync(openproviderHome, { recursive: true });
   mkdirSync(codexHome, { recursive: true });
 
   return {
@@ -23,7 +23,7 @@ export function createIsolatedTestEnvironment(
       ...baseEnv,
       HOME: root,
       USERPROFILE: root,
-      OPENCODEX_HOME: opencodexHome,
+      OPENCODEX_HOME: openproviderHome,
       CODEX_HOME: codexHome,
     },
     cleanup() {

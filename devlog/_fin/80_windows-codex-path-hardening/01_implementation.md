@@ -16,11 +16,11 @@ This removes scattered `homedir()/.codex` assumptions from config injection and 
 `src/codex-inject.ts` now writes the modern shape:
 
 ```toml
-model_provider = "opencodex"
-model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
+model_provider = "openprovider"
+model_catalog_json = "/absolute/path/to/openprovider-catalog.json"
 
-[model_providers.opencodex]
-name = "OpenCodex Proxy"
+[model_providers.openprovider]
+name = "OpenProvider Proxy"
 base_url = "http://localhost:10100/v1"
 wire_api = "responses"
 ```
@@ -28,15 +28,15 @@ wire_api = "responses"
 Key details:
 
 - root `model_provider` is inserted before the first TOML table;
-- existing root or stale opencodex `model_provider` keys are stripped before re-injection;
-- old `[profiles.opencodex]` blocks are removed;
-- `$CODEX_HOME/opencodex.config.toml` is written as a standalone profile file;
+- existing root or stale openprovider `model_provider` keys are stripped before re-injection;
+- old `[profiles.openprovider]` blocks are removed;
+- `$CODEX_HOME/openprovider.config.toml` is written as a standalone profile file;
 - existing custom `model_catalog_json` root paths are preserved;
 - the default generated catalog path comes from `DEFAULT_CATALOG_PATH`, now rooted at resolved `CODEX_HOME`.
 
 ## Catalog Sync
 
-`src/codex-catalog.ts` now resolves the catalog path from the active Codex config, falling back to `$CODEX_HOME/opencodex-catalog.json`.
+`src/codex-catalog.ts` now resolves the catalog path from the active Codex config, falling back to `$CODEX_HOME/openprovider-catalog.json`.
 
 The important behavior is that cache invalidation targets:
 
@@ -82,7 +82,7 @@ This matches the systemd user-service model added in Phase 70, but fixes the Cod
 Task Scheduler runs through a generated wrapper script:
 
 ```text
-~/.opencodex/opencodex-service.cmd
+~/.openprovider/openprovider-service.cmd
 ```
 
 The wrapper sets:

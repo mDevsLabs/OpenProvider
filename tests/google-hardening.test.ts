@@ -68,7 +68,7 @@ describe("google provider hardening", () => {
     const adapter = createGoogleAdapter(antigravityProvider({ apiKey: "   " }));
 
     await expect(adapter.buildRequest(parsed())).rejects.toThrow(
-      "google-antigravity oauth token missing — run ocx login google-antigravity",
+      "google-antigravity oauth token missing — run opr login google-antigravity",
     );
   });
 
@@ -167,7 +167,7 @@ describe("google provider hardening", () => {
       ));
 
       expect(events).toContainEqual({ type: "heartbeat" });
-      const dropped = getDebugLogEntries().filter(entry => entry.line.includes("[ocx:frame-drop] google"));
+      const dropped = getDebugLogEntries().filter(entry => entry.line.includes("[opr:frame-drop] google"));
       expect(dropped).toHaveLength(1);
       expect(dropped[0]?.line).toContain("bytes=7");
     } finally {

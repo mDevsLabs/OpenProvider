@@ -30,20 +30,20 @@ Either is acceptable. Deleting is cleaner because Codex's default is false.
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:408
-/tmp/opencodex-codex-src/codex-rs/models-manager/src/model_info.rs:68
-/tmp/opencodex-codex-src/codex-rs/core/src/client_common.rs:52
-/tmp/opencodex-codex-src/codex-rs/core/src/client.rs:700
-/tmp/opencodex-codex-src/codex-rs/core/src/client.rs:759
-/tmp/opencodex-codex-src/codex-rs/core/src/client.rs:811
-/tmp/opencodex-codex-src/codex-rs/core/src/client.rs:840
-/tmp/opencodex-codex-src/codex-rs/core/src/client.rs:1644
-/tmp/opencodex-codex-src/codex-rs/core/src/client.rs:1746
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:408
+/tmp/openprovider-codex-src/codex-rs/models-manager/src/model_info.rs:68
+/tmp/openprovider-codex-src/codex-rs/core/src/client_common.rs:52
+/tmp/openprovider-codex-src/codex-rs/core/src/client.rs:700
+/tmp/openprovider-codex-src/codex-rs/core/src/client.rs:759
+/tmp/openprovider-codex-src/codex-rs/core/src/client.rs:811
+/tmp/openprovider-codex-src/codex-rs/core/src/client.rs:840
+/tmp/openprovider-codex-src/codex-rs/core/src/client.rs:1644
+/tmp/openprovider-codex-src/codex-rs/core/src/client.rs:1746
 ```
 
 ## Current Observation
 
-The current local opencodex catalog shows:
+The current local openprovider catalog shows:
 
 ```text
 use_responses_lite: false
@@ -52,7 +52,7 @@ use_responses_lite: false
 for both native and routed sample entries in:
 
 ```text
-/Users/jun/.codex/opencodex-catalog.json
+/Users/jun/.codex/openprovider-catalog.json
 ```
 
 That is currently safe, but still inherited. The Phase 100 policy is to make the safe value
@@ -66,10 +66,10 @@ Do not set provider-level:
 supports_websockets = true
 ```
 
-for opencodex until there is an end-to-end Responses websocket proxy.
+for openprovider until there is an end-to-end Responses websocket proxy.
 
 Current routed providers mostly end in HTTP/SSE provider APIs. A websocket first hop from Codex to
-opencodex would not remove the upstream HTTP/SSE bottleneck and can introduce fallback or protocol
+openprovider would not remove the upstream HTTP/SSE bottleneck and can introduce fallback or protocol
 mismatch risk.
 
 ## Implementation Rule

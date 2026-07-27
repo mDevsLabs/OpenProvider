@@ -20,9 +20,9 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
   previousGrokHome = process.env.GROK_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-grok-mgmt-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-grok-mgmt-"));
-  grokRoot = mkdtempSync(join(tmpdir(), "ocx-grok-home-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-grok-mgmt-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-grok-mgmt-"));
+  grokRoot = mkdtempSync(join(tmpdir(), "opr-grok-home-"));
   process.env.OPENCODEX_HOME = testDir;
   process.env.GROK_HOME = grokRoot;
   saveConfig({

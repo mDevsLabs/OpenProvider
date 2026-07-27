@@ -9,7 +9,7 @@ No source-code change; the runtime limitation lives client-side.
 > Known limitation: when a **native** parent (e.g. gpt-5.6-sol on v2) spawns a
 > child routed to a **non-native** provider, the Codex client may send the
 > `NEW_TASK` payload only as backend-encrypted `encrypted_content`; the routed
-> child then receives an empty task body (tracked as opencodex#92). Overrides
+> child then receives an empty task body (tracked as openprovider#92). Overrides
 > with `fork_turns: "none"` apply the model correctly, but the task text can be
 > lost. For heterogeneous-provider delegation, the v1 surface remains the
 > reliable choice.
@@ -43,7 +43,7 @@ No source-code change; the runtime limitation lives client-side.
 
 ## NEW artifact (in this doc, not filed): upstream issue draft — COMPLETE TEXT
 
-B-phase task: update the placeholders (client version, opencodex version,
+B-phase task: update the placeholders (client version, openprovider version,
 subscription plan — the upstream Codex App/CLI issue templates require
 subscription in addition to version; pick the CLI template unless the repro
 used the App), re-run the reproduction to refresh the probe JSON, then hand
@@ -74,8 +74,8 @@ surrounding context.
 - Codex client: <App/CLI version at filing time>
 - Subscription: <plan at filing time — required by the upstream template>
 - Platform: macOS (issue #92 reporter environment was Windows; both affected)
-- Proxy: opencodex <version> (`multiAgentMode: "v2"`), issue
-  lidge-jun/opencodex#92
+- Proxy: openprovider <version> (`multiAgentMode: "v2"`), issue
+  lidge-jun/openprovider#92
 - Parent model: `gpt-5.6-sol` (native, v2 surface)
 - Child spawn: `spawn_agent` with `fork_turns: "none"`, `model: "xai/grok-4.5"`
 
@@ -86,7 +86,7 @@ surrounding context.
    proxy routes to a third-party provider.
 3. Inspect the child's first request as received by the proxy.
 
-Observed (opencodex dev-HEAD probe, 2026-07-18):
+Observed (openprovider dev-HEAD probe, 2026-07-18):
 
 ```json
 {
@@ -114,7 +114,7 @@ proxy cannot decrypt it, and the routed child receives
 - Same-backend children (no override, or overrides within the native family)
   appear unaffected in our testing to date.
 - This is distinct from the earlier plaintext-parked-in-encrypted-slot case
-  (addressed by the patch associated with closed opencodex PR #94 and
+  (addressed by the patch associated with closed openprovider PR #94 and
   subsequently landed on dev; regression-pinned in
   tests/multi-agent-compat.test.ts:364/405/418) and from compaction/429
   reports; the payload here is pure ciphertext.

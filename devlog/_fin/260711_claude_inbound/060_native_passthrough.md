@@ -1,6 +1,6 @@
 # 060 — Subscription-preserving launch + native Anthropic passthrough
 
-User follow-up after live smoke: (1) `ocx claude` triggered "claude.ai connectors
+User follow-up after live smoke: (1) `opr claude` triggered "claude.ai connectors
 are disabled because ANTHROPIC_API_KEY or another auth source is set", (2) asked
 for a NATIVE pierce for claude models, referencing KarpelesLab/teamclaude.
 
@@ -47,6 +47,6 @@ for a NATIVE pierce for claude models, referencing KarpelesLab/teamclaude.
 
 - Suite 2152 pass / 1 pre-existing env fail (install-scripts wants node on PATH);
   tsc clean; gui + docs builds clean.
-- NEEDS_HUMAN: rerun `ocx claude` (proxy restarted from this build) — expect no
+- NEEDS_HUMAN: rerun `opr claude` (proxy restarted from this build) — expect no
   connectors warning; `/model` claude models bill the subscription natively;
   aliases still route.

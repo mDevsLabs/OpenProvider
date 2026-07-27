@@ -9,7 +9,7 @@
 
 ## Goal
 
-Let opencodex stream Gemini via **Vertex AI** (project/location endpoints + GCP auth) by reusing the
+Let openprovider stream Gemini via **Vertex AI** (project/location endpoints + GCP auth) by reusing the
 existing `google` adapter's SSE parser and message conversion — adding only a mode branch + a GCP token resolver.
 
 ## What we port (jawcode)
@@ -18,9 +18,9 @@ existing `google` adapter's SSE parser and message conversion — adding only a 
   - sources (priority): `GOOGLE_APPLICATION_CREDENTIALS` (service_account RS256 JWT exchange `:102-139`, or authorized_user refresh `:141-153`) → `~/.config/gcloud/application_default_credentials.json` → GCE metadata server (`:155-172`).
   - token cache + 60s refresh skew (`:56-58`) + inflight-promise dedup (`:54,230-245`).
 - **URL templates** (`google-vertex.ts:38-51,79-81`): ADC → `https://{location}-aiplatform.googleapis.com/v1/projects/{project}/locations/{location}/publishers/google/models/{model}:streamGenerateContent?alt=sse`; `location==="global"` → `aiplatform.googleapis.com`; API-key path → `x-goog-api-key`.
-- **Body:** unchanged — Vertex reuses the same Gemini params (`messagesToGeminiFormat`); opencodex `google.ts:16-67` is line-for-line equivalent to jawcode `google-shared.ts:convertMessages`. **No new wire.**
+- **Body:** unchanged — Vertex reuses the same Gemini params (`messagesToGeminiFormat`); openprovider `google.ts:16-67` is line-for-line equivalent to jawcode `google-shared.ts:convertMessages`. **No new wire.**
 
-## opencodex fit
+## openprovider fit
 
 - **Config** (`src/types.ts` `OcxProviderConfig`): add `googleMode?: "ai-studio" | "vertex"`, `project?`, `location?`.
 - **Adapter** (`src/adapters/google.ts createGoogleAdapter`): branch `buildRequest` on `googleMode` (default `"ai-studio"` → backward compatible). Vertex branch builds the project/location URL + resolves the ADC Bearer (or `x-goog-api-key`). `parseStream` **unchanged** (mode-agnostic SSE, `google.ts:120-184`).

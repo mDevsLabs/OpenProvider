@@ -1,5 +1,5 @@
 /**
- * WinSW-backed native Windows service (opt-in via `ocx service install --native`).
+ * WinSW-backed native Windows service (opt-in via `opr service install --native`).
  *
  * Design (devlog/_plan/260720_windows_service/060):
  * - WinSW 2.12.0 NET461 build, downloaded on first native install and verified against
@@ -27,8 +27,8 @@ export const WINSW_URL = `https://github.com/winsw/winsw/releases/download/v${WI
 /** SHA-256 of the official v2.12.0 WinSW.NET461.exe release asset (655872 bytes). */
 export const WINSW_SHA256 = "b5066b7bbdfba1293e5d15cda3caaea88fbeab35bd5b38c41c913d492aadfc4f";
 
-/** SCM service id — distinct from the Task Scheduler task name (opencodex-proxy). */
-export const WINSW_SERVICE_ID = "opencodex-proxy-native";
+/** SCM service id — distinct from the Task Scheduler task name (openprovider-proxy). */
+export const WINSW_SERVICE_ID = "openprovider-proxy-native";
 
 export function winswDir(): string {
   return join(getConfigDir(), "winsw");
@@ -198,7 +198,7 @@ export function statusWinswRaw(): WinswStatus {
     }
   }
   // A missing exe does NOT prove the SCM registration is gone (quarantined binary,
-  // partial uninstall): a stale opencodex-proxy-native registration can outlive it.
+  // partial uninstall): a stale openprovider-proxy-native registration can outlive it.
   // Confirm absence against the SCM itself before reporting "nonexistent".
   if (process.platform !== "win32") return "nonexistent";
   const probe = probeScmRegistration();
@@ -257,7 +257,7 @@ function assertServiceAccountApplied(env: NodeJS.ProcessEnv = process.env): void
     try { runWinsw(["uninstall"]); } catch { /* rollback is best-effort */ }
     throw new Error(
       `Native service was registered as "${startName || "unknown"}" instead of the current user; ` +
-        "rolled back. Re-run `ocx service install --native` and enter the account credentials when prompted.",
+        "rolled back. Re-run `opr service install --native` and enter the account credentials when prompted.",
     );
   }
 }
@@ -290,7 +290,7 @@ export async function installWinswService(entry: WinswEntry, deps: WinswInstallD
   if (existing === "unknown") {
     throw new Error(
       "Could not query the native service state (WinSW status failed or returned an unexpected result). " +
-        "Refusing to guess the install state — check 'ocx service status' and retry.",
+        "Refusing to guess the install state — check 'opr service status' and retry.",
     );
   }
   if (existing === "nonexistent") {
@@ -348,7 +348,7 @@ export function winswStatusSummary(): string {
   if (status === "nonexistent") {
     // A stale SCM service can outlive a deleted exe; surface the repair path.
     return existsSync(winswXmlPath()) && !existsSync(winswExePath())
-      ? "native assets present but WinSW binary missing — run 'ocx service install --native' to repair"
+      ? "native assets present but WinSW binary missing — run 'opr service install --native' to repair"
       : "";
   }
   return `native (WinSW ${WINSW_VERSION}): ${status}`;

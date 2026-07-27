@@ -9,7 +9,7 @@ injecting a tool_result text.
 ## Background (from 00_research.md)
 
 codex-rs natively parses `ResponseItem::WebSearchCall` (wire `web_search_call`)
-and renders it as a web-search history cell. opencodex already speaks the
+and renders it as a web-search history cell. openprovider already speaks the
 Responses SSE that codex-rs consumes (`src/bridge.ts`), but the web-search loop
 intercepts the synthetic `web_search` call, runs the real search via the ChatGPT
 forward sidecar, and feeds only text back to the routed model. The native UI item

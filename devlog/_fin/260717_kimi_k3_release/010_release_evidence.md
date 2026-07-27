@@ -12,7 +12,7 @@
 - [ ] `@mdevs/openprovider@2.7.23` publishes under npm `latest`.
 - [ ] `v2.7.23`, the GitHub Release, and all three remote branches resolve to the
   exact release commit.
-- [ ] A clean temporary-prefix install runs `ocx help` without a system Bun.
+- [ ] A clean temporary-prefix install runs `opr help` without a system Bun.
 
 ## Pre-release evidence
 

@@ -5,7 +5,7 @@
 
 ## Objective
 
-ChatGPT Codex 백엔드의 transient 5xx(502/503/504/520류)가 `ocx claude` 경유
+ChatGPT Codex 백엔드의 transient 5xx(502/503/504/520류)가 `opr claude` 경유
 Claude Code Task 에이전트를 즉사시키는 구조를 제거한다. 세 겹 방어:
 (1) 프록시가 pre-stream 5xx를 직접 재시도, (2) 재시도 소진분은 Claude Code가
 스스로 재시도하도록 529 `overloaded_error`로 분류, (3) 다음 사건을 위해 실패
@@ -17,7 +17,7 @@ Claude Code Task 에이전트를 즉사시키는 구조를 제거한다. 세 겹
 - Trigger: 2026-07-15 sol 빌더 72콜 유실 사건, 48h 내 sol 502 42건
 - Goal: transient 5xx 1회당 Task 즉사 → 프록시/클라이언트 재시도로 흡수
 - Non-goals: mid-stream blind replay·커서 resume(업스트림 커서 부재로 불안전,
-  relay.ts fail-closed 계약 유지), WebSocket 전송 전환, 라이브 ocx 재시작, git push
+  relay.ts fail-closed 계약 유지), WebSocket 전송 전환, 라이브 opr 재시작, git push
 - Verifier: `bun test --isolate ./tests/` exit 0 + 신규 activation 테스트 + 임시 포트 스모크
 - Stop: 5개 수락 기준(goalplan cr1~cr5) 충족 or BLOCKED/NEEDS_HUMAN/BUDGET_EXHAUSTED
 - Memory artifact: 이 devlog 유닛 + goalplan ledger

@@ -8,7 +8,7 @@ import { PROXY_MARKER } from "../src/claude/auth-detect";
 import type { OcxConfig } from "../src/types";
 
 /**
- * Auto must reach PLAIN `claude` launches, not just `ocx claude`. Before this, the
+ * Auto must reach PLAIN `claude` launches, not just `opr claude`. Before this, the
  * shell-env file and launchctl keyed on a stored "proxy", so an auto+absent user got
  * nothing from auto-connect (devlog 260726_claude_auth_auto/035).
  *
@@ -54,7 +54,7 @@ beforeEach(() => {
   delete process.env.ANTHROPIC_API_KEY;
   delete process.env.ANTHROPIC_AUTH_TOKEN;
   // An empty profile dir + a HOME with no ~/.claude.json = detection "absent".
-  const empty = fs.mkdtempSync(join(tmpdir(), "ocx-sysenv-"));
+  const empty = fs.mkdtempSync(join(tmpdir(), "opr-sysenv-"));
   process.env.CLAUDE_CONFIG_DIR = empty;
   process.env.HOME = empty;
 

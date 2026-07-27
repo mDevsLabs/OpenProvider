@@ -67,7 +67,7 @@ The in-process alias-scoped lock is not sufficient for shared homes or duplicate
 Requirements:
 
 - refresh lock key must be a verified grant/subject fingerprint, not the local alias;
-- locking must work across processes sharing the same opencodex home, or storage must provide an atomic transaction with equivalent behavior;
+- locking must work across processes sharing the same openprovider home, or storage must provide an atomic transaction with equivalent behavior;
 - `saveCodexAccountCredentialIfGeneration()` must compare the current generation and bump generation in one atomic operation;
 - concurrent refreshes with the same starting generation may result in at most one credential write;
 - later refresh completions after delete/replacement must discard without rewriting tokens.

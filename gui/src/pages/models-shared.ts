@@ -64,10 +64,10 @@ export const THREAD_OPTIONS = [4, 8, 16, 32, 64, 128, 256, 500, 1000];
 export const THREAD_OPTION_SET = new Set(THREAD_OPTIONS);
 export const PAGE = 60; // rows rendered per provider before a "show more"
 
-export const COLLAPSED_KEY_V1 = "ocx-models-collapsed:v1";
-export const COLLAPSED_KEY_LEGACY = "ocx-models-collapsed";
-export const COMBOS_OPEN_KEY_V1 = "ocx-models-combos-open:v1";
-export const COMBOS_OPEN_KEY_LEGACY = "ocx-models-combos-open";
+export const COLLAPSED_KEY_V1 = "opr-models-collapsed:v1";
+export const COLLAPSED_KEY_LEGACY = "opr-models-collapsed";
+export const COMBOS_OPEN_KEY_V1 = "opr-models-combos-open:v1";
+export const COMBOS_OPEN_KEY_LEGACY = "opr-models-combos-open";
 
 /** Compact token display (350k) — unit is technical, not prose. */
 export function fmtK(n: number): string {

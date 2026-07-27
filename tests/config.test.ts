@@ -30,7 +30,7 @@ import { hardenConfigDir, hardenExistingSecret, renameAtomicFile, saveConfig } f
 let testDir = "";
 
 beforeEach(() => {
-  testDir = mkdtempSync(join(tmpdir(), "ocx-config-"));
+  testDir = mkdtempSync(join(tmpdir(), "opr-config-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 
@@ -66,7 +66,7 @@ function writeResponsesPathConfig(responsesPath: string): void {
   });
 }
 
-describe("opencodex config defaults", () => {
+describe("openprovider config defaults", () => {
   test("atomic rename retries transient Windows sharing violations", () => {
     const sleeps: number[] = [];
     let attempts = 0;
@@ -349,7 +349,7 @@ describe("opencodex config defaults", () => {
   });
 
   test("resolves relative OPENCODEX_HOME once to an absolute config directory", () => {
-    const parent = mkdtempSync(join(tmpdir(), "ocx-config-parent-"));
+    const parent = mkdtempSync(join(tmpdir(), "opr-config-parent-"));
     const oldCwd = process.cwd();
     try {
       process.env.OPENCODEX_HOME = "relative-home";
@@ -361,7 +361,7 @@ describe("opencodex config defaults", () => {
 
       expect(firstPath).toBe(join(expectedConfigDir, "config.json"));
       expect(getConfigPath()).toBe(firstPath);
-      expect(getPidPath()).toBe(join(expectedConfigDir, "ocx.pid"));
+      expect(getPidPath()).toBe(join(expectedConfigDir, "opr.pid"));
     } finally {
       process.chdir(oldCwd);
       rmSync(parent, { recursive: true, force: true });
@@ -371,8 +371,8 @@ describe("opencodex config defaults", () => {
   test("uses the default home when OPENCODEX_HOME is unset", () => {
     delete process.env.OPENCODEX_HOME;
 
-    expect(getConfigPath()).toBe(join(homedir(), ".opencodex", "config.json"));
-    expect(getPidPath()).toBe(join(homedir(), ".opencodex", "ocx.pid"));
+    expect(getConfigPath()).toBe(join(homedir(), ".openprovider", "config.json"));
+    expect(getPidPath()).toBe(join(homedir(), ".openprovider", "opr.pid"));
   });
 
   test("loads UTF-8 BOM config files written by Windows tools", () => {
@@ -405,7 +405,7 @@ describe("opencodex config defaults", () => {
       const backups = backupNames();
       expect(backups).toHaveLength(1);
       expect(readFileSync(join(testDir, backups[0]), "utf-8")).toBe("{ invalid json");
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Could not load opencodex config"));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Could not load openprovider config"));
     } finally {
       errorSpy.mockRestore();
     }
@@ -820,14 +820,14 @@ describe("opencodex config defaults", () => {
     expect(parsePidFile("not-json")).toBeNull();
   });
 
-  test("recognizes opencodex start command lines", () => {
+  test("recognizes openprovider start command lines", () => {
     expect(isOcxStartCommandLine('bun run src/cli.ts start')).toBe(true);
     expect(isOcxStartCommandLine('"C:/tools/bun/bin/bun.exe" "run" "src/cli/index.ts" "start"')).toBe(true);
     expect(isOcxStartCommandLine('bun C:/tools/bun/install/global/node_modules/@mdevs/openprovider/src/cli.ts start')).toBe(true);
-    expect(isOcxStartCommandLine("opencodex start")).toBe(true);
+    expect(isOcxStartCommandLine("openprovider start")).toBe(true);
 
     expect(isOcxStartCommandLine("bun run src/cli.ts status")).toBe(false);
-    expect(isOcxStartCommandLine("bun test C:/work/opencodex/tests/config.test.ts")).toBe(false);
+    expect(isOcxStartCommandLine("bun test C:/work/openprovider/tests/config.test.ts")).toBe(false);
     expect(isOcxStartCommandLine("notepad.exe")).toBe(false);
   });
 

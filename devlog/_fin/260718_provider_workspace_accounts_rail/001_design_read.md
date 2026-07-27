@@ -2,7 +2,7 @@
 
 ```yaml
 ---
-name: opencodex-provider-workspace
+name: openprovider-provider-workspace
 colors:
   primary: "var(--text)"
   accent: "var(--accent)"
@@ -17,7 +17,7 @@ iconography:
 ---
 ```
 
-Reading this as: a desktop-first developer operations console for repeated provider and account management, using OpenCodex's existing monochrome OpenAI-like product grammar. The defining behavior is not decoration: account identity becomes a first-class tab, and each rail row reads as one coherent status object.
+Reading this as: a desktop-first developer operations console for repeated provider and account management, using OpenProvider's existing monochrome OpenAI-like product grammar. The defining behavior is not decoration: account identity becomes a first-class tab, and each rail row reads as one coherent status object.
 
 - Do: preserve brand assets, semantic colors, 4px spacing, compact controls, obvious active/pending/error state, and short Korean labels.
 - Do not: add card stacks, gradients, glass panels, new icon packages, raw IDs, horizontal account-pill overflow, or motion beyond feedback.

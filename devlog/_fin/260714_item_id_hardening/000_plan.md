@@ -3,8 +3,8 @@
 ## Root Cause Chain
 
 Four distinct item-ID bugs surfaced today when subagents running through the
-opencodex proxy (gpt-5.6-sol via ocx port 10100) hit upstream 400/404 errors
-on the Responses API. All share the same mechanism: opencodex generates or
+openprovider proxy (gpt-5.6-sol via opr port 10100) hit upstream 400/404 errors
+on the Responses API. All share the same mechanism: openprovider generates or
 preserves item IDs that violate OpenAI's per-type prefix validation, then
 replays them in `input[]` on subsequent turns via `previous_response_id`
 local-state expansion.
@@ -42,7 +42,7 @@ sanitizer.
 
 When `store=false`, OpenAI does not persist response items. Any item ID
 forwarded in `input[]` is interpreted as a reference to a stored item that
-does not exist → 404. opencodex's local continuation cache (`force` bypass)
+does not exist → 404. openprovider's local continuation cache (`force` bypass)
 stores items despite `store=false`, then replays them with IDs intact.
 
 Fix: `stripItemIdsWhenUnstored` strips ALL item IDs when `store === false`,
@@ -52,7 +52,7 @@ matching codex-rs behavior (`core/src/client.rs:918-925`).
 
 Source of truth: codex-rs `core/src/session/mod.rs:2801-2818`.
 
-| Item type               | Prefix  | opencodex generates? |
+| Item type               | Prefix  | openprovider generates? |
 |--------------------------|---------|----------------------|
 | Message                  | `msg_`  | Yes (bridge.ts)      |
 | Reasoning                | `rs_`   | Yes (bridge.ts)      |

@@ -17,8 +17,8 @@ export interface GrokInjectResult {
   skippedReason?: "no-grok-home" | "orphaned-marker" | "non-loopback";
 }
 
-const BEGIN_MARKER = "# >>> opencodex managed block — do not edit (removed by `ocx stop`) >>>";
-const END_MARKER = "# <<< opencodex managed block <<<";
+const BEGIN_MARKER = "# >>> openprovider managed block — do not edit (removed by `opr stop`) >>>";
+const END_MARKER = "# <<< openprovider managed block <<<";
 // grok 0.2.101 verified live (2026-07-23): [model_providers.<id>] inheritance parses but the
 // inherited base_url is NOT applied to inference routing — the turn falls through to the default
 // cli-chat-proxy and 401s. Per-model direct fields DO route. So every [model.*] block carries its
@@ -94,8 +94,8 @@ function canonicalKeySegment(raw: string): string {
 
 /**
  * `[model.<alias>]` table headers the USER owns (outside our fence) — reserved for collisions.
- * TOML admits equivalent header spellings for BOTH segments (`["model"."ocx-mine"]`,
- * `['model'.ocx-mine]`, `[ model . ocx-mine ]`); all of them redefine the same table, so each
+ * TOML admits equivalent header spellings for BOTH segments (`["model"."opr-mine"]`,
+ * `['model'.opr-mine]`, `[ model . opr-mine ]`); all of them redefine the same table, so each
  * form is canonicalized before it is reserved.
  */
 function userModelAliases(content: string, region: ManagedRegion | null): Set<string> {
@@ -114,9 +114,9 @@ function userModelAliases(content: string, region: ManagedRegion | null): Set<st
  * The api_key literal every generated entry carries. It is the STRONG ownership signal:
  * a value we mint, that a human has no reason to type by hand.
  */
-const OPENCODEX_API_KEY = "opencodex-loopback";
+const OPENCODEX_API_KEY = "openprovider-loopback";
 
-/** A plain `[model.<alias>]` table outside the fence that opencodex itself wrote. */
+/** A plain `[model.<alias>]` table outside the fence that openprovider itself wrote. */
 interface OrphanTable {
   alias: string;
   /** The model id this entry routes to — used to find its replacement alias. */
@@ -152,7 +152,7 @@ function isLoopbackBaseUrl(value: string | undefined): boolean {
 }
 
 /**
- * Model tables OUTSIDE the fence that opencodex itself wrote (#511).
+ * Model tables OUTSIDE the fence that openprovider itself wrote (#511).
  *
  * These are entries from a version that predates the markers (or predates
  * `context_window`). Because they sit outside the fence, `userModelAliases` reserves
@@ -237,9 +237,9 @@ function orphanedMarkerResult(action: string): GrokInjectResult {
   return {
     ok: false,
     changed: false,
-    message: `Grok config ${action} refused: found the opencodex begin marker without its end marker. `
+    message: `Grok config ${action} refused: found the openprovider begin marker without its end marker. `
       + "The managed region boundary is ambiguous, so nothing was modified. "
-      + "Repair ~/.grok/config.toml manually (see config.toml.bak-opencodex) and re-run.",
+      + "Repair ~/.grok/config.toml manually (see config.toml.bak-openprovider) and re-run.",
     skippedReason: "orphaned-marker",
   };
 }
@@ -279,7 +279,7 @@ export function buildGrokManagedBlock(
   const taken = new Set(reservedAliases ?? []);
 
   for (const model of models) {
-    const baseAlias = `ocx-${model.id.replace(/[^A-Za-z0-9_-]/g, "-")}`;
+    const baseAlias = `opr-${model.id.replace(/[^A-Za-z0-9_-]/g, "-")}`;
     let count = (aliasCounts.get(baseAlias) ?? 0) + 1;
     let alias = count === 1 ? baseAlias : `${baseAlias}-${count}`;
     // User-owned [model.<alias>] tables outside the fence are reserved: emitting a
@@ -300,12 +300,12 @@ export function buildGrokManagedBlock(
       `model = ${tomlString(model.id)}`,
       `base_url = ${tomlString(baseUrl)}`,
       'api_backend = "chat_completions"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       `name = ${tomlString(model.name ?? `OCX ${model.id}`)}`,
       // Best-effort attribution tag for the usage dashboard. Upstream Grok sends
       // extra_headers verbatim on inference calls (11-custom-models.md). This is NOT a
       // security boundary — any loopback client could send the same header.
-      'extra_headers = { "x-opencodex-grok" = "1" }',
+      'extra_headers = { "x-openprovider-grok" = "1" }',
     );
     if (Number.isFinite(model.contextWindow) && (model.contextWindow ?? 0) > 0) {
       lines.push(`context_window = ${model.contextWindow}`);
@@ -348,15 +348,15 @@ export function injectGrokConfig(
       ok: true, // a deliberate policy skip, not a failure — it must never block startup
       changed: removed.changed,
       skippedReason: "non-loopback",
-      message: `Grok auto-registration skipped: opencodex is bound to the non-loopback host `
+      message: `Grok auto-registration skipped: openprovider is bound to the non-loopback host `
         + `"${opts.hostname}", where requests need your admission token. A managed block would `
         + `either store that secret in ~/.grok/config.toml or overwrite it on the next start, so `
-        + `add the models yourself OUTSIDE the opencodex markers (see the Grok Build guide).${cleanup}`,
+        + `add the models yourself OUTSIDE the openprovider markers (see the Grok Build guide).${cleanup}`,
     };
   }
 
   const configPath = join(grokHome, "config.toml");
-  const backupPath = join(grokHome, "config.toml.bak-opencodex");
+  const backupPath = join(grokHome, "config.toml.bak-openprovider");
   try {
     const configExisted = existsSync(configPath);
     const rawContent = configExisted ? readFileSync(configPath, "utf8") : "";
@@ -412,7 +412,7 @@ export function injectGrokConfig(
 
     const output = applyEol(nextContent, eol);
     if (output === rawContent) {
-      return { ok: true, changed: false, message: "Grok config already contains the current opencodex managed block." };
+      return { ok: true, changed: false, message: "Grok config already contains the current openprovider managed block." };
     }
     if (configExisted && !region) copyBackupOnce(configPath, backupPath);
     atomicWriteFile(configPath, output);
@@ -420,8 +420,8 @@ export function injectGrokConfig(
       ok: true,
       changed: true,
       message: region
-        ? "Updated the opencodex managed block in Grok config."
-        : "Added the opencodex managed block to Grok config.",
+        ? "Updated the openprovider managed block in Grok config."
+        : "Added the openprovider managed block to Grok config.",
     };
   } catch (error) {
     return errorResult("inject", error);
@@ -450,7 +450,7 @@ export function stripGrokConfig(opts: { grokHome?: string } = {}): GrokInjectRes
     const content = applyEol(rawContent, "\n");
     const region = findManagedRegion(content);
     if (!region) {
-      return { ok: true, changed: false, message: "No opencodex managed block found in Grok config." };
+      return { ok: true, changed: false, message: "No openprovider managed block found in Grok config." };
     }
     if (region.orphaned) return orphanedMarkerResult("cleanup");
 
@@ -470,7 +470,7 @@ export function stripGrokConfig(opts: { grokHome?: string } = {}): GrokInjectRes
     return {
       ok: true,
       changed: true,
-      message: "Removed the opencodex managed block from Grok config.",
+      message: "Removed the openprovider managed block from Grok config.",
     };
   } catch (error) {
     return errorResult("strip", error);

@@ -11,7 +11,7 @@ OpenProvider는 단일 Bun 프로세스입니다. 요청은 OpenAI Responses로 
 
 ```
 src/
-├── cli/                # ocx command dispatch, init, status, provider commands
+├── cli/                # opr command dispatch, init, status, provider commands
 ├── server/             # Bun.serve, /v1/* proxy, /api/* management API, WS bridge
 ├── codex/              # Codex config injection, catalog sync, auth/account integration
 ├── providers/          # provider metadata, API-key pool, quota and labels

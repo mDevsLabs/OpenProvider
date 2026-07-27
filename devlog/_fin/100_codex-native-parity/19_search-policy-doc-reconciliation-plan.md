@@ -14,7 +14,7 @@ routed supports_search_tool = true
 
 The remaining issue is documentation drift: older research docs still contain the pre-correction
 recommendation that routed entries should prefer `text` unless image-search is proven end to end.
-That statement is now superseded because opencodex executes hosted search through the native
+That statement is now superseded because openprovider executes hosted search through the native
 `gpt-5.4-mini` sidecar and verbalizes image results for text-only routed models.
 
 ## Files
@@ -22,15 +22,15 @@ That statement is now superseded because opencodex executes hosted search throug
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/devlog/100_codex-native-parity/11_search-defaults-and-inherited-state.md
+/Users/jun/Developer/new/700_projects/openprovider/devlog/100_codex-native-parity/11_search-defaults-and-inherited-state.md
 ```
 
 Update the stale current-observation opening sentence so it no longer says routed entries are
 accidentally inheriting native metadata:
 
 ```diff
--The live local opencodex catalog currently shows routed entries inheriting native search metadata.
-+The current opencodex catalog intentionally normalizes routed search metadata after native-template
+-The live local openprovider catalog currently shows routed entries inheriting native search metadata.
++The current openprovider catalog intentionally normalizes routed search metadata after native-template
 +cloning.
 ```
 
@@ -39,18 +39,18 @@ that block:
 
 ```diff
 -This is not because opencode-go models have native OpenAI hosted image-search support. It is because
-+opencodex cloned a native template and did not normalize these fields.
++openprovider cloned a native template and did not normalize these fields.
 +This is not because opencode-go models have native OpenAI hosted image-search support. It is because
 +`normalizeRoutedCatalogEntry()` deliberately rewrites routed catalog entries to `text_and_image`
-+after cloning. opencodex then executes hosted search through the native `gpt-5.4-mini` sidecar and
++after cloning. openprovider then executes hosted search through the native `gpt-5.4-mini` sidecar and
 +passes routed models a synthetic search tool plus textual summaries of any image results.
 ```
 
 Update the source pointer:
 
 ```diff
--/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:108
-+/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:73-88
+-/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:108
++/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:73-88
 ```
 
 Update the decision preamble:
@@ -65,17 +65,17 @@ Replace the stale decision bullets:
 ```diff
 - native OpenAI passthrough may keep `text_and_image` and `supports_search_tool`;
 - routed non-OpenAI models should not inherit hosted OpenAI search semantics silently;
-- if opencodex keeps `web_search_tool_type = text_and_image`, the docs must state it means Codex
--  will offer a hosted text+image web-search shape, while opencodex currently converts/drops hosted
+- if openprovider keeps `web_search_tool_type = text_and_image`, the docs must state it means Codex
+-  will offer a hosted text+image web-search shape, while openprovider currently converts/drops hosted
 -  tools and can only provide sidecar synthetic web-search behavior;
 - first implementation pass should prefer setting routed `web_search_tool_type` to `text` unless
 -  the sidecar actually supports image-search semantics end to end.
 + native OpenAI passthrough may keep `text_and_image` and `supports_search_tool`;
 + routed non-OpenAI models should not inherit hosted OpenAI search semantics silently;
 + Phase 100.2 now deliberately sets routed `web_search_tool_type = "text_and_image"` because
-+  opencodex executes hosted search through the native `gpt-5.4-mini` sidecar;
++  openprovider executes hosted search through the native `gpt-5.4-mini` sidecar;
 + routed upstream providers still do not receive OpenAI hosted image-search tools directly;
-+  opencodex suppresses the hosted tool and exposes a synthetic search function to the routed model;
++  openprovider suppresses the hosted tool and exposes a synthetic search function to the routed model;
 + for text-only routed models, image search results are verbalized as text with source URLs;
 + the earlier text-only recommendation is superseded by `16_search-image-sidecar-correction.md`.
 ```
@@ -83,16 +83,16 @@ Replace the stale decision bullets:
 Update the implementation note:
 
 ```diff
--It can remain enabled for routed models only if opencodex wants routed providers to see Codex's
+-It can remain enabled for routed models only if openprovider wants routed providers to see Codex's
 -deferred tool-discovery surface.
-+It remains enabled for routed models because opencodex intentionally relays Codex's deferred
++It remains enabled for routed models because openprovider intentionally relays Codex's deferred
 +tool-discovery surface through parser/bridge handling.
 ```
 
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/devlog/100_codex-native-parity/90_phase-plan.md
+/Users/jun/Developer/new/700_projects/openprovider/devlog/100_codex-native-parity/90_phase-plan.md
 ```
 
 Mark the search-policy question as resolved while keeping deferred `tool_search` and hosted
@@ -109,8 +109,8 @@ Mark the search-policy question as resolved while keeping deferred `tool_search`
 ### NO SOURCE CHANGE
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts
 ```
 
 No code patch is planned because the current source and tests already assert the corrected policy:

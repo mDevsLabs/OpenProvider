@@ -24,7 +24,7 @@ import CodexAccountPool from "../CodexAccountPool";
 import type { CodexAccountPoolController } from "../../hooks/useCodexAccountPool";
 import type { AccountLoadState, OAuthAccountRow, ApiKeyRow, LoginHint, ProviderAuthHandlers } from "./types";
 
-const DOCTOR_CMD = "ocx doctor";
+const DOCTOR_CMD = "opr doctor";
 
 export default function ProviderAuthPanel({
   item, apiBase, oauth, accounts = [], keys = [], accountLoadState = "ready",

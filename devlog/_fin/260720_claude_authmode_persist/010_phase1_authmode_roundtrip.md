@@ -43,11 +43,11 @@ if (body.authMode !== undefined) {
 if (config.apiKeys?.length) {
   inject("ANTHROPIC_AUTH_TOKEN", config.apiKeys[0].key);
 } else if (config.claudeCode?.authMode === "proxy" && launchctlGetenv("ANTHROPIC_AUTH_TOKEN") === undefined) {
-  inject("ANTHROPIC_AUTH_TOKEN", "opencodex-proxy");
+  inject("ANTHROPIC_AUTH_TOKEN", "openprovider-proxy");
 } else if (config.claudeCode?.authMode !== "proxy"
   && injectedKeys.includes("ANTHROPIC_AUTH_TOKEN")
-  && launchctlGetenv("ANTHROPIC_AUTH_TOKEN") === "opencodex-proxy") {
-  // Subscription switch-back: remove ONLY the opencodex-owned dummy token so a
+  && launchctlGetenv("ANTHROPIC_AUTH_TOKEN") === "openprovider-proxy") {
+  // Subscription switch-back: remove ONLY the openprovider-owned dummy token so a
   // launchd-started Claude regains its own claude.ai OAuth. User-set tokens
   // (not in injectedKeys, or with a different value) are never touched.
   unsetLaunchctlEnv("ANTHROPIC_AUTH_TOKEN");
@@ -133,13 +133,13 @@ spy가 유효한지 확인. bun 모듈 캐시상 안 되면 시스템-env쪽 단
 기존 spy 하네스(execSync/readFileSync mock) 재사용. 전환 테스트:
 
 1. tracking mock에 `injectedKeys: [..., "ANTHROPIC_AUTH_TOKEN"]` 포함 + 포트 일치.
-2. `launchctl getenv ANTHROPIC_AUTH_TOKEN` → `"opencodex-proxy"` 반환하도록 mock.
+2. `launchctl getenv ANTHROPIC_AUTH_TOKEN` → `"openprovider-proxy"` 반환하도록 mock.
 3. authMode 없는 config로 `injectSystemEnv` 호출.
 4. execSpy 호출 목록에 `launchctl unsetenv ANTHROPIC_AUTH_TOKEN` 존재 단언 +
    tracking JSON의 injectedKeys에서 토큰 제거 단언.
 5. 대조군(사용자 소유 토큰 보존): getenv가 다른 값(실제 키)을 반환하면
    unsetenv가 호출되지 않음을 단언.
-6. 대조군 2(재감사 R2): getenv가 `"opencodex-proxy"`를 반환해도 tracking의
+6. 대조군 2(재감사 R2): getenv가 `"openprovider-proxy"`를 반환해도 tracking의
    injectedKeys에 `ANTHROPIC_AUTH_TOKEN`이 없으면(=우리가 주입한 적 없음)
    unsetenv가 호출되지 않음을 단언 — 소유권 가드와 값 가드를 독립 케이스로 커버.
 

@@ -25,7 +25,7 @@ Add a first-class `sakana` keyed provider for `fugu` and `fugu-ultra`, reusing t
 
 ## Activation scenarios
 
-- `ocx provider add sakana --api-key ...` creates a keyed Responses provider and a routed `sakana/fugu` request reaches `${baseUrl}/responses` with Bearer auth.
+- `opr provider add sakana --api-key ...` creates a keyed Responses provider and a routed `sakana/fugu` request reaches `${baseUrl}/responses` with Bearer auth.
 - Selecting `max` produces upstream `reasoning.effort: "xhigh"`; selecting `high` remains `high`.
 - A mock long-lived stream remains governed by the existing configured stall/connect limits; WP1 does not silently alter unrelated providers.
 
@@ -34,7 +34,7 @@ Add a first-class `sakana` keyed provider for `fugu` and `fugu-ultra`, reusing t
 ```bash
 bun test tests/sakana-provider.test.ts tests/provider-registry-parity.test.ts tests/openai-responses-passthrough.test.ts
 bun run typecheck
-OPENCODEX_HOME=$(mktemp -d) ocx provider add sakana --api-key '$SAKANA_API_KEY'
+OPENCODEX_HOME=$(mktemp -d) opr provider add sakana --api-key '$SAKANA_API_KEY'
 ```
 
 An authenticated live smoke is required for `DONE`; without a user-provided key, unit tests may pass but the work-phase ends `NEEDS_HUMAN`, not `DONE`.

@@ -32,7 +32,7 @@ describe("Cursor tool definitions", () => {
     expect(defs).toHaveLength(1);
     expect(defs[0]?.name).toBe("mcp__fs__read_file");
     expect(defs[0]?.toolName).toBe("mcp__fs__read_file");
-    expect(defs[0]?.providerIdentifier).toBe("opencodex-responses");
+    expect(defs[0]?.providerIdentifier).toBe("openprovider-responses");
     expect(defs[0]?.description).toBe("Read a file");
     expect(toJson(ValueSchema, fromBinary(ValueSchema, defs[0]!.inputSchema))).toEqual(tool.parameters);
   });
@@ -292,7 +292,7 @@ describe("Cursor tool definitions", () => {
 
     expect(note).toContain("`shell_command`");
     expect(note).toContain("`shell_command` and `exec_command` are aliases of the same bridge");
-    expect(note).toContain("mcp_opencodex-responses_shell_command");
+    expect(note).toContain("mcp_openprovider-responses_shell_command");
     expect(note).toContain("Never tell the user that shell or read access is blocked");
   });
 

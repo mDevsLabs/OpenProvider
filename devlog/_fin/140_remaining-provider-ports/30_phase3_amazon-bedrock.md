@@ -7,7 +7,7 @@
 
 ## Goal
 
-Stream Bedrock **ConverseStream** (Claude/etc. on AWS) through opencodex — porting SigV4 auth and the
+Stream Bedrock **ConverseStream** (Claude/etc. on AWS) through openprovider — porting SigV4 auth and the
 AWS binary **eventstream** decoder, both with **zero `@aws-sdk/*` deps** (jawcode is pure WebCrypto/TS).
 
 ## What we port (jawcode)
@@ -18,7 +18,7 @@ AWS binary **eventstream** decoder, both with **zero `@aws-sdk/*` deps** (jawcod
 - **ConverseStream builder** (`amazon-bedrock.ts:204-256,570-810`): messages → WireMessage; tool results batched into one user msg (`:662-696`); thinking config `{type:"enabled",budget_tokens,display:"summarized"}`; **thinking-signature edge case** — only `anthropic.claude*` keep `signature`, else demote to `[Thinking]: text` (`:631-651`).
 - **Endpoint:** `POST https://bedrock-runtime.{region}.amazonaws.com/model/{modelId}/converse-stream`, `Accept: application/vnd.amazon.eventstream`.
 
-## opencodex fit
+## openprovider fit
 
 - **NEW** `src/adapters/bedrock.ts` (`createBedrockAdapter`): `buildRequest` (ConverseStream + SigV4-sign) + `parseStream` (eventstream → `AdapterEvent`).
 - **NEW shared** `src/lib/aws-auth.ts` (SigV4 + credential chain) and `src/lib/eventstream-decoder.ts` (the decoder — **40 reuses this**).

@@ -4,11 +4,11 @@ Date: 2026-06-28
 
 ## Goal
 
-Capture Codex fast/priority requests accurately in opencodex request logs without pretending the model name changed. Codex persists `service_tier = "fast"`, codex-rs normalizes that to wire `service_tier: "priority"`, and upstream may independently report a response `service_tier` or model name. Logs must keep those concepts separate.
+Capture Codex fast/priority requests accurately in openprovider request logs without pretending the model name changed. Codex persists `service_tier = "fast"`, codex-rs normalizes that to wire `service_tier: "priority"`, and upstream may independently report a response `service_tier` or model name. Logs must keep those concepts separate.
 
 ## Current Evidence
 
-- Live `codex exec` succeeds through opencodex with `/Users/jun/.codex/config.toml` containing `service_tier = "fast"` and `[features].fast_mode = true`.
+- Live `codex exec` succeeds through openprovider with `/Users/jun/.codex/config.toml` containing `service_tier = "fast"` and `[features].fast_mode = true`.
 - Current `/api/logs` entries only include `model`, `provider`, `status`, `durationMs`, and stream close metadata.
 - `src/responses/schema.ts` accepts `service_tier`, but `src/responses/parser.ts` does not copy it into `OcxRequestOptions.serviceTier` yet.
 - `devlog/90_service-tier-fast/00_investigation.md` establishes the split: config spelling `fast`, runtime/catalog/request id `priority`.
@@ -56,7 +56,7 @@ bun x tsc --noEmit
 bun test tests
 ```
 
-Then run a live `codex exec` smoke against the already-running local ocx and confirm `/api/logs` includes `requestedServiceTier`/`requestedSpeedLabel` after restarting if necessary.
+Then run a live `codex exec` smoke against the already-running local opr and confirm `/api/logs` includes `requestedServiceTier`/`requestedSpeedLabel` after restarting if necessary.
 
 ## Commit
 

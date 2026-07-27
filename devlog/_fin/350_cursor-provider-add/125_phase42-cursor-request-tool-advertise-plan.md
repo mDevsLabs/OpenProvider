@@ -65,7 +65,7 @@ Rules:
 - Use `namespacedToolName(tool.namespace, tool.name)` as the advertised name, matching
   chat adapter behavior and existing bridge maps.
 - `name` and `toolName` both use the advertised wire name.
-- `providerIdentifier` should identify opencodex client tools, e.g. `opencodex-responses`.
+- `providerIdentifier` should identify openprovider client tools, e.g. `openprovider-responses`.
 - `description` maps from `OcxTool.description`.
 - `inputSchema` is JSON bytes of `OcxTool.parameters ?? {}`.
 - Preserve `strict` only if Cursor protobuf has a compatible field. If not, do not invent one.

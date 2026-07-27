@@ -5,7 +5,7 @@
 - Child: `scripts/openai-provider-option-runtime-child.ts`
 - PID: `4188`
 - Port: `61203` (kernel-assigned from `port: 0`)
-- Temporary root: `/tmp/ocx-provider-option-qa.KZAM2H`
+- Temporary root: `/tmp/opr-provider-option-qa.KZAM2H`
 - Live proxy `127.0.0.1:10100`: not contacted
 
 ## Desktop 1280 x 720, English, Pool

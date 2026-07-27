@@ -407,7 +407,7 @@ function warnUncataloguedComboOnce(
     .map(target => safeCatalogWarningLabel(targetKey(target)))
     .sort((a, b) => a.localeCompare(b));
   console.warn(
-    `[opencodex] Combo "${safeCatalogWarningLabel(id)}" is omitted from the catalog because member capabilities are incomplete: ${targets.join(", ")}.`,
+    `[openprovider] Combo "${safeCatalogWarningLabel(id)}" is omitted from the catalog because member capabilities are incomplete: ${targets.join(", ")}.`,
   );
 }
 ```

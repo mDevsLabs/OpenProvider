@@ -21,7 +21,7 @@ Inventory snapshot: 2026-07-26, taken with `gh pr list --state open`.
 | #429 | Aciredy | 5 files | CONFLICTING/DIRTY | Cursor prompt purity |
 | #447 | coseung2 | +1573/-136 | MERGEABLE/UNSTABLE | Kiro OAuth multi-account |
 | #455 | lidge-jun | Go tree | CONFLICTING | wrong-branch export trigger |
-| #461 | mihneaptu | 6 files | CONFLICTING/DIRTY | `ocx opencode` launcher, copies user config |
+| #461 | mihneaptu | 6 files | CONFLICTING/DIRTY | `opr opencode` launcher, copies user config |
 | #464 | snowyukitty | +339/-2 | MERGEABLE/CLEAN | router baseUrl warning |
 | #479 | Wibias | +3491/-63, 42 files | MERGEABLE/UNSTABLE | OAuth reliability/integrity |
 | #482 | Wibias | — | MERGEABLE/UNSTABLE | release-notes automation |

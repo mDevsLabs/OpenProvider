@@ -6,7 +6,7 @@ provided the codex-rs WS transport evidence.
 ## Root causes
 1. Broken pipe: codex-rs built-in `openai` provider hardcodes supports_websockets=true
    (model-provider-info/src/lib.rs:352) — under Design B codex always tries the WS
-   transport. opencodex config websockets:false only controlled catalog flags; the
+   transport. openprovider config websockets:false only controlled catalog flags; the
    /v1/responses upgrade handler accepted sockets anyway. Proxy-side socket closes
    (restart, account invalidation 4001) surfaced as "failed to send websocket request:
    IO error: Broken pipe" on codex's next response.create write.
@@ -34,7 +34,7 @@ provided the codex-rs WS transport evidence.
 bun test ./tests/ → 1544 pass / 0 fail (159 files); bun x tsc --noEmit → exit 0.
 
 ## Notes
-- Config already has websockets:false, so after ocx restart codex sessions will 426→HTTP
+- Config already has websockets:false, so after opr restart codex sessions will 426→HTTP
   once per session and stop hitting broken pipes.
 - Parked WIP from interrupted work-phase 2 (anthropic thinking-signature): src/types.ts
   AdapterEvent additions + src/responses/reasoning-envelope.ts exist but are not yet wired;

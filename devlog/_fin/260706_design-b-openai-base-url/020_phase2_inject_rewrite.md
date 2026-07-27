@@ -1,6 +1,6 @@
 # Phase 2 — codex-inject Design B rewrite
 
-Replace the re-tag injection (`model_provider = "opencodex"` + `[model_providers.opencodex]`)
+Replace the re-tag injection (`model_provider = "openprovider"` + `[model_providers.openprovider]`)
 with the official built-in override: root `openai_base_url = "http://<host>:<port>/v1"`.
 Threads stay tagged `openai`; no history remap needed forward.
 
@@ -8,8 +8,8 @@ Threads stay tagged `openai`; no history remap needed forward.
 
 - **Loopback (default)**: Design B. Emit marker + `openai_base_url` root key only.
 - **Non-loopback** (`shouldInjectApiAuthHeader` true — remote bind needs the
-  `x-opencodex-api-key` env header, which a built-in provider cannot carry):
-  KEEP the legacy opencodex-table injection unchanged. Legacy path keeps its
+  `x-openprovider-api-key` env header, which a built-in provider cannot carry):
+  KEEP the legacy openprovider-table injection unchanged. Legacy path keeps its
   forward history sync; Design B path does not.
 
 ## Files
@@ -42,7 +42,7 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
      do NOT append the provider table. History: phase 3 migration call.
    - message text updated ("Codex built-in openai provider now points at the proxy;
      threads keep their native provider tag.").
-5. `buildProfileFile` (fallback `opencodex.config.toml`): Design-B variant becomes
+5. `buildProfileFile` (fallback `openprovider.config.toml`): Design-B variant becomes
    root `openai_base_url` + optional catalog + `[features] fast_mode`; drops
    model_provider + table. Legacy variant unchanged for non-loopback.
 6. `stripOpencodexConfig`: additionally run `stripInjectedOpenaiBaseUrl`; keep all
@@ -56,13 +56,13 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
 ## Audit fixes folded in (2026-07-06 reviewer verdict)
 
 - **(blocker 1) `stripRootRoutedModel` gate:** in `stripOpencodexConfig`, fire the
-  routed-model strip when EITHER legacy root `model_provider == "opencodex"` OR a
+  routed-model strip when EITHER legacy root `model_provider == "openprovider"` OR a
   marker-owned `openai_base_url` line is present (`hadInjectedBaseUrl`). Otherwise a
   TUI-persisted root `model = "provider/slug"` survives fallback restore and breaks
   native codex against real OpenAI.
 - **(blocker 2) `tests/shutdown-launcher.test.ts:96`** asserts the loopback injected
-  config contains `model_providers.opencodex` — update to assert the Design B shape
-  (marker + `openai_base_url`); the `:112 not.toContain("opencodex")` restore assert
+  config contains `model_providers.openprovider` — update to assert the Design B shape
+  (marker + `openai_base_url`); the `:112 not.toContain("openprovider")` restore assert
   requires the fallback strip to remove the marker line too (covered by
   `stripInjectedOpenaiBaseUrl`).
 - **(blocker 3) `buildProfileFile` discriminator:** the Design-B-vs-legacy variant is
@@ -71,21 +71,21 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
   `buildProfileFile(port, cat, ws, /*includeApiAuthHeader*/ true, host)` keeps the
   legacy table shape and `tests/codex-inject.test.ts:135-139` stays green;
   `:119-124` (loopback default) must be updated to the Design B profile shape.
-- **(adv 4) profile file semantics:** `opencodex.config.toml` is a standalone
+- **(adv 4) profile file semantics:** `openprovider.config.toml` is a standalone
   reference/fallback file (not consumed by codex `--profile`); its Design-B variant
-  documents the root `openai_base_url` line. The stale "--profile opencodex" header
+  documents the root `openai_base_url` line. The stale "--profile openprovider" header
   comment gets rewritten to describe manual use.
 - **(adv 6) journal hash on upgrade:** first Design-B inject over a legacy-session
   journal produces one expected hash mismatch → fallback strip path. Accepted; the
   fallback strip handles both forms. No hash refresh (journal keeps the ORIGINAL
-  pre-ocx snapshot as source of truth).
+  pre-opr snapshot as source of truth).
 - **(adv 7)** `decodeRequestBody` caps decompressed size (64 MiB) — throw on exceed.
 
 **MODIFY `tests/codex-inject.test.ts`** — new cases:
 - Design B inject emits marker + root openai_base_url before first table; no
-  `[model_providers.opencodex]`, no root model_provider.
+  `[model_providers.openprovider]`, no root model_provider.
 - Re-inject idempotent (port change rewrites the marker-owned line once).
-- Upgrade path: config carrying legacy table + root model_provider = "opencodex"
+- Upgrade path: config carrying legacy table + root model_provider = "openprovider"
   → after inject only Design B form remains.
 - User's own root openai_base_url (no marker) → preserved, no duplicate injected.
 - strip removes marker-owned line only; user line survives.
@@ -96,4 +96,4 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
 
 - `bun test tests/codex-inject.test.ts tests/codex-journal.test.ts` green.
 - `bun test` full green.
-- rg proof: no remaining call path injects the opencodex table for loopback configs.
+- rg proof: no remaining call path injects the openprovider table for loopback configs.

@@ -11,7 +11,7 @@ Evidence base (measured this session, not remembered):
 - `git rev-parse dev` = `3ec8f532bab2b3fb663ca5d8c711b452cf4d806d`
 - `git ls-remote origin refs/heads/dev` = `6d8f05fdce63cb1a9b10491a49a601efba68b03e`
   (origin is 38 commits behind; local is a strict fast-forward descendant)
-- `gh api repos/lidge-jun/opencodex/branches/dev/protection` → 404 "Branch not
+- `gh api repos/lidge-jun/openprovider/branches/dev/protection` → 404 "Branch not
   protected" (a plain push is allowed; no bypass needed)
 - `gh pr view 403` → `state=OPEN head=092dd749102ae568b11c89b9c8e3a57bfb2b877d`
 - `git merge-base --is-ancestor 092dd749 dev` → exit 0 (the PR head is already

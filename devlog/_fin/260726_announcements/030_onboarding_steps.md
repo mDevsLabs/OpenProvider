@@ -67,12 +67,12 @@ afterward — deriving it later is impossible. Onboarding fires only when
 `firstRun` as specified means "the config file was absent when the baseline was
 stamped", and `010` stamps on the first `GET /api/announcements` — the first
 dashboard visit. But the config file is written earlier by ordinary paths:
-`ocx init` (`src/cli/init.ts:166`), proxy startup seeding/migration
+`opr init` (`src/cli/init.ts:166`), proxy startup seeding/migration
 (`src/server/index.ts:248`, `:265`), port-fallback persistence
 (`src/cli/index.ts:133`) and OAuth login (`src/oauth/login-cli.ts:125`).
 
 So it measures whether the user reached the dashboard before the CLI, not whether
-they are new. A brand-new user who follows the documented `ocx init` → `ocx login`
+they are new. A brand-new user who follows the documented `opr init` → `opr login`
 path would be classified `firstRun: false` and never see onboarding.
 
 **`baseline.firstRun` is therefore removed from the schema** rather than kept
@@ -92,7 +92,7 @@ the code that first has the answer:
 `saveConfig` (`src/config.ts:845-857`) is the single choke point every write
 passes through and can see whether the file already existed. The marker is absent
 on every pre-existing installation and present on every new one, and no path —
-`ocx init` replacing providers, tier migration rebuilding a row, pool accounts
+`opr init` replacing providers, tier migration rebuilding a row, pool accounts
 living in a separate file — can forge it, because none can make an existing file
 not exist.
 
@@ -112,7 +112,7 @@ Candidate skeleton, to be confirmed before implementation:
 
 | Step | Candidate |
 |---|---|
-| 1 | What opencodex is — one screen, one sentence |
+| 1 | What openprovider is — one screen, one sentence |
 | 2 | Add your first provider (the actual first meaningful action) |
 | 3 | Point a client at it — Codex CLI / Claude Code / Grok |
 | 4 | Where models and combos live |

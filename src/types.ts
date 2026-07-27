@@ -324,7 +324,7 @@ export interface OcxUsage {
 
 /**
  * Claude Code inbound settings (devlog/260711_claude_inbound). Consumed by the
- * /v1/messages surface, the `ocx claude` launcher, and the GUI Claude page.
+ * /v1/messages surface, the `opr claude` launcher, and the GUI Claude page.
  */
 export interface OcxClaudeCodeConfig {
   /** Kill switch for the /v1/messages inbound (GUI "Claude ON" toggle). Default: enabled. */
@@ -349,7 +349,7 @@ export interface OcxClaudeCodeConfig {
    * Exactly 0 disables; negative/non-finite values fall back to the default.
    */
   bodyMaxBytes?: number;
-  /** Default model slot injected as ANTHROPIC_MODEL by `ocx claude`. */
+  /** Default model slot injected as ANTHROPIC_MODEL by `opr claude`. */
   model?: string;
   /** Haiku/small-fast slot injected as ANTHROPIC_DEFAULT_HAIKU_MODEL (+ legacy SMALL_FAST). */
   smallFastModel?: string;
@@ -357,7 +357,7 @@ export interface OcxClaudeCodeConfig {
   modelMap?: Record<string, string>;
   /**
   * Inject ANTHROPIC_BASE_URL etc. into the macOS user domain via `launchctl setenv`
-  * so plain `claude` commands route through the proxy without `ocx claude`. Reverted
+  * so plain `claude` commands route through the proxy without `opr claude`. Reverted
    * on stop/shutdown. Default: false (opt-in). macOS only.
    */
   systemEnv?: boolean;
@@ -426,10 +426,10 @@ export interface OcxClaudeCodeConfig {
   blockedSkills?: string[];
   /**
    * Sync the featured subagent roster (config.subagentModels + main model) into
-   * ~/.claude/agents/ocx-*.md custom agent definitions at launch (devlog 260712
+   * ~/.claude/agents/opr-*.md custom agent definitions at launch (devlog 260712
    * 070) so any routed model is dispatchable as a subagent_type — the Agent
    * tool's model argument is a hard 4-alias enum, but definition frontmatter is
-   * free. Only ocx-*.md files are owned/pruned. Default: enabled.
+   * free. Only opr-*.md files are owned/pruned. Default: enabled.
    */
   injectAgents?: boolean;
   /** Claude-originated web-search override. Unset fields inherit the global sidecar settings. */
@@ -492,7 +492,7 @@ export interface OcxConfig {
   subagentModels?: string[];
   /**
    * Priority-ordered fallback models for spawned sub-agents. When the requested
-   * model is quota-exhausted or recently failed, opencodex rewrites the child
+   * model is quota-exhausted or recently failed, openprovider rewrites the child
    * turn to the next available entry before routing.
    */
   subagentModelFallback?: string[];
@@ -621,9 +621,9 @@ export interface OcxConfig {
   codexShimAutoRestore?: boolean;
   /**
    * Compatibility mode: temporarily rewrite Codex resume-history metadata while the proxy is active
-   * so Codex App can show old OpenAI chats and opencodex-created exec chats under its default
+   * so Codex App can show old OpenAI chats and openprovider-created exec chats under its default
    * interactive-source/provider filters. Default true; originals are backed up and restored by
-   * `ocx stop` / `ocx restore`. Set false to opt out of history remapping.
+   * `opr stop` / `opr restore`. Set false to opt out of history remapping.
    */
   syncResumeHistory?: boolean;
   /** Freshness window (ms) for the per-provider live `/models` cache. Defaults to 5 min. */
@@ -972,13 +972,13 @@ export interface OcxProviderConfig {
   /** Vertex AI location, e.g. "us-central1" or "global" (or GOOGLE_CLOUD_LOCATION env). */
   location?: string;
   /**
-   * Cursor adapter only: MCP servers opencodex starts/connects and exposes to the Cursor agent
+   * Cursor adapter only: MCP servers openprovider starts/connects and exposes to the Cursor agent
    * as callable tools. Each entry is spawned (stdio `command`) or connected (`url`) lazily per
    * stream; their tools are advertised to the Cursor server and executed against the live server.
    */
   mcpServers?: Record<string, import("./adapters/cursor/mcp-config").CursorMcpServerConfig>;
   /**
-   * Cursor adapter only: opt-in external executor for computer-use / record-screen. opencodex is
+   * Cursor adapter only: opt-in external executor for computer-use / record-screen. openprovider is
    * headless and cannot control a screen itself; provide commands here only when running on a host
    * that can. With no executor, these tools honestly report "not supported".
    */
@@ -997,7 +997,7 @@ export interface OcxProviderConfig {
    * provider and should be used only for a trusted local experiment on a host where every
    * data-plane caller is trusted. "codex-sandbox" is accepted for backwards compatibility
    * but is fail-closed like "off": Responses instructions/system/developer text is
-   * caller-controlled prose, and opencodex has no trustworthy per-request attestation that it
+   * caller-controlled prose, and openprovider has no trustworthy per-request attestation that it
    * reflects a real Codex sandbox state. The default loopback bind admits ANY local process
    * without auth (including other local users on multi-user machines), and
    * isAllowedRequestOrigin blocks non-loopback browser origins by default but not

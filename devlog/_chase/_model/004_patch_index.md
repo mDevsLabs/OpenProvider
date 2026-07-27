@@ -45,13 +45,13 @@
 
 ## jawcode와의 경계
 
-| 질문 | jawcode 소유 | OpenCodex 소유 |
+| 질문 | jawcode 소유 | OpenProvider 소유 |
 |---|---|---|
 | JWC 자체가 provider를 호출하는가 | `packages/ai/src/providers/`, descriptor, auth storage | 해당 없음 |
 | Codex 요청을 provider로 proxy하는가 | 참고 구현 | registry, router, adapters, bridge |
 | JWC bundled model metadata | generator + `packages/ai/src/models.json` | generated metadata snapshot 소비 |
 | Codex App picker 노출 | 해당 없음 | `src/codex/catalog.ts`와 sync/cache |
-| OpenCodex OAuth 계정/키 pool | 해당 없음 | `src/oauth/`, `src/providers/api-keys.ts` |
+| OpenProvider OAuth 계정/키 pool | 해당 없음 | `src/oauth/`, `src/providers/api-keys.ts` |
 
 Provider patch를 가져올 때 `JWC native`, `OCX proxy`, `both`, `docs-only` 중 하나로 먼저 분류한다. jawcode에 provider가 생겼다는 이유만으로 OCX registry를 자동 추가하지 않고, OCX가 route할 수 있다는 이유만으로 jawcode `KnownProvider`를 늘리지 않는다.
 

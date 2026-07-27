@@ -3,7 +3,7 @@ title: Справочник конфигурации
 description: Все поля ~/.OpenProvider/config.json — параметры верхнего уровня, провайдеры и сайдкары.
 ---
 
-OpenProvider настраивается файлом `~/.OpenProvider/config.json`. Его записывают `ocx init` и дашборд,
+OpenProvider настраивается файлом `~/.OpenProvider/config.json`. Его записывают `opr init` и дашборд,
 но вы можете редактировать его и напрямую; прокси перечитывает его при запуске. Если файл не
 удаётся распарсить (например, он усечён или содержит некорректный JSON), OpenProvider создаёт
 резервную копию `config.json.invalid-<timestamp>`, печатает предупреждение в консоль и стартует с
@@ -43,7 +43,7 @@ OpenProvider настраивается файлом `~/.OpenProvider/config.jso
 | `injectionPrompt?` | `string` | — | Пользовательская замена текста внедряемого v2-руководства. Заменяет встроенный текст; плейсхолдеры `{{model}}`, `{{effort}}` и `{{roster}}` подставляются. Условия срабатывания не меняются. Настраивается через `PUT /api/injection-model` (ключ `prompt`). |
 | `multiAgentGuidanceEnabled?` | `boolean` | `true` | Управляет только developer-руководством multi-agent, добавляемым OpenProvider. Отсутствующее значение/`true` сохраняет руководство v1/v2; `false` подавляет оба варианта, не меняя поверхность совместной работы, `subagentModels`, маршрутизацию и пределы effort. `GET/PUT /api/injection-model` возвращает эффективное значение; PUT является частичным обновлением. |
 | `disabledModels?` | `string[]` | — | Модели, скрываемые от Codex. Маршрутизируемые id `provider/model` исключаются из каталога и `/v1/models`; «голые» нативные GPT-slug (например, `gpt-5.4`) переводят свою запись каталога в `visibility: "hide"` и исчезают из «голого» списка `/v1/models`. Переключается для каждой модели на странице Models дашборда. |
-| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | Трёхпозиционное переопределение multi-agent-поверхности. `"v1"` принудительно переводит все модели на поверхность v1 (перекрывает вышестоящие привязки); `"default"` учитывает вышестоящие привязки моделей (sol/terra=v2, luna=v1); `"v2"` принудительно переводит все модели на v2. Настраивается на странице Models дашборда или через `ocx v2 mode`. |
+| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | Трёхпозиционное переопределение multi-agent-поверхности. `"v1"` принудительно переводит все модели на поверхность v1 (перекрывает вышестоящие привязки); `"default"` учитывает вышестоящие привязки моделей (sol/terra=v2, luna=v1); `"v2"` принудительно переводит все модели на v2. Настраивается на странице Models дашборда или через `opr v2 mode`. |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | Видимые Codex лимиты контекста по провайдерам. Лимит только понижает известные контекстные окна. |
 | `contextCapValue?` | `number` | `350000` | Значение, используемое элементами управления лимитом контекста в дашборде; его изменение обновляет каждую включённую запись в `providerContextCaps`. |
 | `stallTimeoutSec?` | `number` | `300` | Секунды без данных от вышестоящей стороны, после которых мост прерывает запрос и генерирует `response.incomplete`. Минимум 1. |
@@ -51,9 +51,9 @@ OpenProvider настраивается файлом `~/.OpenProvider/config.jso
 | `shutdownTimeoutMs?` | `number` | `5000` | Дедлайн корректного завершения (drain) перед прерыванием активных ходов. |
 | `websockets?` | `boolean` | `false` | Объявляет `supports_websockets`, чтобы Codex использовал путь Responses WebSocket. Опустите или установите `false`, чтобы остаться на HTTP/SSE. |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | Дополнительные сгенерированные учётные данные `ocx_…`, принимаемые аутентификацией management API и плоскости данных на не-loopback-привязках. Управляются дашбордом; поля записей перечислены ниже. |
-| `codexAutoStart?` | `boolean` | `true` | Разрешает shim Codex выполнять `ocx ensure` перед запуском Codex. `false` делает `ocx ensure` пустой операцией. |
+| `codexAutoStart?` | `boolean` | `true` | Разрешает shim Codex выполнять `opr ensure` перед запуском Codex. `false` делает `opr ensure` пустой операцией. |
 | `codexShimAutoRestore?` | `boolean` | `true` | Восстанавливает ранее установленный shim после того, как завершённое внешнее обновление Codex заменило его. Для отключения задайте `false` или установите процессу `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0`. |
-| `syncResumeHistory?` | `boolean` | `true` | Обратимый режим совместимости истории Codex App. OpenProvider резервирует исходные метаданные потоков Codex, переназначает старые интерактивные строки OpenAI на `OpenProvider` и временно повышает созданные OpenProvider строки `exec` до видимого в приложении источника. `ocx stop` / `ocx restore` восстанавливают зарезервированные строки OpenAI и возвращают оставшиеся пользовательские потоки OpenProvider обратно к OpenAI, чтобы нативный Codex мог возобновлять их после удаления прокси из `config.toml`. Установите `false`, чтобы отказаться. |
+| `syncResumeHistory?` | `boolean` | `true` | Обратимый режим совместимости истории Codex App. OpenProvider резервирует исходные метаданные потоков Codex, переназначает старые интерактивные строки OpenAI на `OpenProvider` и временно повышает созданные OpenProvider строки `exec` до видимого в приложении источника. `opr stop` / `opr restore` восстанавливают зарезервированные строки OpenAI и возвращают оставшиеся пользовательские потоки OpenProvider обратно к OpenAI, чтобы нативный Codex мог возобновлять их после удаления прокси из `config.toml`. Установите `false`, чтобы отказаться. |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | Метаданные аккаунтов пула ChatGPT/Codex, управляемые дашбордом Codex Auth. Секреты хранятся отдельно в `codex-accounts.json`. |
 | `activeCodexAccountId?` | `string` | — | Вручную выбранный аккаунт пула. Выбор очищает существующие привязки потоков и действует со следующего запроса; выполняющиеся запросы сохраняют захваченный аккаунт. |
 | `autoSwitchThreshold?` | `number` | `80` | Порог процента использования для автопереключения новых сессий. Оценка использует самое «горячее» из известных окон квоты — 5-часовое, недельное или 30-дневное. Установите `0`, чтобы отключить автопереключение по квоте. |
@@ -66,13 +66,13 @@ OpenProvider настраивается файлом `~/.OpenProvider/config.jso
 | `corsAllowOrigins?` | `string[]` | `[]` | Дополнительные точные origin, разрешённые CORS. Loopback-origin разрешены всегда. |
 
 `maxConcurrentThreadsPerSession` — это camelCase-поле, используемое `PUT /api/v2`, а не ключ
-`config.json`. `ocx v2 threads <n>` сохраняет соответствующее значение
+`config.json`. `opr v2 threads <n>` сохраняет соответствующее значение
 `max_concurrent_threads_per_session` в `[features.multi_agent_v2]` в
 `$CODEX_HOME/config.toml` Codex; сначала включите v2, чтобы эта таблица существовала.
 
 Если более старая сборка времён разработки уже выполнила `syncResumeHistory` до появления
 поддержки резервных копий, то же восстановление нативного провайдера можно принудительно
-выполнить командой `ocx recover-history --legacy-openai`.
+выполнить командой `opr recover-history --legacy-openai`.
 
 :::note[Пул аккаунтов Codex]
 Используйте страницу **Codex Auth** дашборда для добавления аккаунтов пула и обновления квот.
@@ -84,7 +84,7 @@ OpenProvider настраивается файлом `~/.OpenProvider/config.jso
 
 ### claudeCode (OcxClaudeCodeConfig)
 
-Входящие настройки Claude Code, используемые поверхностью `/v1/messages`, лаунчером `ocx claude`
+Входящие настройки Claude Code, используемые поверхностью `/v1/messages`, лаунчером `opr claude`
 и страницей Claude в GUI. Ограничения тела нативного passthrough (добавлены вместе с защитой
 body-occupancy):
 
@@ -126,12 +126,12 @@ ISO-строку `createdAt: string`. Записи `codexAccounts[]` содер�
 
 ```bash
 export OpenProvider_API_AUTH_TOKEN="your-secret-token"
-ocx start
+opr start
 ```
 
 Без этой переменной прокси отказывается запускаться при привязке за пределами loopback. Если вы
 устанавливаете фоновый сервис для доступа по LAN, экспортируйте ту же переменную перед
-`ocx service install`, чтобы её получил launchd, systemd или Task Scheduler. Клиенты должны
+`opr service install`, чтобы её получил launchd, systemd или Task Scheduler. Клиенты должны
 включать токен в каждый запрос через заголовок `x-OpenProvider-api-key`:
 
 ```
@@ -196,7 +196,7 @@ x-OpenProvider-api-key: your-secret-token
 
 ## Провайдер Cursor (`adapter: "cursor"`)
 
-Мост Cursor экспериментален. После `ocx login cursor` добавьте или отредактируйте запись
+Мост Cursor экспериментален. После `opr login cursor` добавьте или отредактируйте запись
 `cursor` в `providers` в `~/.OpenProvider/config.json` (Windows:
 `%USERPROFILE%\.OpenProvider\config.json`).
 
@@ -226,7 +226,7 @@ x-OpenProvider-api-key: your-secret-token
 
 Его также можно установить из [веб-дашборда](/ru/guides/web-dashboard/): **Providers →
 Cursor → Edit JSON**, добавьте `"unsafeAllowNativeLocalExec": true`, сохраните, затем
-перезапустите прокси (`ocx restart` или `ocx stop` + `ocx start`).
+перезапустите прокси (`opr restart` или `opr stop` + `opr start`).
 
 MCP, запись экрана и computer-use используют отдельную конфигурацию `mcpServers` /
 `desktopExecutor` и этим флагом не управляются.
@@ -398,7 +398,7 @@ OAuth- и forward-провайдеры вообще не хранят ключ.
 :::note[Атомарная запись]
 Все файлы конфигурации и каталога (`config.toml`, `OpenProvider-catalog.json`) записываются атомарно
 через `atomicWriteFile` (временный файл + переименование). Это предотвращает наполовину
-записанные файлы, когда конкурирующие писатели — например, `ocx stop` и собственный обработчик
+записанные файлы, когда конкурирующие писатели — например, `opr stop` и собственный обработчик
 завершения прокси — восстанавливают Codex одновременно.
 :::
 

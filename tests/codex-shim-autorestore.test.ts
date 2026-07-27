@@ -12,7 +12,7 @@ import {
 } from "../src/cli/codex-shim-autorestore";
 import { autoRestoreCodexShim, CODEX_SHIM_STATE_MAX_BYTES, installCodexShim } from "../src/codex/shim";
 
-const SHIM_MARKER = "opencodex codex autostart shim";
+const SHIM_MARKER = "openprovider codex autostart shim";
 
 function cliDeps(
   result: CodexShimAutoRestoreResult,
@@ -52,7 +52,7 @@ describe("Codex shim CLI auto-restore policy", () => {
     expect(maybeAutoRestoreCodexShim("status", ["status"], deps)).toBeUndefined();
     expect(warnings).toHaveLength(1);
     expect(warnings[0]).toContain("continuing without it");
-    expect(warnings[0]).toContain("ocx codex-shim install");
+    expect(warnings[0]).toContain("opr codex-shim install");
   });
 
   test("successful automatic repair warns exactly once", () => {
@@ -101,7 +101,7 @@ describe("Codex shim CLI auto-restore policy", () => {
   });
 
   test("oversized shim state is bounded, skipped, and warned without loading config", () => {
-    const home = mkdtempSync(join(tmpdir(), "ocx-shim-oversized-state-"));
+    const home = mkdtempSync(join(tmpdir(), "opr-shim-oversized-state-"));
     const oldHome = process.env.OPENCODEX_HOME;
     try {
       process.env.OPENCODEX_HOME = home;
@@ -124,12 +124,12 @@ describe("Codex shim CLI auto-restore policy", () => {
     }
   });
 
-  test("shim replaced -> next ocx command auto-restores and warns", async () => {
+  test("shim replaced -> next opr command auto-restores and warns", async () => {
     if (process.platform === "win32") return;
-    const binDir = mkdtempSync(join(tmpdir(), "ocx-shim-activation-bin-"));
-    const home = mkdtempSync(join(tmpdir(), "ocx-shim-activation-home-"));
+    const binDir = mkdtempSync(join(tmpdir(), "opr-shim-activation-bin-"));
+    const home = mkdtempSync(join(tmpdir(), "opr-shim-activation-home-"));
     const wrapper = join(binDir, "codex");
-    const backup = join(binDir, "codex.opencodex-real");
+    const backup = join(binDir, "codex.openprovider-real");
     const replacement = "#!/bin/sh\necho externally updated codex\n";
     const oldPath = process.env.PATH;
     const oldHome = process.env.OPENCODEX_HOME;

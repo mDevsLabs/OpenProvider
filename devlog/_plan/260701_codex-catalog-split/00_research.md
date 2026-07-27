@@ -30,7 +30,7 @@ to unit-test in isolation once free of fs/network.
 ## Hard constraints
 
 - ZERO behavior change to the injected catalog. The live artifact
-  (~/.codex/opencodex-catalog.json) must be byte-identical before/after for the
+  (~/.codex/openprovider-catalog.json) must be byte-identical before/after for the
   same inputs. Add a golden-snapshot test of a built catalog BEFORE refactoring,
   so the split is provably behavior-preserving.
 - Identity neutralization (routed base_instructions replace) must keep working;

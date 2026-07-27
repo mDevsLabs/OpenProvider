@@ -25,7 +25,7 @@ shape as Desktop without inventing a category that does not exist in the data.
 Endpoint  http://127.0.0.1:10100/v1                    [Save] [Save & apply]
   ⚠ 3 models excluded — apply to update your Grok config
 Native (4)                                                             ▾
-  [on]  gpt-5.6-sol         ocx-gpt-5-6-sol        372k
+  [on]  gpt-5.6-sol         opr-gpt-5-6-sol        372k
   [off] gpt-5.4-mini        —                      —
 Routed (19)                                                            ▸
 ```
@@ -57,7 +57,7 @@ interface GrokStatus {
 ```ts
 // Same store WP1 introduces — one implementation, one fallback path, one test file
 // (audit blocker 4). The key is Grok-specific so the two surfaces cannot collide.
-const GROUP_COLLAPSE = makeCollapseStore("ocx.grok.collapsedGroups.v1");
+const GROUP_COLLAPSE = makeCollapseStore("opr.grok.collapsedGroups.v1");
 
 const [excluded, setExcluded] = useState<Set<string>>(new Set());
 const [savedExcluded, setSavedExcluded] = useState<Set<string>>(new Set());
@@ -131,8 +131,8 @@ const GROUPS = [
 ```
 
 Each group renders with the shared collapsible-group chrome WP1 already introduced —
-`.ocx-group-stack`, `.ocx-group`, `.ocx-group-head`, `.ocx-group-toggle`,
-`.ocx-group-heading`, `.ocx-group-name`, `.ocx-group-count`, `.ocx-chevron`
+`.opr-group-stack`, `.opr-group`, `.opr-group-head`, `.opr-group-toggle`,
+`.opr-group-heading`, `.opr-group-name`, `.opr-group-count`, `.opr-chevron`
 (`010` § Class vocabulary decision). WP4 **consumes** them and renames nothing: the
 vocabulary split was settled in WP1 so this phase adds no CSS beyond Grok's own row
 (`.grok-model-row`) and reuses the existing `.grok-endpoint` block.

@@ -31,7 +31,7 @@ beforeEach(() => {
   tmp = join(tmpdir(), `oauth-health-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(tmp, { recursive: true });
   process.env.HOME = tmp;
-  process.env.OPENCODEX_HOME = join(tmp, "ocx");
+  process.env.OPENCODEX_HOME = join(tmp, "opr");
   clearCodexUpstreamHealth();
 });
 
@@ -112,11 +112,11 @@ describe("collectOAuthHealthEntries", () => {
       provider: "kimi",
       accountId,
       health: { status: "reauth_required", reason: "refresh_failed" },
-      action: "run `ocx login kimi`",
+      action: "run `opr login kimi`",
     });
   });
 
-  test("Codex reauth action points at the dashboard pool, not ocx login codex", () => {
+  test("Codex reauth action points at the dashboard pool, not opr login codex", () => {
     markCodexAccountNeedsReauth(MAIN_CODEX_ACCOUNT_ID);
     const entries = collectOAuthHealthEntries();
     const entry = entries.find(e => e.provider === "codex" && e.accountId === MAIN_CODEX_ACCOUNT_ID);
@@ -126,7 +126,7 @@ describe("collectOAuthHealthEntries", () => {
       health: { status: "reauth_required", reason: "refresh_failed" },
       action: CODEX_REAUTH_ACTION,
     });
-    expect(entry!.action).not.toContain("ocx login codex");
+    expect(entry!.action).not.toContain("opr login codex");
   });
 
   test("kiro manual access-only unexpired credentials are healthy", async () => {

@@ -88,7 +88,7 @@ return (
       onClick={() => setOpenRows(current => ({ ...current, [model.route]: !rowOpen }))}
     >
       <IconChevron
-        className="ocx-chevron"
+        className="opr-chevron"
         width={12}
         height={12}
         aria-hidden="true"

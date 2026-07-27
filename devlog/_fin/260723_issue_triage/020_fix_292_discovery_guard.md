@@ -68,7 +68,7 @@ Before:
       const stale = getStaleCached(name);
       const fallback = stale ? "stale" : "configured";
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
+        `[openprovider] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
       );
       return stale ? withVertexDefaultSeed(applyConfigHintsToCachedModels(name, prov, stale, contextCap)) : configured;
     }
@@ -100,7 +100,7 @@ After:
     if (destinationError) {
       const { models, fallback } = failedDiscoveryFallback();
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" was blocked by destination policy: ${destinationError} [urlClass=${urlClass}, fallback=${fallback}].`,
+        `[openprovider] Provider model discovery for "${name}" was blocked by destination policy: ${destinationError} [urlClass=${urlClass}, fallback=${fallback}].`,
       );
       return models;
     }
@@ -109,7 +109,7 @@ After:
     if (!res.ok) {
       const { models, fallback } = failedDiscoveryFallback();
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
+        `[openprovider] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
       );
       return models;
     }
@@ -127,7 +127,7 @@ After:
         ? "returned invalid JSON in a 2xx response"
         : "returned a non-JSON 2xx response";
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" ${diagnostic} [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
+        `[openprovider] Provider model discovery for "${name}" ${diagnostic} [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
       );
       return models;
     }
@@ -150,7 +150,7 @@ Before:
     if (!isProviderModelsApiItems(data)) {
       markModelsFetchFailure(name);
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" returned malformed 2xx data; using stale/static catalog degradation.`,
+        `[openprovider] Provider model discovery for "${name}" returned malformed 2xx data; using stale/static catalog degradation.`,
       );
       const stale = getStaleCached(name);
       return stale ? withVertexDefaultSeed(applyConfigHintsToCachedModels(name, prov, stale, contextCap)) : configured;
@@ -163,7 +163,7 @@ After:
     if (!isProviderModelsApiItems(data)) {
       const { models, fallback } = failedDiscoveryFallback();
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" returned malformed 2xx data [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
+        `[openprovider] Provider model discovery for "${name}" returned malformed 2xx data [status=${res.status}, contentType=${contentType}, urlClass=${urlClass}, fallback=${fallback}].`,
       );
       return models;
     }
@@ -183,7 +183,7 @@ Before:
     const stale = getStaleCached(name);
     const fallback = stale ? "stale" : "configured";
     console.warn(
-      `[opencodex] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
+      `[openprovider] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
     );
     return stale ? withVertexDefaultSeed(applyConfigHintsToCachedModels(name, prov, stale, contextCap)) : configured;
   }
@@ -195,7 +195,7 @@ After:
   } catch (error) {
     const { models, fallback } = failedDiscoveryFallback();
     console.warn(
-      `[opencodex] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
+      `[openprovider] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
     );
     return models;
   }

@@ -13,8 +13,8 @@ let previousDesktopDir: string | undefined;
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
   previousDesktopDir = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  dir = mkdtempSync(join(tmpdir(), "ocx-desktop-cli-"));
-  process.env.OPENCODEX_HOME = join(dir, "ocx");
+  dir = mkdtempSync(join(tmpdir(), "opr-desktop-cli-"));
+  process.env.OPENCODEX_HOME = join(dir, "opr");
   process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = join(dir, "desktop");
   saveConfig({
     port: 10100,
@@ -76,7 +76,7 @@ test("no-arg and legacy mode flags apply Desktop config", async () => {
   try {
     expect(await handleClaudeDesktopCommand([])).toBe(0);
     expect(await handleClaudeDesktopCommand(["--static"])).toBe(0);
-    expect(readFileSync(join(process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR!, "_meta.json"), "utf8")).toContain("opencodex");
+    expect(readFileSync(join(process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR!, "_meta.json"), "utf8")).toContain("openprovider");
     expect(error).not.toHaveBeenCalled();
   } finally {
     log.mockRestore();

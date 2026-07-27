@@ -87,7 +87,7 @@ export function createCursorAdapter(provider: OcxProviderConfig, deps: CursorAda
           try {
             const token = resolveCursorToken(provider, incoming.headers);
             _parsed._cursorIdentityScope = createHash("sha256")
-              .update("ocx:cursor:acct:")
+              .update("opr:cursor:acct:")
               .update(token)
               .digest("hex")
               .slice(0, 16);

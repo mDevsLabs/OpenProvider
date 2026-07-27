@@ -6,7 +6,7 @@ This work-phase implements the design from `00_design.md`.
 
 Every provider group on the Models page gets a `Cap 350k` switch near
 `All on` / `All off`. Turning it on saves a provider-level context cap in
-opencodex config and refreshes the Codex-visible catalog. Models with a known
+openprovider config and refreshes the Codex-visible catalog. Models with a known
 context window above 350,000 are advertised as 350,000; models at or below the
 cap, and models with no known context metadata, remain unchanged.
 
@@ -197,6 +197,6 @@ Additional B-phase regression correction:
 
 Fresh evidence logs:
 
-- `/tmp/opencodex-provider-context-cap-tests-final.log`
-- `/tmp/opencodex-provider-context-cap-tsc-final.log`
-- `/tmp/opencodex-provider-context-cap-gui-build-final.log`
+- `/tmp/openprovider-provider-context-cap-tests-final.log`
+- `/tmp/openprovider-provider-context-cap-tsc-final.log`
+- `/tmp/openprovider-provider-context-cap-gui-build-final.log`

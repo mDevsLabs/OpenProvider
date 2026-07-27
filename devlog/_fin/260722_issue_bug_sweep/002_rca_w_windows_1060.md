@@ -18,7 +18,7 @@
 
 - `src/lib/winsw.ts:215` probeScmRegistration — true(쿼리 성공) / false(`e.status===1060 || /FAILED 1060/i`) / "error"(그 외)
 - `src/lib/winsw.ts:220` stderr/stdout/message 전 스트림 스캔 (1e6bd6d4 산물)
-- `src/lib/winsw.ts:236` queryScmForService — `sc.exe query opencodex-proxy-native`, utf8
+- `src/lib/winsw.ts:236` queryScmForService — `sc.exe query openprovider-proxy-native`, utf8
 - `src/lib/winsw.ts:189` statusWinswRaw — exe 존재 시 WinSW status 파싱; 부재 시 SCM probe; false만 "nonexistent", true/"error"는 "unknown"
 - fail-closed 소비자: `src/service.ts:493`(scheduler install → unknown이면 native cleanup → abort), `:505`("still present" 오표현), `:764`(unknown을 installed로 취급, stop 오보고), `:796`(best-effort 문서와 달리 예외 미포획)
 - 테스트: `tests/winsw.test.ts:123-131` — status 1060, 영어 FAILED 1060 stderr/stdout, status 5 fail-closed. **status 36 / FALHA / 한국어 / message 단독 1060 미커버**
@@ -35,7 +35,7 @@
 1. **W1**: `winsw.ts:226`을 `e.status === 1060 || /\b1060\b/.test(text)`로 — 1060은 로케일 불변 숫자 식별자. 고정 명령·고정 서비스명이라 오탐 위험 낮음. 회귀 테스트 4종 추가(FALHA/localized stderr/message/status5-without-1060→"error").
 2. **W2**: status 36 단독 수용 금지 — `\b1060\b` 텍스트 매칭이 도입되면 별도 36 처리 불필요. (선택: 텍스트 1060 동반 시에만 36 수용)
 3. **W3**: 호출부 tri-state 보존 — "unknown"을 "still present"로 표현하지 않기, stopped/removed 플래그는 실제 성공 후에만, `uninstallServiceIfInstalled` 예외 포획.
-4. **W4**: 에러 메시지에 `status=<n>` + sanitized 출력 발췌 + `sc.exe query opencodex-proxy-native`(exe 명시) 안내, denied/launch-fail/unrecognized 구분.
+4. **W4**: 에러 메시지에 `status=<n>` + sanitized 출력 발췌 + `sc.exe query openprovider-proxy-native`(exe 명시) 안내, denied/launch-fail/unrecognized 구분.
 5. (대안, 채택 보류) Win32 OpenServiceW 직접 프로브 — 확정적이지만 FFI 표면 확대. 텍스트 매칭 불신 시에만.
 
 ## Open Questions

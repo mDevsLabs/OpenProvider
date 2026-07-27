@@ -1,5 +1,5 @@
 /**
- * Ownership predicates for `~/.codex/config.toml`: does opencodex own the routing
+ * Ownership predicates for `~/.codex/config.toml`: does openprovider own the routing
  * currently written there?
  *
  * These live in their own leaf module rather than in `inject.ts` because
@@ -7,7 +7,7 @@
  * them here breaks that cycle. `inject.ts` imports them back and re-exports the
  * two public predicates, so external callers see no change.
  */
-export const OCX_SECTION_MARKER = "# Auto-injected by opencodex";
+export const OCX_SECTION_MARKER = "# Auto-injected by openprovider";
 
 export function isRootOpenaiBaseUrlLine(line: string): boolean {
   return /^\s*openai_base_url\s*=/.test(line);
@@ -61,12 +61,12 @@ export function hasInjectedOpenaiBaseUrl(content: string): boolean {
 }
 
 /**
- * True when the active Codex config is owned by opencodex routing. Covers the
+ * True when the active Codex config is owned by openprovider routing. Covers the
  * loopback Design B root override and the legacy/non-loopback provider table.
  * A user-owned `openai_base_url` is intentionally not classified as injected.
  */
 export function hasInjectedCodexRouting(content: string): boolean {
   if (hasInjectedOpenaiBaseUrl(content)) return true;
-  return rootTomlString(content, "model_provider") === "opencodex"
-    && providerTableString(content, "opencodex", "base_url") !== null;
+  return rootTomlString(content, "model_provider") === "openprovider"
+    && providerTableString(content, "openprovider", "base_url") !== null;
 }

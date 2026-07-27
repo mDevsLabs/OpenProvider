@@ -37,7 +37,7 @@ describe("debug frame logging", () => {
       debugProviderDiagnostic("cursor", "dial", { host: "api2.cursor.sh", authorization: "Bearer secret-cursor-token" });
       expect(error).toHaveBeenCalledTimes(1);
       const line = String(error.mock.calls[0]?.[0] ?? "");
-      expect(line).toContain("[ocx:cursor:dial]");
+      expect(line).toContain("[opr:cursor:dial]");
       expect(line).toContain("api2.cursor.sh");
       expect(line).not.toContain("secret-cursor-token");
       expect(line).toContain("[REDACTED]");
@@ -53,7 +53,7 @@ describe("debug frame logging", () => {
     try {
       debugProviderDiagnostic("cursor", "connected", { connectMs: 12 });
       expect(error).toHaveBeenCalledTimes(1);
-      expect(String(error.mock.calls[0]?.[0] ?? "")).toContain("[ocx:cursor:connected]");
+      expect(String(error.mock.calls[0]?.[0] ?? "")).toContain("[opr:cursor:connected]");
     } finally {
       error.mockRestore();
     }
@@ -78,7 +78,7 @@ describe("debug frame logging", () => {
     try {
       debugProviderDiagnostic("cursor", "connected", { connectMs: 42 });
       expect(error).toHaveBeenCalledTimes(1);
-      expect(String(error.mock.calls[0]?.[0] ?? "")).toContain("[ocx:cursor:connected]");
+      expect(String(error.mock.calls[0]?.[0] ?? "")).toContain("[opr:cursor:connected]");
     } finally {
       error.mockRestore();
     }
@@ -106,7 +106,7 @@ describe("debug frame logging", () => {
       });
       expect(error).toHaveBeenCalledTimes(1);
       const line = String(error.mock.calls[0]?.[0] ?? "");
-      expect(line).toContain("[ocx:kiro:request]");
+      expect(line).toContain("[opr:kiro:request]");
       expect(line).toContain("us-east-1");
       expect(line).not.toContain("secret-debug-token");
       expect(line).not.toContain("arn:aws:codewhisperer");
@@ -117,8 +117,8 @@ describe("debug frame logging", () => {
   });
 
   test("appendDebugLogLine supports after/limit queries with monotonic seq", () => {
-    appendDebugLogLine("[ocx:test:one]");
-    appendDebugLogLine("[ocx:test:two]");
+    appendDebugLogLine("[opr:test:one]");
+    appendDebugLogLine("[opr:test:two]");
     const all = getDebugLogEntries();
     expect(all).toHaveLength(2);
     expect(all[0]!.seq).toBe(1);
@@ -132,8 +132,8 @@ describe("debug frame logging", () => {
     const now = Date.now();
     const spy = spyOn(Date, "now").mockReturnValue(now);
     try {
-      appendDebugLogLine("[ocx:test:a]");
-      appendDebugLogLine("[ocx:test:b]");
+      appendDebugLogLine("[opr:test:a]");
+      appendDebugLogLine("[opr:test:b]");
       const all = getDebugLogEntries();
       const tail = getDebugLogEntries({ after: all[0]!.seq, limit: 10 });
       expect(tail).toHaveLength(1);

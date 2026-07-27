@@ -48,7 +48,7 @@ describe("GitHub Actions hardening", () => {
     expect(workflow).not.toContain('healthz || echo "healthz not ready yet"');
     expect(workflow).not.toContain("sleep 8");
     expect(workflow).toContain("systemd service has no positive MainPID before crash test");
-    expect(workflow).toContain("Get-ScheduledTask -TaskName opencodex-proxy -ErrorAction SilentlyContinue");
+    expect(workflow).toContain("Get-ScheduledTask -TaskName openprovider-proxy -ErrorAction SilentlyContinue");
     expect(workflow).toContain("launchd artifact or proxy survived uninstall");
     expect(workflow).toContain("scheduled task or proxy survived uninstall");
     expect(workflow).not.toMatch(/uses:\s+\S+@(?:v\d+|main|master)\b/);
@@ -391,7 +391,7 @@ describe("GitHub Actions hardening", () => {
     expect(helperSrc).toContain("Authoritative control state comes only from verified bot-owned comments");
     expect(helperSrc).toContain("sourceComplete");
     expect(helperSrc).not.toContain("writeFileControlState");
-    expect(helperSrc).not.toContain(".ocx-translation-state");
+    expect(helperSrc).not.toContain(".opr-translation-state");
   });
 
   test("React Doctor workflow is SHA-pinned, engine-pinned, advisory, and read-only", async () => {

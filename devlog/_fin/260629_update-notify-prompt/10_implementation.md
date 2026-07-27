@@ -6,7 +6,7 @@ too in the sense of a precise diff plan; code lands in the work phase.
 
 ## Outcome
 
-On an interactive `ocx start`, if a newer published version exists for the
+On an interactive `opr start`, if a newer published version exists for the
 user's channel, show a 3-option prompt (Update now / Skip / Skip until next
 version) before the server starts. Never shown to service/daemon/non-TTY runs
 or source checkouts.
@@ -64,7 +64,7 @@ Self-contained module; never throws out to startup.
     return. Render the 3 options via `readline` (mirror star-prompt: numbered
     `1/2/3`, default Enter = Update now to match codex-rs highlight, try/finally
     `rl.close()`, whole body try/catch).
-    - `1`/Enter -> Update now: `await runUpdate()` then a "Restart: ocx start"
+    - `1`/Enter -> Update now: `await runUpdate()` then a "Restart: opr start"
       line and `process.exit(0)`.
     - `2` -> Skip: return (no cache change).
     - `3` -> Skip until next version: set `dismissed_version = latest`, write
@@ -92,12 +92,12 @@ Self-contained module; never throws out to startup.
 - Do NOT touch `handleEnsure`: its child carries `OCX_SERVICE=1`, and ensure
   itself must stay silent (autostart hot path).
 
-## Prompt copy (opencodex wording)
+## Prompt copy (openprovider wording)
 
 ```
   ✨ Update available!  <current> -> <latest>
 
-  Release notes: https://github.com/lidge-jun/opencodex/releases/latest
+  Release notes: https://github.com/lidge-jun/openprovider/releases/latest
 
   1) Update now (runs `npm install -g @mdevs/openprovider@latest`)
   2) Skip
@@ -133,14 +133,14 @@ TTY (pure helpers exported; the readline shell stays thin).
 
 - `bun x tsc --noEmit`.
 - `bun test tests/update-notify.test.ts`.
-- Manual matrix: `OCX_SERVICE=1 ocx start` (silent), `ocx start | cat` (silent,
-  non-TTY), `ocx ensure` (silent), `ocx gui` spawn (silent), interactive
-  `ocx start` with a stubbed newer cache (prompt shows), pick 3 then restart
+- Manual matrix: `OCX_SERVICE=1 opr start` (silent), `opr start | cat` (silent,
+  non-TTY), `opr ensure` (silent), `opr gui` spawn (silent), interactive
+  `opr start` with a stubbed newer cache (prompt shows), pick 3 then restart
   (stays silent), bump cache to a higher version (prompt returns).
 
 ## Commit
 
-`feat(update): interactive update-available prompt on ocx start`
+`feat(update): interactive update-available prompt on opr start`
 
 ## Risk
 

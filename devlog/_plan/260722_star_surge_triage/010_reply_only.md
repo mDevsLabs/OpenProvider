@@ -24,9 +24,9 @@
 
 ### #241 (comment only, keep open — upstream tracking)
 
-> Status update after investigation: the missing entries are caused by Codex Desktop's remote model allowlist, which filters what the picker shows on the client side. OpenCodex correctly advertises the routed models through the app-server (as your logs show — they are loaded), but the Desktop picker only renders models on its own allowlist. This is outside what the proxy can control.
+> Status update after investigation: the missing entries are caused by Codex Desktop's remote model allowlist, which filters what the picker shows on the client side. OpenProvider correctly advertises the routed models through the app-server (as your logs show — they are loaded), but the Desktop picker only renders models on its own allowlist. This is outside what the proxy can control.
 >
-> Keeping this open as an upstream-tracking issue so others hitting the same behavior can find it. If Desktop exposes a supported control for this allowlist, we can reassess whether any OpenCodex-side change is needed.
+> Keeping this open as an upstream-tracking issue so others hitting the same behavior can find it. If Desktop exposes a supported control for this allowlist, we can reassess whether any OpenProvider-side change is needed.
 
 ### #208 (comment only, keep open — needs spec)
 

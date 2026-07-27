@@ -8,7 +8,7 @@ This cycle creates the shared plan folder only. Runtime behavior changes are res
 
 ### #62 Cursor native execution
 
-Cursor server-driven built-in native execution bypasses Codex approval and sandbox semantics when executed directly by opencodex. The current local patch makes built-in fs/shell/fetch execution fail closed unless `unsafeAllowNativeLocalExec` is explicitly enabled, with `allowNativeLocalExec` kept as a deprecated transition alias.
+Cursor server-driven built-in native execution bypasses Codex approval and sandbox semantics when executed directly by openprovider. The current local patch makes built-in fs/shell/fetch execution fail closed unless `unsafeAllowNativeLocalExec` is explicitly enabled, with `allowNativeLocalExec` kept as a deprecated transition alias.
 
 Key files:
 
@@ -34,11 +34,11 @@ Key files:
 Observed error:
 
 ```text
-Command failed: systemctl --user start opencodex-proxy
-Failed to start opencodex-proxy.service: Unit opencodex-proxy.service not found.
+Command failed: systemctl --user start openprovider-proxy
+Failed to start openprovider-proxy.service: Unit openprovider-proxy.service not found.
 ```
 
-Initial RCA: `installSystemd()` writes the unit and runs `daemon-reload`, `enable`, and `restart`, but `startSystemd()` directly calls `systemctl --user start opencodex-proxy` without checking whether the unit file exists first.
+Initial RCA: `installSystemd()` writes the unit and runs `daemon-reload`, `enable`, and `restart`, but `startSystemd()` directly calls `systemctl --user start openprovider-proxy` without checking whether the unit file exists first.
 
-Cycle 2 will patch this to fail with an opencodex-owned instruction before shelling out.
+Cycle 2 will patch this to fail with an openprovider-owned instruction before shelling out.
 

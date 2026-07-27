@@ -2,7 +2,7 @@
 
 ## 목표
 
-backend 선택(scheduler|native)이 설치 수명 전체에 걸쳐 보존되고, `ocx update`가
+backend 선택(scheduler|native)이 설치 수명 전체에 걸쳐 보존되고, `opr update`가
 선택된 backend 그대로 재설치하며, 문서(SoT)가 실제 동작을 서술한다.
 
 ## 범위 재배치 (감사 WARN 9)
@@ -42,7 +42,7 @@ state **v2 스키마 + exported accessor는 WP3(060)에서 도입**된다 — �
    - `README.md:237` — "starts on boot" 문구를 플랫폼 정확하게 수정(mac/linux는
      login/boot 각각, Windows 기본은 logon, `--native`는 boot).
    - `docs/codex-path-investigation.md` Windows 절 — hidden 런처 + `--native` 반영.
-   - `ocx service --help`/usage 문자열 — `--native`/`--scheduler` 문서화.
+   - `opr service --help`/usage 문자열 — `--native`/`--scheduler` 문서화.
 6. **#166 댓글** (`gh issue comment 166`): 방향 결정(sol 검토 요지 — 창 없는
    Scheduler 기본 + `--native` 옵트인 + 영속화, WinSW 기본 승격은 실측 후),
    구현 커밋 요약, Windows 실측 요청 매트릭스(040 §실측).

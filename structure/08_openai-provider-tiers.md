@@ -37,10 +37,10 @@ deduplicated in stable order; unrelated providers, API-key ids, and unknown pass
 not rewritten. Conflicting provider context caps keep the lower positive value with path-only
 warnings.
 
-Before the first v2 projection, opencodex creates a mode-0600, no-replace byte snapshot:
+Before the first v2 projection, openprovider creates a mode-0600, no-replace byte snapshot:
 
 ```sh
-cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json
+cp ~/.openprovider/config.json.pre-openai-tiers-v2.bak ~/.openprovider/config.json
 ```
 
 The historical v1 backup is never overwritten. Restoring the v2 backup intentionally restores the

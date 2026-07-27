@@ -37,7 +37,7 @@ Wire into `buildRequest` chain.
 
 - `bun run tsc` passes
 - Existing tests pass
-- `ocx sync` regenerates catalogs with spark having `use_responses_lite` absent/false
+- `opr sync` regenerates catalogs with spark having `use_responses_lite` absent/false
 - A dispatched spark subagent does NOT get a 400 for `all_turns`
 
 ## Scope

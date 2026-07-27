@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://opencodex.me/sitemap-index.xml
+Sitemap: https://openprovider.me/sitemap-index.xml

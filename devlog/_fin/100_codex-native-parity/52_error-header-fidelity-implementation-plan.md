@@ -2,7 +2,7 @@
 
 ## Objective
 
-Phase 100.5 makes translated opencodex failures look more like native Codex Responses failures.
+Phase 100.5 makes translated openprovider failures look more like native Codex Responses failures.
 
 Codex RS classifies streaming failures from:
 
@@ -10,7 +10,7 @@ Codex RS classifies streaming failures from:
 response.failed.response.error.code
 ```
 
-Current opencodex translated streams only emit:
+Current openprovider translated streams only emit:
 
 ```text
 response.failed.response.last_error
@@ -25,16 +25,16 @@ tightens passthrough header sanitization without fabricating rate-limit headers.
 Upstream Codex parser evidence:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs:347
-/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs:532
-/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs:557
+/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs:347
+/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs:532
+/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs:557
 ```
 
 Local gap:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts
 ```
 
 ## Files
@@ -42,7 +42,7 @@ Local gap:
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/errors.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/errors.ts
 ```
 
 Complete content:
@@ -81,7 +81,7 @@ export function classifyError(status: number, type: string, message: string): Oc
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
 ```
 
 Import classifier:
@@ -140,7 +140,7 @@ Update JSON error formatter:
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts
 ```
 
 Expand hop-by-hop/stale header drops:
@@ -163,12 +163,12 @@ Expand hop-by-hop/stale header drops:
 
 This keeps truthful upstream headers such as `x-ratelimit-*`, `openai-*`, `request-id`,
 `content-type`, and model/version headers. It does not synthesize rate-limit headers because
-opencodex does not have complete upstream quota telemetry for translated providers.
+openprovider does not have complete upstream quota telemetry for translated providers.
 
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/error-fidelity.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/error-fidelity.test.ts
 ```
 
 Complete content:

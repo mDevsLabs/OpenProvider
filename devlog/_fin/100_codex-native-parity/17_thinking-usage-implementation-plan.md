@@ -13,11 +13,11 @@ unknown providers support metadata they do not expose.
 Relevant source files:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/openai-chat.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/anthropic.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/google.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/openai-chat.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/anthropic.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/google.ts
 ```
 
 Current gaps:
@@ -43,7 +43,7 @@ Use two reasoning event classes:
 Provider mapping:
 
 1. Anthropic `thinking_delta` stays `thinking_delta` for now because its signed thinking blocks also
-   serve provider-specific continuity and are already represented as summary in opencodex history.
+   serve provider-specific continuity and are already represented as summary in openprovider history.
 2. OpenAI-compatible `reasoning_content` becomes `reasoning_raw_delta` because that field is a raw
    reasoning stream on compatible chat APIs.
 3. Google remains text/tool only until a provider-specific raw-thinking field is observed.
@@ -59,7 +59,7 @@ Usage details policy:
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts
 ```
 
 Change `AdapterEvent`:
@@ -86,7 +86,7 @@ Extend `OcxUsage`:
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
 ```
 
 Add a helper:
@@ -171,7 +171,7 @@ done                       -> usage
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/openai-chat.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/openai-chat.ts
 ```
 
 Change streaming mapping:
@@ -205,7 +205,7 @@ usage: {
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/anthropic.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/anthropic.ts
 ```
 
 Keep `thinking_delta` as summary. Extend usage mapping:
@@ -227,7 +227,7 @@ const hasCache =
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/google.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/google.ts
 ```
 
 Extend usage mapping when Gemini returns known metadata:
@@ -242,7 +242,7 @@ Keep both optional.
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/bridge.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/bridge.test.ts
 ```
 
 Add focused bridge tests:
@@ -257,7 +257,7 @@ Add focused bridge tests:
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/adapter-usage.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/adapter-usage.test.ts
 ```
 
 Add adapter-level unit tests for:

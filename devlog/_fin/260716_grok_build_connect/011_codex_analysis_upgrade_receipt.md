@@ -17,7 +17,7 @@ Initial pass only dropped thin (~280 total lines) notes under `180_grok-build-an
    - TUI/headless/ACP/WS surfaces
    - tools/MCP/plugins
    - third-party reuse
-   - OpenCodex integration + live smoke
+   - OpenProvider integration + live smoke
    - historical RE pointer
 3. Mirrored docs into clone `180_grok-build/analysis/` for browse convenience.
 4. Local commit on codex archive repo (no push).

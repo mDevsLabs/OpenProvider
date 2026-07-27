@@ -32,7 +32,7 @@
 - Runtime smoke: isolated OPENCODEX_HOME proxy served masked 2-account list,
   PUT active switched, DELETE promoted; live dashboard (10100) screenshot shows
   divider gone + dropdown open with active badge; mobile 487px rowFits=true.
-- Live catalog healed via `ocx sync` after temp-proxy catalog overwrite
+- Live catalog healed via `opr sync` after temp-proxy catalog overwrite
   (test pollution, root-caused: temp CODEX_HOME missing on first run).
 
 ## Honest limits (LOOP-PESSIMIST-01)

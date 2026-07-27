@@ -36,8 +36,8 @@ function writeAccounts(): void {
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-oauth-accounts-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-oauth-accounts-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-oauth-accounts-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-oauth-accounts-"));
   process.env.OPENCODEX_HOME = testDir;
   saveConfig(baseConfig());
   writeAccounts();
@@ -141,7 +141,7 @@ describe("multiauth accounts API", () => {
       expect(account.healthSummary).toMatch(/account-…/);
       expect(account.healthSummary).not.toContain("aaaa1111");
       expect(account.healthSummary).not.toContain("first@example.com");
-      expect(account.healthAction).toContain("ocx login anthropic");
+      expect(account.healthAction).toContain("opr login anthropic");
     } finally {
       await server.stop(true);
     }

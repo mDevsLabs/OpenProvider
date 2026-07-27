@@ -39,7 +39,7 @@ forceAnswer, structured-output JSON 클램프, ws턴 previous_response_id 연속
 
 - [ ] sol 브랜치(codex/gpt-56-sol-terra-luna-rollout, fd558eb) 머지 전: codex-rs ReasoningEffort에
       Max 추가됐는지 확인 — 현행은 "max" 카탈로그 광고가 invalid (sanitizer가 스트립 중)
-- [ ] 다음 ocx 재시작 후: GUI "Sync models" 버튼이 새 코드로 카탈로그 재작성하는지 확인
+- [ ] 다음 opr 재시작 후: GUI "Sync models" 버튼이 새 코드로 카탈로그 재작성하는지 확인
       (재시작 전엔 구코드가 비전 수정 되돌림)
 - [ ] 재시작 후 라이브 스모크: glm-5.2 이미지 첨부(비전 사이드카), 429 페일오버, compact 턴
 

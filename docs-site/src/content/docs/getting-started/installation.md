@@ -1,9 +1,9 @@
 ---
 title: Installation
-description: Install the OpenProvider (ocx) proxy, its prerequisites, and verify it runs.
+description: Install the OpenProvider (opr) proxy, its prerequisites, and verify it runs.
 ---
 
-OpenProvider installs two equivalent command names, `ocx` and `OpenProvider`. Both launch the same small
+OpenProvider installs two equivalent command names, `opr` and `OpenProvider`. Both launch the same small
 local HTTP server (built on Bun). Model requests go to the provider selected by routing; optional
 vision and web-search sidecars can also use your ChatGPT login when a routed model needs them.
 
@@ -11,7 +11,7 @@ vision and web-search sidecars can also use your ChatGPT login when a routed mod
 
 | Requirement | Why |
 | --- | --- |
-| **[Node](https://nodejs.org) ≥ 18** | `ocx` runs on the Bun runtime, but the runtime is bundled automatically on `npm install` — you do **not** need to install Bun yourself. |
+| **[Node](https://nodejs.org) ≥ 18** | `opr` runs on the Bun runtime, but the runtime is bundled automatically on `npm install` — you do **not** need to install Bun yourself. |
 | **[OpenAI Codex](https://openai.com/codex)** (CLI, App, or SDK) | The client OpenProvider sits in front of. OpenProvider writes to `$CODEX_HOME/config.toml` (default `~/.codex/config.toml`). |
 | A provider account or API key | Anthropic, xAI, Kimi, Ollama Cloud, OpenRouter, an OpenAI-compatible endpoint, or your ChatGPT login. |
 
@@ -39,7 +39,7 @@ sudo npm install -g --allow-scripts=bun @bitkyc08/OpenProvider
 Verify both command aliases are on your `PATH`:
 
 ```bash
-ocx --version
+opr --version
 OpenProvider --version
 ```
 
@@ -52,7 +52,7 @@ unreleased OpenProvider builds:
 
 ```bash
 npm install -g @bitkyc08/OpenProvider@preview
-ocx update --tag preview
+opr update --tag preview
 ```
 
 ## Run from source
@@ -80,17 +80,17 @@ under `$CODEX_HOME` (default `~/.codex`).
 | Path | Purpose |
 | --- | --- |
 | `$OpenProvider_HOME/config.json` | Your providers, default provider, port, and options. |
-| `$OpenProvider_HOME/ocx.pid` | PID of the running proxy (single-instance guard). |
+| `$OpenProvider_HOME/opr.pid` | PID of the running proxy (single-instance guard). |
 | `$OpenProvider_HOME/runtime-port.json` | The live PID, hostname, and port, including an automatically selected fallback port. |
-| `$OpenProvider_HOME/auth.json` | Stored OAuth credentials (when you `ocx login`). |
+| `$OpenProvider_HOME/auth.json` | Stored OAuth credentials (when you `opr login`). |
 | `$OpenProvider_HOME/catalog-backup*.json` | Codex model catalog backups made before OpenProvider edits it. |
 | `$CODEX_HOME/config.toml` | On loopback, OpenProvider adds a marker-owned root `openai_base_url`; non-loopback binds use `model_provider = "OpenProvider"` plus `[model_providers.OpenProvider]` so Codex can send the API-auth header. |
 | `$CODEX_HOME/OpenProvider.config.toml` | Fallback/reference profile written alongside the main Codex config. |
 | `$CODEX_HOME/OpenProvider-catalog.json` | Synced native and routed model catalog used by Codex. |
 
 :::note
-OpenProvider never deletes your Codex config. Every injection is reversible — `ocx stop`, `ocx restore`,
-or `ocx eject` strip exactly the lines OpenProvider added and restore native Codex.
+OpenProvider never deletes your Codex config. Every injection is reversible — `opr stop`, `opr restore`,
+or `opr eject` strip exactly the lines OpenProvider added and restore native Codex.
 :::
 
 ## Next

@@ -1,9 +1,9 @@
 # Catalog-sync hardening — keep the Codex model picker correct
 
-Diagnosed live (2026-06-29): the on-disk catalog `~/.codex/opencodex-catalog.json`
+Diagnosed live (2026-06-29): the on-disk catalog `~/.codex/openprovider-catalog.json`
 had only 7 entries (4 supported natives + 3 legacy: gpt-5.3-codex, gpt-5.2,
 codex-auto-review) and ZERO routed (kiro/*, opencode-go/*), while the live
-`/v1/models` correctly served 9. `ocx sync` re-appended +5 routed → 12 entries.
+`/v1/models` correctly served 9. `opr sync` re-appended +5 routed → 12 entries.
 Two real gaps in `syncCatalogModels` (src/codex-catalog.ts:734).
 
 ## Gap A — transient empty routed fetch overwrites good routed

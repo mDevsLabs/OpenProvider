@@ -3,7 +3,7 @@
 ## 무엇을 했나
 
 커밋 `5875a0b5` (dev): cc-switch/CCR류 전환 도구가 `~/.claude/settings.json`
-env에 남긴 `ANTHROPIC_BASE_URL`/`ANTHROPIC_AUTH_TOKEN`이 `ocx claude`의 spawn
+env에 남긴 `ANTHROPIC_BASE_URL`/`ANTHROPIC_AUTH_TOKEN`이 `opr claude`의 spawn
 env를 덮어써 프록시 라우팅을 납치하는 문제 방어.
 
 - `src/cli/claude.ts` — spawn env에 `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1`
@@ -15,7 +15,7 @@ env를 덮어써 프록시 라우팅을 납치하는 문제 방어.
 ## 감사 이력
 
 sol explorer (Kepler) 2라운드. R1 **FAIL** (blockers=4): injectLever TDZ,
-launchctl 주입이 Claude Desktop settings 모델 슬롯까지 strip, ocx claude
+launchctl 주입이 Claude Desktop settings 모델 슬롯까지 strip, opr claude
 settings-model 회귀, plan-map/GUI 테스트 공백. Synthesis: **launchctl/shell-env
 주입 전면 철회**(#1/#2 소멸), #3은 opt-out 명시된 의도적 계약 변경으로 수용,
 #4는 map v2 + 모듈 추출 + 직접 테스트로 해소. R2 GO-WITH-FIXES (blockers=1):
@@ -34,7 +34,7 @@ GUI 무조건 export가 opt-out을 덮음 → 조건부 할당으로 fold. 최�
 
 - 죽은 방향: launchctl 도메인 주입 — 도달 범위가 CCD까지라 부수 피해가
   방어 이득을 초과. spawn-env 한정이 옳은 경계.
-- 의도적 회귀(문서화): `ocx claude`에서 settings.env 모델 슬롯이 strip됨.
+- 의도적 회귀(문서화): `opr claude`에서 settings.env 모델 슬롯이 strip됨.
   이전 사용자는 top-level `model` 필드나 `=0` opt-out으로 이전.
 - 반증 시나리오: 플래그를 켰는데도 라우팅이 납치되면 settings 소스가
   trusted가 아닌 다른 주입 경로(프로젝트 로컬 settings의 SAFE_ENV_VARS,

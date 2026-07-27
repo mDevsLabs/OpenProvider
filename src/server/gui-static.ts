@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { extname, isAbsolute, join, relative, resolve } from "node:path";
 
-/** opencodex version, read from the packaged package.json (same source as the server bootstrap). */
+/** openprovider version, read from the packaged package.json (same source as the server bootstrap). */
 const VERSION = (() => {
   try {
     return JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version as string;
@@ -82,11 +82,11 @@ export function serveGuiFile(pathname: string): Response | null {
 export function rootFallbackPayload() {
   return {
     status: "ok",
-    service: "opencodex",
+    service: "openprovider",
     version: VERSION,
     dashboard: {
       available: false,
-      reason: "GUI build not found. Run `bun run build:gui` from the opencodex repo, or use `ocx gui` from a packaged install.",
+      reason: "GUI build not found. Run `bun run build:gui` from the openprovider repo, or use `opr gui` from a packaged install.",
     },
     endpoints: {
       health: "/healthz",

@@ -7,12 +7,12 @@
 ## Result — PASS (2026-06-28)
 Imported the installed kiro-cli token (access 233ch, refresh present, profileArn
 `arn:aws:codewhisperer:us-east-…`, region us-east-1), single-turn prompt
-"Reply with exactly: hello-ocx-kiro":
+"Reply with exactly: hello-opr-kiro":
 ```
 [req] url=https://runtime.us-east-1.kiro.dev/  bodyBytes=305
 [res] status=200 OK
 [events] text_delta,text_delta,done
-[assembled-text] "hello-ocx-kiro"
+[assembled-text] "hello-opr-kiro"
 ```
 → auth (oauth import) + conversationState wire + AWS eventstream decode + stop/input/name
 parse + AdapterEvent emission all verified against the live backend. Exact expected text returned.

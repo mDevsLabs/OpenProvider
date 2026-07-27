@@ -6,7 +6,7 @@
 > captures the external SOT we will lean on the way we leaned on jawcode for those two.
 >
 > Source-of-truth hierarchy for these ports:
-> 1. **opencodex itself** — our adapter contract + existing `google` adapter is the primary SOT.
+> 1. **openprovider itself** — our adapter contract + existing `google` adapter is the primary SOT.
 > 2. **jawcode** (`packages/ai/src/providers/*.ts`) — the original internal port reference.
 > 3. **External repos below** — independent, actively-maintained implementations to cross-check
 >    wire/auth/quirks against. Treat as evidence to verify, not code to copy.
@@ -21,9 +21,9 @@
   compatible APIs. Ships **both** Vertex and Antigravity as first-class, fully-tested providers —
   this is the closest external analogue to what we are building.
 
-Why it is the right reference: its internal layering maps almost 1:1 onto opencodex's adapter model.
+Why it is the right reference: its internal layering maps almost 1:1 onto openprovider's adapter model.
 
-| CLIProxyAPI layer | opencodex equivalent |
+| CLIProxyAPI layer | openprovider equivalent |
 |-------------------|----------------------|
 | `internal/auth/*` (OAuth + credential parse/refresh) | `src/oauth/*`, `src/lib/gcp-adc.ts` |
 | `internal/translator/*` (request/response body conversion) | body conversion in `src/adapters/google.ts` |
@@ -73,4 +73,4 @@ diff our behavior against CLIProxyAPI's executor/auth for each of those areas an
 evidence in the corresponding phase doc (`10_…`, `20_…`).
 
 > Note: external repos are reference evidence under their own licenses (CLIProxyAPI is MIT).
-> Verify wire/auth details against them; do not paste their source into opencodex.
+> Verify wire/auth details against them; do not paste their source into openprovider.

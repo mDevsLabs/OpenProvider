@@ -96,7 +96,7 @@ function successfulPicks(config: OcxConfig, count: number): string[] {
 async function withTempHome<T>(run: (dir: string) => Promise<T> | T): Promise<T> {
   const previousHome = process.env.OPENCODEX_HOME;
   const previousClaudeConfigDir = process.env.CLAUDE_CONFIG_DIR;
-  const dir = mkdtempSync(join(tmpdir(), "ocx-combos-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-combos-"));
   process.env.OPENCODEX_HOME = dir;
   process.env.CLAUDE_CONFIG_DIR = join(dir, "claude");
   try {
@@ -338,7 +338,7 @@ describe("combo management API", () => {
       });
       saveConfig(config);
       injectClaudeAgentDefs(config, {});
-      expect(readdirSync(join(process.env.CLAUDE_CONFIG_DIR!, "agents"))).toContain("ocx-old-public.md");
+      expect(readdirSync(join(process.env.CLAUDE_CONFIG_DIR!, "agents"))).toContain("opr-old-public.md");
       const oldCombo = getCombo(config, "old")!;
       const oldPick = pickComboTarget(config, "old")!;
       noteComboSuccess("old", oldCombo, oldPick.target);
@@ -664,7 +664,7 @@ describe("combo management API", () => {
       const codexHome = join(dir, "codex-home");
       mkdirSync(codexHome, { recursive: true });
       process.env.CODEX_HOME = codexHome;
-      const catalogPath = join(codexHome, "opencodex-catalog.json");
+      const catalogPath = join(codexHome, "openprovider-catalog.json");
       writeFileSync(catalogPath, JSON.stringify({
         models: [{
           slug: "combo/free",

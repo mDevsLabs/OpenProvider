@@ -3,9 +3,9 @@ import { countPendingOpencodexHistory, migrateHistoryToOpenai } from "./history-
 /**
  * Daemon-side retry for the one-time Design-B history migration.
  *
- * Most upgrades run `ocx start` while the Codex app still holds `state_5.sqlite`,
+ * Most upgrades run `opr start` while the Codex app still holds `state_5.sqlite`,
  * so the inject-time migration often fails on the FIRST start — exactly the moment
- * every legacy thread is still tagged `opencodex` and invisible to the app. Instead
+ * every legacy thread is still tagged `openprovider` and invisible to the app. Instead
  * of asking the user to close the app and rerun start, this guardian keeps retrying
  * in the background until the migration lands.
  *
@@ -13,7 +13,7 @@ import { countPendingOpencodexHistory, migrateHistoryToOpenai } from "./history-
  * - Ticks use `{ attempts: 1 }`: no sleepSync inside the daemon event loop; the tick
  *   cadence IS the retry. Worst case per tick is one sqlite busy wait.
  * - Timers are unref'd so the guardian never keeps the process alive.
- * - Started ONLY from `ocx start` (cli handleStart), never from injectCodexConfig —
+ * - Started ONLY from `opr start` (cli handleStart), never from injectCodexConfig —
  *   `/api/sync` re-runs inject and must not double-start loops.
  */
 
@@ -70,7 +70,7 @@ export function startHistoryMigrationGuardian(deps: HistoryMigrationGuardianDeps
       if (!result.failed) {
         const moved = result.rows + (result.ejectedRows ?? 0);
         if (moved > 0) {
-          log.log(`🩹 history-migration: ${moved} legacy opencodex thread(s) migrated back to openai.`);
+          log.log(`🩹 history-migration: ${moved} legacy openprovider thread(s) migrated back to openai.`);
         }
         // A "successful" zero-row migration can also mean the DB does not exist YET while a
         // backup manifest still holds restore work (fresh reinstall race). Only stop when a
@@ -86,7 +86,7 @@ export function startHistoryMigrationGuardian(deps: HistoryMigrationGuardianDeps
     }
     if (ticks >= maxTicks) {
       stopped = true;
-      log.log("⚠️ history-migration: Codex history DB stayed locked; legacy threads not yet migrated. Close the Codex app and run 'ocx sync' (or check 'ocx doctor').");
+      log.log("⚠️ history-migration: Codex history DB stayed locked; legacy threads not yet migrated. Close the Codex app and run 'opr sync' (or check 'opr doctor').");
       return;
     }
     schedule();

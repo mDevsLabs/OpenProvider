@@ -12,7 +12,7 @@
 
 ### GET `/wham/usage` (existing, extended)
 
-Already called by opencodex at `codex-auth-api.ts:106,137,349`.
+Already called by openprovider at `codex-auth-api.ts:106,137,349`.
 
 New response field:
 ```json
@@ -62,7 +62,7 @@ Authorization: Bearer <accessToken>
 ChatGPT-Account-Id: <chatgptAccountId>
 ```
 
-Same credentials already stored per-account in opencodex's
+Same credentials already stored per-account in openprovider's
 `codex-accounts.json` and refreshed via `getValidCodexToken()`.
 
 ### Timeout
@@ -103,7 +103,7 @@ pub enum ConsumeAccountRateLimitResetCreditOutcome {
 
 **Note**: The backend (wham) API uses `snake_case` (`redeem_request_id`,
 `nothing_to_reset`). The app-server protocol uses `camelCase`
-(`idempotencyKey`, `nothingToReset`). opencodex calls wham directly,
+(`idempotencyKey`, `nothingToReset`). openprovider calls wham directly,
 so we use **snake_case** for the backend call.
 
 ## TUI State Machine (codex-rs reference)
@@ -133,7 +133,7 @@ POST consume with UUID
 ### Workspace Exclusion
 
 codex-rs hides the reset menu entry for workspace accounts.
-opencodex should check `plan_type` — if it contains "team" or "enterprise"
+openprovider should check `plan_type` — if it contains "team" or "enterprise"
 or if the account is flagged as workspace, skip the redeem button.
 
 ### Availability Hint
@@ -143,7 +143,7 @@ codex-rs shows a hint when:
 2. The account has `available_count > 0`
 3. Not a workspace account
 
-opencodex equivalent: when a 429 response is received and the account
+openprovider equivalent: when a 429 response is received and the account
 has `resetCredits > 0`, show a notification in the dashboard.
 
 ## Community State
@@ -151,11 +151,11 @@ has `resetCredits > 0`, show a notification in the dashboard.
 | Resource | Status |
 |----------|--------|
 | hascodexratelimitreset.today | Tracking site only, no API |
-| Third-party implementations | **None found** — opencodex would be first |
+| Third-party implementations | **None found** — openprovider would be first |
 | Codex CLI v0.135+ | Has `/usage` → reset flow |
 | Codex App v26.609+ | Has reset banking in usage menu |
 
-## opencodex Existing Infrastructure
+## openprovider Existing Infrastructure
 
 | Component | File | Ready? |
 |-----------|------|--------|
@@ -166,4 +166,4 @@ has `resetCredits > 0`, show a notification in the dashboard.
 | Account routing | `codex-routing.ts` | ✅ Pool-aware selection |
 | `WhamUsageResponse` type | `codex-quota.ts:11-19` | ❌ Missing `rate_limit_reset_credits` |
 | Consume API proxy | — | ❌ Not implemented |
-| CLI usage command | `cli.ts` | ❌ No `ocx usage` subcommand |
+| CLI usage command | `cli.ts` | ❌ No `opr usage` subcommand |

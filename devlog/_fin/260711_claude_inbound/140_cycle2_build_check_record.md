@@ -5,7 +5,7 @@
 | 항목 | 파일 | 내용 |
 |------|------|------|
 | B5 config | `src/claude/desktop-3p.ts` | 3값 모드(static 기본/hybrid/discovery), `supports1m`(authoritative contextWindow>=1M만), routed DTO `{provider,id,contextWindow?}`, `parseDesktop3pModeArgs`(상호배타+미지 플래그 거부) |
-| B5 CLI | `src/cli/index.ts` | `ocx claude desktop [--static|--hybrid|--discovery-only]`, 1M 행 안내 문구, contextWindow 전달(호출자 3곳) |
+| B5 CLI | `src/cli/index.ts` | `opr claude desktop [--static|--hybrid|--discovery-only]`, 1M 행 안내 문구, contextWindow 전달(호출자 3곳) |
 | B6 launcher | `src/cli/claude.ts` | opt-in `alwaysEnableEffort`→ALWAYS_ENABLE_EFFORT=1, `maxContextTokens`→MAX_CONTEXT_TOKENS+`DISABLE_COMPACT=1` 쌍(공식 변수명), user-wins |
 | B6 systemEnv | `src/server/system-env.ts` | 레버 키 user-wins 스킵+실주입만 추적, shell 파일 조건부 export(`${VAR+x}`) |
 | B6 API/GUI | `management-api.ts`, `ClaudeCode.tsx`, i18n×4 | maxContextTokens(양의 정수/null clear 검증)·alwaysEnableEffort 왕복, 쉬운 어휘 + compaction 경고 |
@@ -20,7 +20,7 @@
   claude-messages(ladder [] 제거 / unknown 보존 / [1m] 스트립 3테스트), inbound-debug(beta 캡처).
 
 ## 사용자 적용 절차 (Pro 검증 매트릭스, 138 §6)
-1. `ocx stop && ocx start` → `ocx claude desktop` (이제 정적 목록 + supports1m 기본)
+1. `opr stop && opr start` → `opr claude desktop` (이제 정적 목록 + supports1m 기본)
 2. Claude Desktop 완전 종료 후 재시작 (3P 설정은 실행 시 1회 로드)
 3. 피커에서 별칭 모델 선택 → effort를 **low로** 바꿔 메시지 1개, **max로** 바꿔 1개
    (high는 기본값=필드 생략이라 판정 불가) → GUI Debug의 Claude 인바운드 표에서

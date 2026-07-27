@@ -7,7 +7,7 @@ provider that uses a Copilot subscription as a backend.
 
 ## Requirements
 
-1. OpenProvider proxy running locally (`ocx start` / `ocx gui`).
+1. OpenProvider proxy running locally (`opr start` / `opr gui`).
 2. At least one configured provider with models (dashboard → Providers).
 3. GitHub Copilot desktop app with **Model providers** support.
 

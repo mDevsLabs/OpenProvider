@@ -109,11 +109,11 @@ cleanup. 특히 **`nextGroups` 기반 cleanup을 반드시 보존**한다.
 - checkout HEAD와 `origin/dev`: `037e8f5e4fa32a82e4149acc509554f157656dad` (detached worktree at exact dev tip; checkout 없음).
 - PR: `#389 fix(models): make switches reflect final visibility`, base `dev`, head `1e1fa598088c76803409d4022e85d1f1de7504d4`, 15 files, `+677/-71`.
 - GitHub은 현재 `reviewDecision=CHANGES_REQUESTED`로 표시하지만 독립 diff review상 기존 4개 지적은 head에서 모두 해결됐다.
-- PR patch 전량 확인: `gh pr diff 389 --repo lidge-jun/opencodex` = **1148 lines**.
+- PR patch 전량 확인: `gh pr diff 389 --repo lidge-jun/openprovider` = **1148 lines**.
 - 필수 direct apply 검사:
 
 ```text
-$ gh pr diff 389 --repo lidge-jun/opencodex | git apply --check -
+$ gh pr diff 389 --repo lidge-jun/openprovider | git apply --check -
 error: patch failed: gui/src/pages/Models.tsx:10
 error: gui/src/pages/Models.tsx: patch does not apply
 exit 1
@@ -150,9 +150,9 @@ DELETE는 없다.
 1148-line PR patch가 incoming 변경의 원본 권위다. 구현자는 먼저 head와 line count를 고정한다.
 
 ```bash
-test "$(gh pr view 389 --repo lidge-jun/opencodex --json headRefOid --jq .headRefOid)" = \
+test "$(gh pr view 389 --repo lidge-jun/openprovider --json headRefOid --jq .headRefOid)" = \
   "1e1fa598088c76803409d4022e85d1f1de7504d4"
-gh pr diff 389 --repo lidge-jun/opencodex > /tmp/pr-389.patch
+gh pr diff 389 --repo lidge-jun/openprovider > /tmp/pr-389.patch
 test "$(wc -l < /tmp/pr-389.patch | tr -d ' ')" = "1148"
 git apply --3way /tmp/pr-389.patch
 ```

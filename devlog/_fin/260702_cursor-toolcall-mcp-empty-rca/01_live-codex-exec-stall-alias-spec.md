@@ -5,7 +5,7 @@ Owner: Boss RCA; implementation to gpt-5.5 employee.
 
 ## Symptom
 
-`codex exec -m cursor/composer-2.5` and `codex exec -m cursor/claude-4.6-sonnet` route to ocx, receive `response.created`, then hang/reconnect while the proxy emits only `response.heartbeat`.
+`codex exec -m cursor/composer-2.5` and `codex exec -m cursor/claude-4.6-sonnet` route to opr, receive `response.created`, then hang/reconnect while the proxy emits only `response.heartbeat`.
 
 ## Captured request
 

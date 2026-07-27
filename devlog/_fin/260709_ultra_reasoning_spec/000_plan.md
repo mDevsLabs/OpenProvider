@@ -3,8 +3,8 @@
 ## Loop-spec header (C3, spec-satisfaction)
 
 - **Loop archetype:** spec-satisfaction repair (verifier defines done).
-- **Trigger:** upstream codex-rs series — df1199fdd `[codex] Add Ultra reasoning effort (#29899)`, 80f54d126 `Treat max as a first-class reasoning effort (#30467)`, 927004c06 `tui: warn on Ultra with high multi-agent concurrency (#31621)`. User request: make ocx's spec for the gpt-5.6 sol family + ultra as stable as remote.
-- **Goal:** ocx accepts, orders, advertises, and wire-converts the `ultra` reasoning effort with the same semantics as codex-rs origin/main.
+- **Trigger:** upstream codex-rs series — df1199fdd `[codex] Add Ultra reasoning effort (#29899)`, 80f54d126 `Treat max as a first-class reasoning effort (#30467)`, 927004c06 `tui: warn on Ultra with high multi-agent concurrency (#31621)`. User request: make opr's spec for the gpt-5.6 sol family + ultra as stable as remote.
+- **Goal:** opr accepts, orders, advertises, and wire-converts the `ultra` reasoning effort with the same semantics as codex-rs origin/main.
 - **Non-goals:** no codex-rs changes; no proxy-side emulation of proactive multi-agent derivation (client-owned per upstream `core/src/session/multi_agents.rs:52-55`); no TUI concurrency warning port (TUI-owned); no routed-model default ladder expansion; no GUI work.
 - **Verifier:** `bun test tests/reasoning-effort.test.ts tests/responses-parser.test.ts`, `bun test tests/codex-catalog-golden.test.ts tests/codex-catalog.test.ts`, then full `bun test`.
 - **Stop condition:** all verifier gates green + SoT docs synced.
@@ -17,13 +17,13 @@
 
 1. Enum order `None, Minimal, Low, Medium, High, XHigh, Max, Ultra, Custom(String)` — `max` first-class, `ultra` ranks ABOVE `max` (`protocol/src/openai_models.rs:40-51`).
 2. `ultra` never reaches the inference wire: `reasoning_effort_for_request` maps `Ultra => Max` for Responses HTTP/WS, prewarm, compaction, memory summarization (`core/src/client.rs:174-179`, `:802-812`, `:1713-1744`, `:564-592`, `:701-710`).
-3. Catalog owns effort order; clients preserve `supported_reasoning_levels` array order (`app-server/README.md:140`). Bundled models.json advertises no ultra; live/remote catalogs may. Bedrock gpt-5.6 pattern appends `Max` on top of the gpt-5.5 template (`model-provider/src/amazon_bedrock/catalog.rs:77-89`) — the exact pattern ocx already copies via `ensureMaxReasoningLevel`.
+3. Catalog owns effort order; clients preserve `supported_reasoning_levels` array order (`app-server/README.md:140`). Bundled models.json advertises no ultra; live/remote catalogs may. Bedrock gpt-5.6 pattern appends `Max` on top of the gpt-5.5 template (`model-provider/src/amazon_bedrock/catalog.rs:77-89`) — the exact pattern opr already copies via `ensureMaxReasoningLevel`.
 4. Proactive multi-agent derivation from `Ultra` is client-core-owned and V2-gated (`core/src/session/multi_agents.rs:39-67`); deprecated app-server `multiAgentMode` fields are ignored.
 5. TUI warns on Ultra when `max_concurrent_threads_per_session >= 8` (`tui/src/chatwidget/model_popups.rs:8,552-574`) — client-owned, out of proxy scope.
 
-## ocx gaps (evidence)
+## opr gaps (evidence)
 
-- G1 **Parser drops ultra silently**: `src/responses/parser.ts:220` `REASONING_EFFORTS` = {none,minimal,low,medium,high,xhigh,max}; `:467-469` gates ingest. `reasoning.effort:"ultra"` -> `options.reasoning` unset -> adapters treat as no-reasoning (thinking disabled entirely). Upstream degrades ultra->max; ocx degrades to nothing. Stability gap #1.
+- G1 **Parser drops ultra silently**: `src/responses/parser.ts:220` `REASONING_EFFORTS` = {none,minimal,low,medium,high,xhigh,max}; `:467-469` gates ingest. `reasoning.effort:"ultra"` -> `options.reasoning` unset -> adapters treat as no-reasoning (thinking disabled entirely). Upstream degrades ultra->max; opr degrades to nothing. Stability gap #1.
 - G2 **Ladder has no ultra**: `src/reasoning-effort.ts:4-10` `CODEX_REASONING_LEVELS` ends at max; `sanitizeCodexReasoningEfforts` strips `ultra` from provider config; `clampToSupportedCodexEffort` cannot rank it; config opt-in impossible.
 - G3 **gpt-5.6 sol family cannot advertise ultra**: `src/codex/catalog.ts:517-525` `ensureMaxReasoningLevel` appends only max for `gpt-5.6-*` native slugs (`:513-515`, call sites `:555`, fallback `:567`).
 
@@ -43,7 +43,7 @@
 - `ROUTED_REASONING_LEVELS` (L481): change from alias to `CODEX_REASONING_LEVELS.filter(l => l.effort !== "ultra")` — routed-model DEFAULT ladder stays `low..max` (goldens unchanged; upstream bundled models advertise no ultra either). Providers opt in per-model via `reasoningEfforts` config, which `sanitizeCodexReasoningEfforts` now accepts.
 - Rename `ensureMaxReasoningLevel` -> `ensureGpt56ReasoningLevels`: append `max` AND `ultra` (each only when absent), descriptions sourced from `CODEX_REASONING_LEVELS`. Update call site L555; add the same call after `applyReasoningLevels` on the no-template fallback path (L567) for `isGpt56NativeSlug` so both paths agree.
 - Activation scenario: catalog-build test observes `gpt-5.6-sol` entry `supported_reasoning_levels` ending `[..., "max", "ultra"]` and a routed slug WITHOUT ultra.
-- Rationale for advertising ultra on the sol family: upstream ships ultra as the user-facing selection for max+proactive-delegation; sol/terra/luna are the current-gen native slugs ocx synthesizes from the gpt-5.5 template (real backend catalog unavailable to verify directly — ocx owns this synthesis; Bedrock precedent appends efforts the template lacks). Client (>= df1199fdd; installed fork HEAD 129ea2aaf 07-01) converts ultra->max before the wire; the ChatGPT backend already accepts max for 5.6 — no new wire value reaches any backend. Worst case for an older client that sends raw "ultra": parser normalization (G1 fix) degrades it to max.
+- Rationale for advertising ultra on the sol family: upstream ships ultra as the user-facing selection for max+proactive-delegation; sol/terra/luna are the current-gen native slugs opr synthesizes from the gpt-5.5 template (real backend catalog unavailable to verify directly — opr owns this synthesis; Bedrock precedent appends efforts the template lacks). Client (>= df1199fdd; installed fork HEAD 129ea2aaf 07-01) converts ultra->max before the wire; the ChatGPT backend already accepts max for 5.6 — no new wire value reaches any backend. Worst case for an older client that sends raw "ultra": parser normalization (G1 fix) degrades it to max.
 
 ### 4. Tests (MODIFY)
 - `tests/reasoning-effort.test.ts`: sanitize accepts+orders ultra (dedupe, sort after max); clamp `ultra` on supported `low..max` -> `max`; on `["low","high"]` -> `high`; `mapReasoningEffort` ultra -> `"max"` wire fallback; `wireMap: {ultra: "think-hard"}` alias respected; noReasoningModels still returns undefined.

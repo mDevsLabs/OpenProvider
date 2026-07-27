@@ -375,7 +375,7 @@ export async function resolveLiveRelay(
       400,
       "invalid_request_error",
       "Built-in ChatGPT voice needs an OpenAI upstream (ChatGPT login or an OpenAI API-key provider), "
-        + "but none is configured in opencodex. Routed providers cannot serve voice call-create.",
+        + "but none is configured in openprovider. Routed providers cannot serve voice call-create.",
     );
   }
 

@@ -17,8 +17,8 @@ let upstream: ReturnType<typeof Bun.serve> | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-imgretry-e2e-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-imgretry-e2e-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-imgretry-e2e-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-imgretry-e2e-"));
   process.env.OPENCODEX_HOME = testDir;
   clearKeyCooldowns();
   resetNormalizeStateForTests();

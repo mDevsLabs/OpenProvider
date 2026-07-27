@@ -8,9 +8,9 @@ Issues: #295, “Multi-agent guidance can advertise rejected spawn models”; #3
 
 ## Executive finding
 
-Both reports are valid, but they classify differently. **#295 is a confirmed OpenCodex bug**: the proxy's built-in v2 message unconditionally describes `model` and `reasoning_effort` as hidden, while current Codex can expose those fields; more importantly, the roster checks only whether each configured id has effort metadata somewhere in the injected catalog, not whether that model is eligible for the active v2 collaboration backend. **#300 is a confirmed feature gap**: there is no supported boolean that suppresses both v1 and v2 guidance while leaving the collaboration surface, roster, catalog, routing, and caps unchanged.
+Both reports are valid, but they classify differently. **#295 is a confirmed OpenProvider bug**: the proxy's built-in v2 message unconditionally describes `model` and `reasoning_effort` as hidden, while current Codex can expose those fields; more importantly, the roster checks only whether each configured id has effort metadata somewhere in the injected catalog, not whether that model is eligible for the active v2 collaboration backend. **#300 is a confirmed feature gap**: there is no supported boolean that suppresses both v1 and v2 guidance while leaving the collaboration surface, roster, catalog, routing, and caps unchanged.
 
-The reporter's exact #295 split is explained by the active v2 compatibility filter. The local pinned catalog marks Sol and Terra `v2`, Luna `v1`, and GPT-5.5 unpinned; the inspected upstream Codex handler requires an explicit v2 match during a v2 turn. The configured four-model roster therefore resolved all four for prompt text, while the v2 runtime accepted only Sol and Terra. The upstream five-model constant limits the picker-visible models described by `spawn_agent`; it is not reproduced by OpenCodex's current roster helper.
+The reporter's exact #295 split is explained by the active v2 compatibility filter. The local pinned catalog marks Sol and Terra `v2`, Luna `v1`, and GPT-5.5 unpinned; the inspected upstream Codex handler requires an explicit v2 match during a v2 turn. The configured four-model roster therefore resolved all four for prompt text, while the v2 runtime accepted only Sol and Terra. The upstream five-model constant limits the picker-visible models described by `spawn_agent`; it is not reproduced by OpenProvider's current roster helper.
 
 The #295 workaround mechanics are also confirmed. A non-empty `injectionPrompt` replaces the built-in v2 body, `{{roster}}` expands to the same catalog-resolved roster suffix, and the reporter's suffix placement preserves the roster. Through the management API, `null` and `""` clear the override; whitespace-only input is rejected rather than saved. A space written directly to config remains truthy and yields an effectively blank `<multi_agent_mode>` block, but still rewrites every qualifying request. That is containment, not a supported disabled state.
 
@@ -67,7 +67,7 @@ export function catalogModelEfforts(slugs: readonly string[]): Map<string, strin
     if (callerSlug === undefined) continue;
 ```
 
-### A4 — OpenCodex deliberately ranks configured models for Codex's five-item surface
+### A4 — OpenProvider deliberately ranks configured models for Codex's five-item surface
 
 ```ts
 // src/codex/catalog.ts:1091-1104
@@ -249,7 +249,7 @@ function applyInjectionPlaceholders(prompt: string, model?: string, effort?: str
     const guidance = await multiAgentGuidanceText(parsed, config.injectionModel, config.injectionEffort, config.subagentModels, config.injectionPrompt);
     if (guidance) {
       injectDeveloperMessage(parsed, guidance);
-      if (isInjectionDebugEnabled()) injectionDebugLog(`[opencodex] ${route.modelId}: multi-agent guidance injected (surface=${collabSurface(parsed)}, ${guidance.length} chars)`);
+      if (isInjectionDebugEnabled()) injectionDebugLog(`[openprovider] ${route.modelId}: multi-agent guidance injected (surface=${collabSurface(parsed)}, ${guidance.length} chars)`);
 ```
 
 ### A13 — config is passthrough, defaults seed a roster, and no guidance flag exists
@@ -386,14 +386,14 @@ export function getDefaultConfig(): OcxConfig {
 
 ## Issue #295: precise divergence chain
 
-1. `config.subagentModels` is used as a featured ordering input during catalog sync, and OpenCodex assigns configured native ids low priorities. This is intended to align with Codex's priority-sorted, five-item picker description (**A4**: `src/codex/catalog.ts:1091-1104`, “sorts by `priority` ASC and advertises the first 5 picker-visible models”).
+1. `config.subagentModels` is used as a featured ordering input during catalog sync, and OpenProvider assigns configured native ids low priorities. This is intended to align with Codex's priority-sorted, five-item picker description (**A4**: `src/codex/catalog.ts:1091-1104`, “sorts by `priority` ASC and advertises the first 5 picker-visible models”).
 2. `multiAgentGuidanceText` does not consume that effective five-item, surface-compatible set. It passes the raw configured list to `subagentRosterText`, which retains every id for which `catalogModelEfforts` found any catalog row (**A2**: `src/server/responses.ts:254-266`, `const resolved = featured.filter(id => efforts.has(id))`; **A3**: `src/codex/catalog.ts:339-349`, matching only the slug).
 3. Codex independently builds the active `spawn_agent` description from picker-visible models, filters them for the active collaboration backend, and takes five (**A8**: upstream `multi_agents_spec.rs:781-790`). Runtime validation repeats the backend filter before accepting an explicit model (**A9**: upstream `multi_agents_common.rs:402-419`). Thus catalog presence is necessary for roster resolution but is not sufficient for a v2 spawn override.
-4. In the default catalog, Sol and Terra are explicitly v2; Luna is explicitly v1; GPT-5.5 is unpinned (**A5**: `src/codex/data/upstream-models.json:4,21,118,135,230,247,338,355`). For a v2 turn, upstream requires `model.multi_agent_version == Some(V2)` (**A7**: upstream `multi_agents_common.rs:31-39`). This yields the reporter's exact split: OpenCodex advertised all four catalog-resolved configured ids, while runtime acceptance/error disclosure contained only `gpt-5.6-sol` and `gpt-5.6-terra`.
+4. In the default catalog, Sol and Terra are explicitly v2; Luna is explicitly v1; GPT-5.5 is unpinned (**A5**: `src/codex/data/upstream-models.json:4,21,118,135,230,247,338,355`). For a v2 turn, upstream requires `model.multi_agent_version == Some(V2)` (**A7**: upstream `multi_agents_common.rs:31-39`). This yields the reporter's exact split: OpenProvider advertised all four catalog-resolved configured ids, while runtime acceptance/error disclosure contained only `gpt-5.6-sol` and `gpt-5.6-terra`.
 5. `multiAgentMode: "v2"` would stamp every catalog entry v2, while default mode restores the upstream pins (**A6**: `src/codex/catalog.ts:545-570`). That can change the accepted set, but it does not repair the architectural mismatch: the guidance helper still computes a different set from the runtime and can drift again through visibility, priority, surface pins, stale session/catalog cache, or more than five configured entries.
 6. The wording defect is independent of the roster defect. The built-in text always says `hidden`, `not in the schema`, and `never claim` whenever v2 guidance fires (**A1**: `src/server/responses.ts:211-217`). Current upstream can retain `model` and `reasoning_effort` in the v2 schema when override exposure is enabled, so an absolute schema claim is not valid for every session; the reporter's active schema was one such session.
 
-The first-five constant needs a precise interpretation. It caps the model list described to the model and shown in the error (**A8**, **A9**); the inspected handler's exact-name validation can accept a compatible model outside that displayed five because its initial `.find(...)` is not picker/take-limited (**A9**: upstream `multi_agents_common.rs:402-414`). OpenCodex guidance should nevertheless advertise no broader set than Codex itself describes for that turn. Computing the same picker-visible + backend-compatible + priority-sorted first five is a safe subset of runtime acceptance and matches the user-visible contract.
+The first-five constant needs a precise interpretation. It caps the model list described to the model and shown in the error (**A8**, **A9**); the inspected handler's exact-name validation can accept a compatible model outside that displayed five because its initial `.find(...)` is not picker/take-limited (**A9**: upstream `multi_agents_common.rs:402-414`). OpenProvider guidance should nevertheless advertise no broader set than Codex itself describes for that turn. Computing the same picker-visible + backend-compatible + priority-sorted first five is a safe subset of runtime acceptance and matches the user-visible contract.
 
 ## Workaround verification
 
@@ -419,7 +419,7 @@ A supported `multiAgentGuidanceEnabled` flow should be:
 Implement #295 and #300 together because they share the same public configuration and injection boundary, while preserving separate issue classification.
 
 1. **Neutral default copy:** replace the absolute “hidden / not in the schema / never claim” sentence with schema-agnostic wording such as “When the active `spawn_agent` surface supports `model` or `reasoning_effort` overrides, use only models listed for this collaboration surface.” Retain the verified `fork_turns` and self-contained-message rule. Update the stale explanatory comment and the existing test that currently requires the problematic phrase (**A1**: `src/server/responses.ts:214-217`; `tests/multi-agent-compat.test.ts:84-98`).
-2. **One effective roster helper:** derive guidance candidates from the final on-disk catalog using the same order and predicates as Codex's described override set: priority ascending, picker-visible, active-surface compatible, then first five. Intersect configured `subagentModels` with that set before adding effort ladders. **A4** supplies OpenCodex's priority intent; **A7-A9** supply the upstream compatibility and cap semantics. Do not mutate the configured list when filtering.
+2. **One effective roster helper:** derive guidance candidates from the final on-disk catalog using the same order and predicates as Codex's described override set: priority ascending, picker-visible, active-surface compatible, then first five. Intersect configured `subagentModels` with that set before adding effort ladders. **A4** supplies OpenProvider's priority intent; **A7-A9** supply the upstream compatibility and cap semantics. Do not mutate the configured list when filtering.
 3. **Consistency diagnostics:** at catalog sync or management GET, report configured ids excluded for missing catalog row, hidden visibility, incompatible `multi_agent_version`, or five-item displacement. This makes stale-cache/session cases observable while ensuring the injected roster itself never exceeds the computed accepted/advertised subset. The existing API already returns configured `chosen` separately from `available` (**`src/server/management-api.ts:1174-1202`**: “`return jsonResponse({ chosen: config.subagentModels ?? [], available });`”), so adding derived `advertised`/`excluded` metadata can preserve user intent.
 4. **Supported off switch:** add the boolean flow above with default-enabled backward compatibility. When false, return `null` before both surface branches and leave every non-guidance subsystem untouched (**A12**: `src/server/responses.ts:904-908`).
 
@@ -433,7 +433,7 @@ Regression coverage should include:
 
 ## Verdict
 
-**#295 — confirmed OpenCodex bug; keep Bucket 2.** The proxy generates inaccurate absolute schema wording and computes guidance roster membership from catalog resolution rather than the active `spawn_agent` contract (**A1-A9**). The observed Sol/Terra-only runtime result is consistent with the pinned v2 metadata and upstream v2 compatibility filter. Reclassify the issue label to `bug` (multi-agent / guidance), not upstream-only and not needs-repro.
+**#295 — confirmed OpenProvider bug; keep Bucket 2.** The proxy generates inaccurate absolute schema wording and computes guidance roster membership from catalog resolution rather than the active `spawn_agent` contract (**A1-A9**). The observed Sol/Terra-only runtime result is consistent with the pinned v2 metadata and upstream v2 compatibility filter. Reclassify the issue label to `bug` (multi-agent / guidance), not upstream-only and not needs-repro.
 
 **#300 — confirmed feature request / product gap; keep Bucket 2 and link to #295.** Empty override values cannot represent disabled behavior through the API, and the call site has no boolean gate (**A11-A14**). Reclassify/label as `enhancement` or `feature`; implement in the same change set as #295 but close each issue against its own acceptance tests.
 

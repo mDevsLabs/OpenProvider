@@ -35,7 +35,7 @@ function redirectCanonicalCodexTo(baseUrl: string): void {
 }
 
 beforeEach(() => {
-  isolatedCodexHome = installIsolatedCodexHome("ocx-issue-452-");
+  isolatedCodexHome = installIsolatedCodexHome("opr-issue-452-");
   resetDebugSettingsForTests();
   resetDebugLogBufferForTests();
   setDraining(false);
@@ -297,7 +297,7 @@ describe("openai-chat provider debug (#452)", () => {
     } as unknown as OcxParsedRequest;
     adapter.buildRequest(parsed);
     const lines = getDebugLogEntries().map(e => e.line);
-    expect(lines.some(line => line.includes("[ocx:openai-chat:request]"))).toBe(true);
+    expect(lines.some(line => line.includes("[opr:openai-chat:request]"))).toBe(true);
     expect(lines.join("\n")).toContain('"host":"api.xiaomimimo.com"');
     expect(lines.join("\n")).not.toContain("sk-secret-xiaomi-key");
     expect(lines.join("\n")).not.toContain("/v1/chat/completions");
@@ -322,7 +322,7 @@ describe("openai-chat provider debug (#452)", () => {
     } as unknown as OcxParsedRequest;
     adapter.buildRequest(parsed);
     const joined = getDebugLogEntries().map(e => e.line).join("\n");
-    expect(joined).toContain("[ocx:openai-chat:request]");
+    expect(joined).toContain("[opr:openai-chat:request]");
     expect(joined).toContain('"host":"api.cloudflare.com"');
     expect(joined).not.toContain(accountId);
     expect(joined).not.toContain("/accounts/");

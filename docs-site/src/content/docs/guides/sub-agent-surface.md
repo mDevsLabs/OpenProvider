@@ -61,10 +61,10 @@ To replace the built-in v2 guidance, set `injectionPrompt` (config key, or `PUT 
 ### CLI
 
 ```bash
-ocx v2 mode v1       # force all models to v1
-ocx v2 mode default  # restore upstream pins
-ocx v2 mode v2       # force all models to v2
-ocx v2 status        # show current mode + Codex feature flag
+opr v2 mode v1       # force all models to v1
+opr v2 mode default  # restore upstream pins
+opr v2 mode v2       # force all models to v2
+opr v2 status        # show current mode + Codex feature flag
 ```
 
 ### API

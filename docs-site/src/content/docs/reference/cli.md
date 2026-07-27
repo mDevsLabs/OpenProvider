@@ -1,22 +1,22 @@
 ---
 title: CLI Reference
-description: Every ocx command and flag.
+description: Every opr command and flag.
 ---
 
-The OpenProvider CLI is `ocx`. Run `ocx help` (or `--help` / `-h`) for top-level usage.
-Run `ocx help <command>` for commands registered in the help table. Help and version commands are
+The OpenProvider CLI is `opr`. Run `opr help` (or `--help` / `-h`) for top-level usage.
+Run `opr help <command>` for commands registered in the help table. Help and version commands are
 read-only and do not start, stop, install, uninstall, or rewrite Codex/OpenProvider state.
 
 ## Setup & lifecycle
 
-### `ocx init`
+### `opr init`
 
 Interactive setup wizard. Prompts for a provider (preset or custom), API key (literal or `${ENV}`),
 default model, and proxy port; saves `~/.OpenProvider/config.json`; optionally injects the proxy into
 `$CODEX_HOME/config.toml` (default `~/.codex/config.toml`); and optionally installs the Codex
 autostart shim.
 
-### `ocx start [--port <port>]`
+### `opr start [--port <port>]`
 
 Start the proxy server (preferred port `10100`). If that port is occupied, OpenProvider selects and
 records another available port. It writes PID/runtime-port state and refuses to start a second live
@@ -24,17 +24,17 @@ instance. On start it syncs each provider's models into Codex's catalog. On shut
 native Codex — unless it was launched as a managed service (`OCX_SERVICE=1`).
 
 ```bash
-ocx start
-ocx start --port 8080
+opr start
+opr start --port 8080
 ```
 
-### `ocx stop`
+### `opr stop`
 
 Stop the running proxy (by PID), remove the PID file, and restore native Codex. If a managed
-background service is installed, `ocx stop` also stops it first (so it won't respawn the proxy).
+background service is installed, `opr stop` also stops it first (so it won't respawn the proxy).
 The same action is available from the web dashboard's **Stop** button (`POST /api/stop`).
 
-### `ocx restore` &nbsp;·&nbsp; `ocx eject`
+### `opr restore` &nbsp;·&nbsp; `opr eject`
 
 Restore native Codex **without** stopping the proxy — strips the injected config lines and routed
 catalog entries so plain `codex` works natively again. `eject` is an alias of `restore`.
@@ -43,26 +43,26 @@ Pass `back` to either spelling to re-point plain `codex` at an already-running p
 the proxy lifecycle:
 
 ```bash
-ocx restore back
-ocx eject back
+opr restore back
+opr eject back
 ```
 
-### `ocx recover-history --legacy-openai`
+### `opr recover-history --legacy-openai`
 
 Explicit recovery for older development builds that remapped Codex App history before reversible
 backup support existed. Close Codex first if its history database is locked.
 
-### `ocx restart`
+### `opr restart`
 
 Run `stop` followed by `ensure`: stop the proxy/service, restore native Codex, start the proxy in the
 background, and sync the live port back into Codex.
 
-### `ocx ensure`
+### `opr ensure`
 
 Idempotently ensure a background proxy is running, then sync its live model catalog. If
 `codexAutoStart` is `false`, it prints that autostart is disabled and does nothing.
 
-### `ocx status [--json]`
+### `opr status [--json]`
 
 Print a read-only diagnostic summary: proxy PID, `/healthz` reachability, dashboard URL,
 config path, default provider, Codex autostart setting, service state, shim state, and the redacted
@@ -78,8 +78,8 @@ and emails are never printed. The `--json` contract does not currently include t
 Use `--json` for a machine-readable, read-only diagnostics contract:
 
 ```bash
-ocx status
-ocx status --json
+opr status
+opr status --json
 ```
 
 Abbreviated example shape:
@@ -101,7 +101,7 @@ Abbreviated example shape:
   },
   "paths": {
     "config": "/Users/example/.OpenProvider/config.json",
-    "pid": "/Users/example/.OpenProvider/ocx.pid",
+    "pid": "/Users/example/.OpenProvider/opr.pid",
     "runtime": "/path/to/bun"
   },
   "runtime": {
@@ -130,28 +130,28 @@ diagnostics, and bundled Codex plugin diagnostics. The JSON schema is additive-o
 may add fields, but existing fields should stay stable. It intentionally excludes API keys, OAuth
 tokens, authorization headers, request content, emails, and account identities.
 
-### `ocx health [--json]`
+### `opr health [--json]`
 
 Identity-check the live proxy. Human output reports PID/port; `--json` emits `{ok, pid, port}`. The
 command exits 0 only when healthy and 1 otherwise, making it suitable for service probes.
 
-### `ocx uninstall` &nbsp;·&nbsp; `ocx remove`
+### `opr uninstall` &nbsp;·&nbsp; `opr remove`
 
 Stop the service and proxy, remove the service and Codex shim, restore native Codex, then remove
 OpenProvider local config only if all restore steps succeeded. `remove` is an alias of `uninstall`.
 
 ## Models & Codex
 
-### `ocx sync`
+### `opr sync`
 
 Fetch the live model list from every configured provider and re-inject the merged catalog into Codex.
 Run it after adding a provider or to refresh available models.
 
-### `ocx sync-cache`
+### `opr sync-cache`
 
 Invalidate Codex's local model picker cache so it is rebuilt from the active OpenProvider catalog.
 
-### `ocx v2 [subcommand]`
+### `opr v2 [subcommand]`
 
 Manage the Codex `multi_agent_v2` feature flag and the 3-state multi-agent surface mode.
 
@@ -166,11 +166,11 @@ Manage the Codex `multi_agent_v2` feature flag and the 3-state multi-agent surfa
 | `threads <n>` | Set the active v1/v2 thread limit (integer >= 1). |
 
 ```bash
-ocx v2 status
-ocx v2 mode v1
-ocx v2 mode default
-ocx v2 on
-ocx v2 threads 16
+opr v2 status
+opr v2 mode v1
+opr v2 mode default
+opr v2 on
+opr v2 threads 16
 ```
 
 The `mode` subcommand writes `multiAgentMode` to the OpenProvider config and resyncs the Codex catalog.
@@ -179,13 +179,13 @@ Codex keys while flipping the native feature through `codex features enable|disa
 transition restores the original `config.toml`.
 Changes apply to new Codex sessions; running sessions keep their pinned surface.
 
-### `ocx models [--provider <name>] [--json]`
+### `opr models [--provider <name>] [--json]`
 
 List the models statically seeded in configured providers. `--provider` filters one configured
 provider and `--json` returns model metadata plus a reminder that `liveModels` may add runtime-only
-entries. This command does not fetch live catalogs; use `ocx sync` or the dashboard for that.
+entries. This command does not fetch live catalogs; use `opr sync` or the dashboard for that.
 
-### `ocx provider <subcommand>`
+### `opr provider <subcommand>`
 
 Non-interactive provider management. Registry entries are seeded by name; a custom name requires
 both `--adapter` and `--base-url`.
@@ -199,20 +199,20 @@ both `--adapter` and `--base-url`.
 | `set-default <name>` | `--json` | Select an existing provider as the default. |
 
 ```bash
-ocx provider list --json
-ocx provider add anthropic --api-key sk-ant-... --set-default --sync
-ocx provider add local-dev --adapter openai-chat --base-url http://localhost:11434/v1
-ocx provider show anthropic --json
-ocx models --provider anthropic --json
+opr provider list --json
+opr provider add anthropic --api-key sk-ant-... --set-default --sync
+opr provider add local-dev --adapter openai-chat --base-url http://localhost:11434/v1
+opr provider show anthropic --json
+opr models --provider anthropic --json
 ```
 
-### `ocx account <subcommand>`
+### `opr account <subcommand>`
 
 List and switch provider accounts and API-key pools through the running proxy. The shipped help
 surface is:
 
 ```text
-Usage: ocx account <list|current|use|refresh|auto-switch|remove|add-key> ...
+Usage: opr account <list|current|use|refresh|auto-switch|remove|add-key> ...
 
 List and switch provider accounts and API-key pools (GUI parity).
 
@@ -251,7 +251,7 @@ Codex App login in the `openai` account pool, OAuth accounts without an email ap
 }
 ```
 
-#### `ocx account list [provider] [--json] [--all]`
+#### `opr account list [provider] [--json] [--all]`
 
 Without a provider, lists the Codex pool, OAuth accounts, and configured API-key pools. Empty
 providers are skipped unless `--all` is present. With a provider, lists only that credential family.
@@ -263,7 +263,7 @@ again replaces the current account. An empty result is still success. `--json` r
 { accounts: AccountRow[], notes: string[] }
 ```
 
-#### `ocx account current <provider> [--json]`
+#### `opr account current <provider> [--json]`
 
 Shows the active account or key. A Codex pool with no manual pin reports automatic lowest-usage
 selection; another family with no active credential reports that state and still exits 0. `--json`
@@ -273,7 +273,7 @@ returns:
 { provider, type, activeId: string | null, autoSwitchThreshold?: number, account: AccountRow | null }
 ```
 
-#### `ocx account use <provider> <account-or-key-id|main> [--json]`
+#### `opr account use <provider> <account-or-key-id|main> [--json]`
 
 Selects an existing Codex account, OAuth account, or API key. For `openai`, `main` selects the Codex
 App login. Codex selections apply only to **new sessions**; existing threads keep their account, and
@@ -284,9 +284,9 @@ an enabled auto-switch threshold may later override the manual pin. Unknown prov
 { ok: true, provider, type, activeId }
 ```
 
-#### `ocx account refresh <provider> [--json]`
+#### `opr account refresh <provider> [--json]`
 
-For the Codex pool, use `ocx account refresh openai [--json]`. It force-refreshes account quotas and
+For the Codex pool, use `opr account refresh openai [--json]`. It force-refreshes account quotas and
 prints available weekly/monthly percentages and reset times; missing quota data is reported as
 unknown, not 0%. Its JSON envelope is `{ accounts: AccountRow[] }`, with `quota` on each Codex row.
 
@@ -297,7 +297,7 @@ token re-login or a plain account-list re-read. `--json` returns
 failures exit 1; an upstream quota probe that fails or times out degrades to a null or stale
 report instead (exit 0), matching the dashboard's quota bars.
 
-#### `ocx account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]`
+#### `opr account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]`
 
 Controls only the `openai` Codex account pool. `on` sets 80%, `off` sets 0%, `status` reads the current
 value, and `threshold <n>` accepts an integer from 0 through 100. Other providers and invalid values
@@ -307,7 +307,7 @@ exit 1. `--json` returns:
 { provider, autoSwitchThreshold: number, enabled: boolean }
 ```
 
-#### `ocx account remove <provider> <id|main> --yes [--json]`
+#### `opr account remove <provider> <id|main> --yes [--json]`
 
 This guarded, non-interactive deletion requires `--yes`. Before deleting, it verifies that the id
 exists; a missing id exits 1 without sending DELETE. The main Codex App login cannot be removed, so
@@ -321,52 +321,52 @@ success and failure shapes are:
 { error: string } // stderr, exit 1
 ```
 
-#### `ocx account add-key <provider> [--label <label>] [--json]`
+#### `opr account add-key <provider> [--label <label>] [--json]`
 
 Adds and activates a key for an API-key provider. The key is read only from non-TTY piped/redirected
 stdin; interactive TTY input, empty input, OAuth/Codex providers, and API failures exit 1. The key is
 never echoed, including when it appears inside a label. Prefer a secret manager or a here-string:
 
 ```bash
-ocx account add-key openrouter --label personal <<< "$OPENROUTER_API_KEY"
-security find-generic-password -w openrouter | ocx account add-key openrouter --json
+opr account add-key openrouter --label personal <<< "$OPENROUTER_API_KEY"
+security find-generic-password -w openrouter | opr account add-key openrouter --json
 ```
 
 `--json` returns `{ ok: true, id: string | null, label?: string }` and never includes the key.
 
 ## Authentication
 
-### `ocx login <provider>`
+### `opr login <provider>`
 
 Start the provider's registered login flow. OAuth providers open a browser and store auto-refreshed
 credentials under `~/.OpenProvider/`; API-key login providers open their key dashboard, prompt for the
 key, validate it when possible, and save the resulting provider config. The command prints the
 currently accepted OAuth and API-key provider ids when the name is missing or unknown.
 
-Use the same command to **reauthenticate** after `ocx status` / `ocx doctor` reports
+Use the same command to **reauthenticate** after `opr status` / `opr doctor` reports
 reauthentication required or a terminal refresh failure (or use Reauthenticate in the dashboard).
-Codex pool accounts are not a public `ocx login` provider — reauthenticate via the dashboard Codex
+Codex pool accounts are not a public `opr login` provider — reauthenticate via the dashboard Codex
 account pool (Reauthenticate) instead.
 
 ```bash
-ocx login xai
-ocx login anthropic
+opr login xai
+opr login anthropic
 ```
 
-### `ocx logout <provider>`
+### `opr logout <provider>`
 
 Remove the stored OAuth credential for a provider.
 
 ## Dashboard
 
-### `ocx gui`
+### `opr gui`
 
 Open the [web dashboard](/guides/web-dashboard/) at `http://localhost:<port>`, auto-starting
 the proxy if it isn't running.
 
 ## Background service
 
-### `ocx service [subcommand]`
+### `opr service [subcommand]`
 
 Run OpenProvider as a login-managed background service (macOS **launchd**, Linux **systemd user unit**,
 Windows **Task Scheduler**) that auto-starts on login and auto-restarts on crash. Service runs set
@@ -383,21 +383,21 @@ Windows **Task Scheduler**) that auto-starts on login and auto-restarts on crash
 | `remove` | Alias of `uninstall`. |
 
 ```bash
-ocx service
-ocx service install
-ocx service status
-ocx service uninstall
+opr service
+opr service install
+opr service status
+opr service uninstall
 ```
 
-### `ocx codex-shim <subcommand>`
+### `opr codex-shim <subcommand>`
 
 Wrap a script-based `codex` launcher on PATH with a lightweight autostart script. Real `codex.exe`
 targets are left untouched to avoid breaking exact executable invocations.
 
-If a completed external Codex update overwrites an installed shim, the next ordinary `ocx` command
+If a completed external Codex update overwrites an installed shim, the next ordinary `opr` command
 backs up the stable new launcher and restores the shim before dispatch. A launcher that is still
 changing is left untouched and retried later. Repair failures warn without failing the requested
-command; manual fallback: `ocx codex-shim install`. Set `codexShimAutoRestore` to `false`, or set
+command; manual fallback: `opr codex-shim install`. Set `codexShimAutoRestore` to `false`, or set
 `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` for a process-level opt-out.
 
 | Subcommand | Action |
@@ -408,19 +408,19 @@ command; manual fallback: `ocx codex-shim install`. Set `codexShimAutoRestore` t
 | `status` | Report shim state (installed / stale / missing). |
 
 ```bash
-ocx codex-shim install
-ocx codex-shim status
-ocx codex-shim uninstall
+opr codex-shim install
+opr codex-shim status
+opr codex-shim uninstall
 ```
 
 :::tip[Service vs Shim]
-Use `ocx service` for an always-on background proxy (recommended). Use `ocx codex-shim` for
+Use `opr service` for an always-on background proxy (recommended). Use `opr codex-shim` for
 lightweight, on-demand startup without a daemon — the proxy starts only when `codex` is launched.
 :::
 
 ## Diagnostics
 
-### `ocx doctor`
+### `opr doctor`
 
 Run read-only environment and connectivity diagnostics: state paths and filesystem type, WSL dual
 installs, proxy environment/config, ChatGPT reachability, Codex plugin and project-config warnings,
@@ -433,34 +433,34 @@ single-flight / lock files can be created under `OpenProvider_HOME`, non-healthy
 accounts (redacted ids) with a recovery `Action:`, and a static OK that the Codex forward path does
 not fabricate official-client metadata. Doctor never mutates credentials or applies repairs.
 
-### `ocx debug [provider|usage …]`
+### `opr debug [provider|usage …]`
 
 Read or change runtime debug overrides through the running proxy's management API.
 
 ```bash
-ocx debug provider on|off|status|reset
-ocx debug provider logs [-f|--follow]
-ocx debug usage on|off|status|reset
-ocx debug usage logs [-f|--follow]
+opr debug provider on|off|status|reset
+opr debug provider logs [-f|--follow]
+opr debug usage on|off|status|reset
+opr debug usage logs [-f|--follow]
 ```
 
-With no scope, `ocx debug` prints usage and, when the proxy is stopped, the next-start environment
+With no scope, `opr debug` prints usage and, when the proxy is stopped, the next-start environment
 defaults. Provider debug defaults from `OCX_DEBUG=1` (legacy `OCX_DEBUG_FRAMES=1` also works); usage
 debug defaults from `OpenProvider_USAGE_DEBUG=1`.
 
 ## Updating
 
-### `ocx update`
+### `opr update`
 
 Self-update OpenProvider from npm. Stable installs use `@latest`; preview installs stay on `@preview`
 unless you pass `--tag latest|preview`. It detects a source checkout and tells you to
 `git pull && bun install` instead, and is a no-op if you're already on the newest version for that
 tag. A running proxy is stopped before files are replaced; an installed service is rebuilt and
-started automatically, while a foreground installation prints `ocx start` as the next step.
+started automatically, while a foreground installation prints `opr start` as the next step.
 
 ```bash
-ocx update
-ocx update --tag preview
+opr update
+opr update --tag preview
 ```
 
 New versions become available the moment the [Release workflow](https://github.com/mDevsLabs/OpenProvider/actions/workflows/release.yml)
@@ -468,9 +468,9 @@ publishes them to npm.
 
 ## Help
 
-`ocx help`, `ocx --help`, `ocx -h` — print top-level usage and examples.
+`opr help`, `opr --help`, `opr -h` — print top-level usage and examples.
 
-`ocx help <command>`, `ocx <command> --help`, `ocx <command> -h` — print command-specific usage for
+`opr help <command>`, `opr <command> --help`, `opr <command> -h` — print command-specific usage for
 commands registered in `src/cli/help.ts`. The full `provider`, `debug`, and `v2` subcommand contracts
 are documented above.
 
@@ -479,7 +479,7 @@ code instead of scraping text.
 
 ## Version
 
-`ocx --version`, `ocx -v`, `ocx version` — print a single script-friendly version line and exit.
+`opr --version`, `opr -v`, `opr version` — print a single script-friendly version line and exit.
 
 ## Internal commands
 

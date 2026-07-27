@@ -5,7 +5,7 @@
 | 항목 | 파일 | 내용 |
 |------|------|------|
 | B0 별칭 | `src/claude/desktop-3p.ts` | `desktop3pAlias` → `claude-opus-4-8-{code}` (export), `legacyDesktop3pAlias` 디코드 존치, anthropic 실모델 레지스트리 미등록(패스스루 보존), config discovery/static 모드 |
-| B0 CLI | `src/cli/index.ts` | `ocx claude desktop [--static]` — 기본 discovery 모드 |
+| B0 CLI | `src/cli/index.ts` | `opr claude desktop [--static]` — 기본 discovery 모드 |
 | B4b | `src/claude/model-info.ts` (NEW) | 공식 ModelInfo 형태 + capabilities(effort/thinking). native=clamp 항등 rung만, routed=`reasoningEfforts`만, 없으면 supported:false. created_at 고정, max_tokens null |
 | B4b | `src/server/index.ts` | anthropic-flavor /v1/models를 ModelInfo 목록으로 교체 |
 | B4b | `src/server/management-api.ts` | GUI 별칭 미리보기도 새 별칭으로 |
@@ -38,8 +38,8 @@
 
 ## 사용자 실험 절차 (라이브 판정 대기)
 
-1. `ocx stop && ocx start` (새 코드 반영)
-2. `ocx claude desktop` (discovery 모드 config 작성) → Claude Desktop 재시작
+1. `opr stop && opr start` (새 코드 반영)
+2. `opr claude desktop` (discovery 모드 config 작성) → Claude Desktop 재시작
 3. GUI Debug 페이지에서 "Claude 인바운드" 토글 ON
 4. Desktop에서 라우팅 모델 선택 → effort 슬라이더 low→max 이동하며 메시지 전송
 5. 캡처 표에서 `output_config.effort` 값이 슬라이더 위치별로 도달하는지 확인

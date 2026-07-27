@@ -2,7 +2,7 @@
 
 | # | 심각도 | 지적 | 처분 |
 |---|---|---|---|
-| 1 | Med | docs 로스터 절이 반증된 inherit 경로 서술 | 수용 — 3로케일: settings.json 픽커 기본값 핀 + ocx-route 지시자 + placeholder model 인자로 재서술 |
+| 1 | Med | docs 로스터 절이 반증된 inherit 경로 서술 | 수용 — 3로케일: settings.json 픽커 기본값 핀 + opr-route 지시자 + placeholder model 인자로 재서술 |
 | 2 | Med | "thinking disabled → effort 미전송"이 2.1.207 관측과 모순 | **부분 반박** — 관측은 클라이언트→프록시 와이어(항상 effort 탑재), docs 문장은 프록시→업스트림 번역 정책(thinking off면 reasoning 미부여, 의도된 서브에이전트 보호). 어댑터 유지, docs에 주어(프록시)를 명시해 모호성만 제거 |
 | 3 | Med | ko inert 안내가 삭제된 컨트롤("위의 컨텍스트 크기 늘리기") 참조 | 수용 — 4로케일 전부 "설정 파일의 이전 방식 값" 표현으로 교체 (en/zh/de도 동일 결함) |
 | 4 | Low | back-compat 주석 불완전 (alwaysEnableEffort/model, 요청 타입 통합 주석) | 수용 |

@@ -117,7 +117,7 @@ final message. Assumption set if user says proceed:
 
 User: already knew search executes (server-side gpt / luna) and results
 arrive; the work is returning them the way Claude expects, with prompt
-shaping hidden at the opencodex layer. => Goal dimension CONFIRMED:
+shaping hidden at the openprovider layer. => Goal dimension CONFIRMED:
 format-faithful return to Claude Code is the primary deliverable
 (outbound web_search_call -> server_tool_use + web_search_tool_result).
 No new contradiction surface introduced; inline rescan no-delta.

@@ -129,8 +129,8 @@ export function cooldownErrorMessage(err: CodexAccountCooldownError): string {
   const until = new Date(err.cooldownUntil).toISOString();
   return `Selected Codex account (${cooldownAccountLabel(err.accountId)}) is cooling down until ${until}`
     + ` (source: ${err.cooldownSource ?? "default"}).`
-    + ` Run 'ocx account list openai' to find the id, then`
-    + ` 'ocx account clear-cooldown openai <id>' to lift it, or switch accounts with 'ocx account use openai <id>'.`;
+    + ` Run 'opr account list openai' to find the id, then`
+    + ` 'opr account clear-cooldown openai <id>' to lift it, or switch accounts with 'opr account use openai <id>'.`;
 }
 
 /** HTTP form of {@link cooldownErrorMessage}, carrying Retry-After for well-behaved clients. */

@@ -3,7 +3,7 @@
 ## Problem
 Gateway (truncation_recovery.py, Issue #56) detects when Kiro truncates large
 tool-call payloads or content mid-stream and injects a synthetic message so the
-model adapts. opencodex kiro swallows truncation silently.
+model adapts. openprovider kiro swallows truncation silently.
 
 ## Plan (finalized in this phase's P)
 - Detect truncation signals in the eventstream (incomplete tool_input JSON at

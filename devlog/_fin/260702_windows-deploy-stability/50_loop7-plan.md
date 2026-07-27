@@ -9,7 +9,7 @@
 | # | Sev | OS | Defect | Evidence |
 |---|-----|----|--------|----------|
 | F5 | med | win primarily | OAuth callback advertises `localhost`, binds IPv4, then best-effort binds `::1` and swallows ALL failures. If `::1:<port>` is held by another process (EADDRINUSE), a browser resolving `localhost`→`::1` first delivers the OAuth callback (auth code) to the foreign listener. | `src/oauth/callback-server.ts:147-160` |
-| F6 | med | all | Proxy port selection is check-then-bind: `chooseListenPort` probes with a throwaway net.Server, then `startServer` binds later. Two concurrent `ocx start`/`ensure` see the same free port; the loser dies with an unhandled bind error instead of retrying. | `src/cli.ts:102-136`, `src/ports.ts:3-29` |
+| F6 | med | all | Proxy port selection is check-then-bind: `chooseListenPort` probes with a throwaway net.Server, then `startServer` binds later. Two concurrent `opr start`/`ensure` see the same free port; the loser dies with an unhandled bind error instead of retrying. | `src/cli.ts:102-136`, `src/ports.ts:3-29` |
 | F8 | med | win | `installWindows` rewrites the service `.cmd` script and task XML BEFORE ending a running scheduled task. cmd.exe reading the script mid-rewrite executes a torn script; open handles can throw EBUSY/EPERM on the in-place `writeFileSync`. | `src/service.ts:399-409` |
 
 ## Diff-level changes

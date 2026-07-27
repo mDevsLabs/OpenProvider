@@ -40,7 +40,7 @@ rebuilds internal requests from the FORWARD_HEADERS allowlist; `x-openai-subagen
 added to it (turn metadata was already forwarded).
 
 Request log surfaces applied caps as `requestedEffort: "max->high"`, mirroring the
-native clamp annotation. `ocx debug injection on` logs each application.
+native clamp annotation. `opr debug injection on` logs each application.
 
 ## API
 
@@ -67,7 +67,7 @@ ladder value -> set; anything else -> 400 (mirrors /api/injection-model).
   max-tier leakage from a bare-spawning ultra-default parent (22:06-22:07 KST).
 
 Live note: the running proxy predates this change; caps take effect after the next
-`ocx restart` on a build containing this commit. GUI selectors for the two caps are a
+`opr restart` on a build containing this commit. GUI selectors for the two caps are a
 follow-up (Dashboard delegation panel, same pattern as injectionEffort).
 
 ## Follow-ups

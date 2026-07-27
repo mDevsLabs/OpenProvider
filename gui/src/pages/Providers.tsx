@@ -271,7 +271,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
         onAdded={(name) => {
           setAdding(false);
           setAddIntent(null);
-          notify(t("prov.added", { name, cmd: "ocx sync" }), true);
+          notify(t("prov.added", { name, cmd: "opr sync" }), true);
           fetchConfig();
           fetchOauth();
           fetchProviderQuotas(true);
@@ -284,7 +284,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
         onCloseCodexLogin={() => setCodexLoginOpen(false)}
         onCodexAdded={() => {
           setCodexLoginOpen(false);
-          notify(t("prov.loginOk", { provider: formatProviderDisplayName("openai"), cmd: "ocx sync" }), true);
+          notify(t("prov.loginOk", { provider: formatProviderDisplayName("openai"), cmd: "opr sync" }), true);
           void fetchConfig();
           void fetchOauth();
           void fetchProviderQuotas(true);

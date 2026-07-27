@@ -2,8 +2,8 @@
 
 ## Objective
 
-Make web search work for opencodex's Cursor adapter path. The served model
-(cursor/grok-4.5) cannot web-search today: opencodex's Cursor transport
+Make web search work for openprovider's Cursor adapter path. The served model
+(cursor/grok-4.5) cannot web-search today: openprovider's Cursor transport
 HARD-REJECTS Cursor's server-side web-search approval gates, so the model's web
 capability is dead. User log: `web_search -> non-interactive bridge reject`.
 

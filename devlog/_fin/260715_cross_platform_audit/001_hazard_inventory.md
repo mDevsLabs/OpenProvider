@@ -24,7 +24,7 @@ Source: read-only survey by sol explorer subagent (id 019f6516-fd7b-72f3-b60e-06
   (post-CVE-2024-27980 behavior). The repo already documents this convention at
   `src/codex/catalog.ts:610-614` and handles it in `bin/ocx.mjs:97-148` and
   `src/update/index.ts:53-64` — this site predates/missed the convention.
-- Effect: `ocx claude` fails with ENOENT on Windows npm installs.
+- Effect: `opr claude` fails with ENOENT on Windows npm installs.
 
 ### D3 (survey P4-2) — bare `codex` spawn bypasses `codexExecInvocation()` (HIGH)
 

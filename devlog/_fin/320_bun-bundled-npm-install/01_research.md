@@ -2,11 +2,11 @@
 
 ## Problem
 
-opencodex publishes to npm as `@mdevs/openprovider`. The `bin` entries point
+openprovider publishes to npm as `@mdevs/openprovider`. The `bin` entries point
 directly at a TypeScript file with a Bun shebang:
 
 ```json
-"bin": { "opencodex": "./src/cli.ts", "ocx": "./src/cli.ts" }
+"bin": { "openprovider": "./src/cli.ts", "opr": "./src/cli.ts" }
 ```
 
 ```ts
@@ -76,7 +76,7 @@ install.js` finalizes the binary into the main package's `bin/`.
    package → install likely fails. Document as a known constraint.
 4. Bun's own package manager does NOT run dependency lifecycle scripts
    unless the dependency is in `trustedDependencies`. So `bun install` of
-   opencodex needs `"trustedDependencies": ["bun"]` or the binary never
+   openprovider needs `"trustedDependencies": ["bun"]` or the binary never
    downloads.
 5. `require.resolve('bun/package.json')` from a launcher inside the same
    package resolves the nested dependency correctly → robust way to find
@@ -108,7 +108,7 @@ launcher execs bun to run cli.ts). This is critical — see §Ripple effects.
 | `src/codex-shim.ts:39-40` | same pattern baked into codex auto-start shim | same |
 | `src/update.ts:12-15` | `HERE.includes('.bun') ? 'bun' : 'npm'` | npm global path has no `.bun` → correctly picks `npm`. Bundled bun under `node_modules/bun/` does NOT change `HERE`. ✓ |
 | `src/cli.ts:239,489` | `spawn(process.execPath, [process.argv[1],'start'])` | still spawns bun + cli.ts ✓ |
-| `tests/startup-prompt.test.ts:10-17` | asserts opencodex ships NO postinstall | Option 1 relies on the BUN dependency's postinstall, not opencodex's. Do NOT add an opencodex postinstall. ✓ |
+| `tests/startup-prompt.test.ts:10-17` | asserts openprovider ships NO postinstall | Option 1 relies on the BUN dependency's postinstall, not openprovider's. Do NOT add an openprovider postinstall. ✓ |
 
 ## Tradeoffs
 

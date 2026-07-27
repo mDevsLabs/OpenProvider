@@ -25,7 +25,7 @@ import { serviceApiTokenFilePath } from "../lib/service-secrets";
 import { windowsEnvIndirectBatchValue } from "../lib/win-paths";
 import { isWslRuntime, wslAutomountRoot } from "./home";
 
-const SHIM_MARKER = "opencodex codex autostart shim";
+const SHIM_MARKER = "openprovider codex autostart shim";
 const CODEX_SHIM_PROBE_BYTES = 16 * 1024;
 export const CODEX_SHIM_REPLACEMENT_STABLE_MS = 100;
 export const CODEX_SHIM_STATE_MAX_BYTES = 1024 * 1024;
@@ -118,7 +118,7 @@ export type CodexShimAutoRestoreResult =
   | { status: "restored"; message: string };
 
 function cliEntry(): { bun: string; cli: string } {
-  // Bundled Bun path (survives `ocx update`); all three shim builders
+  // Bundled Bun path (survives `opr update`); all three shim builders
   // (Unix / Windows cmd / Windows PowerShell) receive it via this entry.
   // This module lives in src/codex/, the CLI entry in src/cli/index.ts.
   return { bun: durableBunPath(), cli: join(import.meta.dir, "..", "cli", "index.ts") };
@@ -311,7 +311,7 @@ export function findCodexOnPath(deps: CodexPathScanDeps = {}): string | null {
     lastShimDiscoveryError =
       `Found a Windows codex at ${skippedInterop} via WSL PATH interop, but no Linux-side codex. ` +
       "Refusing to shim a Windows launcher from WSL (a WSL shim breaks Windows invocations). " +
-      "Install codex inside WSL (npm i -g @openai/codex), or run 'ocx ensure' from Windows to shim the Windows side.";
+      "Install codex inside WSL (npm i -g @openai/codex), or run 'opr ensure' from Windows to shim the Windows side.";
   }
   return null;
 }
@@ -325,7 +325,7 @@ function findWindowsCodexTargets(): ShimFileState[] | null {
         if (!lstatSync(exe).isDirectory()) {
           lastShimDiscoveryError =
             `Found codex.exe at ${exe}. Refusing to rename a real .exe because exact codex.exe invocations would break; ` +
-            "install a codex.cmd/codex.ps1 launcher or use `ocx service install` for autostart.";
+            "install a codex.cmd/codex.ps1 launcher or use `opr service install` for autostart.";
           return null;
         }
       } catch { /* keep scanning */ }
@@ -352,7 +352,7 @@ function findWindowsCodexTargets(): ShimFileState[] | null {
 
 function backupPathFor(path: string): string {
   const ext = extname(path);
-  return ext ? `${path.slice(0, -ext.length)}.opencodex-real${ext}` : `${path}.opencodex-real`;
+  return ext ? `${path.slice(0, -ext.length)}.openprovider-real${ext}` : `${path}.openprovider-real`;
 }
 
 function shQuote(value: string): string {
@@ -1167,7 +1167,7 @@ export function diagnoseCodexShim(): CodexShimDiagnostic {
     const wrapper = existsSync(file.wrapperPath)
       ? isShim(file.wrapperPath)
         ? "shim present"
-        : "present but not an opencodex shim"
+        : "present but not an openprovider shim"
       : "missing";
     const backup = existsSync(file.backupPath) ? "present" : "missing";
     return `Codex autostart shim: wrapper ${wrapper} at ${file.wrapperPath}; original backup ${backup} at ${file.backupPath}.`;

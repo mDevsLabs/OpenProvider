@@ -17,7 +17,7 @@ import { injectGrokConfig } from "../src/grok/inject";
  * Failure-mode ids below map to devlog/_plan/260727_grok_orphan_adoption/001.
  */
 
-const BEGIN_MARKER = "# >>> opencodex managed block — do not edit (removed by `ocx stop`) >>>";
+const BEGIN_MARKER = "# >>> openprovider managed block — do not edit (removed by `opr stop`) >>>";
 const MODELS = [{ id: "gpt-5.6-sol", contextWindow: 372_000 }];
 
 describe("Grok orphan adoption (#511)", () => {
@@ -26,7 +26,7 @@ describe("Grok orphan adoption (#511)", () => {
   let configPath: string;
 
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), "ocx-grok-orphan-"));
+    root = mkdtempSync(join(tmpdir(), "opr-grok-orphan-"));
     grokHome = join(root, ".grok");
     mkdirSync(grokHome);
     configPath = join(grokHome, "config.toml");
@@ -40,13 +40,13 @@ describe("Grok orphan adoption (#511)", () => {
   function writeOrphanedConfig(extra = ""): void {
     writeFileSync(configPath, [
       "[models]",
-      'default = "ocx-gpt-5-6-sol"',
+      'default = "opr-gpt-5-6-sol"',
       "",
-      "[model.ocx-gpt-5-6-sol]",
+      "[model.opr-gpt-5-6-sol]",
       'model = "gpt-5.6-sol"',
       'base_url = "http://127.0.0.1:10100/v1"',
       'api_backend = "chat_completions"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       'name = "OCX gpt-5.6-sol"',
       "",
       extra,
@@ -99,32 +99,32 @@ describe("Grok orphan adoption (#511)", () => {
   // F1: our api_key pointed at a REMOTE host is not ours to delete.
   test("does not adopt our api_key when the base_url is remote", () => {
     writeFileSync(configPath, [
-      "[model.ocx-remote]",
+      "[model.opr-remote]",
       'model = "gpt-5.6-sol"',
       'base_url = "https://example.com/v1"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       "",
     ].join("\n"));
 
     injectGrokConfig(10100, MODELS, { grokHome });
-    expect(readFileSync(configPath, "utf8")).toContain("[model.ocx-remote]");
+    expect(readFileSync(configPath, "utf8")).toContain("[model.opr-remote]");
   });
 
   // F3: `[[model.x]]` collides with a generated `[model.x]` and makes Grok reject the
   // WHOLE config layer, so that spelling must stay reserved rather than adopted.
   test("leaves an array-of-table model reserved", () => {
     writeFileSync(configPath, [
-      "[[model.ocx-arr]]",
+      "[[model.opr-arr]]",
       'model = "gpt-5.6-sol"',
       'base_url = "http://127.0.0.1:10100/v1"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       "",
     ].join("\n"));
 
     injectGrokConfig(10100, MODELS, { grokHome });
     const content = readFileSync(configPath, "utf8");
-    expect(content).toContain("[[model.ocx-arr]]");
-    expect(content).not.toContain("\n[model.ocx-arr]\n");
+    expect(content).toContain("[[model.opr-arr]]");
+    expect(content).not.toContain("\n[model.opr-arr]\n");
   });
 
   // F4: a partial removal would re-parent leftover keys onto the neighbouring table.
@@ -148,18 +148,18 @@ describe("Grok orphan adoption (#511)", () => {
   test("keeps an orphan whose model is no longer in the catalog", () => {
     writeFileSync(configPath, [
       "[models]",
-      'default = "ocx-retired"',
+      'default = "opr-retired"',
       "",
-      "[model.ocx-retired]",
+      "[model.opr-retired]",
       'model = "retired/model"',
       'base_url = "http://127.0.0.1:10100/v1"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       "",
     ].join("\n"));
 
     injectGrokConfig(10100, MODELS, { grokHome });
     const content = readFileSync(configPath, "utf8");
-    expect(content).toContain('default = "ocx-retired"');
+    expect(content).toContain('default = "opr-retired"');
   });
 
   // F7: the sweep must converge, or `changed` is meaningless to callers.
@@ -195,21 +195,21 @@ describe("Grok orphan adoption (#511)", () => {
       'fork_secondary_model = "grok-build"',
       "",
       "[models]",
-      'default = "ocx-gpt-5-6-sol"',
+      'default = "opr-gpt-5-6-sol"',
       "",
-      "[model.ocx-gpt-5-6-sol]",            // stale: no context_window
+      "[model.opr-gpt-5-6-sol]",            // stale: no context_window
       'model = "gpt-5.6-sol"',
       'base_url = "http://127.0.0.1:10100/v1"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       "",
-      "[model.ocx-gpt-5-6-sol-2]",          // the correct duplicate, also unfenced now
+      "[model.opr-gpt-5-6-sol-2]",          // the correct duplicate, also unfenced now
       'model = "gpt-5.6-sol"',
       'base_url = "http://127.0.0.1:10100/v1"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       "context_window = 372000",
       "",
-      "[model.ocx-gpt-5-6-sol-2.extra_headers]",
-      'x-opencodex-grok = "1"',
+      "[model.opr-gpt-5-6-sol-2.extra_headers]",
+      'x-openprovider-grok = "1"',
       "",
       "[model.hand-written]",               // must survive
       'model = "mine"',
@@ -222,8 +222,8 @@ describe("Grok orphan adoption (#511)", () => {
     expect(result).toMatchObject({ ok: true, changed: true });
 
     const content = readFileSync(configPath, "utf8");
-    // Both opencodex duplicates collapse into the single regenerated entry.
-    expect(modelTables(content).filter(alias => alias.startsWith("ocx-"))).toHaveLength(1);
+    // Both openprovider duplicates collapse into the single regenerated entry.
+    expect(modelTables(content).filter(alias => alias.startsWith("opr-"))).toHaveLength(1);
     expect(content).toContain("context_window = 372000");
     // The user's model and settings are untouched.
     expect(content).toContain("[model.hand-written]");
@@ -238,10 +238,10 @@ describe("Grok orphan adoption (#511)", () => {
   // mean the entire file.
   test("refuses to sweep when the end marker is missing", () => {
     const content = [
-      "[model.ocx-gpt-5-6-sol]",
+      "[model.opr-gpt-5-6-sol]",
       'model = "gpt-5.6-sol"',
       'base_url = "http://127.0.0.1:10100/v1"',
-      'api_key = "opencodex-loopback"',
+      'api_key = "openprovider-loopback"',
       "",
       BEGIN_MARKER,
       "",

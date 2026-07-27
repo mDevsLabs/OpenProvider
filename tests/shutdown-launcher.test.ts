@@ -6,11 +6,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 /**
- * Regression: `ocx start` + Ctrl-C must NOT orphan the Bun proxy.
+ * Regression: `opr start` + Ctrl-C must NOT orphan the Bun proxy.
  *
  * The bin/ocx.mjs launcher used a blocking spawnSync that did not forward signals,
  * so a signal delivered only to the launcher killed it and left the Bun child
- * serving forever (port bound, ocx.pid/runtime-port.json left behind, Codex config
+ * serving forever (port bound, opr.pid/runtime-port.json left behind, Codex config
  * not restored). The launcher now forwards SIGINT/SIGTERM/SIGHUP to the child and
  * waits for its graceful shutdown.
  *
@@ -66,12 +66,12 @@ async function waitUntil(fn: () => Promise<boolean>, deadlineMs: number): Promis
   return false;
 }
 
-describe.skipIf(!runnable)("ocx launcher graceful shutdown", () => {
+describe.skipIf(!runnable)("opr launcher graceful shutdown", () => {
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"] as const) {
     test(
       `${signal} to the launcher tears down the Bun proxy and restores Codex config (no orphan)`,
       async () => {
-        const home = mkdtempSync(join(tmpdir(), "ocx-shutdown-"));
+        const home = mkdtempSync(join(tmpdir(), "opr-shutdown-"));
         tmpHomes.push(home);
         const port = await freePort();
 
@@ -92,11 +92,11 @@ describe.skipIf(!runnable)("ocx launcher graceful shutdown", () => {
         // 1. Proxy comes up + injected the Codex config (Design B root override on loopback).
         const up = await waitUntil(() => healthy(port), 20_000);
         expect(up).toBe(true);
-        expect(existsSync(join(home, "ocx.pid"))).toBe(true);
+        expect(existsSync(join(home, "opr.pid"))).toBe(true);
         const injected = readFileSync(codexConfig, "utf8");
-        expect(injected).toContain("# Auto-injected by opencodex");
+        expect(injected).toContain("# Auto-injected by openprovider");
         expect(injected).toContain(`openai_base_url = "http://127.0.0.1:${port}/v1"`);
-        expect(injected).not.toContain("model_providers.opencodex");
+        expect(injected).not.toContain("model_providers.openprovider");
 
         // 2. Signal ONLY the launcher PID (the exact orphan trigger).
         child.kill(signal);
@@ -110,9 +110,9 @@ describe.skipIf(!runnable)("ocx launcher graceful shutdown", () => {
         expect(portFreed).toBe(true);
 
         // 5. Graceful cleanup ran: pid + runtime-port removed, Codex config restored.
-        expect(existsSync(join(home, "ocx.pid"))).toBe(false);
+        expect(existsSync(join(home, "opr.pid"))).toBe(false);
         expect(existsSync(join(home, "runtime-port.json"))).toBe(false);
-        expect(readFileSync(codexConfig, "utf8")).not.toContain("opencodex");
+        expect(readFileSync(codexConfig, "utf8")).not.toContain("openprovider");
       },
       45_000,
     );

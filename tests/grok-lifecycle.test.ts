@@ -60,7 +60,7 @@ describe("Grok fence lifecycle wiring", () => {
     expect(stopFn.slice(revertAt - 200, revertAt)).toContain("NOT gated");
   });
 
-  test("a refused Grok strip makes ocx stop fail instead of reporting success", () => {
+  test("a refused Grok strip makes opr stop fail instead of reporting success", () => {
     const stopFn = sliceFn(CLI_SOURCE, "async function handleStop(", "async function handleUninstall(");
     expect(stopFn).toContain("else if (!g.ok) { stopFailed = true;");
   });
@@ -77,7 +77,7 @@ describe("Grok fence lifecycle wiring", () => {
     // and echo its message.
     const detailEchoes = stopFn.match(/const detail = err instanceof Error \? err\.message : String\(err\);/g);
     expect(detailEchoes).toHaveLength(2);
-    expect(stopFn.match(/if \(detail\) console\.error\(`   \$\{detail\}`\);/g)).toHaveLength(2);
+    expect(stopFn.match(/if \(detail\) console\.error\(` {3}\$\{detail\}`\);/g)).toHaveLength(2);
   });
 
   test("handleStop returns its outcome so restart and the tray can react", () => {

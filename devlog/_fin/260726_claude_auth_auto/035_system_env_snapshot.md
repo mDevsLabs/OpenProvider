@@ -6,7 +6,7 @@ Split out of WP2 after round 2 judged that phase too broad. Depends on WP2 (reso
 
 ## Why this phase exists
 
-`ocx claude` is not the only path that produces the proxy marker. The macOS
+`opr claude` is not the only path that produces the proxy marker. The macOS
 auto-connect shell-env file and the launchctl env also inject it
 (`src/server/system-env.ts:30-35`, `:238-255`), and both key on a stored `"proxy"`.
 An auto+absent user therefore gets **nothing** when they type plain `claude` — the
@@ -30,7 +30,7 @@ this is a predicate swap, not new machinery. The exported `PROXY_MARKER` constan
 ## The honest promise (R2-4)
 
 The shell file is a **snapshot**, not a live view. It changes only when
-`injectSystemEnv` runs: proxy start (`src/cli/index.ts:269-273`), `ocx ensure`
+`injectSystemEnv` runs: proxy start (`src/cli/index.ts:269-273`), `opr ensure`
 (`:315-321`), or a settings save (`agent-settings-routes.ts:816-818` already calls
 `applySystemEnvToggle` when `authMode`/`systemEnv` change). So a user who logs into
 Claude AFTER an auto-absent write keeps the marker until one of those runs.
@@ -38,8 +38,8 @@ Claude AFTER an auto-absent write keeps the marker until one of those runs.
 This unit does not add a credential watcher — that is a separate feature with its own
 cost. Instead the promise is narrowed and made visible:
 
-- `ocx claude` resolves LIVE on every launch (authoritative path, already correct);
-- the docs and the GUI state that the shell snapshot refreshes on restart / `ocx
+- `opr claude` resolves LIVE on every launch (authoritative path, already correct);
+- the docs and the GUI state that the shell snapshot refreshes on restart / `opr
   ensure` / a settings save;
 - the GUI's existing save already triggers the refresh, so "it did not update" has a
   one-click answer instead of a mystery.
@@ -50,10 +50,10 @@ cost. Instead the promise is narrowed and made visible:
 `markerMode`. The earlier claim that it "cannot disagree" with the real launch was
 FALSE and is retracted (002 R3-1): daemon-side detection cannot see an
 `ANTHROPIC_API_KEY` exported only in the user's terminal, so a daemon auto-absent
-snapshot can say proxy while `ocx claude` in that terminal resolves subscription.
+snapshot can say proxy while `opr claude` in that terminal resolves subscription.
 
 So the snippet ships with the same `detectionScope: "daemon"` caveat the badge
-carries: it reflects what the daemon can see, and `ocx claude` remains authoritative
+carries: it reflects what the daemon can see, and `opr claude` remains authoritative
 because it resolves against the launch environment itself. A copy-paste block that
 quietly contradicted the CLI is precisely the confusing-report class this unit exists
 to remove; saying so is cheaper and truer than pretending the two are identical.

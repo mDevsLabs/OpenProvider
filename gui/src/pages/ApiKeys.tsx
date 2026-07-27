@@ -263,7 +263,7 @@ export default function ApiKeys({ apiBase }: { apiBase: string }) {
         {subtitleParts[0]}
         <code>Authorization: Bearer ocx_...</code>
         {subtitleParts[1]}
-        <code>x-opencodex-api-key</code>
+        <code>x-openprovider-api-key</code>
         {subtitleParts[2]}
       </p>
 

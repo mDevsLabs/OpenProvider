@@ -15,9 +15,9 @@ Grok Build 소스 `~/Developer/codex/180_grok-build` (SOURCE_REV `30192d2e`, `xa
 - `api_backend`는 `chat_completions` / `responses` / `messages`이고 경로는 `base_url`에 상대 결합된다(`xai-grok-sampler/src/client.rs:703`). `/v1` 주입은 없다.
 - config.toml 변경은 `ConfigFileWatcher` + `ConfigUpdate::ModelsChanged`로 실행 중 세션에 반영되지만(`config/reloader.rs:385`), docs.x.ai는 이를 보장하지 않고 `grok inspect` 후 재선택을 안내한다. 문서에서 hot-reload를 약속하면 안 된다.
 
-opencodex 쪽 경계:
+openprovider 쪽 경계:
 
-- `isApiAuthRequired(config) = !isLoopbackHostname(config.hostname)` (`src/server/auth-cors.ts:121`). 비루프백 바인드에서는 모든 데이터플레인 요청이 admission 토큰을 요구하므로, 현재 주입되는 `api_key = "opencodex-loopback"`은 **반드시 401**이 된다. 리뷰 지적이 실재한다.
+- `isApiAuthRequired(config) = !isLoopbackHostname(config.hostname)` (`src/server/auth-cors.ts:121`). 비루프백 바인드에서는 모든 데이터플레인 요청이 admission 토큰을 요구하므로, 현재 주입되는 `api_key = "openprovider-loopback"`은 **반드시 401**이 된다. 리뷰 지적이 실재한다.
 - `~/.grok/config.toml`은 공유 파일이므로 실제 토큰을 직렬화하면 안 된다. `env_key = "OPENCODEX_API_AUTH_TOKEN"`이 두 요구를 동시에 만족한다.
 
 ## 작업 순서 (의존성 순)

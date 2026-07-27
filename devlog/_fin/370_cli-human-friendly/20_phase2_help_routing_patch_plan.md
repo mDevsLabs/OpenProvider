@@ -18,15 +18,15 @@ This phase intentionally does not add `status --json`, `doctor`, `logs`, or life
 Authoritative matrix:
 
 ```path
-/Users/jun/Developer/new/700_projects/opencodex/devlog/370_cli-human-friendly/11_help_surface_matrix.md
+/Users/jun/Developer/new/700_projects/openprovider/devlog/370_cli-human-friendly/11_help_surface_matrix.md
 ```
 
 Relevant findings:
 
-- `ocx --version`, `ocx -v`, `ocx version`, and `node bin/ocx.mjs --version` currently exit 1 as unknown commands.
-- `ocx <command> --help` and `ocx <command> -h` currently work for top-level commands.
-- `ocx help <command>` prints top-level help instead of command-specific help.
-- `ocx restart --help` and other unknown commands with help flags exit 0 and print top-level help, which makes unsupported commands look successful.
+- `opr --version`, `opr -v`, `opr version`, and `node bin/ocx.mjs --version` currently exit 1 as unknown commands.
+- `opr <command> --help` and `opr <command> -h` currently work for top-level commands.
+- `opr help <command>` prints top-level help instead of command-specific help.
+- `opr restart --help` and other unknown commands with help flags exit 0 and print top-level help, which makes unsupported commands look successful.
 - `service remove` and `codex-shim remove` are implemented aliases but are omitted from current help strings.
 - Top-level human help is compact and not grouped by workflow.
 
@@ -35,7 +35,7 @@ Relevant findings:
 ### Included
 
 - `--version`, `-v`, and `version` output.
-- `ocx help <command>` routing.
+- `opr help <command>` routing.
 - unknown-command help behavior.
 - richer but still plain-text top-level help grouping.
 - subcommand metadata table or equivalent local helper inside `src/cli.ts`.
@@ -53,7 +53,7 @@ Relevant findings:
 
 ## Planned Files
 
-### MODIFY `/Users/jun/Developer/new/700_projects/opencodex/src/cli.ts`
+### MODIFY `/Users/jun/Developer/new/700_projects/openprovider/src/cli.ts`
 
 Planned changes:
 
@@ -62,15 +62,15 @@ Planned changes:
    Desired behavior:
 
    ```text
-   ocx --version
-   ocx -v
-   ocx version
+   opr --version
+   opr -v
+   opr version
    ```
 
    Output should be one line and stable, for example:
 
    ```text
-   opencodex <package-version>
+   openprovider <package-version>
    ```
 
    Constraints:
@@ -99,11 +99,11 @@ Planned changes:
    Desired behavior:
 
    ```text
-   ocx <command> --help      -> command help, exit 0
-   ocx <command> -h          -> command help, exit 0
-   ocx help <command>        -> command help, exit 0
-   ocx help                  -> top-level help, exit 0
-   ocx <unknown> --help      -> "Unknown command: <unknown>" + top-level help, exit 1
+   opr <command> --help      -> command help, exit 0
+   opr <command> -h          -> command help, exit 0
+   opr help <command>        -> command help, exit 0
+   opr help                  -> top-level help, exit 0
+   opr <unknown> --help      -> "Unknown command: <unknown>" + top-level help, exit 1
    ```
 
 4. Keep help flags side-effect free.
@@ -123,43 +123,43 @@ Planned changes:
 
    Include:
 
-   - `ocx remove` as alias for `uninstall`;
-   - `ocx service remove` as alias for `service uninstall`;
-   - `ocx codex-shim remove` as alias for `codex-shim uninstall`.
+   - `opr remove` as alias for `uninstall`;
+   - `opr service remove` as alias for `service uninstall`;
+   - `opr codex-shim remove` as alias for `codex-shim uninstall`.
 
-### MODIFY `/Users/jun/Developer/new/700_projects/opencodex/tests/cli-help.test.ts`
+### MODIFY `/Users/jun/Developer/new/700_projects/openprovider/tests/cli-help.test.ts`
 
 Planned tests:
 
-- `ocx --version`, `ocx -v`, and `ocx version` exit 0 and produce one line.
+- `opr --version`, `opr -v`, and `opr version` exit 0 and produce one line.
 - `node bin/ocx.mjs --version` matches source CLI behavior.
-- `ocx help start` matches or includes `Usage: ocx start`.
-- `ocx help service` includes service usage.
-- `ocx restart --help` exits 1 and says unknown command.
+- `opr help start` matches or includes `Usage: opr start`.
+- `opr help service` includes service usage.
+- `opr restart --help` exits 1 and says unknown command.
 - Help flags on representative mutating commands do not mutate temp homes:
-  - `ocx stop --help`
-  - `ocx uninstall --help`
-  - `ocx service uninstall --help`
-  - `ocx codex-shim uninstall --help`
+  - `opr stop --help`
+  - `opr uninstall --help`
+  - `opr service uninstall --help`
+  - `opr codex-shim uninstall --help`
 
-### MODIFY `/Users/jun/Developer/new/700_projects/opencodex/docs-site/src/content/docs/reference/cli.md`
+### MODIFY `/Users/jun/Developer/new/700_projects/openprovider/docs-site/src/content/docs/reference/cli.md`
 
 Planned documentation:
 
-- Document `ocx --help`, `ocx -h`, and `ocx help <command>`.
-- Document `ocx --version`, `ocx -v`, and `ocx version`.
+- Document `opr --help`, `opr -h`, and `opr help <command>`.
+- Document `opr --version`, `opr -v`, and `opr version`.
 - State that help/version are side-effect free.
 - Update service/shim alias tables to include `remove` if retained in implementation.
 
-### OPTIONAL MODIFY `/Users/jun/Developer/new/700_projects/opencodex/README.md`
+### OPTIONAL MODIFY `/Users/jun/Developer/new/700_projects/openprovider/README.md`
 
 Only if top-level README command list becomes inconsistent after implementation. Keep README concise; detailed behavior belongs in docs-site.
 
 ## Acceptance Criteria
 
 - Version commands exit 0 and print one line.
-- `ocx help <known-command>` exits 0 and shows command-specific usage.
-- `ocx <unknown> --help` does not exit 0.
+- `opr help <known-command>` exits 0 and shows command-specific usage.
+- `opr <unknown> --help` does not exit 0.
 - Help flags on mutating commands do not create, delete, start, or stop local state in test homes.
 - Existing lifecycle behavior remains unchanged when commands are run without help flags.
 - Docs match implemented behavior.

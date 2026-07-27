@@ -4,10 +4,10 @@
 
 Make `npm install -g @mdevs/openprovider` work on a machine that has only
 Node (no Bun). Bundle the Bun runtime via the official `bun` npm package and
-route the `ocx`/`opencodex` bin through a Node launcher shim that execs the
+route the `opr`/`openprovider` bin through a Node launcher shim that execs the
 bundled Bun to run `src/cli.ts`.
 
-Non-goal: porting opencodex off Bun (that is a separate future effort —
+Non-goal: porting openprovider off Bun (that is a separate future effort —
 Option 3). The Bun runtime stays; only the **manual install step** is removed.
 
 ## Classification
@@ -22,9 +22,9 @@ Release-surface change → C4-level care on the publish/verify gate.
 npm install -g @mdevs/openprovider
   → installs `bun` dep + @oven/bun-<platform> (~60MB) via optionalDependencies
   → bun postinstall (node install.js) places binary at node_modules/bun/bin/bun.exe
-  → npm links bin: ocx → bin/ocx.mjs  (#!/usr/bin/env node)
+  → npm links bin: opr → bin/ocx.mjs  (#!/usr/bin/env node)
 
-ocx start
+opr start
   → bin/ocx.mjs resolves bundled bun (bun/package.json → bin/bun.exe)
   → guards: missing / 0-byte → run install.js once
   → spawnSync(bunBin, [src/cli.ts, ...args], {stdio:'inherit'})
@@ -82,7 +82,7 @@ function resolveBundledBun() {
 
 function fail() {
   console.error(
-    "opencodex: bundled Bun runtime is missing.\n" +
+    "openprovider: bundled Bun runtime is missing.\n" +
     "This usually means the install skipped scripts or optional deps.\n" +
     "Reinstall without those flags:\n" +
     "  npm install -g @mdevs/openprovider   (no --ignore-scripts, no --omit=optional)"
@@ -102,7 +102,7 @@ process.exit(res.status ?? 1);
 ```jsonc
 {
   // bin → Node launcher (was ./src/cli.ts)
-  "bin": { "opencodex": "./bin/ocx.mjs", "ocx": "./bin/ocx.mjs" },
+  "bin": { "openprovider": "./bin/ocx.mjs", "opr": "./bin/ocx.mjs" },
 
   // ship the launcher (C5)
   "files": ["bin", "src", "gui/dist", "README.md", "LICENSE"],
@@ -110,7 +110,7 @@ process.exit(res.status ?? 1);
   // bundle the Bun runtime
   "dependencies": { "zod": "^4.0.0", "bun": "1.3.14" },
 
-  // let `bun install` of opencodex run the bun dep's postinstall (C4)
+  // let `bun install` of openprovider run the bun dep's postinstall (C4)
   "trustedDependencies": ["bun"],
 
   // launcher needs Node; bun is no longer a user prerequisite (C6)
@@ -122,7 +122,7 @@ Keep `#!/usr/bin/env bun` on `src/cli.ts` — dev workflow (`bun run
 src/cli.ts`) is unchanged; only the published `bin` routes through the
 launcher (C-alt-4).
 
-Do NOT add an opencodex-level `postinstall` — `tests/startup-prompt.test.ts`
+Do NOT add an openprovider-level `postinstall` — `tests/startup-prompt.test.ts`
 asserts there is none, and the bun dependency's own postinstall is what we
 rely on (C12).
 
@@ -190,7 +190,7 @@ covers all three automatically; no per-builder change needed.
 
 Rationale: if a user later removes a standalone bun, the baked launchd/shim
 path must still resolve. The bundled bun lives under the npm global prefix
-and persists across `ocx update` (in-place content replacement).
+and persists across `opr update` (in-place content replacement).
 
 ---
 
@@ -198,20 +198,20 @@ and persists across `ocx update` (in-place content replacement).
 
 ### 3.1 MODIFY `src/update.ts` (success path, ~line 60-69)
 
-After a successful `ocx update`, if a service or codex-shim is installed,
+After a successful `opr update`, if a service or codex-shim is installed,
 re-bake their paths (or advise). Today only the Windows shim is repaired.
 
 ```ts
 // after successful update, before "Restart the proxy" message
-if (serviceIsInstalled()) console.log("Service detected — refresh paths:  ocx service install");
-if (codexShimIsInstalled()) console.log("Codex shim detected — refresh:    ocx codex-shim install");
+if (serviceIsInstalled()) console.log("Service detected — refresh paths:  opr service install");
+if (codexShimIsInstalled()) console.log("Codex shim detected — refresh:    opr codex-shim install");
 ```
 
 (If `serviceIsInstalled()` / `codexShimIsInstalled()` helpers don't exist,
 either add lightweight existence checks or print the advisory unconditionally.)
 
 `detectInstall()` needs no change — npm global path has no `.bun` segment,
-so it correctly returns `"npm"` and `ocx update` runs `npm install -g
+so it correctly returns `"npm"` and `opr update` runs `npm install -g
 @mdevs/openprovider@latest`, which re-pulls the bun dep.
 
 ### 3.2 NEW CI job — npm-global path (`.github/workflows/ci.yml`)
@@ -230,9 +230,9 @@ npm-global-smoke:
     - uses: actions/setup-node@v4
       with: { node-version: 20 }
     - run: npm pack
-    - run: npm install -g ./bitkyc08-opencodex-*.tgz
-    - run: ocx help          # must succeed with NO bun on PATH
-    - run: ocx status || true
+    - run: npm install -g ./bitkyc08-openprovider-*.tgz
+    - run: opr help          # must succeed with NO bun on PATH
+    - run: opr status || true
 ```
 
 ---
@@ -245,7 +245,7 @@ npm-global-smoke:
 - New install block:
   ```
   npm install -g @mdevs/openprovider
-  ocx start
+  opr start
   ```
 - Keep a "Dev from source" note that uses bun (`bun run src/cli.ts`).
 
@@ -284,14 +284,14 @@ npm install path.
 | C9 | no CI for npm-global path | add smoke job | 3 |
 | C10 | docs still require standalone bun | update README/docs | 4 |
 | C11 | launcher must propagate exit/signal | `spawnSync` + signal forward | 1 |
-| C12 | repo forbids opencodex postinstall | rely on bun dep postinstall only | 1 |
+| C12 | repo forbids openprovider postinstall | rely on bun dep postinstall only | 1 |
 
 ## Verification Gate (C4-level — release surface)
 
 1. `bun run typecheck` clean
 2. `bun test` full suite green (existing 369 + any new)
 3. Local pack smoke: `npm pack` → install the tarball into a Node-only
-   shell (PATH stripped of bun) → `ocx help` / `ocx status` succeed
+   shell (PATH stripped of bun) → `opr help` / `opr status` succeed
 4. CI npm-global-smoke job green on ubuntu + windows
 5. Only after all green: version bump + publish (existing release.ts gate)
 

@@ -15,7 +15,7 @@ const prevHome = process.env.OPENCODEX_HOME;
 let dir: string;
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "ocx-version-"));
+  dir = mkdtempSync(join(tmpdir(), "opr-version-"));
   process.env.OPENCODEX_HOME = dir;
 });
 

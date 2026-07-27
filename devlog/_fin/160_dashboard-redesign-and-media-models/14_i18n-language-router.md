@@ -20,11 +20,11 @@ same ethos rather than pulling in i18next.
   error** (all three currently hold 109 keys).
 - `gui/src/i18n/index.tsx` — `LanguageProvider` (React context), `useT()`, `useI18n()`, `LOCALES`,
   and a `<Trans>` helper.
-  - Persistence: `localStorage["ocx-lang"]`; fallback chain **stored → `navigator.language` → en**.
+  - Persistence: `localStorage["opr-lang"]`; fallback chain **stored → `navigator.language` → en**.
   - Side effect: sets `document.documentElement.lang` to `en` / `ko` / `zh-CN`.
   - `t(key, vars?)` interpolates `{var}` via split/join (no `replaceAll` lib dependency).
   - `<Trans k cmd vars?>` renders a translation's leftover `{cmd}` slot as a `<code className="chip">`
-    — used for inline CLI commands (`ocx init`, `ocx start`, `spawn_agent`) inside otherwise
+    — used for inline CLI commands (`opr init`, `opr start`, `spawn_agent`) inside otherwise
     translated sentences.
 
 ## Switcher

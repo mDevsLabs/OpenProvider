@@ -2,14 +2,14 @@
 
 ## Objective
 
-Land all 8 open PRs from Wibias on lidge-jun/opencodex, honoring the parallel sol-reviewer
+Land all 8 open PRs from Wibias on lidge-jun/openprovider, honoring the parallel sol-reviewer
 verdicts (2026-07-12 session 019f54d8): merge approved content, fix the named blockers on the
 PR branches, merge in stack order, and leave main green with zero open PRs from the batch.
 
 ## Ground truth (explored)
 
 - Stack: `cde614a1`(#96) → `c6af7f90`(#97) → `6bb3aecf`(#98) → `e8794d22`(#99) →
-  `84d601f9`(#100) → `37b4b2d6`(#101) → `21e58b09`(#102), all on fork `Wibias/opencodex`,
+  `84d601f9`(#100) → `37b4b2d6`(#101) → `21e58b09`(#102), all on fork `Wibias/openprovider`,
   all base=main. #103 = `aa888074` (independent; overlaps only `src/server/management-api.ts`,
   `gui/src/pages/Debug.tsx`).
 - Permissions: admin on repo; `maintainerCanModify: true` on PRs → can push fix commits to fork

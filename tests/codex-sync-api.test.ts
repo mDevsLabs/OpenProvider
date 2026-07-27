@@ -51,7 +51,7 @@ describe("GUI/CLI Codex sync backend", () => {
     const result = await syncModelsToCodex(12345, config, { log: line => logs.push(String(line)), error: line => errors.push(String(line)) }, {
       refreshCodexModelCatalog: async () => ({
         added: 3,
-        path: "/tmp/opencodex-catalog.json",
+        path: "/tmp/openprovider-catalog.json",
         catalogExists: true,
         cacheSynced: true,
       }),
@@ -65,11 +65,11 @@ describe("GUI/CLI Codex sync backend", () => {
     });
 
     expect(injectedPort).toBe(12345);
-    expect(injectedCatalogPath).toBe("/tmp/opencodex-catalog.json");
+    expect(injectedCatalogPath).toBe("/tmp/openprovider-catalog.json");
     expect(result).toEqual({
       ok: true,
       added: 3,
-      catalogPath: "/tmp/opencodex-catalog.json",
+      catalogPath: "/tmp/openprovider-catalog.json",
       catalogExists: true,
       cacheSynced: true,
       message: "injected",

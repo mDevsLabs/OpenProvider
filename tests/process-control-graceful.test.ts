@@ -64,7 +64,7 @@ describe("stopProxyGracefully", () => {
       env: { OPENCODEX_API_AUTH_TOKEN: "secret-token" },
     });
 
-    expect(headers?.["x-opencodex-api-key"]).toBe("secret-token");
+    expect(headers?.["x-openprovider-api-key"]).toBe("secret-token");
   });
 
   test("returns false when no runtime port is recorded (caller falls back to killProxy)", async () => {

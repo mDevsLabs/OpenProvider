@@ -1,8 +1,8 @@
 /**
  * Claude auth-mode resolution.
  *
- * The resolver answers exactly ONE question: does the opencodex-owned dummy token
- * (`ANTHROPIC_AUTH_TOKEN=opencodex-proxy`) get injected? That is narrower than "how
+ * The resolver answers exactly ONE question: does the openprovider-owned dummy token
+ * (`ANTHROPIC_AUTH_TOKEN=openprovider-proxy`) get injected? That is narrower than "how
  * will Claude authenticate" — native passthrough additionally needs an `sk-ant-`
  * credential on the incoming request — so the field is `markerMode`, not
  * `effectiveAuthMode` (devlog/_plan/260726_claude_auth_auto/002 R2-1).

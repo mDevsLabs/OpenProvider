@@ -3,7 +3,7 @@
 ## Summary
 
 Fixed three classes of upstream errors that prevented `gpt-5.3-codex-spark` from working
-as a subagent model in opencodex.
+as a subagent model in openprovider.
 
 ## Root cause
 
@@ -38,7 +38,7 @@ matching the corrected behavior.
 
 - `bun run tsc`: 0 errors
 - `bun test codex-catalog.test.ts`: 51 pass, 0 fail
-- `ocx sync`: spark catalog entry has no `use_responses_lite` or `supports_websockets`
+- `opr sync`: spark catalog entry has no `use_responses_lite` or `supports_websockets`
 - Spark subagent dispatch: completed successfully, no upstream 400 errors
 
 ## Terminal outcome: DONE

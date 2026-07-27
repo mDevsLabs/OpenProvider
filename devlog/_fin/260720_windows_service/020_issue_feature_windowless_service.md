@@ -7,7 +7,7 @@
 
 ## Problem to solve
 
-Windows에서 `ocx service install`은 Task Scheduler 태스크를 `InteractiveToken`으로 등록하고 콘솔 배치 래퍼를 직접 실행하기 때문에, cmd 콘솔 창이 사용자 세션에 계속 표시됩니다. 사용자가 그 창을 닫으면 래퍼+프록시가 함께 죽어 모든 모델 연결이 끊깁니다(상세 진단은 연관 Bug 이슈 참조). macOS launchd·Linux systemd 사용자와 동일한 "창 없이 백그라운드에서 돌고, 실수로 죽일 수 없는" 서비스 경험이 Windows에도 필요합니다.
+Windows에서 `opr service install`은 Task Scheduler 태스크를 `InteractiveToken`으로 등록하고 콘솔 배치 래퍼를 직접 실행하기 때문에, cmd 콘솔 창이 사용자 세션에 계속 표시됩니다. 사용자가 그 창을 닫으면 래퍼+프록시가 함께 죽어 모든 모델 연결이 끊깁니다(상세 진단은 연관 Bug 이슈 참조). macOS launchd·Linux systemd 사용자와 동일한 "창 없이 백그라운드에서 돌고, 실수로 죽일 수 없는" 서비스 경험이 Windows에도 필요합니다.
 
 또한 README의 서비스 설명("starts on boot and stays out of your way")과 실제 Windows 동작(logon 트리거 + 보이는 콘솔 창)이 불일치하므로, 해결 전까지는 문서에 known limitation으로 명시할 필요가 있습니다.
 
@@ -35,7 +35,7 @@ WinSW로 프록시를 진짜 SCM 서비스로 등록하면 창 문제와 프로�
 
 - 서비스 설치 후 사용자 세션에 콘솔 창이 보이지 않음
 - 사용자가 프로세스를 강제 종료해도 서비스 매니저가 자동 재시작 (Bug 이슈의 RestartOnFailure 실측 포함)
-- `ocx service install/start/stop/status/uninstall` 계약 유지, `OCX_SERVICE=1` 재주입 계약 유지
+- `opr service install/start/stop/status/uninstall` 계약 유지, `OCX_SERVICE=1` 재주입 계약 유지
 - 중복 인스턴스 방지 유지 (현행 `MultipleInstancesPolicy=IgnoreNew` 상당)
 - README 서비스 시맨틱 정정(채택 옵션에 맞게): S4U 채택 시 logon 트리거 유지를 명시, WinSW 채택 시 boot 시작 여부를 실제 구성에 맞게 서술 — 어느 쪽이든 현행 "starts on boot" 일괄 서술은 Windows에 대해 정정
 - `docs/codex-path-investigation.md` Windows 서비스 절 동기화

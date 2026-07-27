@@ -26,7 +26,7 @@ Add:
 Add to the `Local state` table:
 
 ```
-| `~/.opencodex/usage.jsonl` | opencodex | Append-only request usage log (0o600); only metadata, never prompts or tokens. |
+| `~/.openprovider/usage.jsonl` | openprovider | Append-only request usage log (0o600); only metadata, never prompts or tokens. |
 ```
 
 ### MODIFY `structure/05_gui-and-management-api.md`
@@ -42,7 +42,7 @@ Optionally add a short note in the same file:
 ```
 ## Usage accounting
 
-`src/usage-log.ts` writes append-only JSONL to `~/.opencodex/usage.jsonl` (0o600). `src/usage-summary.ts`
+`src/usage-log.ts` writes append-only JSONL to `~/.openprovider/usage.jsonl` (0o600). `src/usage-summary.ts`
 turns that file into the `/api/usage` shape — totals, daily zero-filled grid, model and provider
 breakdowns, and reported / unreported / unsupported counts. Missing usage is never treated as zero.
 ```

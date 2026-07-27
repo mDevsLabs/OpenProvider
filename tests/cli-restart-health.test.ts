@@ -17,11 +17,11 @@ function runCli(args: string[], env: Record<string, string> = {}) {
   });
 }
 
-describe("ocx restart", () => {
+describe("opr restart", () => {
   test("restart --help prints usage", () => {
     const result = runCli(["restart", "--help"]);
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("ocx restart");
+    expect(result.stdout).toContain("opr restart");
   });
 
   test("help restart shows restart help entry", () => {
@@ -31,11 +31,11 @@ describe("ocx restart", () => {
   });
 });
 
-describe("ocx health", () => {
+describe("opr health", () => {
   test("health --help prints usage", () => {
     const result = runCli(["health", "--help"]);
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("ocx health");
+    expect(result.stdout).toContain("opr health");
   });
 
   test("help health shows health help entry", () => {
@@ -45,7 +45,7 @@ describe("ocx health", () => {
   });
 
   test("health exits 1 with no proxy running (isolated home)", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-health-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-health-"));
     writeFileSync(join(dir, "config.json"), JSON.stringify({
       port: 19999,
       providers: { openai: { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" } },
@@ -62,7 +62,7 @@ describe("ocx health", () => {
   });
 
   test("health --json exits 1 with valid JSON when no proxy", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-health-json-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-health-json-"));
     writeFileSync(join(dir, "config.json"), JSON.stringify({
       port: 19999,
       providers: { openai: { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" } },

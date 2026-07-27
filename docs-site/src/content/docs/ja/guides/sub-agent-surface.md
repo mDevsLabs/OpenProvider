@@ -61,10 +61,10 @@ v2 サーフェス(`multi_agent_v2`)のサブエージェントは**デフォル
 ### CLI
 
 ```bash
-ocx v2 mode v1       # 全モデルを v1 に強制
-ocx v2 mode default  # 上流 pin を復元
-ocx v2 mode v2       # 全モデルを v2 に強制
-ocx v2 status        # 現在のモード + Codex 機能フラグを確認
+opr v2 mode v1       # 全モデルを v1 に強制
+opr v2 mode default  # 上流 pin を復元
+opr v2 mode v2       # 全モデルを v2 に強制
+opr v2 status        # 現在のモード + Codex 機能フラグを確認
 ```
 
 ### API

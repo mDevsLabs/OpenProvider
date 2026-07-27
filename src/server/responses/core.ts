@@ -558,10 +558,10 @@ async function applyFinalRouteRequestNormalization(args: {
     if (guidance) {
       injectDeveloperMessage(parsed, guidance);
       if (isInjectionDebugEnabled()) {
-        injectionDebugLog(`[opencodex] ${route.modelId}: multi-agent guidance injected (surface=${collabSurface(parsed)}, guidanceEnabled=${multiAgentGuidanceEnabled(config)}, ${guidance.length} chars)`);
+        injectionDebugLog(`[openprovider] ${route.modelId}: multi-agent guidance injected (surface=${collabSurface(parsed)}, guidanceEnabled=${multiAgentGuidanceEnabled(config)}, ${guidance.length} chars)`);
       }
     } else if (isInjectionDebugEnabled() && collabSurface(parsed) !== null) {
-      injectionDebugLog(`[opencodex] ${route.modelId}: collab surface=${collabSurface(parsed)}, guidance silent (effort=${parsed.options.reasoning ?? "unset"}, injectionModel=${config.injectionModel ?? "unset"})`);
+      injectionDebugLog(`[openprovider] ${route.modelId}: collab surface=${collabSurface(parsed)}, guidance silent (effort=${parsed.options.reasoning ?? "unset"}, injectionModel=${config.injectionModel ?? "unset"})`);
     }
   }
 
@@ -573,11 +573,11 @@ async function applyFinalRouteRequestNormalization(args: {
       if (capped) {
         logCtx.requestedEffort = `${capped.from}->${capped.to}`;
         if (isInjectionDebugEnabled()) {
-          injectionDebugLog(`[opencodex] ${route.modelId}: effort cap applied (${capped.from} -> ${capped.to}, ${capped.subagent ? "sub-agent" : "main"} turn)`);
+          injectionDebugLog(`[openprovider] ${route.modelId}: effort cap applied (${capped.from} -> ${capped.to}, ${capped.subagent ? "sub-agent" : "main"} turn)`);
         }
       }
     } else if (isInjectionDebugEnabled() && (config.effortCap || config.subagentEffortCap)) {
-      injectionDebugLog(`[opencodex] ${route.modelId}: effort cap skipped (surface=${surface ?? "none"}, v2 feature only)`);
+      injectionDebugLog(`[openprovider] ${route.modelId}: effort cap skipped (surface=${surface ?? "none"}, v2 feature only)`);
     }
   }
 
@@ -851,7 +851,7 @@ export async function handleResponses(
     );
     if (rewritten > 0)
       console.warn(
-        `[opencodex] rewrote ${rewritten} plaintext encrypted_content part(s) to input_text (spawn-message compatibility)`,
+        `[openprovider] rewrote ${rewritten} plaintext encrypted_content part(s) to input_text (spawn-message compatibility)`,
       );
   }
 
@@ -932,7 +932,7 @@ export async function handleResponses(
       (logCtx as unknown as Record<string, unknown>).subagentModelFallbackFrom = fallback.from;
       (logCtx as unknown as Record<string, unknown>).subagentModelFallbackTo = fallback.to;
       if (isInjectionDebugEnabled()) {
-        injectionDebugLog(`[opencodex] subagent model fallback ${fallback.from} -> ${fallback.to}`);
+        injectionDebugLog(`[openprovider] subagent model fallback ${fallback.from} -> ${fallback.to}`);
       }
     }
     subagentQuotaFailureModel = fallback?.to ?? parsed.modelId;
@@ -1103,7 +1103,7 @@ export async function handleResponses(
 
   if ("passthrough" in adapter && adapter.passthrough && !routedCompaction) {
     // Local continuation cache for the ChatGPT passthrough. Codex WS turns chain with
-    // previous_response_id, ocx converts them to internal HTTP requests, and the ChatGPT Codex
+    // previous_response_id, opr converts them to internal HTTP requests, and the ChatGPT Codex
     // REST backend rejects the parameter — the adapter strips it in forward mode, so the ONLY
     // way a chained turn keeps its earlier context is the local replay expansion. Record
     // completed passthrough responses (force bypasses Codex's blanket store:false) so the next

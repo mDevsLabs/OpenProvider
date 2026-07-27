@@ -1,7 +1,7 @@
 # 140.12 — Phase 1c: google-vertex stream + usage + ADC-refresh hardening
 
 > Second hardening slice for Vertex: fail-closed stream truncation, correct usage tagging, and a
-> hardened ADC token exchange (timeout + bounded retry). Copy-paste-ready. SOT = opencodex Kiro
+> hardened ADC token exchange (timeout + bounded retry). Copy-paste-ready. SOT = openprovider Kiro
 > pattern (`kiro-truncation.ts`, `usage-log.ts`) + the existing `gcp-adc.ts`; external cross-check =
 > CLIProxyAPI `helps/usage_helpers.go`. See `05_reference-repos.md`.
 

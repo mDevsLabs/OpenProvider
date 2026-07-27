@@ -32,7 +32,7 @@ runtime the leak itself remains an upstream problem:
 
 - **RSS watchdog** — the proxy samples its own memory every minute and logs a
   rate-limited warning when RSS crosses 4 GiB.
-- **`ocx doctor`** — a "Memory / runtime" section shows the *service*
+- **`opr doctor`** — a "Memory / runtime" section shows the *service*
   process's Bun version, RSS, JS-heap share, and stream-mode decision, and
   tells you whether growth looks native-side (the upstream issue) or JS-side
   (an OpenProvider bug you should report).
@@ -70,7 +70,7 @@ restart it.
    unvalidated territory — you are running OpenProvider on a runtime we have not
    tested; at your own risk. Important for service installs: the override is
    read **when the service artifact is generated**, not at service start. Set
-   the environment variable, then re-run `ocx service install` from that same
+   the environment variable, then re-run `opr service install` from that same
    shell so the path is baked into the durable service definition. Setting
    the env alone does nothing for an already-installed service.
 
@@ -84,7 +84,7 @@ restart it.
    default; `"auto"` (default) lets the runtime gate decide.
 
 If you try any of these on a real Windows workload, please report the before
-and after `ocx doctor` memory sections on
+and after `opr doctor` memory sections on
 [#314](https://github.com/mDevsLabs/OpenProvider/issues/314) — that is exactly
 the verification this mitigation is waiting on.
 

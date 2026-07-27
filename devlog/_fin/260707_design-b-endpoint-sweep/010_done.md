@@ -34,5 +34,5 @@ surfaced as serde decode errors ("failed to decode ... response") instead of 404
 
 ## Verification
 bun test ./tests/ → 1550 pass / 0 fail (159 files); bun x tsc --noEmit → exit 0.
-Not live until ocx restart (queued with image guard, compaction v2, WS 426 gate,
+Not live until opr restart (queued with image guard, compaction v2, WS 426 gate,
 glm-5.2 vision sidecar).

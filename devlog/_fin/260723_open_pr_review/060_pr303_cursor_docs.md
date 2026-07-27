@@ -6,7 +6,7 @@
 ## What it does
 
 - codex-integration.md: new "Catalog troubleshooting" checklist (selectedModels →
-  disabledModels → liveModels/models → Cursor GetUsableModels → cache TTL + `ocx sync`),
+  disabledModels → liveModels/models → Cursor GetUsableModels → cache TTL + `opr sync`),
   plus an honest caution box about external local writers racing catalog files.
 - configuration.md + adapters.md: documents the `nativeLocalExec: "off" | "codex-sandbox" |
   "on"` tri-state and demotes `unsafeAllowNativeLocalExec` to legacy-equivalent.

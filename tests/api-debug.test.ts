@@ -37,8 +37,8 @@ function loopbackOrigin(server: { port: number }): string {
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-api-debug-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-api-debug-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-api-debug-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-api-debug-"));
   process.env.OPENCODEX_HOME = testDir;
   saveConfig(baseConfig());
   resetDebugLogBufferForTests();
@@ -163,8 +163,8 @@ describe("management API /api/debug", () => {
 describe("management API /api/debug/logs", () => {
   test("returns buffered provider lines with seq cursor and limit", async () => {
     setDebugSettings({ debug: true });
-    appendDebugLogLine("[ocx:test:one]");
-    appendDebugLogLine("[ocx:test:two]");
+    appendDebugLogLine("[opr:test:one]");
+    appendDebugLogLine("[opr:test:two]");
 
     const server = startServer(0);
     try {
@@ -206,7 +206,7 @@ describe("management API /api/debug/logs", () => {
   });
 
   test("caps limit query param at 2000", async () => {
-    for (let i = 0; i < 5; i += 1) appendDebugLogLine(`[ocx:test:${i}]`);
+    for (let i = 0; i < 5; i += 1) appendDebugLogLine(`[opr:test:${i}]`);
     const server = startServer(0);
     try {
       const res = await fetch(new URL("/api/debug/logs?limit=99999", server.url));
@@ -222,8 +222,8 @@ describe("management API /api/debug/logs", () => {
 describe("management API /api/debug/injection-logs", () => {
   test("returns buffered injection lines with seq cursor and limit", async () => {
     setDebugSettings({ injection: true });
-    injectionDebugLog("[opencodex] gpt-5.4: multi-agent guidance injected (surface=collab, 128 chars)");
-    injectionDebugLog("[opencodex] gpt-5.4: effort cap applied (ultra -> high, main turn)");
+    injectionDebugLog("[openprovider] gpt-5.4: multi-agent guidance injected (surface=collab, 128 chars)");
+    injectionDebugLog("[openprovider] gpt-5.4: effort cap applied (ultra -> high, main turn)");
 
     const server = startServer(0);
     try {
@@ -244,7 +244,7 @@ describe("management API /api/debug/injection-logs", () => {
   });
 
   test("caps limit query param at 2000", async () => {
-    for (let i = 0; i < 5; i += 1) injectionDebugLog(`[opencodex] inj:${i}`);
+    for (let i = 0; i < 5; i += 1) injectionDebugLog(`[openprovider] inj:${i}`);
     const server = startServer(0);
     try {
       const res = await fetch(new URL("/api/debug/injection-logs?limit=99999", server.url));
@@ -261,7 +261,7 @@ describe("management API /api/debug/usage-logs", () => {
   test("tails usage-debug.jsonl from the running proxy home", async () => {
     appendUsageDebug({
       ts: Date.now(),
-      requestId: "ocx-usage-wire",
+      requestId: "opr-usage-wire",
       provider: "cursor",
       model: "gpt-5.4",
       upstreamContentType: "text/event-stream",
@@ -278,7 +278,7 @@ describe("management API /api/debug/usage-logs", () => {
       const entries = await res.json() as { seq: number; line: string }[];
       expect(entries.length).toBeGreaterThanOrEqual(1);
       expect(entries[0]!.seq).toBe(1);
-      expect(entries[0]!.line).toContain("ocx-usage-wire");
+      expect(entries[0]!.line).toContain("opr-usage-wire");
 
       const tail = await fetch(new URL(`/api/debug/usage-logs?after=${entries[0]!.seq}`, server.url));
       expect(await tail.json()).toEqual([]);
@@ -290,7 +290,7 @@ describe("management API /api/debug/usage-logs", () => {
   test("serves redacted usage samples without leaking bearer tokens", async () => {
     appendUsageDebug({
       ts: Date.now(),
-      requestId: "ocx-usage-secret",
+      requestId: "opr-usage-secret",
       provider: "cursor",
       model: "gpt-5.4",
       upstreamContentType: "application/json",

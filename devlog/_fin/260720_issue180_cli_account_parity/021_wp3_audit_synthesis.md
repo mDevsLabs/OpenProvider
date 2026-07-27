@@ -94,7 +94,7 @@ Gauss reviewed the docs diff against the shipped CLI surface. Dispositions:
    guarantee.
 3. [Medium] kiro note documented as unconditional — folded: all locales qualify it
    appears when a stored kiro account exists.
-4. [Medium] README "deep-link only" judgment was FALSE — folded: `ocx account` rows
+4. [Medium] README "deep-link only" judgment was FALSE — folded: `opr account` rows
    added to the CLI lists in README.md:282, README.ko.md:249, README.zh-CN.md:242;
    999_closeout corrected.
 5. [Medium] kiro guidance row still marked gap — folded: 004 row flipped to full

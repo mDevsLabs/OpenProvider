@@ -21,8 +21,8 @@ let originalFetch: typeof fetch;
 beforeEach(() => {
   originalFetch = globalThis.fetch;
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-xai-401-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-xai-401-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-xai-401-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-xai-401-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 

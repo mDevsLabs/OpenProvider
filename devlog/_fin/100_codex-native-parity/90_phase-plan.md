@@ -2,7 +2,7 @@
 
 ## Scope
 
-Phase 100 should convert this research into explicit catalog/runtime metadata policy for opencodex.
+Phase 100 should convert this research into explicit catalog/runtime metadata policy for openprovider.
 The goal is not to make every routed provider fully native in one pass. The goal is to prevent
 accidental native-template inheritance from changing routed model behavior silently.
 
@@ -13,7 +13,7 @@ accidental native-template inheritance from changing routed model behavior silen
 Primary file:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
 ```
 
 Tasks:
@@ -41,15 +41,15 @@ Expected first policy:
 Primary files:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/web-search/synthetic-tool.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/web-search/synthetic-tool.ts
 ```
 
 Tasks:
 
 1. Decide whether routed models should expose deferred `tool_search`.
-2. Set `web_search_tool_type` according to opencodex sidecar capability, not template inheritance.
+2. Set `web_search_tool_type` according to openprovider sidecar capability, not template inheritance.
 3. Add tests proving hosted `web_search` is either converted to the synthetic sidecar tool or
    suppressed predictably.
 
@@ -58,10 +58,10 @@ Tasks:
 Primary files:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/anthropic.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/openai-chat.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/anthropic.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/openai-chat.ts
 ```
 
 Tasks:
@@ -77,9 +77,9 @@ Tasks:
 Primary files:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/generated/jawcode-model-metadata.ts
-/Users/jun/Developer/new/700_projects/opencodex/scripts/generate-jawcode-metadata.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/generated/jawcode-model-metadata.ts
+/Users/jun/Developer/new/700_projects/openprovider/scripts/generate-jawcode-metadata.ts
 ```
 
 Tasks:
@@ -98,8 +98,8 @@ Tasks:
 Primary files:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts
 ```
 
 Tasks:
@@ -107,7 +107,7 @@ Tasks:
 1. Emit `response.error` in failure payloads where upstream Codex expects it.
 2. Preserve `last_error` only if it is also useful for Responses compatibility.
 3. Add context-window exceeded and quota/rate-limit fixtures.
-4. Synthesize Codex-relevant headers only where opencodex has truthful data.
+4. Synthesize Codex-relevant headers only where openprovider has truthful data.
 
 ### 100.6 Websocket Work Removed
 
@@ -121,8 +121,8 @@ routed providers keep supports_websockets absent/false
 
 Reason:
 
-opencodex routed models mostly end in upstream HTTP/SSE Chat Completions or HTTP/SSE-compatible
-streams. Adding websocket only between Codex and opencodex does not make those upstream providers
+openprovider routed models mostly end in upstream HTTP/SSE Chat Completions or HTTP/SSE-compatible
+streams. Adding websocket only between Codex and openprovider does not make those upstream providers
 websocket-native. It would advertise a capability the routed model path does not support end-to-end
 and is not expected to materially improve speed.
 
@@ -140,7 +140,7 @@ bun x tsc --noEmit
 Catalog checks:
 
 ```bash
-ocx sync
+opr sync
 codex debug models
 ```
 
@@ -166,7 +166,7 @@ Runtime checks:
 1. Resolved: routed models should strip `model_messages` first. Provider-safe personality templates
    can be added later.
 2. Should routed models inherit Codex feature-default multi-agent behavior by deleting
-   `multi_agent_version`, or should opencodex force a specific version?
+   `multi_agent_version`, or should openprovider force a specific version?
 3. Resolved in Phase 100.2/100.16:
    - routed models expose deferred `tool_search` by default;
    - routed hosted web-search metadata is `text_and_image` because actual hosted search runs via
@@ -190,7 +190,7 @@ Start with catalog normalization only. It has the highest leverage and lowest ru
 
 Then add jawcode metadata snapshot support:
 
-1. generate a small opencodex-owned metadata projection from jawcode;
+1. generate a small openprovider-owned metadata projection from jawcode;
 2. map provider ids explicitly;
 3. enrich internal routed model metadata;
 4. write only Codex-verified catalog fields.

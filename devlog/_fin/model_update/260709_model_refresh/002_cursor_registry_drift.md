@@ -11,7 +11,7 @@ Diff vs CURSOR_STATIC_MODELS (src/adapters/cursor/discovery.ts):
   grok-build-0.1, grok-code-fast-1, kimi-k2.5, gpt-5.5-extra. composer-2.5-fast UNVERIFIED
   (docs mention a faster variant; exposed modelId is composer-2.5 only).
 - METADATA: glm-5.2 static 200k -> official 1M context / 128k output (https://docs.z.ai/guides/llm/glm-5.2).
-- CAUTION (main-session note): Cursor list is PLAN-dependent and ocx filters live via
+- CAUTION (main-session note): Cursor list is PLAN-dependent and opr filters live via
   GetUsableModels; static seed removals only affect logged-out fallback. Renames matter most
   (stale ids => ERROR_BAD_MODEL_NAME on the live filter path).
 

@@ -25,7 +25,7 @@ export type AuthSourceId =
   | "macos-keychain"           // S3: security find-generic-password
   | "exported-env";            // S5: ANTHROPIC_API_KEY / a USER's ANTHROPIC_AUTH_TOKEN
 
-// S4 (opencodex's own anthropic OAuth credential) was REMOVED by the audit: it is a
+// S4 (openprovider's own anthropic OAuth credential) was REMOVED by the audit: it is a
 // provider credential the Claude CLI never consumes, so it is not evidence the
 // client can run natively (002 §5).
 
@@ -62,13 +62,13 @@ export interface AuthDetectResult {
   foundBy?: AuthSourceId;
   sources: AuthSourceResult[];
   /** True when env carries OUR OWN dummy marker (ANTHROPIC_AUTH_TOKEN ===
-      "opencodex-proxy"). The resolver strips it on an auto→subscription launch;
+      "openprovider-proxy"). The resolver strips it on an auto→subscription launch;
       it must never count as user auth (002 §1 — the feedback loop). */
   staleProxyMarker: boolean;
 }
 
 /** The one owned value. Exported so the CLI, system-env and tests share it. */
-export const PROXY_MARKER = "opencodex-proxy";
+export const PROXY_MARKER = "openprovider-proxy";
 
 export function detectClaudeAuth(deps: AuthDetectDeps): AuthDetectResult;
 ```
@@ -103,7 +103,7 @@ Per-source rules:
   secret material): exit 0 → present; exit 44 (item not found) → absent; timeout /
   spawn error / any other exit → unknown. 1.5s timeout.
 - S5: `ANTHROPIC_API_KEY` non-empty → present. `ANTHROPIC_AUTH_TOKEN` non-empty →
-  present UNLESS the value is exactly `opencodex-proxy`: that is OUR OWN dummy
+  present UNLESS the value is exactly `openprovider-proxy`: that is OUR OWN dummy
   marker (injected by buildClaudeEnv and the system-env file), so it is not user
   auth — it sets `staleProxyMarker: true` and counts as absent for this source.
 
@@ -115,7 +115,7 @@ Default IO wiring (same module, exported as `defaultAuthDetectDeps()`): real pat
 - S1 present/absent/corrupt-JSON → present/absent/unknown;
 - S2 missing/exists/stat-error → absent/present/unknown; `CLAUDE_CONFIG_DIR` honoured;
 - S3 non-Darwin absent; exit 0 → present; exit 44 → absent; timeout → unknown;
-- S5 API key → present; user AUTH_TOKEN → present; `ANTHROPIC_AUTH_TOKEN=opencodex-proxy`
+- S5 API key → present; user AUTH_TOKEN → present; `ANTHROPIC_AUTH_TOKEN=openprovider-proxy`
   → absent for the source AND `staleProxyMarker: true`;
 - the keychain probe command contains no `-g` or `-w` flag (string assertion);
 - aggregate: any present wins over unknowns; unknown beats absent; all-absent → absent;

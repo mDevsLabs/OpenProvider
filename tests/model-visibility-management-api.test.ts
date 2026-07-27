@@ -15,7 +15,7 @@ beforeEach(() => {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
   mkdirSync(TEST_DIR, { recursive: true });
   process.env.OPENCODEX_HOME = TEST_DIR;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-model-visibility-codex-");
+  isolatedCodexHome = installIsolatedCodexHome("opr-model-visibility-codex-");
   refreshes = 0;
   saveConfig({
     port: 0,

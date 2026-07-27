@@ -13,7 +13,7 @@ residual drift gaps — and close finding **#10 (test evidence mismatch)**.
 ## 1. Easy explanation
 
 Three loose ends:
-1. **The error message lies.** When a Cursor transport error happens, opencodex always appends
+1. **The error message lies.** When a Cursor transport error happens, openprovider always appends
    "No Cursor native file/shell/MCP/fetch/screen/computer-use command was executed" — even though a
    native exec may have already run earlier in the same turn. After `111` adds a deny gate it's still a
    per-turn fact, so the message must reflect what *actually* happened.
@@ -42,7 +42,7 @@ function safeCursorTransportError(err: unknown): string {
 - The sentence is **unconditional**. But `live-transport.ts:199-202` can execute
   `handleCursorNativeExec` before a later transport error → the claim can be false. (Review #3.)
 - jawcode has no equivalent unconditional safety sentence (it returns typed rejections instead), so this
-  is opencodex-specific text that must become conditional.
+  is openprovider-specific text that must become conditional.
 
 ### #7 — per-model already done by 108, residual gaps
 ```57:68:src/adapters/cursor/effort-map.ts

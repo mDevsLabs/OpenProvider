@@ -10,7 +10,7 @@ Branch context: `codex/gpt-56-sol-terra-luna-rollout`
 After the previous token-refresh patch, most Codex pool accounts still became unusable except one.
 The working hypothesis from the live incident is:
 
-> After OAuth login/import, opencodex records the token but does not actually send a small Codex
+> After OAuth login/import, openprovider records the token but does not actually send a small Codex
 > `/responses` request. Accounts that are logged in and then left idle never get their Codex backend
 > session validated/warmed, while the one account that receives real traffic survives.
 
@@ -20,7 +20,7 @@ based, not Codex `last_refresh` / real backend-use based.
 
 ## Current evidence
 
-### opencodex behavior
+### openprovider behavior
 
 - Login completion checks `https://chatgpt.com/backend-api/wham/usage`, not Codex `/responses`:
   `src/codex-auth-api.ts:557`.
@@ -52,7 +52,7 @@ based, not Codex `last_refresh` / real backend-use based.
 The previous patch protected the local refresh code path from simple access-token expiry, but it
 did not guarantee that each stored Codex pool account has recently exercised the Codex backend.
 Because the store has no durable `lastRefresh` / `lastValidated` style timestamp, an account with
-a far-future `expiresAt` is considered valid indefinitely by opencodex even if upstream Codex has
+a far-future `expiresAt` is considered valid indefinitely by openprovider even if upstream Codex has
 silently invalidated or not initialized the session.
 
 This makes `/wham/usage` a false positive: it proves the bearer token can query account metadata,
@@ -106,7 +106,7 @@ Behavior:
   - EOF before a success terminal;
   - malformed terminal JSON.
 
-Important distinction: codex-lb uses warmup probes for quota planning. opencodex should use this
+Important distinction: codex-lb uses warmup probes for quota planning. openprovider should use this
 first as auth/session validation, not as hidden quota shaping.
 
 ### Phase 2 — Login/import gate

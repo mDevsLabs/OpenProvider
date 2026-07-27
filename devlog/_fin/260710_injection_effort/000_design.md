@@ -60,5 +60,5 @@ Semantics guardrails:
   model+effort configured; `reasoning_effort` absent otherwise.
 
 Live note: the running proxy (v2.7.1-preview, port 10100) predates this change;
-the new fields appear after the next `ocx restart`. No restart was performed here
+the new fields appear after the next `opr restart`. No restart was performed here
 because live sub-agent traffic (gpt-5.6-sol) was in flight.

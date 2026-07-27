@@ -117,7 +117,7 @@ export function applyCatalogModelMetadata(entry: RawEntry, model?: CatalogModel)
   // displayName is DISPLAY-ONLY: it relabels the picker row but never touches the routing
   // slug, alias, or provider. deriveEntry already stamped the slug as display_name; a
   // configured displayName overrides just the label. The `/` separator is rejected at every
-  // input boundary (CLI `ocx models add`, management API), so the catalog trusts its source.
+  // input boundary (CLI `opr models add`, management API), so the catalog trusts its source.
   // Combos carry no displayName, and natives never reach here (no CatalogModel), so genuine
   // upstream marketing names and combo alias labels are preserved untouched.
   const displayName = typeof model.displayName === "string" ? model.displayName.trim() : "";
@@ -319,21 +319,21 @@ export function clampCatalogModelsToCodexSupport(models: RawEntry[], deps: Bundl
       runtimeVersion = resolved.runtime.version;
       process.stderr.write(`${formatRuntimeLogLine(resolved.runtime)}\n`);
       if (resolved.persistError) {
-        console.warn(`[opencodex] Codex runtime selection could not be persisted; a later sync may pick a different binary.`);
+        console.warn(`[openprovider] Codex runtime selection could not be persisted; a later sync may pick a different binary.`);
       }
       if (
         resolved.replacedConfigured
         && resolved.replacedConfigured.from.command !== resolved.runtime.command
       ) {
-        console.warn(`[opencodex] Preferred Codex runtime is unavailable.`);
+        console.warn(`[openprovider] Preferred Codex runtime is unavailable.`);
         console.warn(
-          `[opencodex] Falling back from ${displayCodexRuntimePath(resolved.replacedConfigured.from.command)} to ${displayCodexRuntimePath(runtimePath)}.`,
+          `[openprovider] Falling back from ${displayCodexRuntimePath(resolved.replacedConfigured.from.command)} to ${displayCodexRuntimePath(runtimePath)}.`,
         );
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const redacted = redactUserPath(redactSecretString(message)).slice(0, 200);
-      console.warn(`[opencodex] Codex runtime resolve failed during catalog clamp: ${redacted}`);
+      console.warn(`[openprovider] Codex runtime resolve failed during catalog clamp: ${redacted}`);
     }
   }
 

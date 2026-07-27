@@ -162,7 +162,7 @@ In each locale, update both the exposed-endpoint paragraph and the non-loopback 
 
 - Do nothing: rejected; exact failure reproduces and source intentionally 404s the required path.
 - Delete: rejected; the generic guard is correct for unknown paths and must remain.
-- Configure: rejected; Codex correctly derives `/v1/images/generations` from opencodex's injected base; no existing config can create a missing server route.
+- Configure: rejected; Codex correctly derives `/v1/images/generations` from openprovider's injected base; no existing config can create a missing server route.
 - Reuse: selected for auth, header timeout, abort relay, header sanitizer, health recording, and route gates. Reset retry is deliberately not reused for this non-idempotent paid POST. Only the Images-specific handler and its bounded collector/selector are new.
 
 ## Verification

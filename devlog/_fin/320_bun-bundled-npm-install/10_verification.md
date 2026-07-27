@@ -32,11 +32,11 @@ This is the objective's headline acceptance test: `npm install -g` works
 without a separately-installed Bun.
 
 ```
-$ npm pack            # → bitkyc08-opencodex-2.5.5-preview.1.tgz (launcher shipped: package/bin/ocx.mjs)
+$ npm pack            # → bitkyc08-openprovider-2.5.5-preview.1.tgz (launcher shipped: package/bin/ocx.mjs)
 $ npm install <tarball> into an isolated temp prefix
   → node_modules/bun/bin/bun.exe present, 60M (real binary, not the stub)
-$ env -i PATH="<node-dir>:/usr/bin:/bin"  (NO bun on PATH)  ocx help
-  → opencodex (ocx) — Universal provider proxy for Codex ...
+$ env -i PATH="<node-dir>:/usr/bin:/bin"  (NO bun on PATH)  opr help
+  → openprovider (opr) — Universal provider proxy for Codex ...
   → exit 0
 ```
 
@@ -45,7 +45,7 @@ $ env -i PATH="<node-dir>:/usr/bin:/bin"  (NO bun on PATH)  ocx help
 ```
 $ npm install <tarball> --ignore-scripts   # leaves a 450-byte ASCII stub at bin/bun.exe
   stub size before: 450 bytes
-$ ocx help  (no bun on PATH)
+$ opr help  (no bun on PATH)
   → launcher detects stub (< 1MB) → runs install.js → downloads real binary
   → bun.exe after recovery: 63,096,576 bytes
   → help printed, exit 0

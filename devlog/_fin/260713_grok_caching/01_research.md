@@ -25,7 +25,7 @@
   - CCR: usage 매핑만 존재, xAI 전용 캐시 대응 없음.
 - **공식 Grok CLI 0.2.93 실캡처**: `POST cli-chat-proxy.grok.com/v1/responses`, 헤더 x-grok-client-version/identifier, x-xai-token-auth, `include:["reasoning.encrypted_content"]`, store:false (omni-llm-provider CAPTURE.md, 2026-07-11).
 
-## opencodex 반영 결정
+## openprovider 반영 결정
 
 1. PR #113 (oauth→cli-chat-proxy 분리) = LINUX DO/CLIProxyAPI와 동일 방향. dev 통합 완료.
 2. `x-grok-conv-id`: `parsed.options.promptCacheKey`(Codex가 보내는 세션 안정 키)를 sha256 32-hex로 해시해 xai 양 모드에 부여. CLIProxyAPI 선례와 공식 best-practices 근거. body `prompt_cache_key`는 chat/completions 비문서 파라미터라 보류(400 리스크 > 이득).

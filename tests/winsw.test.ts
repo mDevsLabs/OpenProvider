@@ -213,7 +213,7 @@ describe("service reinstall args", () => {
 
 describe("app-side service token loading", () => {
   test("loads the token from OCX_API_TOKEN_FILE only when the env token is empty", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-token-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-token-"));
     const file = join(dir, "service-api-token");
     writeFileSync(file, "  tok-123  \n");
     try {

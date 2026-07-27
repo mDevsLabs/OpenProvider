@@ -75,7 +75,7 @@ After:
       const stale = getStaleCached(name);
       const fallback = stale ? "stale" : "configured";
       console.warn(
-        `[opencodex] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
+        `[openprovider] Provider model discovery for "${name}" failed with HTTP ${res.status} [urlClass=${urlClass}, fallback=${fallback}].`,
       );
       return stale ? applyConfigHintsToCachedModels(name, prov, stale, contextCap) : configured;
     }
@@ -87,7 +87,7 @@ After:
     const stale = getStaleCached(name);
     const fallback = stale ? "stale" : "configured";
     console.warn(
-      `[opencodex] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
+      `[openprovider] Provider model discovery for "${name}" threw ${error instanceof Error ? error.name : "unknown"} [urlClass=${urlClass}, fallback=${fallback}].`,
     );
     return stale ? applyConfigHintsToCachedModels(name, prov, stale, contextCap) : configured;
   }
@@ -246,7 +246,7 @@ export function concreteComboRequestBody(
     const key = `${target.provider}/${target.model}:${defaultEffort}`;
     if (!warnedUnsupportedDefaults.has(key)) {
       warnedUnsupportedDefaults.add(key);
-      console.debug("[opencodex] combo default effort omitted", {
+      console.debug("[openprovider] combo default effort omitted", {
         provider: target.provider,
         model: target.model,
         requestedEffort: defaultEffort,

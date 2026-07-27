@@ -3,8 +3,8 @@
 ## Easy Summary
 
 Phase 100.4 gives routed models real context-window metadata instead of accidentally inheriting the
-native GPT catalog window. opencodex will not import jawcode at runtime. Instead, a build-time script
-will read jawcode's static `models.json`, generate a tiny opencodex-owned snapshot, and the catalog
+native GPT catalog window. openprovider will not import jawcode at runtime. Instead, a build-time script
+will read jawcode's static `models.json`, generate a tiny openprovider-owned snapshot, and the catalog
 builder will apply exact provider/model matches to Codex catalog fields.
 
 ## Policy
@@ -12,7 +12,7 @@ builder will apply exact provider/model matches to Codex catalog fields.
 Do:
 
 ```text
-jawcode models.json -> generated opencodex snapshot -> exact provider/model lookup -> Codex fields
+jawcode models.json -> generated openprovider snapshot -> exact provider/model lookup -> Codex fields
 ```
 
 Do not:
@@ -73,14 +73,14 @@ max_context_window_tokens -> context_window
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/scripts/generate-jawcode-metadata.ts
+/Users/jun/Developer/new/700_projects/openprovider/scripts/generate-jawcode-metadata.ts
 ```
 
 Responsibilities:
 
 1. Read jawcode model registry from:
    - `process.env.JAWCODE_MODELS_JSON`, or
-   - `../jawcode/packages/ai/src/models.json` relative to opencodex cwd.
+   - `../jawcode/packages/ai/src/models.json` relative to openprovider cwd.
 2. Filter to the unique jawcode provider ids used by `PROVIDER_ALIASES` only:
    - `xai`
    - `anthropic`
@@ -99,16 +99,16 @@ Responsibilities:
 4. Write:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/generated/jawcode-model-metadata.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/generated/jawcode-model-metadata.ts
 ```
 
 The generated file must be deterministic: sorted providers and sorted model ids.
-It must not emit the full jawcode registry; large unrelated provider catalogs stay out of opencodex.
+It must not emit the full jawcode registry; large unrelated provider catalogs stay out of openprovider.
 
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/generated/jawcode-model-metadata.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/generated/jawcode-model-metadata.ts
 ```
 
 Generated exports:
@@ -149,7 +149,7 @@ export function resolveJawcodeProvider(provider: string): string | undefined {
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
 ```
 
 Add import:
@@ -191,7 +191,7 @@ Call sites:
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/package.json
+/Users/jun/Developer/new/700_projects/openprovider/package.json
 ```
 
 Add script:
@@ -203,7 +203,7 @@ Add script:
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts
 ```
 
 Add tests proving:

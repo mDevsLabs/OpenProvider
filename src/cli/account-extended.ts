@@ -15,15 +15,15 @@ import {
 const MAIN_ID = "__main__";
 const AUTO_NOTE = "auto (no pin — lowest-usage account is selected per request)";
 const EXTENDED_USAGE = `Usage:
-  ocx account refresh <provider> [--json]
-  ocx account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]
-  ocx account alias <provider> <id|main> <display-name|-> [--json]
-  ocx account remove <provider> <id|main> --yes [--json]
-  ocx account clear-cooldown <provider> <id|main> [--json]
-  ocx account add-key <provider> [--label <label>] [--json]`;
+  opr account refresh <provider> [--json]
+  opr account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]
+  opr account alias <provider> <id|main> <display-name|-> [--json]
+  opr account remove <provider> <id|main> --yes [--json]
+  opr account clear-cooldown <provider> <id|main> [--json]
+  opr account add-key <provider> [--label <label>] [--json]`;
 const PIPE_GUIDANCE = `Pipe the API key on stdin, for example:
-  ocx account add-key <provider> <<< "$MY_KEY"
-  security find-generic-password -w <item> | ocx account add-key <provider>`;
+  opr account add-key <provider> <<< "$MY_KEY"
+  security find-generic-password -w <item> | opr account add-key <provider>`;
 
 function flag(args: string[], value: string): boolean {
   const index = args.indexOf(value);
@@ -214,7 +214,7 @@ export async function cmdRemove(args: string[], deps: AccountDeps): Promise<numb
   const requestedId = args.shift();
   if (!name || !requestedId || args.length) return wantsJson ? fail("provider and account id are required") : usage();
   if (!confirmed) {
-    const message = `Confirmation required. Re-run: ocx account remove ${name} ${requestedId} --yes`;
+    const message = `Confirmation required. Re-run: opr account remove ${name} ${requestedId} --yes`;
     return wantsJson ? fail(message) : usage(message);
   }
   const classified = configAndType(deps, name);
@@ -224,15 +224,15 @@ export async function cmdRemove(args: string[], deps: AccountDeps): Promise<numb
     ? fail("the main Codex App login cannot be removed")
     : usage("Error: the main Codex App login cannot be removed");
   const baseUrl = await resolveBaseUrl(deps);
-  if (!baseUrl) return fail("Proxy not reachable. Start it with 'ocx start' or 'ocx ensure'.");
+  if (!baseUrl) return fail("Proxy not reachable. Start it with 'opr start' or 'opr ensure'.");
   const before = await fetchRows(deps, baseUrl, name, classified.type);
-  if (before.networkDown) return fail("Proxy not reachable. Start it with 'ocx start' or 'ocx ensure'.");
+  if (before.networkDown) return fail("Proxy not reachable. Start it with 'opr start' or 'opr ensure'.");
   if (before.errorJson) return fail(errorText(before.errorJson, `failed to verify ${name} before removal`));
   if (!before.rows.some(row => row.id === id)) return wantsJson
     ? fail(`account or key "${requestedId}" was not found`)
     : usage(`Error: account or key "${requestedId}" was not found`);
   const response = await apiJson(deps, baseUrl, "DELETE", deletePath(classified.type, name, id));
-  if (response.status === 0) return fail("Proxy not reachable. Start it with 'ocx start' or 'ocx ensure'.");
+  if (response.status === 0) return fail("Proxy not reachable. Start it with 'opr start' or 'opr ensure'.");
   if (response.status !== 200) return fail(errorText(response.json, `failed to remove ${requestedId}`));
   const after = await fetchRows(deps, baseUrl, name, classified.type);
   if (after.networkDown || after.errorJson) {

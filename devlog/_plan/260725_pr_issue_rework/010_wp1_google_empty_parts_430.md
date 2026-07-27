@@ -13,11 +13,11 @@
 ## 착수 시점 사실
 
 - 기준 시각: 2026-07-25 KST.
-- worktree: `/Users/jun/.codex/worktrees/ebcd/opencodex`.
+- worktree: `/Users/jun/.codex/worktrees/ebcd/openprovider`.
 - 현재 체크아웃 상태는 브랜치가 아니라 **detached HEAD**이지만, `HEAD`와 `origin/dev`는 모두 `037e8f5e4fa32a82e4149acc509554f157656dad`이다. 브랜치 checkout은 하지 않는다.
 - PR #430 base/head: `dev` ← `8704ab7bd38d7f98dd4cc9f94deae12642abac6b` (`fix/gemini-empty-content-parts`).
 - PR 원문 diff 길이: 291줄. 대상은 `src/adapters/google.ts` MODIFY, `tests/google-empty-content.test.ts` NEW 두 파일뿐이다.
-- 실행 명령: `gh pr diff 430 --repo lidge-jun/opencodex | git apply --check -`.
+- 실행 명령: `gh pr diff 430 --repo lidge-jun/openprovider | git apply --check -`.
 - 결과: exit 0, stderr/stdout 없음. 기준 `037e8f5e`에 clean apply된다.
 - 독립 리뷰 판정은 `MERGE_OK`: #420의 empty string, empty/malformed text part, empty assistant turn, empty tool result 경로를 막는다. 이 WP의 추가 프로덕션 수정은 금지한다.
 
@@ -32,7 +32,7 @@
 
 ### PR snapshot diff — 그대로 적용
 
-출처: `gh pr diff 430 --repo lidge-jun/opencodex`, head `8704ab7bd38d7f98dd4cc9f94deae12642abac6b`.
+출처: `gh pr diff 430 --repo lidge-jun/openprovider`, head `8704ab7bd38d7f98dd4cc9f94deae12642abac6b`.
 
 ```diff
 diff --git a/src/adapters/google.ts b/src/adapters/google.ts

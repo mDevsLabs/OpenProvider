@@ -23,8 +23,8 @@ For each provider record: registry id, adapter, auth mode, base/region rule, sta
 
 ## Activation scenarios
 
-- `ocx provider list`, `/api/provider-presets`, and GUI show the same shipped provider ids/auth modes.
-- `ocx sync` emits routed catalog rows with no duplicate ids and respects disabled models/context caps.
+- `opr provider list`, `/api/provider-presets`, and GUI show the same shipped provider ids/auth modes.
+- `opr sync` emits routed catalog rows with no duplicate ids and respects disabled models/context caps.
 - One local mock E2E per adapter family proves text, tool, terminal error, abort, and secret redaction.
 - The running proxy is restarted from the built tree and one safe smoke per available credential confirms runtime—not only tests—uses the intended provider.
 
@@ -36,7 +36,7 @@ bun run test
 bun run privacy:scan
 bun run build:gui
 rg -n "Cursor.*unported|xAI.*transport.*missing" devlog/_chase devlog/_plan/260717_non_openai_provider_chase
-cxc loop validate --slug opencodex-openai-xai-provider-chase-durable-docs
+cxc loop validate --slug openprovider-openai-xai-provider-chase-durable-docs
 ```
 
 The final `cxc loop validate` must pass only after all work-phases are done and every met criterion carries captured evidence.

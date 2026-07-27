@@ -41,7 +41,7 @@ let previousOpencodexHome: string | undefined;
 let previousCodexHome: string | undefined;
 
 beforeEach(() => {
-  testDir = mkdtempSync(join(tmpdir(), "ocx-subagent-hr-"));
+  testDir = mkdtempSync(join(tmpdir(), "opr-subagent-hr-"));
   previousOpencodexHome = process.env.OPENCODEX_HOME;
   previousCodexHome = process.env.CODEX_HOME;
   process.env.OPENCODEX_HOME = testDir;

@@ -41,6 +41,6 @@
 - Real OpenAI-encrypted compaction items remain opaque to routed models (note
   only) — nothing decryptable proxy-side by design.
 - WS bridge relays SSE frames as-is; no changes needed (reviewer-verified).
-- The RUNNING ocx instance must be restarted to pick this up.
+- The RUNNING opr instance must be restarted to pick this up.
 
 ## Terminal outcome: DONE

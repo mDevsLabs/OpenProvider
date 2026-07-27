@@ -24,10 +24,10 @@
   (metapi#504, Locus#35; also rejects `metadata`, `max_output_tokens` — strict allowlist).
   Public platform `/v1/responses` DOES support it.
 - codex-rs: HTTP `ResponsesApiRequest` has no `previous_response_id` field; only the WS
-  `ResponseCreateWsRequest` carries it (prefix-continuation reuse). ocx's WS server converts
+  `ResponseCreateWsRequest` carries it (prefix-continuation reuse). opr's WS server converts
   `response.create` into an internal HTTP request → shared handleResponses → forward adapter
   → ChatGPT backend HTTP → 400 whenever the local expansion misses.
-- ocx strips the field only when the in-memory store expanded it
+- opr strips the field only when the in-memory store expanded it
   (src/adapters/openai-responses.ts:61 stripExpandedPreviousResponseId,
   src/server.ts:268 expandPreviousResponseInput). Misses forward it raw (locked by
   tests/openai-responses-passthrough.test.ts:128).

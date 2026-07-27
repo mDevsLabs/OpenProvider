@@ -27,7 +27,7 @@ import {
 let testDir = "";
 
 beforeEach(() => {
-  testDir = mkdtempSync(join(tmpdir(), "ocx-acl-test-"));
+  testDir = mkdtempSync(join(tmpdir(), "opr-acl-test-"));
 });
 
 afterEach(() => {

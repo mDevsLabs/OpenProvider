@@ -18,7 +18,7 @@ GPT Pro found that `schtasks /create /sc onlogon /du 9999:59` does not implement
    - `Exec` command pointing at the generated `.cmd` script;
    - principal run level limited/least privilege.
 4. Change `buildWindowsSchtasksCreateArgs()` to return `/create /tn <TASK> /xml <xmlPath> /f` instead of `/tr`, `/sc`, `/du` flags.
-5. In `installWindows()`, write both `opencodex-service.cmd` and the XML before `schtasks(...)`.
+5. In `installWindows()`, write both `openprovider-service.cmd` and the XML before `schtasks(...)`.
 6. In `uninstallWindows()`, remove the XML file along with the cmd script.
 
 ### MODIFY tests/service.test.ts

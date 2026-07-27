@@ -6,7 +6,7 @@ Close OpenCode Go model metadata drift across the three places that now matter:
 
 1. GJC upstream clone on `dev` at `/Users/jun/Developer/new/700_projects/jawcode/devlog/_upstream_gjc`.
 2. jawcode at `/Users/jun/Developer/new/700_projects/jawcode`.
-3. opencodex generated jawcode metadata at `/Users/jun/Developer/new/700_projects/opencodex`.
+3. openprovider generated jawcode metadata at `/Users/jun/Developer/new/700_projects/openprovider`.
 
 The user-facing bug is that Codex receives wrong context/output limits for routed OpenCode Go
 models. The root cause is that OpenCode Go's `/v1/models` endpoint only exposes
@@ -107,28 +107,28 @@ Apply the same generator-safe patch to:
 
 Run the same targeted and package gates.
 
-### Cycle 4 — opencodex
+### Cycle 4 — openprovider
 
 Modify:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/src/generated/jawcode-model-metadata.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/generated/jawcode-model-metadata.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts`
 - this devlog folder's verification record
 
 Plan:
 
-- Regenerate opencodex jawcode metadata from patched jawcode using
+- Regenerate openprovider jawcode metadata from patched jawcode using
   `bun run generate:jawcode-metadata`.
 - Add/adjust catalog tests for high-risk OpenCode Go entries:
   `glm-5.2`, `qwen3.5-plus`, `kimi-k2.7-code`, `minimax-m3`, `hy3-preview`.
-- Run opencodex targeted tests, full test suite, typecheck, and a local catalog smoke.
+- Run openprovider targeted tests, full test suite, typecheck, and a local catalog smoke.
 
 ## Acceptance Criteria
 
 - GJC `opencode-go` generated rows match official context/output for the 20 tracked models.
 - jawcode `opencode-go` generated rows match official context/output for the 20 tracked models.
-- opencodex generated metadata exposes the corrected rows.
-- Codex catalog entries built by opencodex carry the corrected `context_window`,
+- openprovider generated metadata exposes the corrected rows.
+- Codex catalog entries built by openprovider carry the corrected `context_window`,
   `max_context_window`, and `auto_compact_token_limit`.
 - No token values are printed.
 - No unrelated dirty worktree changes are reverted.

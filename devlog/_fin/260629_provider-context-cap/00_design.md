@@ -9,9 +9,9 @@ safe no-op.
 
 The Models page already lets a user turn individual models on/off and bulk
 enable/disable a provider. This change adds one more provider-level switch:
-when it is on, opencodex will advertise that provider's large-context models to
+when it is on, openprovider will advertise that provider's large-context models to
 Codex as at most 350k context. Smaller models stay unchanged, and the upstream
-request path is not modified. The setting is saved in opencodex config, so it
+request path is not modified. The setting is saved in openprovider config, so it
 survives restart and refreshes the Codex model catalog after each toggle.
 
 ## Current repository shape

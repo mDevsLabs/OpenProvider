@@ -6,7 +6,7 @@ Base: `origin/dev` = `024a929adb9cdad75213e47e1b431a2de8770871`
 
 ## Goal
 
-Prepare opencodex so a later rollout can expose GPT-5.6 Sol/Terra/Luna and the
+Prepare openprovider so a later rollout can expose GPT-5.6 Sol/Terra/Luna and the
 `max` reasoning level with a small switch/default change, while preserving existing
 provider routing behavior.
 
@@ -311,8 +311,8 @@ bun test ./tests/
 Manual smoke after build:
 
 ```bash
-ocx /v1/models
-ocx /v1/models?client_version=dev
+opr /v1/models
+opr /v1/models?client_version=dev
 ```
 
 Check that:

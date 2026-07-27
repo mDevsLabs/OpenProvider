@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-opencodex accepts security fixes on a best-effort basis for these lines:
+openprovider accepts security fixes on a best-effort basis for these lines:
 
 | Version | Supported |
 | --- | --- |

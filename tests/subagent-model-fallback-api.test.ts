@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 function isolatedHome(): void {
-  tempHome = mkdtempSync(join(tmpdir(), "ocx-subagent-fallback-api-"));
+  tempHome = mkdtempSync(join(tmpdir(), "opr-subagent-fallback-api-"));
   process.env.OPENCODEX_HOME = tempHome;
 }
 

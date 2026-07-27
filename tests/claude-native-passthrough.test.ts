@@ -13,8 +13,8 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-claude-native-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-claude-native-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-claude-native-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-claude-native-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 
@@ -187,14 +187,14 @@ test("alias/mapped models and non-anthropic credentials do NOT pass through", as
     const alias = await fetch(new URL("/v1/messages", server.url), {
       method: "POST",
       headers: OAUTH_HEADERS,
-      body: JSON.stringify({ model: "claude-ocx-mock--test-model", max_tokens: 10, messages: [{ role: "user", content: "x" }] }),
+      body: JSON.stringify({ model: "claude-opr-mock--test-model", max_tokens: 10, messages: [{ role: "user", content: "x" }] }),
     });
     expect(alias.status).not.toBe(200);
 
     // Claude model with placeholder bearer -> translate path (no sk-ant credential).
     const placeholder = await fetch(new URL("/v1/messages", server.url), {
       method: "POST",
-      headers: { "content-type": "application/json", "authorization": "Bearer opencodex-local" },
+      headers: { "content-type": "application/json", "authorization": "Bearer openprovider-local" },
       body: JSON.stringify({ model: "claude-fable-5", max_tokens: 10, messages: [{ role: "user", content: "x" }] }),
     });
     expect(placeholder.status).not.toBe(200);

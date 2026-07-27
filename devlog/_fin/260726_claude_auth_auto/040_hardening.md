@@ -149,7 +149,7 @@ No new defence in this unit — an honest coverage check instead:
   `ANTHROPIC_AUTH_TOKEN` is NOT injected and the mode resolves subscription.
   Absent case: fixture home (`HOME`-redirected deps in a unit test already; for the
   smoke, run the resolver against an empty temp home and show auto→proxy).
-  Feedback-loop case: pre-set `ANTHROPIC_AUTH_TOKEN=opencodex-proxy` in the smoke env
+  Feedback-loop case: pre-set `ANTHROPIC_AUTH_TOKEN=openprovider-proxy` in the smoke env
   and show it is DELETED on the subscription resolution.
 
 ## D-phase record

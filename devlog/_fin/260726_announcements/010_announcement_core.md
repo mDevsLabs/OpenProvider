@@ -52,7 +52,7 @@ Add to `OcxConfig`, beside the existing optional feature fields:
 ```
 
 **`firstRun` was removed** (see `031` § D1). It recorded whether the config FILE
-was absent at stamp time, but the file is written by `ocx init`, startup seeding,
+was absent at stamp time, but the file is written by `opr init`, startup seeding,
 port fallback and OAuth login — so it measured whether the user opened the
 dashboard before the CLI, not whether they were new. WP-D derives newness from
 an explicit install marker instead (`031` § D1′), written once by the first

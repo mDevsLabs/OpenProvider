@@ -84,7 +84,7 @@ return new ReadableStream<Uint8Array>({
 });
 ```
 
-For the **passthrough** path opencodex returns `upstreamResponse.body` directly; to abort the
+For the **passthrough** path openprovider returns `upstreamResponse.body` directly; to abort the
 upstream on client cancel, pipe it through a pass-through `TransformStream` whose `cancel()`
 calls `ac.abort()` (or rely on the runtime propagating cancel to the signalled fetch — verify
 in Bun). The minimal, certain win is passing `signal` so an explicit abort is possible.
@@ -166,7 +166,7 @@ the stream — that case needs different handling).
    - RC5 header-preservation test (P1b).
 2. **Static:** `bun x tsc --noEmit` clean; `git diff --check`.
 3. **Regression:** full `bun test` stays green (baseline 26 pass / 0 fail).
-4. **Live (user environment):** run the Codex CLI against `ocx` with a **routed** model over
+4. **Live (user environment):** run the Codex CLI against `opr` with a **routed** model over
    a multi-turn session that includes interrupts; confirm the absence of `ApiError::Stream`
    ("stream closed before response.completed" / "idle timeout") and no leaked upstream
    connections. This is the acceptance gate — the symptom is only fully reproducible with a

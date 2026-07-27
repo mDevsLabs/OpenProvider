@@ -10,10 +10,10 @@ Code에서 OAuth 로그인, 계정 풀, 키 장애 조치, 사이드카를 포�
 ## 빠른 시작
 
 ```bash
-ocx claude
+opr claude
 ```
 
-`ocx claude`는 프록시가 실행 중인지 확인한 다음, 환경을 연결해 Claude Code를 실행해요.
+`opr claude`는 프록시가 실행 중인지 확인한 다음, 환경을 연결해 Claude Code를 실행해요.
 
 | 변수 | 값 |
 | --- | --- |
@@ -26,7 +26,7 @@ ocx claude
 | `ANTHROPIC_DEFAULT_{OPUS,SONNET,FABLE}_MODEL` | `claudeCode.tierModels.*` (선택 사항) |
 | `CLAUDE_CODE_ALWAYS_ENABLE_EFFORT` | `alwaysEnableEffort`가 켜져 있으면 `1` (조건부) |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS` / `DISABLE_COMPACT` | `maxContextTokens`가 설정된 경우 기존 컨텍스트 재정의 값 (조건부) |
-직접 내보낸 변수가 항상 우선해요. 추가 인자는 그대로 전달돼요: `ocx claude -p "hello"`.
+직접 내보낸 변수가 항상 우선해요. 추가 인자는 그대로 전달돼요: `opr claude -p "hello"`.
 
 ## 인증 모드
 
@@ -43,29 +43,29 @@ Claude Code가 게이트웨이와 통신하려면 `ANTHROPIC_AUTH_TOKEN`에 토�
 | 확인 실패(키체인 접근 거부, 파일 손상 등) | 구독으로 간주하고 경고를 출력해요. 읽기에 실패했다고 구독자를 프록시로 옮기지는 않아요 |
 
 이 판단은 저장하지 않고 실행할 때마다 다시 계산해요. 그래서 로그인하거나 로그아웃하면 다음
-`ocx claude`부터 알아서 반영돼요.
+`opr claude`부터 알아서 반영돼요.
 
 고정하고 싶다면 **구독** 또는 **프록시**를 직접 선택하세요. 직접 고른 값은 `claudeCode.authMode`에
 저장되고, 이후에 로그인 상태가 바뀌어도 자동 감지가 이 값을 덮어쓰지 않아요. 다시 자동으로
 돌리면 판단을 OpenProvider에 넘겨요.
 
-macOS의 자동 연결(`claudeCode.systemEnv`)도 같은 방식으로 판단하므로, `ocx` 없이 실행한 `claude`도
+macOS의 자동 연결(`claudeCode.systemEnv`)도 같은 방식으로 판단하므로, `opr` 없이 실행한 `claude`도
 동일하게 동작해요. 다만 이쪽은 프록시가 시작하거나 설정을 저장할 때 갱신되는 스냅숏이고,
-`ocx claude`는 실행할 때마다 실시간으로 판단해요.
+`opr claude`는 실행할 때마다 실시간으로 판단해요.
 
 ## 시스템 환경 통합(macOS)
 
-`claudeCode.systemEnv`를 `true`로 설정하면(기본값: **꺼짐**) `ocx start`가 `launchctl setenv`를
+`claudeCode.systemEnv`를 `true`로 설정하면(기본값: **꺼짐**) `opr start`가 `launchctl setenv`를
 사용해 `ANTHROPIC_BASE_URL`과 관련 Claude Code 환경 변수를 시스템 전체에 주입해요. 따라서 새
-터미널 창과 탭에서는 `ocx claude` 래퍼 없이 일반 `claude` 명령도 프록시를 거쳐요. 이미 열려
+터미널 창과 탭에서는 `opr claude` 래퍼 없이 일반 `claude` 명령도 프록시를 거쳐요. 이미 열려
 있는 셸에는 적용되지 않으므로 다시 열어야 해요.
 
-`ocx stop`과 프록시 종료는 **주입된 키를 해제해요**. 이전 값을 복원하지는 않고 OpenProvider가
-주입한 키만 제거해요. 프록시는 `~/.OpenProvider/claude-env.sh`도 작성하고, `ocx start`는 이 파일을
+`opr stop`과 프록시 종료는 **주입된 키를 해제해요**. 이전 값을 복원하지는 않고 OpenProvider가
+주입한 키만 제거해요. 프록시는 `~/.OpenProvider/claude-env.sh`도 작성하고, `opr start`는 이 파일을
 자동으로 불러오는 `.zshrc` source hook을 설치해요.
 
 설정에서 `claudeCode.systemEnv: false`로 지정하거나 GUI 토글로 끌 수 있어요. 이 기능은 macOS
-전용이며, 다른 플랫폼에서는 `ocx claude`를 사용하세요.
+전용이며, 다른 플랫폼에서는 `opr claude`를 사용하세요.
 
 ## 네이티브 Claude 패스스루(구독 직접 연결)
 
@@ -80,7 +80,7 @@ macOS의 자동 연결(`claudeCode.systemEnv`)도 같은 방식으로 판단하�
 
 다음 네 조건을 **모두** 충족하면 패스스루가 작동해요. `nativePassthrough`가 `false`가 아니고,
 모델 이름이 `claude` 또는 `anthropic`으로 시작하며, bearer 또는 `x-api-key`가 `sk-ant-`로
-시작하고, 별칭/모델 맵 해석 결과가 변경되지 않은 같은 모델이어야 해요. 그래서 `ocx claude`를
+시작하고, 별칭/모델 맵 해석 결과가 변경되지 않은 같은 모델이어야 해요. 그래서 `opr claude`를
 사용할 때 "claude.ai connectors are disabled" 경고도 더 이상 나타나지 않아요.
 
 `claudeCode.nativePassthrough: false`로 끌 수 있고, `claudeCode.anthropicBaseUrl`로 다른 주소를
@@ -91,7 +91,7 @@ macOS의 자동 연결(`claudeCode.systemEnv`)도 같은 방식으로 판단하�
 능력 정보(추론 강도 사다리, thinking 타입)를 실어 보냅니다 — Claude Desktop의 서드파티
 게이트웨이 모드가 추론 강도 선택 UI를 열 수 있게 하기 위해서입니다. 실제 Anthropic 모델은
 원래 id를 그대로 유지합니다. 합성된 2026 날짜는 내부 슬롯이며 출시일이 아닙니다. 구버전의
-해시 별칭과 `claude-ocx-<provider>--<model>` 별칭도 계속 해석됩니다. 컨텍스트가 1M인 모델에는
+해시 별칭과 `claude-opr-<provider>--<model>` 별칭도 계속 해석됩니다. 컨텍스트가 1M인 모델에는
 `…[1m]` 행이 하나 더 생깁니다 — 이걸 고르면 Claude Code가 그 모델의 컨텍스트를 1M로 계산합니다
 (자동 요약 유지, 프록시가 표식을 떼고 라우팅). 선택하면 Claude Code의
 `settings.json` `model` 필드에 저장되고, 인바운드 요청에서
@@ -104,7 +104,7 @@ Claude Code 2.1.129 이상은 `GET /v1/models?limit=1000`에서 게이트웨이 
 
 | 화면 | 형식 | 예시 |
 | --- | --- | --- |
-| Claude Code CLI | `claude-ocx-<provider>--<model>` | `claude-ocx-native--gpt-5.6-sol` |
+| Claude Code CLI | `claude-opr-<provider>--<model>` | `claude-opr-native--gpt-5.6-sol` |
 | Claude Desktop 3P | `claude-opus-4-8-<code>` (3자리 base36 해시) | `claude-opus-4-8-ncb` |
 
 프록시는 요청마다 계열을 골라요. `?ids=cli` 또는 `?ids=desktop`이 우선하고, 지정하지 않으면
@@ -156,7 +156,7 @@ Claude 페이지에서 압축 값을 조절할 수 있어요. **경고:** 모델
 
 ### 실제 모델 환경
 
-`effectiveModelEnv`는 `ocx claude` / 시스템 환경 / 셸 파일이 주입할 슬롯 여섯 개를 계산해요.
+`effectiveModelEnv`는 `opr claude` / 시스템 환경 / 셸 파일이 주입할 슬롯 여섯 개를 계산해요.
 `ANTHROPIC_MODEL`, 네 개의 `ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU,FABLE}_MODEL`, 기존
 `ANTHROPIC_SMALL_FAST_MODEL`이에요. 실제 Haiku 값은 `tierModels.haiku ?? smallFastModel`이며,
 두 Haiku 변수에 모두 들어가요.
@@ -165,22 +165,22 @@ Claude 페이지에서 압축 값을 조절할 수 있어요. **경고:** 모델
 
 ## 로스터 에이전트(injectAgents)
 
-`ocx claude`와 시스템 환경 데몬은 추천 서브에이전트 로스터(Subagents 탭, 최대 5개 모델)와
-`ocx-self`를 `~/.claude/agents/ocx-*.md`에 동기화해요.
+`opr claude`와 시스템 환경 데몬은 추천 서브에이전트 로스터(Subagents 탭, 최대 5개 모델)와
+`opr-self`를 `~/.claude/agents/opr-*.md`에 동기화해요.
 
-- **`ocx-self`**는 `/model` 선택기의 기본값을 고정하고, 값이 없으면 `claudeCode.model`을 사용해요.
+- **`opr-self`**는 `/model` 선택기의 기본값을 고정하고, 값이 없으면 `claudeCode.model`을 사용해요.
   둘 다 없으면 만들지 않아요. 모델 상속은 사용하지 않아요.
-- 각 에이전트 본문에는 `<!-- ocx-route: <model> -->` 지시문이 들어 있어요. 프록시는 이 지시문으로
+- 각 에이전트 본문에는 `<!-- opr-route: <model> -->` 지시문이 들어 있어요. 프록시는 이 지시문으로
   실제 라우트를 고정해요. 따라서 Agent 도구의 `model` 인자는 작동하지 않으며, 자리 표시자로
   `"haiku"`를 전달하세요.
 - frontmatter에는 별칭이 들어가고, 라우팅은 지시문을 따라요.
-- `generated-by: OpenProvider`가 들어 있는 표식 검증된 `ocx-*.md` 파일만 덮어쓰거나 정리해요.
+- `generated-by: OpenProvider`가 들어 있는 표식 검증된 `opr-*.md` 파일만 덮어쓰거나 정리해요.
   사용자가 만든 에이전트는 건드리지 않아요.
 - 파일마다 원자적으로 동기화해요(write + rename).
 - `enabled: false` 또는 `injectAgents: false`를 설정하면 소유권이 확인된 정의를 모두 정리해요.
 - GUI PUT과 로스터 변경은 즉시 다시 동기화하고, launcher/system-env는 실행할 때 동기화해요.
 
-디스패치 예시: `subagent_type: "ocx-gpt-5-6-sol"`. 1M을 지원하는 대상에는 `[1m]`이 자동으로
+디스패치 예시: `subagent_type: "opr-gpt-5-6-sol"`. 1M을 지원하는 대상에는 `[1m]`이 자동으로
 붙어요.
 
 ## 번들 스킬 생략(blockedSkills)
@@ -345,7 +345,7 @@ role, `tool_use_id` 없는 `tool_result`, id/name 없는 `tool_use`, name 없는
 
 ## 디버그 캡처
 
-`ocx debug claude on|off|status|reset`, `OCX_CLAUDE_DEBUG=1` 또는
+`opr debug claude on|off|status|reset`, `OCX_CLAUDE_DEBUG=1` 또는
 `PUT /api/debug {"claude": true}`로 입력 캡처를 제어해요. `GET /api/claude/inbound-debug`는
 `{enabled, entries}`를 반환해요(최신 항목부터, 20개 순환 버퍼).
 
@@ -361,7 +361,7 @@ role, `tool_use_id` 없는 `tool_result`, id/name 없는 `tool_use`, name 없는
 레이블은 모든 언어에서 의도적으로 같아요. 페이지에는 다음 항목이 표시돼요.
 
 - 입력 차단 스위치(사용 토글)
-- 빠른 시작(`ocx claude`)과 수동 환경 블록
+- 빠른 시작(`opr claude`)과 수동 환경 블록
 - Fast Mode 선택기(Auto / ON / OFF)
 - 자동 컨텍스트 토글과 압축 임곗값 드롭다운
 - 서브에이전트 자동 등록 토글
@@ -385,18 +385,18 @@ Anthropic OAuth 활성 계정이 `needsReauth` 상태가 아닌지 확인하세�
 Anthropic 백엔드를 명시하면 의도적으로 실패 후 중단해요.
 
 **"claude.ai connectors are disabled"** — 셸에 `ANTHROPIC_API_KEY` 또는
-`ANTHROPIC_AUTH_TOKEN`이 설정되어 있어요. `ocx claude`는 의도적으로 `ANTHROPIC_API_KEY`를
-설정하지 않으므로, 직접 내보냈다면 해제하세요. `ocx claude`를 사용할 때는
+`ANTHROPIC_AUTH_TOKEN`이 설정되어 있어요. `opr claude`는 의도적으로 `ANTHROPIC_API_KEY`를
+설정하지 않으므로, 직접 내보냈다면 해제하세요. `opr claude`를 사용할 때는
 `ANTHROPIC_BASE_URL`, 검색, 자동 컨텍스트, 설정된 모델 슬롯을 주입하지만
 `ANTHROPIC_API_KEY`는 절대 주입하지 않아요.
 
 **/model 선택기에 모델이 표시되지 않음** — `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1`이
-설정되어 있는지 확인하세요(`ocx claude`에서는 자동). `ocx claude`를 실행해
+설정되어 있는지 확인하세요(`opr claude`에서는 자동). `opr claude`를 실행해
 `~/.claude/cache/gateway-models.json`의 게이트웨이 모델 캐시를 새로 고치세요.
 `claudeCode.enabled`가 `false`가 아닌지도 확인하세요.
 
 **포트 변경 뒤 오래된 환경이 남음** — 프록시 포트가 바뀌었다면 기존 셸의
-`ANTHROPIC_BASE_URL`이 오래된 값일 수 있어요. 새 터미널을 열거나 `ocx claude`를 다시 실행하세요.
+`ANTHROPIC_BASE_URL`이 오래된 값일 수 있어요. 새 터미널을 열거나 `opr claude`를 다시 실행하세요.
 
 **대형 모델인데도 컨텍스트가 200k로 제한됨** — 선택기에서 `[1m]` 변형을 고르거나 기본으로
 켜져 있는 자동 컨텍스트를 사용하세요. 선택기에 `[1m]` 행이 없다면 모델의 공식 컨텍스트 창이
@@ -406,7 +406,7 @@ Anthropic 백엔드를 명시하면 의도적으로 실패 후 중단해요.
 언급하면 자동으로 불러와요. 네이티브 패스스루에서는 정상이며, 라우팅 모델에서는 OpenProvider가
 기본적으로 스텁으로 바꿔요(`blockedSkills: ["claude-api"]`).
 
-**서브에이전트가 잘못된 모델로 디스패치됨** — 로스터 에이전트(`ocx-*`)는 Agent 도구의 `model`
-인자가 아니라 `<!-- ocx-route: ... -->` 지시문을 사용해요. 지시문이 원하는 라우트와 일치하는지
+**서브에이전트가 잘못된 모델로 디스패치됨** — 로스터 에이전트(`opr-*`)는 Agent 도구의 `model`
+인자가 아니라 `<!-- opr-route: ... -->` 지시문을 사용해요. 지시문이 원하는 라우트와 일치하는지
 확인하고, 모델 자리 표시자로 `"haiku"`를 전달하세요.
 

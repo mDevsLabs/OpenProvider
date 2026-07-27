@@ -135,7 +135,7 @@ describe("Cursor MCP manager", () => {
     const defs = await buildMcpToolDefinitions(manager);
     const echo = defs.find(d => d.toolName === "echo");
     expect(echo).toBeDefined();
-    expect(echo?.providerIdentifier).toBe("opencodex");
+    expect(echo?.providerIdentifier).toBe("openprovider");
     const schema = toJson(ValueSchema, fromBinary(ValueSchema, echo!.inputSchema)) as { type?: string };
     expect(schema.type).toBe("object");
   });
@@ -147,7 +147,7 @@ describe("Cursor MCP deps via native-exec dispatcher", () => {
     const manager = makeManager(clientTransport);
     const deps = mcpDepsFromManager(manager);
 
-    const args = create(McpArgsSchema, { name: "echo", toolName: "echo", providerIdentifier: "opencodex" });
+    const args = create(McpArgsSchema, { name: "echo", toolName: "echo", providerIdentifier: "openprovider" });
     args.args = { text: textEncoder.encode(JSON.stringify("world")) };
 
     const reply = decode((await handleCursorNativeExec(execMessage({ case: "mcpArgs", value: args }), deps))[0]);
@@ -166,7 +166,7 @@ describe("Cursor MCP deps via native-exec dispatcher", () => {
     const manager = makeManager(clientTransport);
     const deps = mcpDepsFromManager(manager);
 
-    const args = create(McpArgsSchema, { name: "shot", toolName: "shot", providerIdentifier: "opencodex" });
+    const args = create(McpArgsSchema, { name: "shot", toolName: "shot", providerIdentifier: "openprovider" });
     const reply = decode((await handleCursorNativeExec(execMessage({ case: "mcpArgs", value: args }), deps))[0]);
     expect(reply.message.case).toBe("mcpResult");
     expect(reply.message.value.result.case).toBe("success");
@@ -188,7 +188,7 @@ describe("Cursor MCP deps via native-exec dispatcher", () => {
     const manager = makeManager(clientTransport);
     const deps = mcpDepsFromManager(manager);
 
-    const args = create(McpArgsSchema, { name: "ghost", toolName: "ghost", providerIdentifier: "opencodex" });
+    const args = create(McpArgsSchema, { name: "ghost", toolName: "ghost", providerIdentifier: "openprovider" });
     const reply = decode((await handleCursorNativeExec(execMessage({ case: "mcpArgs", value: args }), deps))[0]);
     expect(reply.message.case).toBe("mcpResult");
     expect(reply.message.value.result.case).toBe("toolNotFound");
@@ -200,7 +200,7 @@ describe("Cursor MCP deps via native-exec dispatcher", () => {
     const manager = makeManager(clientTransport);
     const deps = mcpDepsFromManager(manager);
 
-    const args = create(McpArgsSchema, { name: "boom", toolName: "boom", providerIdentifier: "opencodex" });
+    const args = create(McpArgsSchema, { name: "boom", toolName: "boom", providerIdentifier: "openprovider" });
     const reply = decode((await handleCursorNativeExec(execMessage({ case: "mcpArgs", value: args }), deps))[0]);
     expect(reply.message.case).toBe("mcpResult");
     expect(reply.message.value.result.case).toBe("success");

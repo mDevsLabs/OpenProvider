@@ -20,12 +20,12 @@ export function historyRestoreIncomplete(configDir = getConfigDir()): boolean {
 }
 
 export const PKG = "@mdevs/openprovider";
-const HERE = dirname(fileURLToPath(import.meta.url)); // .../opencodex/src/update
+const HERE = dirname(fileURLToPath(import.meta.url)); // .../openprovider/src/update
 
 export type Installer = "bun" | "npm" | "source";
 export type Channel = "latest" | "preview";
 
-/** Infer how opencodex is installed from the running module's path. */
+/** Infer how openprovider is installed from the running module's path. */
 export function detectInstall(): Installer {
   if (!HERE.includes("node_modules")) return "source"; // a git checkout, not a global install
   return HERE.includes(".bun") ? "bun" : "npm";
@@ -84,7 +84,7 @@ export function latestVersion(tag: string): string | null {
   return r.status === 0 ? (r.stdout.trim() || null) : null;
 }
 
-/** The global-install command opencodex would run to update on this channel. */
+/** The global-install command openprovider would run to update on this channel. */
 export function updateCommand(installer: Installer, tag: Channel, resolvedVersion?: string | null): { bin: string; args: string[] } {
   const bin = installer === "bun" ? "bun" : "npm";
   // Immutable target: when the registry resolved a concrete version, install exactly
@@ -131,14 +131,14 @@ export function checkUpdatePackageIntegrity(
 }
 
 /**
- * `ocx update` fallback for source checkouts and Bun global installs. npm global installs are updated
+ * `opr update` fallback for source checkouts and Bun global installs. npm global installs are updated
  * in the Node bin launcher before Bun starts, so Windows does not replace the running Bun binary.
  */
 export async function runUpdate(): Promise<void> {
   const installer = detectInstall();
   const current = currentVersion();
   const tag = updateTag(current);
-  console.log(`opencodex v${current} (installed via ${installer}, tag ${tag})`);
+  console.log(`openprovider v${current} (installed via ${installer}, tag ${tag})`);
 
   if (installer === "source") {
     console.log("Running from a source checkout — update with:  git pull && bun install");
@@ -164,7 +164,7 @@ export async function runUpdate(): Promise<void> {
     console.log(`Verified ${PKG}@${latest} integrity metadata ${integrity.integrity.slice(0, 24)}…`);
   }
 
-  // Remember whether a background service manages the proxy BEFORE stopping — `ocx stop`
+  // Remember whether a background service manages the proxy BEFORE stopping — `opr stop`
   // unloads it permanently, so a successful update must reinstall/restart it afterwards.
   let serviceWasInstalled = false;
   try {
@@ -210,8 +210,8 @@ export async function runUpdate(): Promise<void> {
   // Never replace package files under a live proxy: the running server dynamic-imports
   // modules after startup, so an in-place update leaves it executing mixed old/new code.
   // Gate on the service and the runtime-port record too, not just the pid file — a
-  // service-managed or orphaned proxy can be live while ocx.pid is stale/missing.
-  // Full `ocx stop` semantics (drain, service stop, restore).
+  // service-managed or orphaned proxy can be live while opr.pid is stale/missing.
+  // Full `opr stop` semantics (drain, service stop, restore).
   if (serviceWasInstalled || readPid() || readRuntimePort()) {
     console.log("⏹  Stopping the running proxy before updating...");
     const stopStdio = updateChildStdio();
@@ -228,14 +228,14 @@ export async function runUpdate(): Promise<void> {
           startWindowsTray();
         } catch { /* preserve the proxy stop failure */ }
       }
-      console.error("⚠️  Could not stop the running proxy; aborting the update. Run 'ocx stop' and retry.");
+      console.error("⚠️  Could not stop the running proxy; aborting the update. Run 'opr stop' and retry.");
       process.exit(1);
     }
     if (historyRestoreIncomplete()) {
       console.warn(
         "⚠️  Codex resume history was NOT restored (history DB locked — Codex app/IDE open?).\n" +
         "    Your routed threads stay hidden in the native Codex app until restored.\n" +
-        "    After the update: close the Codex app, then run 'ocx stop' once to restore.",
+        "    After the update: close the Codex app, then run 'opr stop' once to restore.",
       );
     }
   }
@@ -272,7 +272,7 @@ export async function runUpdate(): Promise<void> {
       if (tray.status === 0) {
         console.log("🔧 Refreshed Windows tray startup paths.");
       } else {
-        console.warn("⚠️  Windows tray refresh failed. Run 'ocx tray install'.");
+        console.warn("⚠️  Windows tray refresh failed. Run 'opr tray install'.");
         if (trayWasRunning) spawnSync(process.execPath, [process.argv[1], "tray", "start"], { stdio: "ignore", windowsHide: true });
       }
     }
@@ -310,10 +310,10 @@ export async function runUpdate(): Promise<void> {
           // leaves the user without a running proxy — but only when the port is free.
           if (!freed) {
             console.warn("⚠️  Service refresh failed and the captured port is still busy; not starting on another port.");
-            console.warn(`   Run 'ocx service install' as administrator, then 'ocx start --port ${capturedListen.port}'.`);
+            console.warn(`   Run 'opr service install' as administrator, then 'opr start --port ${capturedListen.port}'.`);
           } else {
             console.warn("⚠️  Service refresh failed — starting the proxy directly instead.");
-            console.warn("   Run 'ocx service install' as administrator to refresh the background service.");
+            console.warn("   Run 'opr service install' as administrator to refresh the background service.");
             const env = { ...process.env };
             delete env.OCX_SERVICE;
             const child = spawn(process.execPath, [process.argv[1], "start", "--port", String(capturedListen.port)], {
@@ -331,7 +331,7 @@ export async function runUpdate(): Promise<void> {
         else process.env.OCX_BAKE_PORT = prevBake;
       }
     } else {
-      console.log(`Restart the proxy:  ocx start --port ${capturedListen.port}`);
+      console.log(`Restart the proxy:  opr start --port ${capturedListen.port}`);
     }
   } else {
     if (trayWasRunning) {

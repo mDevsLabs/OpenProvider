@@ -231,7 +231,7 @@ test("shell bridge aliases reject empty or malformed commands across both wire f
       name: entry.tool,
       toolName: entry.tool,
       toolCallId: callId,
-      providerIdentifier: "opencodex-responses",
+      providerIdentifier: "openprovider-responses",
       args: entry.args,
     });
 
@@ -265,7 +265,7 @@ test("rejection survives cmd-to-command schema normalization", () => {
     name: "shell_command",
     toolName: "shell_command",
     toolCallId: callId,
-    providerIdentifier: "opencodex-responses",
+    providerIdentifier: "openprovider-responses",
     args: { cmd: jsonBytes("  ") },
   });
 

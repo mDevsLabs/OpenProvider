@@ -11,7 +11,7 @@
    ~:396) then adds `AND threads.model_provider IN (...)` plus `archived = 0` and
    `preview <> ''`. TUI resume picker does the same (`tui/src/resume_picker.rs` ~:1818).
    → With native config restored (`model_provider_id = openai`-ish), every thread still
-   tagged `opencodex` is **invisible in list views**. While opencodex's config is injected,
+   tagged `openprovider` is **invisible in list views**. While openprovider's config is injected,
    the tag is what MAKES threads listable/resumable — the re-tag design is load-bearing.
 
 2. **Pinned bypasses the filter.** No pinned storage in the Rust crates (app-side store);
@@ -31,7 +31,7 @@
    `backfill_state.status != Complete` (+lease), so not every start — but any re-backfill
    makes ROLLOUT content authoritative over the DB. Consequence: a restore that fixes only
    the DB but not the rollout meta (or vice versa) can be undone/half-undone later.
-   opencodex's dual writes (line-1 in-place patch + trailing append) are therefore both
+   openprovider's dual writes (line-1 in-place patch + trailing append) are therefore both
    necessary; `read_head_summary` (`rollout/src/list.rs` ~:1100) reads ONLY line 1.
 
 5. `session_index.jsonl` is an append-only name index (`rollout/src/session_index.rs`) —
@@ -39,7 +39,7 @@
 
 ## Design options for loop 2 (decision needed)
 
-- **A. Keep re-tag design** (status quo + loop-1 hardening + `ocx restore`/`restore back`
+- **A. Keep re-tag design** (status quo + loop-1 hardening + `opr restore`/`restore back`
   manual switch). Residual risk: any failed restore hides history until a retry.
 - **B. Stop re-tagging entirely: inject by overriding the `openai` provider id** (keep
   `model_provider_id = openai`, point its base_url at the proxy). Threads never change

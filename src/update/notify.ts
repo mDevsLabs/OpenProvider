@@ -217,7 +217,7 @@ function renderPrompt(current: string, latest: string, channel: Channel): string
 }
 
 /**
- * Interactive-only update prompt for `ocx start`. Must be called BEFORE the
+ * Interactive-only update prompt for `opr start`. Must be called BEFORE the
  * server binds a port / writes a PID, because "Update now" installs globally
  * and exits. No-op for service/daemon/non-TTY runs and source checkouts.
  * Never throws.
@@ -245,7 +245,7 @@ export async function maybeShowUpdatePrompt(): Promise<void> {
     const choice = answer === "" ? "1" : answer;
     if (choice === "1") {
       await runUpdate();
-      console.log("\nRestart the proxy:  ocx start");
+      console.log("\nRestart the proxy:  opr start");
       process.exit(0);
     } else if (choice === "3") {
       dismissVersion(channel, latest);

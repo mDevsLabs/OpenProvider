@@ -5,16 +5,16 @@
 
 ## Part 1 — Easy explanation
 
-opencodex will be able to **actually run MCP tools** that a Cursor model asks for.
+openprovider will be able to **actually run MCP tools** that a Cursor model asks for.
 
 Flow:
 1. You declare MCP servers in your provider config (`mcpServers`), just like Claude
    Desktop / any MCP host: a `command` + `args` to spawn, or a `url` for a remote server.
-2. When a Cursor stream starts, opencodex lazily connects to those servers, asks each
+2. When a Cursor stream starts, openprovider lazily connects to those servers, asks each
    *"what tools do you have?"*, and tells Cursor's server *"these tools are available"*
    (this is the `requestContext` advertise step that is currently empty).
 3. When the Cursor model decides to call one of those tools, Cursor's server sends
-   opencodex an `mcpArgs` request. opencodex finds the right server, calls the tool for
+   openprovider an `mcpArgs` request. openprovider finds the right server, calls the tool for
    real, and returns the real result.
 4. The model can also list/read MCP resources, which now hit the live servers too.
 
@@ -103,7 +103,7 @@ export class CursorMcpManager {
 ```
 
 Uses SDK API verified 2026-06-27:
-`new Client({name:"opencodex",version})`, `client.connect(transport)`,
+`new Client({name:"openprovider",version})`, `client.connect(transport)`,
 `client.listTools()`, `client.callTool({name,arguments})`,
 `client.listResources({cursor})`, `client.readResource({uri})`.
 
@@ -133,7 +133,7 @@ export async function buildMcpToolDefinitions(manager: CursorMcpManager): Promis
   return handles.map(h => create(McpToolDefinitionSchema, {
     name: h.advertisedName,
     toolName: h.advertisedName,
-    providerIdentifier: "opencodex",
+    providerIdentifier: "openprovider",
     description: h.description,
     inputSchema: textEncoder.encode(JSON.stringify(h.inputSchema ?? {})),
   }));
@@ -202,7 +202,7 @@ Mapping helpers `decodeMcpArgs`, `toContentItem`, plus `errorText` (reuse from
 
 ```ts
   // after liveModels / headers block, near other cursor-only options
-+  /** Cursor adapter: MCP servers opencodex starts/connects and exposes as callable tools. */
++  /** Cursor adapter: MCP servers openprovider starts/connects and exposes as callable tools. */
 +  mcpServers?: Record<string, import("./adapters/cursor/mcp-config").CursorMcpServerConfig>;
 ```
 

@@ -50,7 +50,7 @@ export function AutoConnectSetting({
           <span className="desc">{t("claude.systemEnvDesc")}</span>
         ) : (
           <span className="desc" id={unsupportedDescriptionId}>
-            <Trans k="claude.systemEnvUnsupported" cmd="ocx claude" />
+            <Trans k="claude.systemEnvUnsupported" cmd="opr claude" />
           </span>
         )}
         {supported && checked && (

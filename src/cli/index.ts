@@ -68,7 +68,7 @@ maybeAutoRestoreCodexShim(command, args);
 function parsePortOption(): number | undefined {
   if (args.length === 1) return undefined;
   if (args.length !== 3 || args[1] !== "--port") {
-    console.error("Usage: ocx start [--port <port>]");
+    console.error("Usage: opr start [--port <port>]");
     process.exit(1);
   }
   const portIdx = args.indexOf("--port");
@@ -109,7 +109,7 @@ async function chooseListenPort(requestedPort?: number): Promise<number> {
   const hardPin = requestedPort !== undefined && requestedPort > 0;
   // Soft start: brief prefer-retry then ephemeral hop.
   // Explicit `--port` (service wrappers / update restart): wait for the pinned port
-  // to free without killing any listener (healthy ocx / foreign). Never hop.
+  // to free without killing any listener (healthy opr / foreign). Never hop.
   if (hardPin && preferred > 0) {
     const { reclaimListenPort } = await import("../server/port-reclaim");
     await reclaimListenPort(preferred, config.hostname ?? "127.0.0.1", {
@@ -127,7 +127,7 @@ async function chooseListenPort(requestedPort?: number): Promise<number> {
       allowEphemeralFallback: !hardPin,
     });
     if (preferred > 0 && selected !== preferred) {
-      console.log(`⚠️  Port ${preferred} is busy; starting opencodex on ${selected}.`);
+      console.log(`⚠️  Port ${preferred} is busy; starting openprovider on ${selected}.`);
     }
     if (shouldPersistSelectedPort(config.port, selected, preferred)) {
       config.port = selected;
@@ -156,7 +156,7 @@ async function handleStart(options: { block?: boolean } = {}) {
   if (existingPid) {
     const live = await findLiveProxy();
     if (live) {
-      console.error(`⚠️  Proxy already running (PID ${live.pid ?? existingPid}, port ${live.port}). Use 'ocx stop' first.`);
+      console.error(`⚠️  Proxy already running (PID ${live.pid ?? existingPid}, port ${live.port}). Use 'opr stop' first.`);
       process.exit(1);
     }
     removePid(existingPid);
@@ -167,7 +167,7 @@ async function handleStart(options: { block?: boolean } = {}) {
   // live daemon holding resources while it overwrites its own binary.
   await maybeShowUpdatePrompt();
 
-  // Port selection is check-then-bind: a concurrent `ocx start`/`ensure` can win the port
+  // Port selection is check-then-bind: a concurrent `opr start`/`ensure` can win the port
   // between the probe and Bun.serve. Soft starts may re-pick; hard-pinned `--port` retries
   // the same port only (never hop — that was the remaining PR #152 gap).
   let port = await chooseListenPort(requestedPort);
@@ -206,8 +206,8 @@ async function handleStart(options: { block?: boolean } = {}) {
   // Background proactive token refresh. No-op unless config.tokenGuardian.enabled; timer is unref'd
   // so it never keeps the process alive on its own. Stopped in syncCleanup so no refresh fires mid-drain.
   const guardian = startTokenGuardian();
-  // Design B upgrade path: keep retrying the one-time opencodex→openai history migration in the
-  // background — the first `ocx start` after an update usually races the Codex app's DB lock.
+  // Design B upgrade path: keep retrying the one-time openprovider→openai history migration in the
+  // background — the first `opr start` after an update usually races the Codex app's DB lock.
   // Loopback-only (legacy mode still forward-tags) and respects syncResumeHistory opt-out.
   let historyGuardian: ReturnType<typeof startHistoryMigrationGuardian> | undefined;
 
@@ -223,7 +223,7 @@ async function handleStart(options: { block?: boolean } = {}) {
     if (!process.env.OCX_SERVICE && !currentExternalCodexModelProvider()) {
       try { restoreNativeCodex(); } catch { /* best-effort restore */ }
     }
-    // Same ownership rule as `ocx stop`: if the installed service belongs to another home, the
+    // Same ownership rule as `opr stop`: if the installed service belongs to another home, the
     // Grok fence is shared state we must not remove — that service keeps running and would be
     // left pointing nowhere. This guard also covers signal-driven exits, which is the path that
     // would otherwise bypass handleStop's gate entirely.
@@ -249,7 +249,7 @@ async function handleStart(options: { block?: boolean } = {}) {
     }
     shuttingDown = true;
     shutdownStartedAt = now;
-    console.log("\n🛑 Shutting down opencodex proxy...");
+    console.log("\n🛑 Shutting down openprovider proxy...");
     void (async () => {
       try {
         await drainAndShutdown(server, config.shutdownTimeoutMs ?? 5000);
@@ -290,7 +290,7 @@ async function handleStart(options: { block?: boolean } = {}) {
     );
   } catch { /* best-effort — registry rebuilds on first /v1/models call */ }
   // Grok Build auto-registration: additive fenced block in ~/.grok/config.toml so an installed
-  // grok CLI can pick opencodex-routed models without manual config. No-op when ~/.grok is
+  // grok CLI can pick openprovider-routed models without manual config. No-op when ~/.grok is
   // absent or the bind is non-loopback; removed again by stop/eject/uninstall/shutdown.
   // Deliberately a SIBLING of the Desktop-3P block above: nesting it there meant a catalog
   // failure skipped the fence entirely, even though syncGrokConfig handles that case itself.
@@ -348,7 +348,7 @@ async function handleEnsure() {
   }
   // Deterministic fence guarantee: the spawned child injects late in its own startup, but
   // this parent returns as soon as /healthz responds — inject here too (idempotent block
-  // replace) so `ocx ensure` never returns without the Grok fence in place.
+  // replace) so `opr ensure` never returns without the Grok fence in place.
   try {
     const { syncGrokConfig } = await import("../grok/sync");
     const g = await syncGrokConfig(port, config, config.hostname ? { hostname: config.hostname } : {});
@@ -447,7 +447,7 @@ async function handleStop() {
       if (detail) console.error(`   ${detail}`);
     }
   } else {
-    // Snapshot the stale on-disk state BEFORE the async probe: a concurrent `ocx start`
+    // Snapshot the stale on-disk state BEFORE the async probe: a concurrent `opr start`
     // can write fresh records mid-probe, and the purge below must never delete those.
     const stalePidValue = readPidFileValue();
     const staleRuntimePid = readRuntimePort()?.pid ?? null;
@@ -469,7 +469,7 @@ async function handleStop() {
     }
     if (!stopFailed) {
       // `readPid() === null` means the snapshotted pid file was absent, invalid, dead, or
-      // not ours — stale by definition. Purge (guarded by the snapshot) so `ocx update`'s
+      // not ours — stale by definition. Purge (guarded by the snapshot) so `opr update`'s
       // stop gate can't wedge on it.
       removePidIfValueIs(stalePidValue);
       removeRuntimePortIfPidIs(staleRuntimePid);
@@ -565,25 +565,25 @@ async function handleUninstall() {
   }
 
   if (failures.length === 0) {
-    await runStep("opencodex config removed", () => {
+    await runStep("openprovider config removed", () => {
       rmSync(getConfigDir(), { recursive: true, force: true });
     });
   } else {
-    console.error("Leaving opencodex config/backups in place so the failed restore step can be retried.");
+    console.error("Leaving openprovider config/backups in place so the failed restore step can be retried.");
   }
 
   if (failures.length > 0) {
     console.error(`\nUninstall finished with ${failures.length} failed step(s): ${failures.join(", ")}`);
     process.exit(1);
   }
-  console.log("\n✅ opencodex local state removed. Remove the package with: npm uninstall -g @mdevs/openprovider");
+  console.log("\n✅ openprovider local state removed. Remove the package with: npm uninstall -g @mdevs/openprovider");
 }
 
 async function handleStatus() {
   const statusArgs = args.slice(1);
   const wantsJson = statusArgs.length === 1 && statusArgs[0] === "--json";
   if (statusArgs.length > 1 || (statusArgs.length === 1 && !wantsJson)) {
-    console.error("Usage: ocx status [--json]");
+    console.error("Usage: opr status [--json]");
     process.exit(1);
   }
 
@@ -601,7 +601,7 @@ async function handleStatus() {
   console.log(`   Health: ${status.healthLabel}`);
   if (!(status.json.proxy.pid || status.json.proxy.health.ok)) {
     console.log("   ↳ Not running — Codex/Claude requests will fail with connection errors.");
-    console.log("     Restart with 'ocx start', or install the persistent service: 'ocx service install'.");
+    console.log("     Restart with 'opr start', or install the persistent service: 'opr service install'.");
   }
   console.log(`   Dashboard: ${status.json.dashboard.url}`);
   console.log(`   Config: ${status.json.paths.config}`);
@@ -651,8 +651,8 @@ async function handleStatus() {
 
 function handleRecoverHistory() {
   if (args[1] !== "--legacy-openai") {
-    console.error("Usage: ocx recover-history --legacy-openai");
-    console.error("Only use this if an older syncResumeHistory build already remapped OpenAI Codex App history to opencodex before backup support existed.");
+    console.error("Usage: opr recover-history --legacy-openai");
+    console.error("Only use this if an older syncResumeHistory build already remapped OpenAI Codex App history to openprovider before backup support existed.");
     process.exit(1);
   }
   const r = restoreLegacyOpenaiHistory();
@@ -678,7 +678,7 @@ switch (command) {
     // Downtime warning lives HERE, not in handleStop: `restart`/tray-restart callers
     // re-start the proxy immediately, so warning there would contradict the next line.
     if (await handleStop()) {
-      console.log("⚠️  Codex/Claude requests through the proxy will fail until it is restarted ('ocx start' or 'ocx service start').");
+      console.log("⚠️  Codex/Claude requests through the proxy will fail until it is restarted ('opr start' or 'opr service start').");
     }
     break;
   }
@@ -686,16 +686,16 @@ switch (command) {
   case "eject": {
     if (args[1] === "back") {
       // Reverse switch: re-point plain `codex` at the RUNNING proxy without touching its
-      // lifecycle — the counterpart of `ocx restore`. Start/stop triggers are unchanged;
-      // this only re-runs the same inject (config + catalog + history) `ocx start` does.
+      // lifecycle — the counterpart of `opr restore`. Start/stop triggers are unchanged;
+      // this only re-runs the same inject (config + catalog + history) `opr start` does.
       const live = await findLiveProxy();
       if (!live) {
-        console.error("No running proxy found. Run 'ocx start' — it injects opencodex automatically.");
+        console.error("No running proxy found. Run 'opr start' — it injects openprovider automatically.");
         process.exit(1);
       }
       await syncModelsToCodex(live.port);
       const target = collectOrcaCodexHomeDiagnostic();
-      console.log(`Plain \`codex\` now routes through opencodex in ${target.effectiveCodexHome} (undo with: ocx restore).`);
+      console.log(`Plain \`codex\` now routes through openprovider in ${target.effectiveCodexHome} (undo with: opr restore).`);
       break;
     }
     const r = restoreNativeCodex();
@@ -705,7 +705,7 @@ switch (command) {
       if (g.changed) console.log(`✅ ${g.message}`);
       else if (!g.ok) console.error(`⚠️  ${g.message}`);
     } catch { /* best-effort */ }
-    console.log("Plain `codex` now runs natively (no proxy). Switch back with: ocx restore back");
+    console.log("Plain `codex` now runs natively (no proxy). Switch back with: opr restore back");
     break;
   }
   case "recover-history":
@@ -813,13 +813,13 @@ switch (command) {
         break;
       }
       default:
-        console.error("Usage: ocx codex-shim <install|status|uninstall|remove>");
+        console.error("Usage: opr codex-shim <install|status|uninstall|remove>");
         process.exit(1);
     }
     break;
   }
   case "update": {
-    // `ocx update --help` must print usage and exit WITHOUT side effects — running the
+    // `opr update --help` must print usage and exit WITHOUT side effects — running the
     // real self-update stops the proxy and drops in-flight routed streams (issue #168).
     if (hasHelpFlag(args.slice(1))) {
       printSubcommandUsage("update");
@@ -896,7 +896,7 @@ switch (command) {
   }
   case "claude": {
     const { cmdClaude } = await import("./claude");
-    // "ocx claude desktop" → write Desktop 3P config
+    // "opr claude desktop" → write Desktop 3P config
     if (args[1] === "desktop") {
       const { handleClaudeDesktopCommand } = await import("./claude-desktop");
       const exitCode = await handleClaudeDesktopCommand(args.slice(2));

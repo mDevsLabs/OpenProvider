@@ -2,9 +2,9 @@
 
 ## Objective
 
-Add Codex rate-limit reset credit viewing and redemption to opencodex.
+Add Codex rate-limit reset credit viewing and redemption to openprovider.
 Users can see how many banked reset credits each pool account has,
-and redeem them from the CLI (`ocx usage`) or Dashboard GUI (CodexAuth tab).
+and redeem them from the CLI (`opr usage`) or Dashboard GUI (CodexAuth tab).
 
 Pool-aware: every account in `codex-accounts.json` is independently queryable
 and redeemable, using each account's own OAuth credentials.
@@ -19,7 +19,7 @@ and redeem them to instantly reset their hourly/weekly usage windows.
 
 ### API Contract (from codex-rs)
 
-**Read credits** — already called by opencodex:
+**Read credits** — already called by openprovider:
 
 ```
 GET https://chatgpt.com/backend-api/wham/usage
@@ -66,7 +66,7 @@ No public API contract change (internal dashboard/CLI only).
 | Phase | Scope | Deliverable |
 |-------|-------|-------------|
 | **Phase 1** | Backend types + API proxy | `WhamUsageResponse` extension, consume proxy route, `codex-auth-api.ts` endpoint |
-| **Phase 2** | CLI `ocx usage` enhancement | Show reset credits in `ocx usage`, add `ocx reset-limit` subcommand |
+| **Phase 2** | CLI `opr usage` enhancement | Show reset credits in `opr usage`, add `opr reset-limit` subcommand |
 | **Phase 3** | Dashboard GUI | CodexAuth.tsx reset credit display + redeem button per account |
 | **Phase 4** | Tests | Unit tests for parsing, proxy, CLI output |
 
@@ -288,10 +288,10 @@ provider model routing — NOT edited.
 
 ### 2.1 MODIFY `src/cli.ts`
 
-Add `ocx usage` subcommand (or enhance existing status output):
+Add `opr usage` subcommand (or enhance existing status output):
 
 ```
-$ ocx usage
+$ opr usage
 
   Codex Account Usage
   ─────────────────────────────────────────
@@ -308,29 +308,29 @@ $ ocx usage
     Reset credits: 1 available
 ```
 
-Add `ocx reset-limit <accountId>` subcommand:
+Add `opr reset-limit <accountId>` subcommand:
 
 ```
-$ ocx reset-limit work
+$ opr reset-limit work
 
   Redeeming 1 reset credit for "work" (work@corp.com)...
   ✓ Rate limit windows reset successfully.
   Remaining credits: 0
 
-$ ocx reset-limit work
+$ opr reset-limit work
   ✗ No reset credits available for "work".
 ```
 
 Implementation: HTTP call to `POST http://localhost:<port>/api/codex-auth/reset-credits/consume`.
 
-**Prerequisite**: opencodex server must be running (`ocx start`).
-Both `ocx usage` and `ocx reset-limit` resolve the port from config
+**Prerequisite**: openprovider server must be running (`opr start`).
+Both `opr usage` and `opr reset-limit` resolve the port from config
 (`config.port`, default 10100) and fail fast with a clear message if
 the server is not reachable:
 
 ```
-$ ocx reset-limit work
-  ✗ opencodex server is not running. Start it with: ocx start
+$ opr reset-limit work
+  ✗ openprovider server is not running. Start it with: opr start
 ```
 
 This is the first CLI feature that depends on a live server. The pattern
@@ -476,7 +476,7 @@ Test cases:
 |--------|------|--------|
 | MODIFY | `src/codex-quota.ts` | Add `resetCredits` to types + parsing |
 | MODIFY | `src/codex-auth-api.ts` | Pass `resetCredits` through + add consume endpoint |
-| MODIFY | `src/cli.ts` | `ocx usage` + `ocx reset-limit` subcommands |
+| MODIFY | `src/cli.ts` | `opr usage` + `opr reset-limit` subcommands |
 | MODIFY | `gui/src/pages/CodexAuth.tsx` | Reset credits display + redeem button |
 | MODIFY | `gui/src/i18n/en.ts` | Translation keys |
 | MODIFY | `gui/src/styles.css` | Reset credits styling |
@@ -506,5 +506,5 @@ Test cases:
 3. **Idempotency** — UUID generated server-side per request. Retries use the same
    key only within the same HTTP request (no persistence needed).
 4. **Workspace accounts** — excluded from redeem button via `plan_type` regex guard.
-5. **CLI requires running server** — `ocx usage` and `ocx reset-limit` need `ocx start`.
+5. **CLI requires running server** — `opr usage` and `opr reset-limit` need `opr start`.
    Fail fast with clear message if server unreachable.

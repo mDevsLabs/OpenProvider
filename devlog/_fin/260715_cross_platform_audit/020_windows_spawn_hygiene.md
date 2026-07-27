@@ -154,7 +154,7 @@ on macOS/Linux, CMD on Windows. Effective Windows form for a quoted exe path:
   (.exe → plain; .cmd → ComSpec + `/d /s /c` + outer-quoted line + verbatim flag; posix →
   passthrough).
 - `tests/claude-cli.test.ts`: injected-platform win32 case asserting exact cmd.exe argv
-  for `ocx claude`; arg-preservation case `["chat", "hello world", "a\"b", "50%"]`.
+  for `opr claude`; arg-preservation case `["chat", "hello world", "a\"b", "50%"]`.
   (Requires exporting a pure `claudeSpawnInvocation(args, platform, deps)` or passing
   platform/deps through — implementer's choice, tests own the shape either way.)
 - `tests/codex-v2-gate.test.ts`: `runCodexFeatures` win32 invocation via injected

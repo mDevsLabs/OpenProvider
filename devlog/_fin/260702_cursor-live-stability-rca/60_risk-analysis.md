@@ -32,7 +32,7 @@ S1/S2 results (landed):
   optional `planUri` is schema-valid. Keep surfacing plan text to codex.
 - NEW RISK (R8, High relevance to WP2b): jawcode EXECUTES `mcpArgs` locally
   via handlers and replies success/toolNotFound/error (`cursor.ts:1155-1167,
-  1248-1258, 1937-1953`). ocx instead replies a bridge-suspension ERROR for
+  1248-1258, 1937-1953`). opr instead replies a bridge-suspension ERROR for
   client Responses tools (`native-exec.ts:79-86`). That refusal likely lands in
   the server-side agent's state as a FAILED tool result — explaining the live
   20:41 session where the model saw "MCP exec_command keeps failing" and fell
@@ -57,7 +57,7 @@ S1/S2 results (landed):
 
 | # | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
-| R1 | Alias acceptance (`mcp_opencodex-responses_exec_command` → `exec_command`) collides with a real third-party MCP server named similarly | Very low | Low | Prefix match only for providerIdentifier === "opencodex-responses". |
+| R1 | Alias acceptance (`mcp_openprovider-responses_exec_command` → `exec_command`) collides with a real third-party MCP server named similarly | Very low | Low | Prefix match only for providerIdentifier === "openprovider-responses". |
 | R2 | Removing the bridge-suspension error changes server routing in unknown ways (server may then EXPECT synchronous MCP results on the exec channel) | Med | High | Do NOT just delete the error. A/B on debug instance: advertise client tools via AgentRunRequest.mcpTools vs requestContextResult; pick the shape where the server emits client tool calls (interactionUpdate) instead of exec-channel mcpArgs. S1/S3 inform. |
 | R3 | Relaxing exact-name prompt weakens the tool-count discipline wins | Low | Low | Relax ONLY the naming clause; keep count/batch/result-accounting rules intact; rerun tool-count evals. |
 
@@ -79,8 +79,8 @@ S1/S2 results (landed):
 
 ## Additional root causes (Boss direct pass, 21:0x)
 
-1. **20:41 catalog write identified**: the user restarted ocx at 20:41 (new
-   PID 34360; ocx.pid mtime 20:41). Restart sync wrote the healthy 24-model
+1. **20:41 catalog write identified**: the user restarted opr at 20:41 (new
+   PID 34360; opr.pid mtime 20:41). Restart sync wrote the healthy 24-model
    catalog — benign, and explains the clean 21:00 live session. The
    "Proxy already running (PID 5766)" service.log line is from a prior stale
    pid file, not a foreign writer.
@@ -108,7 +108,7 @@ S1/S2 results (landed):
 
 ## Live acceptance / operational
 
-- Restarting the shared ocx (PID 75582) mid-day kills in-flight requests of
+- Restarting the shared opr (PID 75582) mid-day kills in-flight requests of
   other consumers (kiro/chatgpt lanes observed live). Plan: debug instance on
   :10199 for all captures/evals; restart the main instance only at an
   agreed moment (user confirm) or when traffic is idle.

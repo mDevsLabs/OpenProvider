@@ -3,7 +3,7 @@
 ## Objective
 
 Add a Responses **WebSocket server** at `/v1/responses` so Codex's WS-first transport works
-through `ocx` for **every** model. Strategy: **re-frame the existing SSE bridge output onto the
+through `opr` for **every** model. Strategy: **re-frame the existing SSE bridge output onto the
 socket** — the WS path consumes the same `bridgeToResponsesSSE` / passthrough `ReadableStream`
 and sends each frame's JSON as a WS Text message. This reuses RC1 (terminal guarantee), RC2
 (abort on disconnect), RC3 (heartbeat), and the 100.5/110 error classifier **unchanged**, so WS
@@ -14,14 +14,14 @@ Satisfies the minimum server obligations in `01_codex-ws-protocol-analysis.md §
 
 ## Evidence
 
-opencodex pipeline + integration point:
+openprovider pipeline + integration point:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:87-223   handleResponses (parse→route→oauth→vision→web-search→adapter→bridge)
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:141-162  passthrough → Response(relayWithAbort(body))   (SSE bytes)
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:202-223  routed stream → bridgeToResponsesSSE(...) → SSE Response
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:508-510  Bun.serve({ fetch }) — add `websocket` handler here
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:547-559  POST /v1/responses — add WS upgrade beside it
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:87-223   handleResponses (parse→route→oauth→vision→web-search→adapter→bridge)
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:141-162  passthrough → Response(relayWithAbort(body))   (SSE bytes)
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:202-223  routed stream → bridgeToResponsesSSE(...) → SSE Response
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:508-510  Bun.serve({ fetch }) — add `websocket` handler here
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:547-559  POST /v1/responses — add WS upgrade beside it
 ```
 
 Codex WS contract this satisfies:
@@ -58,7 +58,7 @@ Codex WS contract this satisfies:
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/ws-bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/ws-bridge.ts
 ```
 
 Complete content:
@@ -107,7 +107,7 @@ export async function pumpSseToWebSocket(
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts
 ```
 
 **(a) Extract `handleResponsesCore`.** Change `handleResponses` to obtain the body, then delegate.
@@ -205,7 +205,7 @@ async function handleResponses(req: Request, config: OcxConfig, logCtx: { model:
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/ws-endpoint.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/ws-endpoint.test.ts
 ```
 
 Integration test: start the server on an ephemeral port, open a `WebSocket` to

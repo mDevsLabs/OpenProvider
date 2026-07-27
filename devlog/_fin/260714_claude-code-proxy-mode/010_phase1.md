@@ -4,7 +4,7 @@
 ADD: authMode?: "subscription" | "proxy"
 
 ## src/cli/claude.ts (line ~49)
-MODIFY: authMode === "proxy"일 때 ANTHROPIC_AUTH_TOKEN=opencodex-proxy 주입
+MODIFY: authMode === "proxy"일 때 ANTHROPIC_AUTH_TOKEN=openprovider-proxy 주입
 apiKeys 없어도 placeholder 토큰 설정
 
 ## src/server/system-env.ts (line ~28, ~239)

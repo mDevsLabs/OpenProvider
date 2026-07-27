@@ -11,7 +11,7 @@
 2. **activation 재확인**: 010/020/030 각 테스트가 실제 조건 경로를 발화시키는지
    테스트 본문 기준으로 점검 (mock 5xx 주입 → 재시도 카운트 / 529 봉투 / jsonl 필드).
 3. **격리 홈 + 임시 포트 스모크** (cr5, 감사 blocker #4 + WP4-P 수정): 라이브
-   ocx(10100, 이 세션 자신이 경유 중)는 건드리지 않는다. `ocx start`는
+   opr(10100, 이 세션 자신이 경유 중)는 건드리지 않는다. `opr start`는
    pid/runtime-port 덮어쓰기(cli/index.ts:136-139)에 **더해 Codex 설정 인젝션 등
    공유 상태 부작용**이 있으므로 스모크에 사용하지 않는다. 대신 e2e 테스트와 동일한
    `startServer()` 직접 부팅:
@@ -25,11 +25,11 @@
    - 설정 형태는 tests/claude-529-mapping.test.ts의 nativeConfig+saveConfig 선례 재사용
   - `curl -s localhost:10199/healthz` → ok, `/v1/messages` 1회 → 529 재분류 또는
     200 정상 응답 확인 (cr1/cr2 e2e 재확인 겸함)
-   - 종료(프로세스 kill) + tmpdir 삭제. 라이브 10100의 runtime-port.json/ocx.pid
+   - 종료(프로세스 kill) + tmpdir 삭제. 라이브 10100의 runtime-port.json/opr.pid
      **및 `~/.codex/models_cache.json` mtime**이 변하지 않았음을 종료 후 확인.
 4. **커밋 정리**: WP별 로컬 커밋이 쌓였는지 확인(commit-as-you-go), push 없음.
 5. **NEEDS_HUMAN 보고 항목** (wp4-t3): 라이브 프록시(10100) 재시작은 이 세션의
-   전송로를 끊으므로 자동 수행 금지. 최종 보고에 "다음 유휴 시점에 `ocx` 재시작
+   전송로를 끊으므로 자동 수행 금지. 최종 보고에 "다음 유휴 시점에 `opr` 재시작
    필요 — 그 전까지 라이브 트래픽은 구버전 동작" 명시.
 
 ## Accept criteria

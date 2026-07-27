@@ -26,7 +26,7 @@ beforeEach(() => {
   mkdirSync(TEST_DIR, { recursive: true });
   process.env.OPENCODEX_HOME = TEST_DIR;
   delete process.env.OPENCODEX_API_AUTH_TOKEN;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-server-live-codex-");
+  isolatedCodexHome = installIsolatedCodexHome("opr-server-live-codex-");
   clearCodexUpstreamHealth();
   clearThreadAccountMap();
   clearAccountNeedsReauth("pool-a");

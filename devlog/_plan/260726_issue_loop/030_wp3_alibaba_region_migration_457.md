@@ -34,7 +34,7 @@ const INTL_ID = "alibaba-token-plan-intl";
 
 /**
  * Credentials and switches the user owns directly. Everything else on the moved
- * row is registry-derived Beijing metadata (`ocx provider add` and the GUI persist
+ * row is registry-derived Beijing metadata (`opr provider add` and the GUI persist
  * it, and registry enrichment only fills absent fields) and must NOT travel to the
  * international id — carrying it would leave the intl provider serving Singapore
  * while advertising the six-model Beijing Personal Edition catalog.
@@ -70,7 +70,7 @@ function isInternationalEndpoint(baseUrl: string): boolean {
 /**
  * Seed the destination from the international registry entry, then overlay only
  * what the user owns. `providerConfigSeed` (`src/providers/derive.ts:102`) is the
- * same function `ocx provider add` uses, so the migrated row is indistinguishable
+ * same function `opr provider add` uses, so the migrated row is indistinguishable
  * from one the user had created against the international provider directly —
  * default model, model list, `liveModels: false`, context windows, modality maps
  * and reasoning metadata all come from the intl contract.
@@ -343,14 +343,14 @@ import {
 } from "../src/providers/alibaba-region-backup";
 
 test("absent source produces no backup", () => {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-bak-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-bak-"));
   try {
     expect(backupConfigBeforeAlibabaRegionMigration(join(dir, "config.json"))).toBe("absent");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 test("creates a snapshot, then never replaces it", () => {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-bak-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-bak-"));
   const configPath = join(dir, "config.json");
   const backupPath = `${configPath}.pre-alibaba-region-v1.bak`;
   try {
@@ -365,7 +365,7 @@ test("creates a snapshot, then never replaces it", () => {
 test("an existing snapshot is kept even after the config legitimately changes", () => {
   // The false positive an equality rule would have created: a snapshot from an
   // earlier aborted run plus ordinary later edits must not stop the proxy.
-  const dir = mkdtempSync(join(tmpdir(), "ocx-bak-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-bak-"));
   const configPath = join(dir, "config.json");
   const backupPath = `${configPath}.pre-alibaba-region-v1.bak`;
   try {
@@ -379,7 +379,7 @@ test("an existing snapshot is kept even after the config legitimately changes", 
 });
 
 test("a short copy is never published", () => {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-bak-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-bak-"));
   const configPath = join(dir, "config.json");
   try {
     writeFileSync(configPath, '{"before":true}', "utf8");
@@ -395,7 +395,7 @@ test("a short copy is never published", () => {
 });
 
 test("a failed copy leaves no snapshot and no temp file", () => {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-bak-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-bak-"));
   const configPath = join(dir, "config.json");
   try {
     writeFileSync(configPath, '{"before":true}', "utf8");
@@ -498,7 +498,7 @@ test("moves a Beijing entry holding an international endpoint", () => {
 test("the migrated config survives a reload", () => {
   // A stale combo target would fail validation and make loadConfig fall back to
   // defaults (src/config.ts:764) — this is the assertion that catches it.
-  const home = mkdtempSync(join(tmpdir(), "ocx-alibaba-"));
+  const home = mkdtempSync(join(tmpdir(), "opr-alibaba-"));
   const projection = projectAlibabaRegionMigration({
     port: 10100,
     defaultProvider: "alibaba-token-plan",

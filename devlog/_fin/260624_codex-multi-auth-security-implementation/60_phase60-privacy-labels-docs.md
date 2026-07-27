@@ -326,14 +326,14 @@ Before:
 
 ```ts
 const preview = payload.length > 200 ? `${payload.slice(0, 200)}...` : payload;
-console.error(`[ocx:frame-drop] ${adapter}: ${preview}`);
+console.error(`[opr:frame-drop] ${adapter}: ${preview}`);
 ```
 
 After:
 
 ```ts
 if (!debugFramesEnabled()) return;
-console.error(`[ocx:frame-drop] ${adapter}: dropped malformed upstream frame (payload redacted, bytes=${payload.length})`);
+console.error(`[opr:frame-drop] ${adapter}: dropped malformed upstream frame (payload redacted, bytes=${payload.length})`);
 ```
 
 The log preserves adapter and size but never emits content.

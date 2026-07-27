@@ -2,7 +2,7 @@
 
 ## Status: DEFERRED, OPTIONAL
 
-This sub-phase delivers **end-to-end** WS for native `gpt-*` only: `Codex ⇄ ocx ⇄ ChatGPT
+This sub-phase delivers **end-to-end** WS for native `gpt-*` only: `Codex ⇄ opr ⇄ ChatGPT
 backend`, all WS. It is **not required** for WS parity — the MVP (`10_`) already answers Codex's
 WS with a Codex-facing bridge over an HTTP/SSE upstream read. Do B only if native transport
 parity (true upstream WS, no SSE re-encode for native) is independently wanted. Routed models
@@ -54,7 +54,7 @@ A Bun WebSocket **client** mirroring `ResponsesWebsocketClient`:
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/adapters/openai-responses-ws.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/adapters/openai-responses-ws.ts
 ```
 
 An upstream WS client: `connect(provider, authHeaders) → { send(frame), events: AsyncIterable }`,
@@ -65,7 +65,7 @@ preconditions are captured — the handshake headers are the only unknowns; the 
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts
 ```
 
 In the WS `message` handler (`10_`), branch native vs routed: native + WS-upstream-available →

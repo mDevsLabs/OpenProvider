@@ -1,6 +1,6 @@
 # PR #89 / #90 integration — per-claim verdicts (260711)
 
-Loop: cxc-loop HOTL, goalplan `resolve-opencodex-prs-89-and-90-end-to-end-on-de`.
+Loop: cxc-loop HOTL, goalplan `resolve-openprovider-prs-89-and-90-end-to-end-on-de`.
 Both PRs targeted `main` (37f97e34); integration branch is `dev`. Strategy for both:
 retarget base to `dev` + squash-merge (author credit preserved, no `main` release
 history pulled into `dev`, no duplicate cherry-pick commits).

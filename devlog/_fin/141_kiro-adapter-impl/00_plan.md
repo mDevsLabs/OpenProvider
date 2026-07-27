@@ -1,7 +1,7 @@
 # 141.00 — kiro adapter on dev (implementation MOC)
 
 > Branch: `feat/kiro-on-dev` (off `dev`, cursor-free). Implements the kiro provider for
-> opencodex independent of the cursor stack. Grounded in jawcode + the 260628 live-confirmed
+> openprovider independent of the cursor stack. Grounded in jawcode + the 260628 live-confirmed
 > CodeWhisperer contract (codex `015_reverse-engineering/45_ki_codewhisperer_wire_stream_oauth.md`).
 > Supersedes-by-execution: `140_remaining-provider-ports/40_phase4_kiro.md` (the original port plan).
 
@@ -20,7 +20,7 @@
   `parseStream` (eventstream → AdapterEvent; **discriminate by stop/input, not name**).
 - **P4 — wiring**: registry entry (`adapter:"kiro"`, runtime.{region}.kiro.dev) + `resolveAdapter`
   case + 8 static models.
-- **P5 — verify**: `tsc`/`bun test`; `ocx login kiro` import + single-turn live smoke; ToS note.
+- **P5 — verify**: `tsc`/`bun test`; `opr login kiro` import + single-turn live smoke; ToS note.
 
 ## Correctness carried from the jawcode live debugging (must-have from day one)
 1. `toolUses[].input` = JSON object (NOT JSON.stringify string) — else REQUEST_BODY_INVALID.

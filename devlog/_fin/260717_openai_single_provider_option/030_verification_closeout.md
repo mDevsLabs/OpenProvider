@@ -133,7 +133,7 @@ New probe order on the second child:
 4. actual `codex exec --model openai-apikey/gpt-5.6-sol-pro` => API key, wire Sol, Pro mode;
 5. verify catalog has one bare OpenAI group and API Pro row, no legacy namespace.
 
-The smoke must never call `ocx stop`, `ocx restart`, `/api/shutdown`, process-control helpers, or a
+The smoke must never call `opr stop`, `opr restart`, `/api/shutdown`, process-control helpers, or a
 fixed port. Before starting, record the read-only PID/listener identity for `127.0.0.1:10100` when
 present; after teardown, require the same identity. Absence is recorded as absence and is not
 “fixed.”
@@ -407,8 +407,8 @@ by the user after this unit is complete.
 ### Isolated runtime
 
 - Required smoke: PASS.
-- Cold start 1: PID 70490, opencodex 2.7.23, port 63954.
-- Cold start 2: PID 70529, opencodex 2.7.23, port 63956.
+- Cold start 1: PID 70490, openprovider 2.7.23, port 63954.
+- Cold start 2: PID 70529, openprovider 2.7.23, port 63956.
 - Both ports are kernel-assigned and not 10100; PIDs are distinct.
 - Pool probe selected an added credential for bare `gpt-5.6-sol`; PATCH Direct then used the caller
   for bare `gpt-5.6-terra`; actual `codex exec` preserved

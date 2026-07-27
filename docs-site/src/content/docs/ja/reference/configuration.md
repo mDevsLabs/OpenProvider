@@ -3,7 +3,7 @@ title: 設定リファレンス
 description: ~/.OpenProvider/config.json のすべてのフィールド — 最上位オプション、プロバイダー、サイドカー。
 ---
 
-OpenProvider は `~/.OpenProvider/config.json` から設定を読みます。`ocx init` とダッシュボードがこのファイルを
+OpenProvider は `~/.OpenProvider/config.json` から設定を読みます。`opr init` とダッシュボードがこのファイルを
 書きますが、直接編集しても構いません。プロキシは起動時に再読み込みします。途切れた、または正しい JSON でないなど
 ファイルをパースできない場合は `config.json.invalid-<timestamp>` にバックアップし、コンソールに警告したのちデフォルト値で
 起動します。ファイルがなくてもデフォルト設定（単一の `openai` forward プロバイダー）を使います。
@@ -38,7 +38,7 @@ namespaced selected id を bare id に変えます。
 | `injectionPrompt?` | `string` | — | 注入される v2 案内本文を丸ごと差し替えるカスタムテキスト。`{{model}}`、`{{effort}}`、`{{roster}}` placeholder が置換され、発火条件はそのままです。`PUT /api/injection-model` の `prompt` キーでも設定できます。 |
 | `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenProvider が作成する multi-agent developer ガイダンスだけを制御します。未設定/`true` は v1/v2 ガイダンスを維持し、`false` は collaboration surface、`subagentModels`、routing、effort cap を変えずに両方を抑止します。`GET/PUT /api/injection-model` は有効値を返し、PUT は部分更新です。 |
 | `disabledModels?` | `string[]` | — | Codex で隠すモデル。ルーティングされた `provider/model` id はカタログと `/v1/models` から除外します。`gpt-5.4` のような通常のネイティブ GPT slug はカタログ項目を `visibility: "hide"` に変え、通常の `/v1/models` 一覧から外します。ダッシュボードの Models ページでモデルごとに切り替えできます。 |
-| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3 段階 multi-agent surface override。`"v1"` は上流 pin より優先してすべてのモデルを v1 に、`"default"` は上流 model pin（sol/terra=v2、luna=v1）に従い、`"v2"` はすべてを v2 に強制します。ダッシュボードの Models ページまたは `ocx v2 mode` で設定します。 |
+| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3 段階 multi-agent surface override。`"v1"` は上流 pin より優先してすべてのモデルを v1 に、`"default"` は上流 model pin（sol/terra=v2、luna=v1）に従い、`"v2"` はすべてを v2 に強制します。ダッシュボードの Models ページまたは `opr v2 mode` で設定します。 |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | プロバイダー別の Codex 表示 context cap。既知の context window を下げるだけです。 |
 | `contextCapValue?` | `number` | `350000` | ダッシュボード context-cap control で使う値。変えると `providerContextCaps` で有効化されたすべての項目を更新します。 |
 | `stallTimeoutSec?` | `number` | `300` | 上流データが来ないとき bridge が中断し `response.incomplete` を送るまでの秒数。最小 1。 |
@@ -46,9 +46,9 @@ namespaced selected id を bare id に変えます。
 | `shutdownTimeoutMs?` | `number` | `5000` | 進行中のターンを中断する前の graceful drain deadline。 |
 | `websockets?` | `boolean` | `false` | `supports_websockets` を知らせ Codex が Responses WebSocket 経路を使うようにします。省略または `false` なら HTTP/SSE を維持します。 |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | 非 loopback バインドで管理 API とデータプレーン認証に追加で許可する生成型 `ocx_…` 認証情報。ダッシュボードが管理し、項目フィールドは下で説明します。 |
-| `codexAutoStart?` | `boolean` | `true` | Codex shim が Codex 実行前に `ocx ensure` を実行するようにします。`false` なら `ocx ensure` は何もしません。 |
+| `codexAutoStart?` | `boolean` | `true` | Codex shim が Codex 実行前に `opr ensure` を実行するようにします。`false` なら `opr ensure` は何もしません。 |
 | `codexShimAutoRestore?` | `boolean` | `true` | 完了した外部 Codex 更新で以前にインストールした shim が置換された場合に復元します。無効にするには `false`、またはプロセスで `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0` を設定します。 |
-| `syncResumeHistory?` | `boolean` | `true` | 戻せる Codex App 履歴互換モード。OpenProvider は元の Codex thread metadata をバックアップし、旧 OpenAI interactive row を `OpenProvider` に再マッピングし、OpenProvider が作成した `exec` row を App に見えるソースとして一時的に昇格します。`ocx stop` / `ocx restore` はバックアップした OpenAI row を復元し、残った OpenProvider user thread を OpenAI に戻し、ネイティブ Codex が `config.toml` からプロキシを削除した後でも開き続けられるようにします。オフにするには `false` に設定します。 |
+| `syncResumeHistory?` | `boolean` | `true` | 戻せる Codex App 履歴互換モード。OpenProvider は元の Codex thread metadata をバックアップし、旧 OpenAI interactive row を `OpenProvider` に再マッピングし、OpenProvider が作成した `exec` row を App に見えるソースとして一時的に昇格します。`opr stop` / `opr restore` はバックアップした OpenAI row を復元し、残った OpenProvider user thread を OpenAI に戻し、ネイティブ Codex が `config.toml` からプロキシを削除した後でも開き続けられるようにします。オフにするには `false` に設定します。 |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | Codex Auth ダッシュボードが管理する ChatGPT/Codex pool アカウント metadata。secret は `codex-accounts.json` に別途置きます。 |
 | `activeCodexAccountId?` | `string` | — | 手動選択した pool アカウント。既存 thread affinity を消去して次のリクエストから適用し、処理中のリクエストは現在のアカウントを維持します。 |
 | `autoSwitchThreshold?` | `number` | `80` | 新しいセッション自動切替用の使用量百分率 threshold。既知の 5 時間、週次、30 日 quota window のうち最も高いスコアを使います。`0` なら quota 自動切替をオフにします。 |
@@ -61,11 +61,11 @@ namespaced selected id を bare id に変えます。
 | `corsAllowOrigins?` | `string[]` | `[]` | CORS で追加で許可する正確な origin。loopback origin は常に許可します。 |
 
 `maxConcurrentThreadsPerSession` は `config.json` キーではなく `PUT /api/v2` で使う camel-case
-フィールドです。`ocx v2 threads <n>` は対応する `max_concurrent_threads_per_session` 値を Codex の
+フィールドです。`opr v2 threads <n>` は対応する `max_concurrent_threads_per_session` 値を Codex の
 `$CODEX_HOME/config.toml` 内 `[features.multi_agent_v2]` に保存します。その table ができるように v2 を先にオンにしてください。
 
 バックアップ対応より前の開発ビルドで既に `syncResumeHistory` を実行していた場合は
-`ocx recover-history --legacy-openai` で同じ native-provider 復元を強制できます。
+`opr recover-history --legacy-openai` で同じ native-provider 復元を強制できます。
 
 :::note[Codex アカウントプール]
 pool アカウントの追加と quota 更新はダッシュボードの **Codex Auth** ページで処理してください。設定には secret で
@@ -105,11 +105,11 @@ OpenProvider はデフォルトで `127.0.0.1`（loopback 専用）にバイン�
 
 ```bash
 export OpenProvider_API_AUTH_TOKEN="your-secret-token"
-ocx start
+opr start
 ```
 
 非 loopback バインドではこの変数がないとプロキシは起動しません。LAN アクセス用のバックグラウンド
-サービスをインストールするときも同じ変数を先に export したのち `ocx service install` を実行し、launchd、
+サービスをインストールするときも同じ変数を先に export したのち `opr service install` を実行し、launchd、
 systemd、Task Scheduler に渡す必要があります。クライアントはすべてのリクエストの `x-OpenProvider-api-key` ヘッダーに
 token を入れる必要があります。
 
@@ -172,7 +172,7 @@ token の代わりに使えます。すべての候補は timing side channel �
 
 ## Cursor プロバイダー（`adapter: "cursor"`）
 
-Cursor bridge は実験的です。`ocx login cursor` を実行したのち
+Cursor bridge は実験的です。`opr login cursor` を実行したのち
 `~/.OpenProvider/config.json`（Windows: `%USERPROFILE%\.OpenProvider\config.json`）の `providers` 以下に
 `cursor` 項目を追加または編集してください。
 
@@ -199,7 +199,7 @@ Codex の承認経路なしにローカルファイルを読み、書き、消�
 
 [ウェブダッシュボード](/ja/guides/web-dashboard/) でも設定できます。**Providers →
 Cursor → Edit JSON** で `"unsafeAllowNativeLocalExec": true` を追加して保存し、プロキシを
-再起動してください（`ocx restart` または `ocx stop` + `ocx start`）。
+再起動してください（`opr restart` または `opr stop` + `opr start`）。
 
 MCP、画面録画、computer-use は別の `mcpServers` / `desktopExecutor` 設定を使い、このフラグの影響を
 受けません。
@@ -347,7 +347,7 @@ fingerprint 方式をそのまま踏襲します。保存所の既存 OAuth 先�
 
 :::note[アトミック書き込み]
 すべての設定・カタログファイル（`config.toml`、`OpenProvider-catalog.json`）は `atomicWriteFile`（一時ファイル +
-名前変更）でアトミックに書き込みます。`ocx stop` とプロキシ自身の終了 handler のように複数 writer が
+名前変更）でアトミックに書き込みます。`opr stop` とプロキシ自身の終了 handler のように複数 writer が
 同時に Codex を復元しても、ファイルが半分だけ書かれるのを防ぎます。
 :::
 

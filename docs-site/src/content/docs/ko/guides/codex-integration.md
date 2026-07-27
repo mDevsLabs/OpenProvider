@@ -13,7 +13,7 @@ OpenAI는 bare 모델용 단일 `openai` 경로와 `openai-apikey/<model>` API �
 
 ## 설정 주입
 
-`ocx init`, `ocx start`, `ocx sync`는 모두 인젝터를 호출합니다. 기본 loopback 바인드에서는 Codex의
+`opr init`, `opr start`, `opr sync`는 모두 인젝터를 호출합니다. 기본 loopback 바인드에서는 Codex의
 빌트인 `openai` 프로바이더 id를 유지한 채 그 프로바이더가 OpenProvider를 바라보게 합니다.
 
 ```toml
@@ -94,7 +94,7 @@ WSL에서는 `CODEX_HOME`이 없고 Linux 쪽 `~/.codex/config.toml`도 없을 �
 auth 파일을 공유합니다. 이 탐지를 덮어쓰려면 `CODEX_HOME`을 명시하세요.
 
 Windows의 Orca 셸은 `CODEX_HOME`과 `ORCA_CODEX_HOME`을 Orca 번들 런타임 home으로 설정할 수 있지만,
-ChatGPT/Codex 앱은 계속 `%USERPROFILE%\\.codex`를 읽습니다. `ocx status`와 `ocx doctor`는 이 정확한
+ChatGPT/Codex 앱은 계속 `%USERPROFILE%\\.codex`를 읽습니다. `opr status`와 `opr doctor`는 이 정확한
 불일치를 탐지해 사용자 경로를 가린 상태로 대상 home을 표시합니다. 해당 Orca 셸에서 백그라운드 서비스를
 설치했다면 먼저 원래 셸에서 서비스를 제거하고, 앱 home으로 `CODEX_HOME`을 설정하고
 `ORCA_CODEX_HOME`을 해제한 뒤 동기화/복원 및 서비스 설치를 다시 실행하세요.
@@ -115,7 +115,7 @@ Codex의 빌트인 프로바이더가 먼저 WebSocket을 시도할 수 있으�
 ## 모델 카탈로그 동기화
 
 Codex는 디스크의 카탈로그(기본값 `$CODEX_HOME/OpenProvider-catalog.json`)에 있는 모델을 표시합니다. 시작 시와
-`ocx sync` 시, OpenProvider는:
+`opr sync` 시, OpenProvider는:
 
 1. 원본 카탈로그를 `~/.OpenProvider/catalog-backup.json`에 한 번 **백업**합니다(featuring을 되돌릴 수 있도록).
 2. 지원되는 프로바이더의 실시간 모델 카탈로그를 **가져옵니다**(약 5분간 캐시; 마지막 정상 목록,
@@ -137,12 +137,12 @@ Codex가 재시도 끝에 `stream disconnected before completion: error sending 
 설정된 포트에 리스너가 없으면 클라이언트가 그 날것의 연결 오류를 그대로 보여줍니다. 프록시를 다시 시작하세요:
 
 ```bash
-ocx start              # 포그라운드
-ocx service install    # 상주: 로그인 시 자동 시작, 크래시 시 자동 재시작
+opr start              # 포그라운드
+opr service install    # 상주: 로그인 시 자동 시작, 크래시 시 자동 재시작
 ```
 
-`ocx status`는 프록시 실행 여부를 보여주고, 꺼져 있을 때 같은 재시작 안내를 함께 출력합니다.
-`ocx doctor`는 재시작 안전성(서비스/심 커버리지)을 알려줍니다.
+`opr status`는 프록시 실행 여부를 보여주고, 꺼져 있을 때 같은 재시작 안내를 함께 출력합니다.
+`opr doctor`는 재시작 안전성(서비스/심 커버리지)을 알려줍니다.
 
 ## 서브에이전트 선택기
 
@@ -177,17 +177,17 @@ Token Guardian이 활성화되고, `chatgpt`의 갱신 정책이 `proactive`이�
 
 ## 네이티브 Codex 복원
 
-OpenProvider는 절대 당신을 가두지 않습니다. **`ocx stop`은 네이티브 Codex로 완전히 되돌리는 단일 명령입니다** —
+OpenProvider는 절대 당신을 가두지 않습니다. **`opr stop`은 네이티브 Codex로 완전히 되돌리는 단일 명령입니다** —
 프록시를 중지하고, 설치된 백그라운드 서비스를 중지한 뒤, 주입된 모든 라인과 라우팅된 카탈로그 항목을 제거하여
 OpenProvider가 처음부터 없었던 것처럼 일반 `codex`가 정확히 동작합니다:
 
 ```bash
-ocx stop       # 프록시 + 서비스 중지, 네이티브 Codex 복원
-ocx restore    # 중지하지 않고 복원  (별칭: ocx eject)
-ocx restore back # 실행 중인 프록시를 일반 Codex에 다시 연결
+opr stop       # 프록시 + 서비스 중지, 네이티브 Codex 복원
+opr restore    # 중지하지 않고 복원  (별칭: opr eject)
+opr restore back # 실행 중인 프록시를 일반 Codex에 다시 연결
 ```
 
-OpenProvider가 관리형 [백그라운드 서비스](/ko/reference/cli/#ocx-service)로 실행될 때는
+OpenProvider가 관리형 [백그라운드 서비스](/ko/reference/cli/#opr-service)로 실행될 때는
 `OCX_SERVICE=1`을 설정하므로 서비스가 주도하는 재시작이 Codex 설정을 흔들지 **않습니다** — 명시적인
-`ocx stop` / `ocx service stop`만이 네이티브 Codex를 복원합니다.
+`opr stop` / `opr service stop`만이 네이티브 Codex를 복원합니다.
 

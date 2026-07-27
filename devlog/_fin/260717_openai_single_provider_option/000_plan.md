@@ -112,7 +112,7 @@ Cycle details are in `010_core_contract.md`, `020_surfaces.md`, and
   no-replace snapshot:
 
   ```text
-  ~/.opencodex/config.json.pre-openai-tiers-v2.bak
+  ~/.openprovider/config.json.pre-openai-tiers-v2.bak
   ```
 
 - The existing `.pre-openai-tiers-v1.bak` is never overwritten, renamed, or deleted. It restores

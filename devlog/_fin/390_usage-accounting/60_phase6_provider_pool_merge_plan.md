@@ -8,7 +8,7 @@ flagged two production bugs after running real `gpt-5.5` traffic through the pro
 1. Provider rows split per pool account (`chatgpt`, `chatgpt-p104398`, ...) when they should
    collapse to a single pool entry.
 2. `Tokens` column is always 0 even for successful gpt-5.5 calls — `usageStatus` ends up
-   `unreported` for every entry in `~/.opencodex/usage.jsonl`.
+   `unreported` for every entry in `~/.openprovider/usage.jsonl`.
 
 Bug 1 is a clean summary-layer fix. Bug 2 needs diagnostic data first because the chatgpt
 internal Responses backend returns a non-standard JSON shape that `applyResponseLogMetadata`

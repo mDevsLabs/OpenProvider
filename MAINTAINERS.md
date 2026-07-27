@@ -1,6 +1,6 @@
 # Maintainers
 
-This document lists the people responsible for maintaining opencodex and defines the project's
+This document lists the people responsible for maintaining openprovider and defines the project's
 review and merge policy.
 
 ## Current maintainers

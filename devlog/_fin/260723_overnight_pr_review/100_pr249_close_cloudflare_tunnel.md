@@ -9,7 +9,7 @@
 
 1. CI fails on all 3 platforms — not just flaky, structurally broken.
 2. Massive scope: 2268 lines added across 20 files (new server module, GUI, i18n x5, 4 test files).
-3. Introduces `cloudflared` as a runtime dependency managed by opencodex.
+3. Introduces `cloudflared` as a runtime dependency managed by openprovider.
 4. Security surface: spawns external process, manages tunnel tokens.
 
 ## What It Does

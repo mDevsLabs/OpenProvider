@@ -37,25 +37,25 @@ codex-rs source anchors:
 
 ## Local DB evidence
 
-Read-only query against `/Users/jun/.codex/state_5.sqlite` for project cwd `/Users/jun/Developer/new/700_projects/opencodex`:
+Read-only query against `/Users/jun/.codex/state_5.sqlite` for project cwd `/Users/jun/Developer/new/700_projects/openprovider`:
 
 | model_provider | source | count |
 | --- | --- | ---: |
 | `openai` | `cli` | 7 |
 | `openai` | `exec` | 2 |
-| `opencodex` | `exec` | 43 |
-| `opencodex` | subagent thread-spawn JSON | 2 |
+| `openprovider` | `exec` | 43 |
+| `openprovider` | subagent thread-spawn JSON | 2 |
 
-Default Codex App list while opencodex is active:
+Default Codex App list while openprovider is active:
 
 ```sql
 WHERE archived = 0
   AND preview <> ''
   AND source IN ('cli', 'vscode', 'atlas', 'chatgpt')
-  AND model_provider = 'opencodex'
+  AND model_provider = 'openprovider'
 ```
 
-That returns zero rows locally because opencodex-created project rows are `source = 'exec'`.
+That returns zero rows locally because openprovider-created project rows are `source = 'exec'`.
 
 ## Upstream patch direction
 
@@ -65,17 +65,17 @@ The cleaner upstream fix would be in Codex App / codex-rs:
 - or make the project sidebar intentionally provider/source agnostic when the user is browsing project history,
 - or expose a UI affordance for source filtering.
 
-opencodex cannot change Codex App's `thread/list` request payload. The opencodex-side fix therefore must be an explicit compatibility mode that temporarily adjusts local metadata and restores it later.
+openprovider cannot change Codex App's `thread/list` request payload. The openprovider-side fix therefore must be an explicit compatibility mode that temporarily adjusts local metadata and restores it later.
 
-## opencodex fix direction
+## openprovider fix direction
 
 For `syncResumeHistory: true`:
 
-- backup original thread metadata into `~/.opencodex/codex-history-backup.json`;
-- remap old OpenAI `cli`/`vscode` rows to `model_provider = 'opencodex'`;
-- promote opencodex-created user `exec` rows to `source = 'cli'`;
+- backup original thread metadata into `~/.openprovider/codex-history-backup.json`;
+- remap old OpenAI `cli`/`vscode` rows to `model_provider = 'openprovider'`;
+- promote openprovider-created user `exec` rows to `source = 'cli'`;
 - update the rollout JSONL first `session_meta` line consistently so Codex's rollout scanner does not repair the DB back to the hidden state;
-- on `ocx stop` / `ocx restore`, restore only rows recorded in the backup manifest.
+- on `opr stop` / `opr restore`, restore only rows recorded in the backup manifest.
 
 Default remains unchanged: no history mutation unless the user explicitly enables `syncResumeHistory`.
 
@@ -84,45 +84,45 @@ Default remains unchanged: no history mutation unless the user explicitly enable
 There is one unsafe-to-automate edge case:
 
 1. A user enabled `syncResumeHistory: true` on a development build before backup support existed.
-2. That build remapped old `openai` interactive rows to `opencodex`.
+2. That build remapped old `openai` interactive rows to `openprovider`.
 3. The user upgrades while those rows are still remapped.
-4. The new backup manifest does not exist, so `ocx stop` cannot know which `opencodex` interactive rows were originally OpenAI rows.
+4. The new backup manifest does not exist, so `opr stop` cannot know which `openprovider` interactive rows were originally OpenAI rows.
 
-The fix must not silently rewrite all `opencodex` `cli`/`vscode` rows to `openai`, because future or app-created rows can legitimately be opencodex-owned. Instead:
+The fix must not silently rewrite all `openprovider` `cli`/`vscode` rows to `openai`, because future or app-created rows can legitimately be openprovider-owned. Instead:
 
-- normal `ocx stop` detects and reports ambiguous unbacked rows;
+- normal `opr stop` detects and reports ambiguous unbacked rows;
 - it leaves them unchanged by default;
-- `ocx recover-history --legacy-openai` is the explicit manual recovery path for users who know those rows came from the old remap.
+- `opr recover-history --legacy-openai` is the explicit manual recovery path for users who know those rows came from the old remap.
 
-## 2026-06-22 correction: native restore cannot leave opencodex providers behind
+## 2026-06-22 correction: native restore cannot leave openprovider providers behind
 
-Live local testing showed that the conservative "leave unbacked opencodex rows unchanged" approach
-breaks Codex App after `ocx stop`:
+Live local testing showed that the conservative "leave unbacked openprovider rows unchanged" approach
+breaks Codex App after `opr stop`:
 
 ```text
 Codex can't load config.toml, so this thread can't resume.
-Fix config.toml: Model provider `opencodex` not found.
+Fix config.toml: Model provider `openprovider` not found.
 ```
 
-The root cause is straightforward: `ocx stop` removes `[model_providers.opencodex]` from
-`~/.codex/config.toml`. Any remaining `threads.model_provider = 'opencodex'` row can therefore point
+The root cause is straightforward: `opr stop` removes `[model_providers.openprovider]` from
+`~/.codex/config.toml`. Any remaining `threads.model_provider = 'openprovider'` row can therefore point
 Codex App at a provider id that no longer exists. This applies not only to legacy `cli`/`vscode` rows,
-but also to opencodex-created `exec` rows and subagent rows if the user resumes them directly.
+but also to openprovider-created `exec` rows and subagent rows if the user resumes them directly.
 
-Revised opencodex invariant:
+Revised openprovider invariant:
 
-- while opencodex is active, `syncResumeHistory: true` may remap/promote history so the App sidebar is visible;
-- after native restore (`ocx stop`, `ocx restore`, uninstall), no user thread should be left with
-  `model_provider = 'opencodex'` unless the Codex config still contains that provider;
+- while openprovider is active, `syncResumeHistory: true` may remap/promote history so the App sidebar is visible;
+- after native restore (`opr stop`, `opr restore`, uninstall), no user thread should be left with
+  `model_provider = 'openprovider'` unless the Codex config still contains that provider;
 - backed-up OpenAI rows restore to OpenAI;
-- opencodex-owned user rows are ejected to `openai`, and `exec` source is promoted to `cli`, so native
+- openprovider-owned user rows are ejected to `openai`, and `exec` source is promoted to `cli`, so native
   Codex can list/resume them after the proxy provider has been removed;
 - root `model = "provider/model"` values are also stripped on native restore because provider-prefixed
-  routed model ids are invalid without the opencodex provider/catalog.
+  routed model ids are invalid without the openprovider provider/catalog.
 
 Local repair evidence after the correction:
 
-- `ocx recover-history --legacy-openai` recovered 218 user thread rows to `openai`;
-- `ocx stop` left zero user rows with `model_provider = 'opencodex'`;
-- `~/.codex/config.toml` no longer contains `[model_providers.opencodex]`, root
-  `model_provider = "opencodex"`, or root `model = "provider/model"`.
+- `opr recover-history --legacy-openai` recovered 218 user thread rows to `openai`;
+- `opr stop` left zero user rows with `model_provider = 'openprovider'`;
+- `~/.codex/config.toml` no longer contains `[model_providers.openprovider]`, root
+  `model_provider = "openprovider"`, or root `model = "provider/model"`.

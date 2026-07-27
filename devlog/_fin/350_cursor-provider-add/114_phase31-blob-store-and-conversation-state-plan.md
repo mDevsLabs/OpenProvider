@@ -12,8 +12,8 @@ always sends `turns: []`, so multi-turn context relies entirely on root-prompt b
 
 ## 1. Easy explanation
 
-Cursor doesn't send big message bodies inline — it sends short "blob IDs" and later asks opencodex to
-hand back the bytes for each ID. opencodex keeps **one global bag** of those blobs for the whole
+Cursor doesn't send big message bodies inline — it sends short "blob IDs" and later asks openprovider to
+hand back the bytes for each ID. openprovider keeps **one global bag** of those blobs for the whole
 process, so blobs from conversation A are visible to conversation B and the bag never empties. It also
 sends an **empty `turns` list**, stuffing all prior history into the root-prompt blobs. jawcode instead
 keeps a **per-conversation** blob bag plus a per-conversation **state cache**, and rebuilds both
@@ -22,7 +22,7 @@ scope blobs per conversation, reuse cached state on `conversationCheckpointUpdat
 
 ## 2. Pre-write evidence
 
-### Current opencodex — single global map, empty turns
+### Current openprovider — single global map, empty turns
 ```30:45:src/adapters/cursor/native-exec.ts
 const blobs = new Map<string, Uint8Array>();
 …
@@ -60,7 +60,7 @@ export function storeCursorBlob(data: Uint8Array): Uint8Array {
   actual model prompt; `turns[]` is UI/display metadata** — but both are populated; last user message
   is excluded (it goes in the action).
 - Unbounded-growth mitigation = content-addressed IDs so identical history reuses IDs
-  (`cursor.ts:2240-2244`). Explicit TTL/LRU/cap = **NOT FOUND in jawcode** → opencodex may add a cap as
+  (`cursor.ts:2240-2244`). Explicit TTL/LRU/cap = **NOT FOUND in jawcode** → openprovider may add a cap as
   a hardening beyond jawcode (review #4 asks for it).
 
 ## 3. Decision

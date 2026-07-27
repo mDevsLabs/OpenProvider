@@ -13,7 +13,7 @@ bridge tools (exec_command, apply_patch) when native exec is rejected.
 - Known Bun issues: zstd corruption (#20053), gzip ShortRead (#8017), CONNECT proxy (#30381)
 
 ## Architecture Context
-opencodex Cursor adapter has two tool execution paths:
+openprovider Cursor adapter has two tool execution paths:
 - Path A (Responses Bridge): exec_command/apply_patch as MCP tools — always works
 - Path B (Native Exec): read/write/shell/grep/ls/fetch — controlled by nativeLocalExec policy
 

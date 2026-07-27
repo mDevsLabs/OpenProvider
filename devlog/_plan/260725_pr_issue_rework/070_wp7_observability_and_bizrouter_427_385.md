@@ -13,15 +13,15 @@
 ## 착수 시점 사실
 
 - 기준 시각: 2026-07-25 KST.
-- worktree는 `/Users/jun/.codex/worktrees/ebcd/opencodex`, 실제 상태는 detached HEAD이며 `HEAD == origin/dev == 037e8f5e4fa32a82e4149acc509554f157656dad`.
+- worktree는 `/Users/jun/.codex/worktrees/ebcd/openprovider`, 실제 상태는 detached HEAD이며 `HEAD == origin/dev == 037e8f5e4fa32a82e4149acc509554f157656dad`.
 - PR #427: base `dev`, head `a4a212d6403a6f499a76322502b271cb51383bb6`, 13 files, `+417/-2`. 원문 diff 585줄 전량 확인.
 - #427 files: `src/responses/state.ts`, `src/server/management/system-routes.ts`, `gui/src/components/MemoryObservabilityCard.tsx`(NEW), `gui/src/pages/Dashboard.tsx`, `gui/src/i18n/{de,en,ja,ko,ru,zh}.ts`, `tests/memory-watchdog.test.ts`, `tests/responses-state.test.ts`, `docs-site/src/content/docs/troubleshooting/windows-memory.md`.
-- `gh pr diff 427 --repo lidge-jun/opencodex | git apply --check -` → exit 1. 유일한 text conflict는 `gui/src/pages/Dashboard.tsx:1`; 현재 dev가 Classic view를 제거하고 tabbed workspace/layout을 복원한 뒤 PR의 old outer-return hunk가 더는 적용되지 않는다.
-- `gh pr diff 427 --repo lidge-jun/opencodex | git apply --check --exclude=gui/src/pages/Dashboard.tsx -` → exit 0. Dashboard를 제외한 12 files는 clean apply된다.
+- `gh pr diff 427 --repo lidge-jun/openprovider | git apply --check -` → exit 1. 유일한 text conflict는 `gui/src/pages/Dashboard.tsx:1`; 현재 dev가 Classic view를 제거하고 tabbed workspace/layout을 복원한 뒤 PR의 old outer-return hunk가 더는 적용되지 않는다.
+- `gh pr diff 427 --repo lidge-jun/openprovider | git apply --check --exclude=gui/src/pages/Dashboard.tsx -` → exit 0. Dashboard를 제외한 12 files는 clean apply된다.
 - 현재 Dashboard는 `Dashboard({ apiBase })`, `overview/providers/models` 3개 tab, `overviewSection`의 `.dash-overview-stack`, `sections[]`, 단일 tabpanel 구조다(`gui/src/pages/Dashboard.tsx:715-716,1125-1152,1403-1458`). PR의 `viewMode`/outer closing-div 기준 hunk를 되살리면 안 된다.
 - PR #385: base `dev`, head `ac0260b7afa06c38588f21fee9dadfadb09ce2d3`, 2 files, `+13/-1`. 원문 diff 36줄 전량 확인.
-- `gh pr diff 385 --repo lidge-jun/opencodex | git apply --check -` → exit 0, 출력 없음(clean).
-- #385 작성자는 PR 본문에 “I work with the BizRouter team”이라고 관계를 공개했고, 2026-07-24 기준 `/v1/chat/completions` tools+SSE, `/v1/models` OpenAI list shape, opencodex/real Codex CLI E2E를 검증했다고 기재했다. 이는 contributor-provided evidence이며 registry 등록의 신뢰 판단을 대신하지 않는다.
+- `gh pr diff 385 --repo lidge-jun/openprovider | git apply --check -` → exit 0, 출력 없음(clean).
+- #385 작성자는 PR 본문에 “I work with the BizRouter team”이라고 관계를 공개했고, 2026-07-24 기준 `/v1/chat/completions` tools+SSE, `/v1/models` OpenAI list shape, openprovider/real Codex CLI E2E를 검증했다고 기재했다. 이는 contributor-provided evidence이며 registry 등록의 신뢰 판단을 대신하지 않는다.
 
 ### #427 privacy/auth 근거
 
@@ -35,8 +35,8 @@
 ### 1. PR #427 — Dashboard 제외 clean apply
 
 ```bash
-test "$(gh pr view 427 --repo lidge-jun/opencodex --json headRefOid --jq .headRefOid)" = "a4a212d6403a6f499a76322502b271cb51383bb6"
-gh pr diff 427 --repo lidge-jun/opencodex | git apply --exclude=gui/src/pages/Dashboard.tsx -
+test "$(gh pr view 427 --repo lidge-jun/openprovider --json headRefOid --jq .headRefOid)" = "a4a212d6403a6f499a76322502b271cb51383bb6"
+gh pr diff 427 --repo lidge-jun/openprovider | git apply --exclude=gui/src/pages/Dashboard.tsx -
 ```
 
 PR의 나머지 12 files는 그대로 적용한다. DELETE는 없다.
@@ -145,8 +145,8 @@ test("memory byte labels use binary units and the active numeric locale", () => 
 #427과 repair가 green인 뒤 적용한다. 두 PR의 changed-file 교집합은 없다.
 
 ```bash
-test "$(gh pr view 385 --repo lidge-jun/opencodex --json headRefOid --jq .headRefOid)" = "ac0260b7afa06c38588f21fee9dadfadb09ce2d3"
-gh pr diff 385 --repo lidge-jun/opencodex | git apply -
+test "$(gh pr view 385 --repo lidge-jun/openprovider --json headRefOid --jq .headRefOid)" = "ac0260b7afa06c38588f21fee9dadfadb09ce2d3"
+gh pr diff 385 --repo lidge-jun/openprovider | git apply -
 ```
 
 PR이 `src/providers/registry.ts:647` 부근에 추가하는 row는 다음 계약을 유지한다.

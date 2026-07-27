@@ -52,7 +52,7 @@ The canonical registry value is `adapter: "azure-openai"`. Existing saved config
 | `azure` | Legacy compatibility alias routed to the same Azure adapter. |
 
 This is a compatibility fix: before Phase 130, `azure-openai` worked in the GUI path while `azure`
-could be emitted by `ocx init`, creating an inconsistent saved config depending on setup path.
+could be emitted by `opr init`, creating an inconsistent saved config depending on setup path.
 
 ## GUI runtime endpoint
 

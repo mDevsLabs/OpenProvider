@@ -1,5 +1,5 @@
 /**
- * Data-access layer for `ocx account` (issue #180) — live-proxy HTTP client and
+ * Data-access layer for `opr account` (issue #180) — live-proxy HTTP client and
  * per-family account readers. Kept separate from account.ts (command handlers)
  * per the 400-line module budget.
  */
@@ -91,7 +91,7 @@ export async function resolveBaseUrl(deps: AccountDeps): Promise<string | null> 
 }
 
 export function proxyUnreachable(): number {
-  console.error("Proxy not reachable. Start it with 'ocx start' or 'ocx ensure'.");
+  console.error("Proxy not reachable. Start it with 'opr start' or 'opr ensure'.");
   return 1;
 }
 

@@ -223,7 +223,7 @@ describe("Anthropic vision planning and management config", () => {
 
   test("GET/PUT persists valid vision backend and cap and rejects invalid values", async () => {
     const previousHome = process.env.OPENCODEX_HOME;
-    const isolatedHome = mkdtempSync(join(tmpdir(), "ocx-vision-management-"));
+    const isolatedHome = mkdtempSync(join(tmpdir(), "opr-vision-management-"));
     process.env.OPENCODEX_HOME = isolatedHome;
     const config: OcxConfig = { port: 10100, defaultProvider: "none", providers: {} };
     try {
@@ -317,7 +317,7 @@ describe("Anthropic vision planning and management config", () => {
 
   test("PUT rejects malformed body shapes with 400 and never persists them (review F2)", async () => {
     const previousHome = process.env.OPENCODEX_HOME;
-    const isolatedHome = mkdtempSync(join(tmpdir(), "ocx-vision-management-malformed-"));
+    const isolatedHome = mkdtempSync(join(tmpdir(), "opr-vision-management-malformed-"));
     process.env.OPENCODEX_HOME = isolatedHome;
     const config: OcxConfig = { port: 10100, defaultProvider: "none", providers: {} };
     try {

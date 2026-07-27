@@ -4,7 +4,7 @@
 
 - What is `tool_mode`?
 - What is `multi_agent_version`?
-- If opencodex omits or inherits them, what fallback does Codex use?
+- If openprovider omits or inherits them, what fallback does Codex use?
 - Do these fields affect the subagent picker and tool exposure?
 
 ## Codex RS Behavior: `tool_mode`
@@ -22,8 +22,8 @@ code_mode_only
 Relevant upstream definitions:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:297
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:414
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:297
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:414
 ```
 
 Semantics:
@@ -38,12 +38,12 @@ feature flags: `CodeModeOnly`, then `CodeMode`, then `Direct`.
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/mod.rs:63
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/mod.rs:64
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:272
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:452
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:475
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:987
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/mod.rs:63
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/mod.rs:64
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:272
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:452
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:475
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:987
 ```
 
 Unknown `tool_mode` strings deserialize as omitted, not as hard errors.
@@ -69,8 +69,8 @@ v2
 Relevant upstream definitions:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/protocol/src/openai_models.rs:420
-/tmp/opencodex-codex-src/codex-rs/protocol/src/protocol.rs:2891
+/tmp/openprovider-codex-src/codex-rs/protocol/src/openai_models.rs:420
+/tmp/openprovider-codex-src/codex-rs/protocol/src/protocol.rs:2891
 ```
 
 Semantics:
@@ -85,11 +85,11 @@ later model changes do not necessarily change multi-agent behavior inside the sa
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/core/src/session/mod.rs:2916
-/tmp/opencodex-codex-src/codex-rs/core/src/session/mod.rs:2921
-/tmp/opencodex-codex-src/codex-rs/core/src/session/mod.rs:2925
-/tmp/opencodex-codex-src/codex-rs/core/src/session/mod.rs:2927
-/tmp/opencodex-codex-src/codex-rs/core/src/session/turn_context.rs:727
+/tmp/openprovider-codex-src/codex-rs/core/src/session/mod.rs:2916
+/tmp/openprovider-codex-src/codex-rs/core/src/session/mod.rs:2921
+/tmp/openprovider-codex-src/codex-rs/core/src/session/mod.rs:2925
+/tmp/openprovider-codex-src/codex-rs/core/src/session/mod.rs:2927
+/tmp/openprovider-codex-src/codex-rs/core/src/session/turn_context.rs:727
 ```
 
 If omitted, Codex falls back to feature flags:
@@ -101,9 +101,9 @@ If omitted, Codex falls back to feature flags:
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/core/src/config/mod.rs:1363
-/tmp/opencodex-codex-src/codex-rs/features/src/lib.rs:1011
-/tmp/opencodex-codex-src/codex-rs/features/src/lib.rs:1017
+/tmp/openprovider-codex-src/codex-rs/core/src/config/mod.rs:1363
+/tmp/openprovider-codex-src/codex-rs/features/src/lib.rs:1011
+/tmp/openprovider-codex-src/codex-rs/features/src/lib.rs:1017
 ```
 
 ## Tool-Spec Impact
@@ -119,13 +119,13 @@ Relevant upstream paths:
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:343
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:347
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:766
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:769
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/spec_plan.rs:819
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:48
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:80
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:343
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:347
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:766
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:769
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/spec_plan.rs:819
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:48
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:80
 ```
 
 ## Spawn-Agent Model List
@@ -137,32 +137,32 @@ visibility, and capped at five entries.
 Relevant upstream paths:
 
 ```text
-/tmp/opencodex-codex-src/codex-rs/models-manager/src/manager.rs:80
-/tmp/opencodex-codex-src/codex-rs/models-manager/src/manager.rs:117
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:19
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:747
-/tmp/opencodex-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:751
+/tmp/openprovider-codex-src/codex-rs/models-manager/src/manager.rs:80
+/tmp/openprovider-codex-src/codex-rs/models-manager/src/manager.rs:117
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:19
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:747
+/tmp/openprovider-codex-src/codex-rs/core/src/tools/handlers/multi_agents_spec.rs:751
 ```
 
-## Current opencodex Behavior
+## Current openprovider Behavior
 
-opencodex derives routed entries by deep-copying a native template:
+openprovider derives routed entries by deep-copying a native template:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:82
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:108
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:118
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:128
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:82
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:108
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:118
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:128
 ```
 
 Live `/v1/models?client_version=...` and on-disk catalog sync both use the same derived entries:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:473
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:480
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:484
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:273
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts:292
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:473
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:480
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:484
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:273
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts:292
 ```
 
 The routed entries currently do not normalize:
@@ -189,7 +189,7 @@ Normalize both fields deliberately in `deriveEntry()`:
 1. For native OpenAI passthrough entries, preserve native `tool_mode` and `multi_agent_version`.
 2. For non-OpenAI routed entries, either delete both fields and let Codex feature defaults apply, or
    set a project-wide explicit policy.
-3. Prefer deletion first unless opencodex has a strong reason to force code-mode or V2 for routed
+3. Prefer deletion first unless openprovider has a strong reason to force code-mode or V2 for routed
    models. Deletion does not disable the user's configured/default multi-agent behavior; it lets
    Codex resolve the feature default (including V2 when the user has enabled V2) instead of letting
    the cloned native template force a selector.

@@ -135,7 +135,7 @@ Suggested commit: `fix(windows): log service wrapper startup`
 
 ### Cycle 5 — Windows Child Exit and Status Diagnostics
 
-Purpose: capture child exit/restart decisions and expose the service log path in `ocx service status` / `ocx status`.
+Purpose: capture child exit/restart decisions and expose the service log path in `opr service status` / `opr status`.
 
 Expected files:
 
@@ -147,7 +147,7 @@ Expected files:
 Implementation notes:
 
 - Capture child stdout/stderr or append child exit code to the service log.
-- `ocx service status` should show log path without requiring admin-only commands.
+- `opr service status` should show log path without requiring admin-only commands.
 
 Verification:
 
@@ -172,7 +172,7 @@ Implementation notes:
 - Generate XML or a PowerShell task definition if less brittle than `schtasks /create` flags.
 - Set `ExecutionTimeLimit` to `PT0S`.
 - Set restart interval/count together.
-- Preserve intentional `ocx service stop` semantics: stop must not immediately resurrect.
+- Preserve intentional `opr service stop` semantics: stop must not immediately resurrect.
 
 Verification:
 
@@ -252,7 +252,7 @@ Expected files:
 
 Implementation notes:
 
-- Add `ocx -v`, `ocx --version`, `ocx version` with no config mutation.
+- Add `opr -v`, `opr --version`, `opr version` with no config mutation.
 - Split scripts/wording into backend proxy vs GUI dev/build.
 - `GET /` without built GUI should give exact clone/dev guidance.
 - Status should flag stale unsupported OAuth config safely, if not already enough after `c560b54`.

@@ -8,7 +8,7 @@ import { classifyOpenAiTierBackup } from "../src/config";
 describe("cleanupOpenAiTierBackupAfterInit", () => {
   const dirs: string[] = [];
   const makeDir = () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-init-backup-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-init-backup-"));
     dirs.push(dir);
     return dir;
   };

@@ -32,7 +32,7 @@ a pager (`gui/src/pages/claude-desktop-lane.ts`) but kept the kanban geometry an
 always-expanded card, so the wall is shorter, not gone.
 
 **Grok.** `gui/src/pages/Grok.tsx:88-113` renders a read-only `<table>` of the models
-opencodex wrote into `~/.grok/config.toml`. The list itself is produced by
+openprovider wrote into `~/.grok/config.toml`. The list itself is produced by
 `src/grok/sync.ts:33-52`: every visible native slug plus every catalog-visible routed
 model, injected by `src/grok/inject.ts:170` (`injectGrokConfig`). There is no
 per-model choice anywhere in that path — the fence mirrors the whole visible catalog,
@@ -49,7 +49,7 @@ only when open, and collapse state persisted through
 
 ```yaml
 ---
-name: opencodex-model-assignment-surfaces
+name: openprovider-model-assignment-surfaces
 surface: expert control panel inside the local dashboard (Claude Desktop + Grok tabs)
 colors: inherited — var(--surface), var(--border), var(--amber), var(--green)
 typography: inherited — app sans for labels, var(--font-code) for routes/aliases
@@ -160,7 +160,7 @@ checked by something that can actually fail.
 - Non-goals: releases, version bumps, `main`/`preview` promotion, provider adapters,
   Codex/Claude routing, breaking the version-1 desktop profile schema.
 - Verifier: the gates above; `c-*` criteria in
-  `.codexclaw/goalplans/opencodex-grok-claude-desktop-ux-models-2-work-p/goalplan.json`.
+  `.codexclaw/goalplans/openprovider-grok-claude-desktop-ux-models-2-work-p/goalplan.json`.
 - Stop condition: all criteria met with captured evidence, or a terminal outcome
   (`BLOCKED` / `NEEDS_HUMAN` / `BUDGET_EXHAUSTED`) with evidence.
 - Write scope: `gui/src/`, `gui/tests/`, `src/grok/`, `src/types.ts`,

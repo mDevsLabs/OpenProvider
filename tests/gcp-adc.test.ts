@@ -25,7 +25,7 @@ function parsed(modelId = "gemini-3-pro"): OcxParsedRequest {
 }
 
 beforeAll(async () => {
-  tmp = mkdtempSync(join(tmpdir(), "ocx-gcp-adc-"));
+  tmp = mkdtempSync(join(tmpdir(), "opr-gcp-adc-"));
   const kp = await globalThis.crypto.subtle.generateKey(
     { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
     true,
@@ -209,7 +209,7 @@ describe("gcp-adc token-exchange hardening", () => {
     __resetVertexTokenCache();
     // First resolve with the SA file → caches under source `gac:<saPath>`.
     setEnv("GOOGLE_APPLICATION_CREDENTIALS", saPath);
-    let tokenValue = "tok-source-A";
+    const tokenValue = "tok-source-A";
     globalThis.fetch = (async (input: RequestInfo | URL) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
       if (url === OAUTH_TOKEN_URL) return new Response(JSON.stringify({ access_token: tokenValue, expires_in: 3600 }), { status: 200 });

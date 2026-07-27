@@ -9,18 +9,18 @@ import { navigateHash, normalizeHashPath, replaceHash } from "./hash-routing";
 
 /** localStorage keys written by the removed Classic/Workspace preference. */
 const STALE_VIEW_KEYS = [
-  "ocx-global-view",
-  "ocx-view",
-  "ocx-providers-view",
-  "ocx-subagents-view",
-  "ocx-storage-view",
-  "ocx-codexauth-view",
-  "ocx-apikeys-view",
-  "ocx-claudecode-view",
-  "ocx-usage-view",
-  "ocx-logs-view",
-  "ocx-models-view",
-  "ocx-dashboard-view",
+  "opr-global-view",
+  "opr-view",
+  "opr-providers-view",
+  "opr-subagents-view",
+  "opr-storage-view",
+  "opr-codexauth-view",
+  "opr-apikeys-view",
+  "opr-claudecode-view",
+  "opr-usage-view",
+  "opr-logs-view",
+  "opr-models-view",
+  "opr-dashboard-view",
 ];
 
 /**

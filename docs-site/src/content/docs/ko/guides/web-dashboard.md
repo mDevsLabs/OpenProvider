@@ -10,14 +10,14 @@ OpenProvider는 프록시가 제공하는 로컬 웹 대시보드(`gui/` 아래�
 ## 열기
 
 ```bash
-ocx gui
+opr gui
 ```
 
 브라우저에서 `http://localhost:<port>`를 엽니다. 프록시가 꺼져 있으면 먼저 자동으로 시작합니다.
 개발 중에는 실행 중인 프록시와 GUI 개발 서버를 따로 띄울 수 있습니다.
 
 ```bash
-ocx start
+opr start
 bun run dev:gui
 ```
 
@@ -31,7 +31,7 @@ bun run dev:gui
 | **Maintenance** | Codex 모델 카탈로그를 다시 동기화하고, 프로젝트 로컬 설정의 우회 경고를 확인하고, latest/preview 업데이트를 조회하거나 선택적 프록시 재시작과 함께 설치합니다. |
 | **시작 안전성** | 주입된 Codex 라우팅이 재부팅 후에도 유지되는지 서비스와 launcher shim 상태, 정확한 복구 명령과 함께 표시합니다. |
 | **Windows 트레이** | 로그인할 때 사용자 전용 트레이를 시작하고 프록시 시작·중지·재시작·대시보드·상태를 클릭으로 제어합니다. 트레이는 재시작 서비스가 아닙니다. |
-| **Codex 자동 시작** | 이미 설치된 Codex launcher shim이 `ocx ensure`를 실행하도록 허용합니다. 이 토글은 shim이나 백그라운드 서비스를 설치하지 않습니다. |
+| **Codex 자동 시작** | 이미 설치된 Codex launcher shim이 `opr ensure`를 실행하도록 허용합니다. 이 토글은 shim이나 백그라운드 서비스를 설치하지 않습니다. |
 | **Providers** | 프로바이더를 추가, 편집, 활성화/비활성화, 제거하고, 지원되는 OAuth 계정 풀과 API key 풀을 관리합니다. |
 | **Add provider** | 레지스트리 기반 프리셋에서 계정 로그인, API key 서비스, 로컬 서버, custom endpoint를 검색합니다. |
 | **Codex Auth** | ChatGPT/Codex 풀 계정을 추가하고, 다음 세션 계정을 선택하고, 5시간 / 주간 / 30일 할당량을 갱신하며, 할당량 자동 전환을 켜거나 끄고 1~100% 임계값과 일시적 실패 failover를 설정합니다. |

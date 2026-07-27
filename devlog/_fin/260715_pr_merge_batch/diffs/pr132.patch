@@ -235,7 +235,7 @@ index 126ed7ef..cfcb8b70 100644
          const s: (OAuthStatus & { accounts?: OAuthAccount[] }) | null = await fetch(`${apiBase}/api/oauth/status?provider=${provider}`).then(r => r.json()).catch(() => null);
 @@ -269,12 +274,19 @@ export default function Providers({ apiBase }: { apiBase: string }) {
            setOauthStatus(prev => ({ ...prev, [provider]: s }));
-           notify(t("prov.loginOk", { provider: oauthLabel(provider), cmd: "ocx sync" }), true);
+           notify(t("prov.loginOk", { provider: oauthLabel(provider), cmd: "opr sync" }), true);
            setLoginInfo(null);
 +          setManualCode("");
 +          setManualCodeMsg("");

@@ -112,7 +112,7 @@ function messagesToChatFormat(parsed: OcxParsedRequest, provider: OcxProviderCon
       out.push({
         role: "tool",
         tool_call_id: call.id,
-        content: `[ocx] no tool result was recorded for "${call.name}"; execution status unknown — do not treat this as success, failure, or user-provided input.`,
+        content: `[opr] no tool result was recorded for "${call.name}"; execution status unknown — do not treat this as success, failure, or user-provided input.`,
       });
     }
     pendingToolCalls = [];

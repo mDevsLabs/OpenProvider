@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working on or reviewing this repository.
 
 ## What this project is
 
-opencodex (`ocx`) is a universal provider proxy for OpenAI Codex and Claude Code:
+openprovider (`opr`) is a universal provider proxy for OpenAI Codex and Claude Code:
 one local proxy that lets Codex CLI/App/SDK and Claude Code use many LLM
 providers (Claude, Gemini, Grok, DeepSeek, Ollama, and more). The runtime is
 Bun-native TypeScript with no separate server compile step.

@@ -28,7 +28,7 @@
 - Per-request option: `fetch(url, { proxy })` — string URL, or `{ url, headers }` object
   form since Bun v1.3.4.
   - 출처: https://bun.com/blog/bun-v1.3.4
-- undici `setGlobalDispatcher`/`EnvHttpProxyAgent` is irrelevant: ocx always runs on Bun
+- undici `setGlobalDispatcher`/`EnvHttpProxyAgent` is irrelevant: opr always runs on Bun
   (bin/ocx.mjs is a Node shim that execs a bundled Bun).
 - **Empirically verified locally (Bun 1.3.14, scratchpad proxy-probe.ts)**: a spawned Bun
   process with `HTTP_PROXY` set routes `fetch()` through the proxy; `NO_PROXY=example.com`
@@ -38,8 +38,8 @@
   break it. `clearModelCache` (src/model-cache.ts) is already used by tests, so the
   failure-cooldown state belongs in model-cache.ts and gets cleared by the same helper.
 
-**Implication for issue #54**: the reporter's env simply lacks the proxy vars when ocx
-launches. If ocx exposes a config `proxy` and mirrors it into `process.env.HTTP(S)_PROXY`
+**Implication for issue #54**: the reporter's env simply lacks the proxy vars when opr
+launches. If opr exposes a config `proxy` and mirrors it into `process.env.HTTP(S)_PROXY`
 at startup, Bun applies it to every outbound fetch with zero call-site changes.
 
 ## 3. Codebase map (what matters for the patch)

@@ -6,7 +6,7 @@ from `002` — the feedback loop, the admission-key axis, and three-state intent
 
 ## What the resolver answers (exactly one question)
 
-**Does the proxy-mode dummy marker (`ANTHROPIC_AUTH_TOKEN=opencodex-proxy`) get
+**Does the proxy-mode dummy marker (`ANTHROPIC_AUTH_TOKEN=openprovider-proxy`) get
 injected?** That is the whole of it — and because that is narrower than "how will
 Claude authenticate", the field is named **`markerMode`**, not `effectiveAuthMode`
 (002 R2-1). Native passthrough additionally requires an `sk-ant-` credential on the
@@ -81,7 +81,7 @@ with no token at all. The owned dummy is therefore stripped FIRST, before anythi
 reads or writes `ANTHROPIC_AUTH_TOKEN`:
 
 ```ts
-// 1. Strip our own dummy from the inherited env. It is opencodex state, never user
+// 1. Strip our own dummy from the inherited env. It is openprovider state, never user
 //    auth, and it must not shadow a real admission key (002 R2-1).
 if (env.ANTHROPIC_AUTH_TOKEN === PROXY_MARKER) delete env.ANTHROPIC_AUTH_TOKEN;
 
@@ -119,7 +119,7 @@ tests inject the detector without touching the real home — same pattern as
 The F4 invariant is untouched: `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST` still ships
 only when an AUTH_TOKEN exists. Under auto→subscription with no admission key that
 is now genuinely never — previously a stale marker could have satisfied it. With an
-admission key configured the flag DOES ship, which is correct: opencodex really does
+admission key configured the flag DOES ship, which is correct: openprovider really does
 own authentication on that deployment (002 §2).
 
 ## MODIFY — GET `/api/claude-code` (`agent-settings-routes.ts:605-640`)
@@ -163,7 +163,7 @@ the current two-option select cannot express. Validation widens to
 - **c-sticky**: manual proxy survives presence flips (present→absent→present) — same
   result every time; manual explicit subscription likewise;
 - **the feedback loop (002 §1)**: base env carrying
-  `ANTHROPIC_AUTH_TOKEN=opencodex-proxy` with auth now PRESENT → the marker is
+  `ANTHROPIC_AUTH_TOKEN=openprovider-proxy` with auth now PRESENT → the marker is
   deleted, the mode resolves subscription, and no host flag ships;
 - **admission axis (002 §2)**: detected credential + `config.apiKeys` → markerMode
   subscription AND the admission token still injected AND the host flag present;

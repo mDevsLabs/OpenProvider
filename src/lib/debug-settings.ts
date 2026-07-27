@@ -1,12 +1,12 @@
 /**
  * Runtime-controllable debug flags.
- * Provider debug: `ocx debug provider on|off|status|reset|logs [-f]` (or OCX_DEBUG=1 on start).
- * Usage capture: `ocx debug usage on|off|status|reset|logs [-f]` (or OPENCODEX_USAGE_DEBUG=1).
- * Injection log: `ocx debug injection on|off|status|reset` (or OCX_INJECTION_DEBUG=1) —
+ * Provider debug: `opr debug provider on|off|status|reset|logs [-f]` (or OCX_DEBUG=1 on start).
+ * Usage capture: `opr debug usage on|off|status|reset|logs [-f]` (or OPENCODEX_USAGE_DEBUG=1).
+ * Injection log: `opr debug injection on|off|status|reset` (or OCX_INJECTION_DEBUG=1) —
  * multi-agent guidance-injection console lines, default OFF.
- * Claude inbound capture: `ocx debug claude on|off|status|reset` (or OCX_CLAUDE_DEBUG=1) —
+ * Claude inbound capture: `opr debug claude on|off|status|reset` (or OCX_CLAUDE_DEBUG=1) —
  * allowlist-scalar ring of inbound Anthropic request metadata, default OFF.
- * `/api/debug` and `ocx debug` override env defaults without restart.
+ * `/api/debug` and `opr debug` override env defaults without restart.
  */
 
 export const DEBUG_ENV = {

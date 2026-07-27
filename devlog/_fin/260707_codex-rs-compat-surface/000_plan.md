@@ -1,19 +1,19 @@
 # codex-rs compatibility-surface audit (260707)
 
 Goal: compare codex-rs wire protocol (protocol/src/models.rs ResponseItem, codex-api/src/sse/responses.rs)
-against opencodex src/responses/{schema,parser}.ts + bridge and close routed-provider gaps.
+against openprovider src/responses/{schema,parser}.ts + bridge and close routed-provider gaps.
 
 ## Findings (probe-verified with /tmp/probe-parser.test.ts)
 
 1. **function_call_output array drops `input_text` blocks** (BUG, verified).
    codex-rs FunctionCallOutputContentItem = InputText | InputImage | EncryptedContent.
-   opencodex outputContentBlockSchema only accepts output_text|text|refusal, and
+   openprovider outputContentBlockSchema only accepts output_text|text|refusal, and
    outputToToolResultContent skips input_text. MCP tools returning text+image lose ALL text.
    Probe: output [{input_text "here"},{input_image}] -> toolResult content had ONLY the image.
 
 2. **custom_tool_call_output with array output passes raw blocks through** (BUG, verified).
    codex-rs CustomToolCallOutput.output is FunctionCallOutputPayload (string | content items).
-   opencodex schema requires string; array falls to loose branch and raw `{type:"input_text"}`
+   openprovider schema requires string; array falls to loose branch and raw `{type:"input_text"}`
    objects leak into OcxContentPart[] (invalid parts for adapters).
 
 3. **`context_compaction` input items silently dropped** (BUG, verified).

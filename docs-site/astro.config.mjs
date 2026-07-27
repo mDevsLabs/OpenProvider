@@ -3,14 +3,14 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
 // Canonical GitHub Pages custom domain. The site is served at the domain root,
-// so Starlight must not emit the former /opencodex project-site prefix.
-const SITE_URL = "https://opencodex.me";
+// so Starlight must not emit the former /openprovider project-site prefix.
+const SITE_URL = "https://openprovider.me";
 
 // NOTE: the WebSite / SoftwareApplication JSON-LD deliberately does NOT live here.
 // Google only reads site-name markup from the home page of a site, and a global
 // `head` entry would replay one `#website` entity (with the root `url`) on every
 // docs page and every locale. Duplicated, conflicting WebSite objects are exactly
-// what makes Google fall back to the domain ("opencodex.me") for the site name.
+// what makes Google fall back to the domain ("openprovider.me") for the site name.
 // The markup is emitted once per locale home page from `src/components/SiteJsonLd.astro`.
 
 export default defineConfig({
@@ -21,7 +21,7 @@ export default defineConfig({
   vite: { build: { cssMinify: "esbuild" } },
   integrations: [
     starlight({
-      title: "opencodex",
+      title: "openprovider",
       description:
         "Universal provider proxy for OpenAI Codex & Claude Code — use any LLM with Codex CLI, App, SDK, and Claude Code.",
       tagline: "Use any LLM with OpenAI Codex and Claude Code.",

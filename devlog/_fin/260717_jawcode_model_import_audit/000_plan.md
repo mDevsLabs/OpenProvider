@@ -3,7 +3,7 @@
 ## Loop specification
 
 - **Archetype:** spec-satisfaction / documentation audit
-- **Trigger:** jawcode의 model/provider chase와 실제 로직·모델명을 OpenCodex와 대조해 이식 대상을 기록한다.
+- **Trigger:** jawcode의 model/provider chase와 실제 로직·모델명을 OpenProvider와 대조해 이식 대상을 기록한다.
 - **Goal:** 각 차이를 `IMPORT`, `ADAPT`, `NOOP`, `REJECT`, `RESEARCH` 중 하나로 분류하고, 정확한 모델 ID·소유 경로·검증 조건을 `_model` 기준 문서에 남긴다.
 - **Non-goals:** production code 변경, jawcode 수정, generated metadata 재생성, 외부 provider 호출, 모델 가용성 추정.
 - **Verifier:** source anchor 재검색, provider/model set 비교, generated snapshot diff, Markdown link/path 검사, `git diff --check`.
@@ -15,7 +15,7 @@
 
 - jawcode 근거는 2026-07-17 로컬 working tree의 **미커밋 스냅샷**이다.
 - jawcode chase 문서의 upstream range와 로컬 소스를 함께 읽되, upstream에 병합됐다고 간주하지 않는다.
-- OpenCodex 판단은 현재 `dev` 소스와 테스트를 기준으로 한다.
+- OpenProvider 판단은 현재 `dev` 소스와 테스트를 기준으로 한다.
 
 ## Planned documentation changes
 

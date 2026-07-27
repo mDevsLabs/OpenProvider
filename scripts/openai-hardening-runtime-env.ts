@@ -1,6 +1,6 @@
 export function buildSanitizedRuntimeEnv(
   source: Record<string, string | undefined>,
-  opencodexHome: string,
+  openproviderHome: string,
   codexHome: string,
 ): Record<string, string> {
   const env: Record<string, string> = {};
@@ -12,7 +12,7 @@ export function buildSanitizedRuntimeEnv(
   }
   return {
     ...env,
-    OPENCODEX_HOME: opencodexHome,
+    OPENCODEX_HOME: openproviderHome,
     CODEX_HOME: codexHome,
     OCX_SHIM_BYPASS: "1",
     OPENCODEX_API_AUTH_TOKEN: "fixture-admission",

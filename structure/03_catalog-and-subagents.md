@@ -14,7 +14,7 @@
 - applies exact provider/model compatibility exclusions after live discovery and metadata
   augmentation, so upstream-advertised but uncallable rows never enter dashboard or Codex pickers;
 - strips native-only service tier and WebSocket metadata unless explicitly enabled;
-- backs up the pristine catalog once to `~/.opencodex/catalog-backup.json`;
+- backs up the pristine catalog once to `~/.openprovider/catalog-backup.json`;
 - invalidates `$CODEX_HOME/models_cache.json` when model visibility changes.
 
 Codex App model picker visibility comes from this shared catalog, not from patching the App.
@@ -50,7 +50,7 @@ The override is applied as a final pass in both `buildCatalogEntries` (live `/v1
 ensures `normalizeRoutedCatalogEntry` (which deletes `multi_agent_version` from routed entries) does
 not clobber the forced value.
 
-CLI: `ocx v2 mode v1|default|v2`. GUI: segmented control on the Models page. API: `GET/PUT /api/v2`
+CLI: `opr v2 mode v1|default|v2`. GUI: segmented control on the Models page. API: `GET/PUT /api/v2`
 with `multiAgentMode` field.
 
 ## Ultra reasoning level
@@ -82,11 +82,11 @@ Codex `spawn_agent` advertises only the highest-priority first five catalog mode
 is capped at five ids and may contain routed `provider/model` slugs or native model slugs. Startup
 seeds native GPT defaults only when the field is unset; an explicit empty list persists.
 
-Claude Code `ocx-*` agent definitions consume the same effective `claudeCode.blockedSkills` policy
+Claude Code `opr-*` agent definitions consume the same effective `claudeCode.blockedSkills` policy
 as inbound bundle elision. When the list is non-empty (default: `claude-api`), generated definitions
 whose marker-stripped model resolves to a routed id receive a preventive instruction not to invoke
 those skills. Direct `provider/model` selectors are routed even when their inbound resolution is
-identity. The only unguarded `ocx-self` case is an identity-resolved `claude|anthropic` model while
+identity. The only unguarded `opr-self` case is an identity-resolved `claude|anthropic` model while
 native passthrough is enabled; `modelMap` claims and `nativePassthrough:false` restore the guard. The
 guard avoids creating oversized skill messages before the proxy can intervene; inbound elision remains
 the fallback if a client still sends a blocked bundle. An explicit empty list disables both routed-model

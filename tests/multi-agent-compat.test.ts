@@ -1,6 +1,6 @@
 /**
  * Multi-agent compatibility shims (follow-up to devlog/260709_v2_gated_ultra):
- * models are no longer v1-pinned by ocx, but legacy/v1-surface requests still need
+ * models are no longer v1-pinned by opr, but legacy/v1-surface requests still need
  * the Proactive delegation prompt when they arrive with the synthetic top tier.
  */
 import { afterEach, describe, expect, test } from "bun:test";
@@ -27,7 +27,7 @@ afterEach(() => {
 });
 
 function codexHomeFixture(configToml: string): string {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-v1pin-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-v1pin-"));
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "config.toml"), configToml);
   process.env.CODEX_HOME = dir;
@@ -44,7 +44,7 @@ type CatalogFixtureModel = {
 
 /** Write an injected-catalog fixture into the active CODEX_HOME. */
 function catalogFixture(dir: string, models: CatalogFixtureModel[]): void {
-  writeFileSync(join(dir, "opencodex-catalog.json"), JSON.stringify({
+  writeFileSync(join(dir, "openprovider-catalog.json"), JSON.stringify({
     models: models.map((model, index) => ({
       slug: model.slug,
       display_name: model.slug,

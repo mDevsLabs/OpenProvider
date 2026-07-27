@@ -20,7 +20,7 @@ hostile stream fails loudly and safely instead of silently misbehaving or growin
 
 ## 2. Pre-write evidence
 
-### Current opencodex — permissive decoder
+### Current openprovider — permissive decoder
 ```68:90:src/adapters/cursor/framing.ts
 const flags = view.getUint8(0);
 const length = view.getUint32(1, false);
@@ -75,7 +75,7 @@ function validateDecodedFlags(flags: number): void {
 - Add `ConnectFrameErrorCode` member `"compressed_unsupported"` (and `"pending_overflow"`,
   `"incomplete_at_end"`). `decodeAvailableConnectFrames` (or the transport) fails when a returned frame
   has `compressed === true` and no decompressor is wired.
-- (Decision note: opencodex chooses **fail-closed** on reserved/compressed rather than
+- (Decision note: openprovider chooses **fail-closed** on reserved/compressed rather than
   forward-compatible ignore; document this and test it.)
 
 ### MODIFY `src/adapters/cursor/live-transport.ts`

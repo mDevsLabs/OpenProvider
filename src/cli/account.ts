@@ -1,4 +1,4 @@
-/** `ocx account` — list and switch provider credentials (issue #180). */
+/** `opr account` — list and switch provider credentials (issue #180). */
 import { loadConfig } from "../config";
 import { providerCodexAccountMode } from "../providers/registry";
 import type { OcxConfig } from "../types";
@@ -16,15 +16,15 @@ const MAIN_CODEX_ID = "__main__";
 const REPLACEMENT_STYLE_OAUTH = new Set(["kiro"]);
 
 const ACCOUNT_USAGE = `Usage:
-  ocx account list [provider] [--json] [--all]
-  ocx account current <provider> [--json]
-  ocx account use <provider> <account-or-key-id|main> [--json]
-  ocx account refresh <provider> [--json]
-  ocx account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]
-  ocx account alias <provider> <account-or-key-id> <display-name|-> [--json]
-  ocx account remove <provider> <account-or-key-id|main> --yes [--json]
-  ocx account clear-cooldown <provider> <account-id|main> [--json]
-  ocx account add-key <provider> [--label <label>] [--json]
+  opr account list [provider] [--json] [--all]
+  opr account current <provider> [--json]
+  opr account use <provider> <account-or-key-id|main> [--json]
+  opr account refresh <provider> [--json]
+  opr account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]
+  opr account alias <provider> <account-or-key-id> <display-name|-> [--json]
+  opr account remove <provider> <account-or-key-id|main> --yes [--json]
+  opr account clear-cooldown <provider> <account-id|main> [--json]
+  opr account add-key <provider> [--label <label>] [--json]
 
 List and switch provider accounts and API-key pools (masked output only).
 'main' selects the Codex App login for the openai account pool.`;

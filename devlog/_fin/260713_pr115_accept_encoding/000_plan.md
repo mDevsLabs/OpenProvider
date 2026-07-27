@@ -22,8 +22,8 @@ Land contributor PR #115 on `dev` without losing authorship, harden its header h
 
 ## Key evidence already captured
 
-- PR: https://github.com/lidge-jun/opencodex/pull/115
-- Issue: https://github.com/lidge-jun/opencodex/issues/114
+- PR: https://github.com/lidge-jun/openprovider/pull/115
+- Issue: https://github.com/lidge-jun/openprovider/issues/114
 - Contributor head: `75109049d8ba6ddbda4097a99231dc036a56375d`
 - PR CI: six Cross-platform CI jobs succeeded on 2026-07-12.
 - Current production owner: `src/server/responses.ts:1172-1190`.

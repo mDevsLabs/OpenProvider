@@ -7,7 +7,7 @@
 - **Status:** Scoping recommendation below (NOT implemented — documentation phase).
 - **Next:** see `10_plan.md` for the audited implementation plan (Phase 1
   read-only diagnostic + deferred opt-in Phase 2 repair), with codex-rs and
-  opencodex file:line evidence.
+  openprovider file:line evidence.
 
 ## Report summary
 
@@ -16,21 +16,21 @@ After a Codex app update on Windows, Codex-bundled plugins (`computer-use`,
 the new app package. The active Codex plugin marketplace list no longer includes
 the current `openai-bundled` marketplace path because Windows app-package paths
 embed the Codex app version; an update leaves a stale/missing registered path.
-Reporter proposes: Phase 1 read-only diagnostics in `ocx status`/`ocx doctor`/a
-new command; Phase 2 an optional explicit `ocx repair codex-plugins`. Explicitly
-wants to AVOID `ocx ensure` silently mutating Codex plugin marketplaces.
+Reporter proposes: Phase 1 read-only diagnostics in `opr status`/`opr doctor`/a
+new command; Phase 2 an optional explicit `opr repair codex-plugins`. Explicitly
+wants to AVOID `opr ensure` silently mutating Codex plugin marketplaces.
 
 ## Current state in the repo (investigation)
 
-- There is **no `ocx doctor` command** today. `src/codex-shim.ts` lists `doctor`
+- There is **no `opr doctor` command** today. `src/codex-shim.ts` lists `doctor`
   and `plugin` only as Codex subcommands the shim passes through (L17, L25) — not
-  an opencodex diagnostic.
-- opencodex already owns adjacent Codex-integration surfaces, which makes a
+  an openprovider diagnostic.
+- openprovider already owns adjacent Codex-integration surfaces, which makes a
   read-only diagnostic a natural fit:
   - config injection/restore: `src/codex-inject.ts` (already reasons about
     `[plugins."chrome@openai-bundled"]` table state — see comment L25)
   - paths: `src/codex-paths.ts` (`CODEX_HOME`, `CODEX_CONFIG_PATH`)
-  - shim: `src/codex-shim.ts` (`ocx codex-shim`)
+  - shim: `src/codex-shim.ts` (`opr codex-shim`)
   - status: `src/cli-status.ts`, `src/service.ts`
 - No existing reader for `codex plugin marketplace list`.
 
@@ -38,10 +38,10 @@ wants to AVOID `ocx ensure` silently mutating Codex plugin marketplaces.
 
 In scope as **read-only diagnostics**; the explicit repair command is acceptable
 only as an opt-in, never automatic. Agree with the reporter's "do not let
-`ocx ensure` mutate plugin marketplaces" stance.
+`opr ensure` mutate plugin marketplaces" stance.
 
 ### Phase 1 — diagnostics (recommended first PR)
-Add a read-only report (extend `ocx status --json` or add `ocx doctor`) that, on
+Add a read-only report (extend `opr status --json` or add `opr doctor`) that, on
 Windows, reports:
 - whether a Codex app package is installed and its detected version/path
 - the detected current `openai-bundled` marketplace path
@@ -54,7 +54,7 @@ Output should be **path-focused and secret-safe** (reuse `src/redact.ts`
 conventions) and only *suggest* a manual repair command — never mutate.
 
 ### Phase 2 — explicit repair (optional, opt-in only)
-`ocx repair codex-plugins`:
+`opr repair codex-plugins`:
 - detect the current bundled marketplace dir
 - `codex plugin marketplace add <current-openai-bundled-path>`
 - install/refresh known bundled plugins only when present

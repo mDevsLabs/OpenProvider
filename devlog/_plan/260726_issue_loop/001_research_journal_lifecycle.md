@@ -9,12 +9,12 @@ Research notes behind WP1. No diffs here; the implementation design lives in
 
 | Caller | Process | When |
 |--------|---------|------|
-| `src/cli/index.ts:201` | server process (`ocx start`, service mode) | after the server binds, before any injection |
+| `src/cli/index.ts:201` | server process (`opr start`, service mode) | after the server binds, before any injection |
 | `src/codex/inject.ts:532` | whichever process injects | first thing `injectCodexConfig` does after rejecting external providers |
 
-Everything that injects reaches the second one: `ocx sync`, `ocx ensure` (both
-the spawned child at `src/cli/index.ts:333` and the parent at `:357`), `ocx init`,
-`ocx provider add --sync`, `ocx models add`, the V2 commands, and the daemon's
+Everything that injects reaches the second one: `opr sync`, `opr ensure` (both
+the spawned child at `src/cli/index.ts:333` and the parent at `:357`), `opr init`,
+`opr provider add --sync`, `opr models add`, the V2 commands, and the daemon's
 `POST /api/sync` at `src/server/management/config-routes.ts:227`.
 
 `markJournalInjectedState()` has one caller, `src/codex/inject.ts:577`, always
@@ -23,9 +23,9 @@ in the same process and the same function body as the `writeJournal()` at 532.
 `restoreJournalState()` is reached from `restoreNativeCodex()`
 (`src/codex/inject.ts:714`), which runs on foreground `syncCleanup`
 (`src/cli/index.ts:212-222`, skipped when `OCX_SERVICE` is set), `POST /api/stop`
-(`src/server/management-api.ts:151`), `ocx stop`, `ocx uninstall`, and
-`ocx restore`. `reconcileJournal()` runs at the top of `ocx start`
-(`src/cli/index.ts:153`) and `ocx ensure` (`:307`).
+(`src/server/management-api.ts:151`), `opr stop`, `opr uninstall`, and
+`opr restore`. `reconcileJournal()` runs at the top of `opr start`
+(`src/cli/index.ts:153`) and `opr ensure` (`:307`).
 
 ## The two frozen returns
 
@@ -37,11 +37,11 @@ two-file restore (`:98`), and a partial restore is normal and tested
 
 ## Why the guard at line 32 is load-bearing
 
-`ocx start` calls `writeJournal()` twice — once directly, once through
+`opr start` calls `writeJournal()` twice — once directly, once through
 injection — and injection over an already-injected config is a supported,
 tested path (`tests/codex-inject-integration.test.ts`, "re-inject over a Design
 B config is idempotent"). Without the guard the second call captures the
-*injected* config as `originalConfig`, and a later restore replays opencodex's
+*injected* config as `originalConfig`, and a later restore replays openprovider's
 own routing into the user's config as if they had written it. Deleting the line,
 which the issue suggests, converts a recoverable staleness bug into permanent
 unremovable injection.
@@ -69,7 +69,7 @@ Path 2 matches the reported symptom and is what the frozen snapshot enables.
 
 - **Delete line 32.** Permanent injection, as above.
 - **PID-based transaction ownership** (`journal.pid !== process.pid`). Rejected
-  during audit: `ocx sync` and the `ocx ensure` parent legitimately inject in a
+  during audit: `opr sync` and the `opr ensure` parent legitimately inject in a
   process that did not write the journal, so the guard would suppress hash
   refresh exactly when it is needed. It is also unnecessary — a refreshed
   journal is rebuilt from scratch and therefore has no hash to protect.

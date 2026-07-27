@@ -286,7 +286,7 @@ function hardenEntry(
     const annotated = `${diagnostics}; ${state}`;
     // Timeout-only soft-fail: a hung icacls must not block OAuth/token writes.
     // chmod is still applied by the caller.
-    console.warn(`[opencodex] ${annotated} — continuing without NTFS ACL harden`);
+    console.warn(`[openprovider] ${annotated} — continuing without NTFS ACL harden`);
     return { ok: false, diagnostics: annotated };
   }
   if (opts.required) throw new Error(diagnostics);

@@ -2,7 +2,7 @@
 
 ## Problem
 
-Windows reports are consistent with native runtime instability as well as timeout disconnects. GPT Pro found external evidence of a Bun 1.3.14 Windows/opencodex crash class, and this repo already contains a Windows streaming crash workaround comment in `src/server.ts`.
+Windows reports are consistent with native runtime instability as well as timeout disconnects. GPT Pro found external evidence of a Bun 1.3.14 Windows/openprovider crash class, and this repo already contains a Windows streaming crash workaround comment in `src/server.ts`.
 
 macOS stability does not disprove this; Bun's Windows stream/process behavior can diverge from macOS.
 
@@ -20,7 +20,7 @@ Record these in Windows service logs and status output:
 - Bun version;
 - whether bundled Bun or override Bun is used;
 - CLI entrypoint path;
-- opencodex version;
+- openprovider version;
 - platform/arch;
 - config dir and `CODEX_HOME`.
 
@@ -61,7 +61,7 @@ Short-term release posture:
   - logs Bun path/version command;
   - includes selected Bun path.
 - Status test:
-  - `ocx service status` or `ocx status` exposes enough runtime identity without leaking secrets.
+  - `opr service status` or `opr status` exposes enough runtime identity without leaking secrets.
 
 ## Manual Windows smoke
 

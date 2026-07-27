@@ -21,7 +21,7 @@
 - **슬롯 자동 발급**: 라우팅 모델마다 `claude-opus-4-8-2026MMDD` 형태 날짜 접미사 슬롯.
   날짜는 2026년 범위에서 **중복 없는 난수**(모델 route 해시 → 유효 날짜 매핑, 충돌 회피).
   labelOverride = "Opus 4.8 (<실모델명>)", contextWindow>=1M이면 supports1m.
-  `ocx claude desktop`이 슬롯 목록 + modelMap을 자동 기록.
+  `opr claude desktop`이 슬롯 목록 + modelMap을 자동 기록.
 - **티어 기본 3모델**: Claude Code 서브에이전트는 opus/sonnet/haiku(/fable) **별칭**으로
   호출하므로 티어별 기본 슬롯을 GUI에서 지정: opus=주력(복잡한 설계/디버깅),
   sonnet=균형(구현/조사), haiku=경량(탐색/분류/요약), fable=명시 선택.

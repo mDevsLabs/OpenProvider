@@ -4,20 +4,20 @@ Final D summary across work-phases (updated at WP4 D).
 
 ## Delivered surface
 
-`ocx account` family (GUI parity for the credential domain):
+`opr account` family (GUI parity for the credential domain):
 
 | Command | Semantics |
 |---|---|
-| `ocx account list [provider] [--json] [--all]` | Codex pool + OAuth accounts + API-key pools, masked; config-first classification; provenance-aware fan-out error policy |
-| `ocx account current <provider> [--json]` | Active credential (codex: next-session pin incl. `auto` note) |
-| `ocx account use <provider> <id\|main> [--json]` | Switch (codex: new sessions only; oauth/keys: immediate) |
-| `ocx account refresh openai [--json]` | WHAM quota fan-out, per-account quota lines |
-| `ocx account auto-switch <provider> <on\|off\|status\|threshold N> [--json]` | openai-only guard |
-| `ocx account remove <provider> <id\|main> --yes [--json]` | Guarded delete, family-correct promotion output, main refused |
-| `ocx account add-key <provider> [--label L] [--json]` | Pipe-only stdin, TTY rejected, `[redacted]` on key occurrences |
+| `opr account list [provider] [--json] [--all]` | Codex pool + OAuth accounts + API-key pools, masked; config-first classification; provenance-aware fan-out error policy |
+| `opr account current <provider> [--json]` | Active credential (codex: next-session pin incl. `auto` note) |
+| `opr account use <provider> <id\|main> [--json]` | Switch (codex: new sessions only; oauth/keys: immediate) |
+| `opr account refresh openai [--json]` | WHAM quota fan-out, per-account quota lines |
+| `opr account auto-switch <provider> <on\|off\|status\|threshold N> [--json]` | openai-only guard |
+| `opr account remove <provider> <id\|main> --yes [--json]` | Guarded delete, family-correct promotion output, main refused |
+| `opr account add-key <provider> [--label L] [--json]` | Pipe-only stdin, TTY rejected, `[redacted]` on key occurrences |
 
-Docs: `ocx account` section in cli.md (en/ko/zh-cn) + "Switching accounts from the
-terminal" pointer in guides/providers.md (3 locales) + `ocx account` rows in the
+Docs: `opr account` section in cli.md (en/ko/zh-cn) + "Switching accounts from the
+terminal" pointer in guides/providers.md (3 locales) + `opr account` rows in the
 README CLI lists (en/ko/zh-cn) — audit R4 corrected the initial "deep-link only"
 judgment; the READMEs DO carry command lists (README.md:269-287).
 
@@ -51,7 +51,7 @@ judgment; the READMEs DO carry command lists (README.md:269-287).
 
 ## Residual candidates (recorded, NOT in this loop's scope)
 
-- `ocx account reauth` (GUI #171 re-auth flows; browser territory).
+- `opr account reauth` (GUI #171 re-auth flows; browser territory).
 - Codex pool add-account via CLI browser flow; reset-credit view/consume.
 - Failover threshold (`/api/codex-auth/failover`) — GUI doesn't expose it either.
 - Non-credential GUI↔CLI gaps from `004` (combos, usage, logs, storage, proxy

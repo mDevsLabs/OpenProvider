@@ -50,7 +50,7 @@ The scaffold work introduced two modules:
 | Helper | Consumer |
 |--------|----------|
 | `deriveKeyLoginMap()` | `KEY_LOGIN_PROVIDERS` compatibility export and `/api/key-providers`. |
-| `deriveInitProviders()` | `ocx init` provider menu. |
+| `deriveInitProviders()` | `opr init` provider menu. |
 | `deriveOAuthProviderConfig()` | OAuth provider config seeds. |
 | `deriveOAuthDefaultModel()` | OAuth default model fields. |
 | `deriveProviderPresets()` | GUI add-provider picker via `/api/provider-presets`. |

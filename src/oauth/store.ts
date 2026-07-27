@@ -1,5 +1,5 @@
 /**
- * OAuth token store at ~/.opencodex/auth.json, keyed by provider name.
+ * OAuth token store at ~/.openprovider/auth.json, keyed by provider name.
  *
  * Multiauth shape (260706): each provider value is a ProviderAccountSet
  * `{ activeAccountId, accounts: [{ id, credential, needsReauth?, addedAt? }] }`.
@@ -115,7 +115,7 @@ export function loadAuthStore(): AuthStore {
 }
 
 /**
- * Observe-only auth store read for diagnostics (`ocx doctor` / status).
+ * Observe-only auth store read for diagnostics (`opr doctor` / status).
  * Does not chmod paths or backup invalid JSON — corrupt files are treated as empty.
  */
 export function peekAuthStore(): AuthStore {
@@ -167,7 +167,7 @@ export function createOAuthRefreshIntentLock(provider:string,accountId:string,ov
 
 /**
  * One-time downgrade safety net: the first time we persist the NEW shape over a file that
- * still contains legacy single-credential entries, keep a pristine copy. An older opencodex
+ * still contains legacy single-credential entries, keep a pristine copy. An older openprovider
  * would silently drop the new shape (normalizeCredential -> null) and then persist an empty
  * store, destroying refresh tokens; the backup makes that recoverable.
  */

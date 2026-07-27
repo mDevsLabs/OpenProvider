@@ -42,7 +42,7 @@ test's guarded set. Confirms the audit finding rather than adding a new one.
 
 `detectExportedEnv` excluded only `PROXY_MARKER` from `ANTHROPIC_AUTH_TOKEN`, but
 `system-env.ts` exports the CONFIGURED admission key into that same variable. So
-opencodex read its own output back as proof the user can authenticate natively, and
+openprovider read its own output back as proof the user can authenticate natively, and
 `auto` resolved `subscription` for someone with no Claude login at all — the marker
 feedback loop (002 §1) one variable over.
 

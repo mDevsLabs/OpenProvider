@@ -11,7 +11,7 @@ import type { OcxConfig } from "../src/types";
 const baseConfig = { port: 10100, defaultProvider: "openai", providers: {} } as unknown as OcxConfig;
 
 function tempGrokHome(): { root: string; grokHome: string } {
-  const root = mkdtempSync(join(tmpdir(), "ocx-grok-sync-"));
+  const root = mkdtempSync(join(tmpdir(), "opr-grok-sync-"));
   const grokHome = join(root, ".grok");
   mkdirSync(grokHome);
   return { root, grokHome };
@@ -31,8 +31,8 @@ describe("syncGrokConfig", () => {
       expect(result).toMatchObject({ ok: true, changed: true });
       const content = readFileSync(join(grokHome, "config.toml"), "utf8");
       // Native slugs come from visibleNativeSlugs(config) — at least one gpt native present.
-      expect(content).toContain("[model.ocx-gpt-");
-      expect(content).toContain("[model.ocx-cursor-grok-4-5]");
+      expect(content).toContain("[model.opr-gpt-");
+      expect(content).toContain("[model.opr-cursor-grok-4-5]");
       expect(content).toContain("context_window = 500000");
       expect(content).toContain('base_url = "http://127.0.0.1:10190/v1"');
     } finally {
@@ -53,7 +53,7 @@ describe("syncGrokConfig", () => {
       expect(result).toMatchObject({ ok: true, changed: true });
       const content = readFileSync(join(grokHome, "config.toml"), "utf8");
 
-      const solBlock = content.slice(content.indexOf("[model.ocx-gpt-5-6-sol]"));
+      const solBlock = content.slice(content.indexOf("[model.opr-gpt-5-6-sol]"));
       expect(solBlock).toContain(`context_window = ${nativeOpenAiContextWindow("gpt-5.6-sol")}`);
       expect(nativeOpenAiContextWindow("gpt-5.6-sol")).toBe(372_000);
 
@@ -61,7 +61,7 @@ describe("syncGrokConfig", () => {
       // none recorded, and inject.ts deliberately omits the line rather than writing a
       // placeholder — asserting "every block has one" would encode a bug as a requirement.
       const windowBySlug = visibleNativeSlugs(baseConfig).map(slug => {
-        const header = `[model.ocx-${slug.replace(/\./g, "-")}]`;
+        const header = `[model.opr-${slug.replace(/\./g, "-")}]`;
         const start = content.indexOf(header);
         if (start < 0) return `${slug}: MISSING BLOCK`;
         const rest = content.slice(start + header.length);
@@ -134,9 +134,9 @@ describe("syncGrokConfig", () => {
         fetchAllModels: async () => [{ id: "new", provider: "p" } as CatalogModel],
       });
       const content = readFileSync(join(grokHome, "config.toml"), "utf8");
-      expect(content.match(/>>> opencodex managed block/g) ?? []).toHaveLength(1);
-      expect(content).not.toContain("[model.ocx-p-old]");
-      expect(content).toContain("[model.ocx-p-new]");
+      expect(content.match(/>>> openprovider managed block/g) ?? []).toHaveLength(1);
+      expect(content).not.toContain("[model.opr-p-old]");
+      expect(content).toContain("[model.opr-p-new]");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

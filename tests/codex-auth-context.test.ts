@@ -41,7 +41,7 @@ let previousOpencodexHome: string | undefined;
 let previousCodexHome: string | undefined;
 
 beforeEach(() => {
-  testDir = mkdtempSync(join(tmpdir(), "ocx-auth-ctx-"));
+  testDir = mkdtempSync(join(tmpdir(), "opr-auth-ctx-"));
   previousOpencodexHome = process.env.OPENCODEX_HOME;
   process.env.OPENCODEX_HOME = testDir;
   // Isolate the main-account credential source: testDir has no auth.json, so the main
@@ -417,7 +417,7 @@ describe("cooldown error surface", () => {
 
     expect(message).toContain("2026-07-26T10:00:00.000Z");
     expect(message).toContain("reset-derived");
-    expect(message).toContain("ocx account clear-cooldown openai <id>");
+    expect(message).toContain("opr account clear-cooldown openai <id>");
     // Masked, never raw: /v1/* bodies can reach remote authenticated clients when the
     // proxy binds a non-loopback hostname.
     expect(message).not.toContain("acct_9f3c21");
@@ -444,7 +444,7 @@ describe("cooldown error surface", () => {
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBe("90");
     const body = await response.json() as { error?: { message?: string } };
-    expect(body.error?.message).toContain("ocx account clear-cooldown");
+    expect(body.error?.message).toContain("opr account clear-cooldown");
   });
 
   test("an already-elapsed cooldown still yields a valid Retry-After", () => {

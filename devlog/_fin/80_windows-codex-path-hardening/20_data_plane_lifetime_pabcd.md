@@ -79,7 +79,7 @@ bun test tests/responses-lifetime.test.ts tests/passthrough-relay.test.ts
 Manual Windows smoke:
 
 ```powershell
-ocx start
+opr start
 # Send a streaming /v1/responses request that stays quiet longer than the old failure window.
 # Confirm the stream continues and service/process logs show no unintended close.
 ```

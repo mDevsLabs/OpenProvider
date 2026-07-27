@@ -37,7 +37,7 @@ Implements Phase 1 of `10_plan.md` under cli-jaw dev/goal/pabcd conventions
 - `src/cli.ts` (MODIFY): `handleStatus()` prints one diagnostic line + suggested
   repair only when `applicable` (Windows), so macOS/Linux output is unchanged.
 - `tests/codex-plugins-doctor.test.ts` (NEW): 8 tests (platform-injected unit
-  cases + a spawned `ocx status --json` read-only case).
+  cases + a spawned `opr status --json` read-only case).
 
 ## Non-mutation guarantee
 
@@ -60,7 +60,7 @@ from `handleEnsure()`.
 
 - Windows Codex app-package locator + "current bundled path differs from
   registered path" signal (needs a reliable app-dir resolver).
-- Phase 2 opt-in `ocx repair codex-plugins` (explicit, mutating) — separate PR.
+- Phase 2 opt-in `opr repair codex-plugins` (explicit, mutating) — separate PR.
 
 ## Independent verification (gpt-5.5 subagent) + bug fix
 

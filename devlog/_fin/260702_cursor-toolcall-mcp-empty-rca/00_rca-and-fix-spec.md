@@ -29,11 +29,11 @@
 
 ### Backward(server tool-call → SSE emit) — 결함 없음
 - decode: `protobuf-events.ts:195-272`(deferred start, parallel 직렬화, arg 정규화) → `message-mapper.ts:20-25`(필터 없이 통과) → `live-transport.ts` push → `bridge.ts:362-397` SSE. 끊기는 지점 없음, 잘 테스트됨.
-- 단 **게이팅 조건**: 서버가 돌려준 tool-call이 `case==="mcpToolCall"` AND `providerIdentifier==="opencodex-responses"`(`protobuf-events.ts:44-48`)여야 인식. 아니면 무음 drop. 그리고 `recordToolCall`(protobuf-events.ts:153-155)은 이름이 `clientToolNames`에 없으면 error emit — `clientToolNames`는 `request.tools`에서만 채워짐(live-transport.ts:236-240).
+- 단 **게이팅 조건**: 서버가 돌려준 tool-call이 `case==="mcpToolCall"` AND `providerIdentifier==="openprovider-responses"`(`protobuf-events.ts:44-48`)여야 인식. 아니면 무음 drop. 그리고 `recordToolCall`(protobuf-events.ts:153-155)은 이름이 `clientToolNames`에 없으면 error emit — `clientToolNames`는 `request.tools`에서만 채워짐(live-transport.ts:236-240).
 - `finalizeTurnEvents`(protobuf-events.ts:280-287)의 fail-closed 절단은 정상 흐름에선 grace-cancel로 회피됨. 상시 원인 아님.
 
 ### "MCP empty"의 절반은 설계상 예상됨
-- opencodex-hosted MCP 서버는 `provider.mcpServers`를 읽는 `mcp-config.ts:35-42` 단 하나의 경로에만 의존. 이 값이 비면 `live-transport.ts:177-182`에서 `mcpManager` 자체가 undefined → `mcpToolDefs` 영영 미생성.
+- openprovider-hosted MCP 서버는 `provider.mcpServers`를 읽는 `mcp-config.ts:35-42` 단 하나의 경로에만 의존. 이 값이 비면 `live-transport.ts:177-182`에서 `mcpManager` 자체가 undefined → `mcpToolDefs` 영영 미생성.
 - **설정 surface 부재**: `grep mcpServers`가 GUI 0건, CLI 0건, `providers/derive.ts`/`registry.ts` 시드 0건. `config.json` 수기 편집만 유일 주입 경로(`config.ts` `.passthrough()`). 즉 일반 사용자에겐 hosted MCP는 100% 빈 상태 = **정상 동작이나 "MCP 비어보임"으로 오인**. devlog 362가 이미 "The empty MCP listing the user saw is expected"라고 문서화.
 
 ### 테스트가 green인데 라이브가 죽는 이유
@@ -73,7 +73,7 @@
 
 추가 조사(jawcode SOT / in-repo 레퍼런스 / Phase-45 git 아카이브, 전부 opus 서브에이전트)로 두 가지가 뒤집혔다:
 
-1. **복사할 proactive 레퍼런스는 없다.** jawcode(`packages/ai/src/providers/cursor.ts:2607-2616` "Tools are sent later via requestContext")·gajae-code·oh-my-pi 전부 opencodex와 **동일한 reactive-only**. danger-pi 원본은 머신에 없음(fail-fast). jawcode도 tool-call은 composer-2.5로만 검증, claude-opus 증거 없음 — opencodex 증상과 정확히 일치(모델별 requestContextArgs 거동 차이 = 가설 a 강화).
+1. **복사할 proactive 레퍼런스는 없다.** jawcode(`packages/ai/src/providers/cursor.ts:2607-2616` "Tools are sent later via requestContext")·gajae-code·oh-my-pi 전부 openprovider와 **동일한 reactive-only**. danger-pi 원본은 머신에 없음(fail-fast). jawcode도 tool-call은 composer-2.5로만 검증, claude-opus 증거 없음 — openprovider 증상과 정확히 일치(모델별 requestContextArgs 거동 차이 = 가설 a 강화).
 
 2. **그러나 proto field 4는 살아있고, Phase 45의 "field 4 불가" 결론은 반박됨(신뢰도 High).**
    - 스키마: `AgentRunRequest.mcpTools`(field 4, `gen/agent_pb.ts:2760`) = `McpTools{ mcpTools: McpToolDefinition[] }`(`McpToolsSchema` `gen:9016`). reactive `RequestContext.tools`(field 7)와 **원소 타입 동일**(`McpToolDefinition`). Phase 45는 스키마가 아니라 값 채우는 배선만 제거.
@@ -104,6 +104,6 @@ import { buildCursorToolDefinitions, OCX_RESPONSES_TOOL_PROVIDER } from "./tool-
 - (선택, MCP-empty UX) `providers/registry.ts`+GUI에 mcpServers 설정 surface — 별건, 우선순위 낮음
 
 ## 제약
-- 프로토콜은 문서 없는 2단계 reverse-engineered 사본(Cursor → jawcode RE → opencodex vendored). `.proto` 원본/재생성 파이프라인 없음.
+- 프로토콜은 문서 없는 2단계 reverse-engineered 사본(Cursor → jawcode RE → openprovider vendored). `.proto` 원본/재생성 파이프라인 없음.
 - 라이브 진단은 실 Cursor 계정 토큰 필요. 파괴적 실험 금지(read/ls/grep 위주).
 - Boss는 직접 코드 미작성. 구현은 gpt-5.5 직원(`cli-jaw dispatch --virtual --cli codex --model gpt-5.5 --mutable --scope src/adapters/cursor`).

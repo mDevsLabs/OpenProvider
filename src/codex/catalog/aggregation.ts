@@ -148,7 +148,7 @@ export function warnUncataloguedComboOnce(
     .map(target => safeCatalogWarningLabel(targetKey(target)))
     .sort((a, b) => a.localeCompare(b));
   console.warn(
-    `[opencodex] Combo "${safeCatalogWarningLabel(id)}" is omitted from the catalog because member capabilities are incomplete: ${targets.join(", ")}.`,
+    `[openprovider] Combo "${safeCatalogWarningLabel(id)}" is omitted from the catalog because member capabilities are incomplete: ${targets.join(", ")}.`,
   );
 }
 
@@ -191,7 +191,7 @@ export function warnComboMasqueradeCollisionOnce(slug: string): void {
   if (comboMasqueradeCollisionWarnings.has(slug)) return;
   comboMasqueradeCollisionWarnings.add(slug);
   console.warn(
-    `[opencodex] combo alias collision on "${safeCatalogWarningLabel(slug)}": the combo wins and the shadowed provider model is omitted from the catalog.`,
+    `[openprovider] combo alias collision on "${safeCatalogWarningLabel(slug)}": the combo wins and the shadowed provider model is omitted from the catalog.`,
   );
 }
 
@@ -218,7 +218,7 @@ export function resolveSlugAliasCollisions(goModels: CatalogModel[]): Set<Catalo
     if (!slugAliasCollisionWarnings.has(key)) {
       slugAliasCollisionWarnings.add(key);
       console.warn(
-        `[opencodex] slug alias collision on "${key}": multiple native ids encode to the same Codex-facing slug; `
+        `[openprovider] slug alias collision on "${key}": multiple native ids encode to the same Codex-facing slug; `
         + "the plain-hyphen native id is cataloged, the slash id remains callable via its raw selector.",
       );
     }

@@ -8,7 +8,7 @@
 - Non-goals: new authentication protocols, account deletion redesign, automatic quota-routing policy changes, provider catalog redesign, brand-asset replacement, new dependencies, deployment, or remote push.
 - Verifier: focused OAuth/Codex API and workspace tests prove contracts; GUI typecheck/build/lint prove compilation and i18n; live local API and browser flows prove account switching, restoration, keyboard behavior, responsive layout, console, and network state.
 - Stop condition: account and rail criteria in the bound goalplan carry fresh evidence; no credential or raw account identifier is exposed; independent review has no open High/Critical blocker.
-- Memory artifact: this unit, its decade documents, `.codexclaw/goalplans/opencodex-providers-workspace-provider-workspace/`, local commits, and browser screenshots.
+- Memory artifact: this unit, its decade documents, `.codexclaw/goalplans/openprovider-providers-workspace-provider-workspace/`, local commits, and browser screenshots.
 - Terminal outcomes: `DONE` on verified integration; `NOOP` only for a slice already satisfying every criterion; `BLOCKED` for a missing safe account contract; `UNSAFE` for credential exposure or destructive requirements; `NEEDS_HUMAN` for irreducible product intent; `BUDGET_EXHAUSTED` only after the bounds below are hit.
 - Escalation: the main agent reclaims a packet after two distinct workers fail it; any new delegated write slice is first added as a P-phase amendment. Review findings are folded back through the same reviewer until pass/near-pass or three failed rounds.
 
@@ -17,7 +17,7 @@
 - Overall work: C3 cross-domain frontend integration.
 - Account-selection slice: C4 verification depth because it mutates the active authentication identity, although it reuses existing local routes and stores.
 - Rail slice: C2 frontend repair within the existing workspace module.
-- Tool and credential scope: local repository, local OpenCodex management API on `127.0.0.1`, Browser/in-app browser and isolated agbrowse only. Never read browser storage, cookies, raw tokens, or credential files.
+- Tool and credential scope: local repository, local OpenProvider management API on `127.0.0.1`, Browser/in-app browser and isolated agbrowse only. Never read browser storage, cookies, raw tokens, or credential files.
 - Write scope: files named in `010_account_switcher.md`, `020_provider_rail.md`, `030_integration_qa.md`, this devlog unit, and the bound goalplan/ledger.
 - External cost: zero paid web/provider calls and no new package installs.
 - Delegation bound: at most four concurrent research/review agents; writes remain main-agent owned unless a later P amendment assigns disjoint files.

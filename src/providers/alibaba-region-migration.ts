@@ -9,7 +9,7 @@ const INTL_ID = "alibaba-token-plan-intl";
 
 /**
  * Credentials and switches the user owns directly. Everything else on the moved
- * row is registry-derived Beijing metadata (`ocx provider add` and the GUI persist
+ * row is registry-derived Beijing metadata (`opr provider add` and the GUI persist
  * it, and registry enrichment only fills absent fields) and must NOT travel to the
  * international id — carrying it would leave the intl provider serving Singapore
  * while advertising the six-model Beijing Personal Edition catalog.
@@ -42,7 +42,7 @@ function isInternationalEndpoint(baseUrl: string): boolean {
 
 /**
  * Seed the destination from the international registry entry, then overlay only
- * what the user owns. `providerConfigSeed` is the same function `ocx provider add`
+ * what the user owns. `providerConfigSeed` is the same function `opr provider add`
  * uses, so the migrated row is indistinguishable from one the user had created
  * against the international provider directly.
  */

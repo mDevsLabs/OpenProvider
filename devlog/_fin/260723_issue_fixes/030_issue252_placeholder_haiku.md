@@ -3,7 +3,7 @@
 ## Design
 
 The Agent tool's `model` argument is ignored by the proxy (routing is pinned by the
-`<!-- ocx-route: ... -->` directive), but our injected guidance tells the model to
+`<!-- opr-route: ... -->` directive), but our injected guidance tells the model to
 pass `model: "sonnet"` as the placeholder. Claude Code UI then displays "sonnet",
 indistinguishable from a genuine Sonnet call (issue #252, screenshot evidence).
 Reporter's own proposal: use the lowest tier (`haiku`) as the placeholder so a
@@ -26,13 +26,13 @@ client rejects "haiku", stop and amend this doc (audit finding 7a).
 // before (:234-236)
  * placeholder: any value works, "sonnet" is the cheap canonical one.
  */
-const NO_MODEL_ARG = "NOTE: this agent's real model is pinned by the opencodex proxy — the `model` argument is ignored. Pass model: \"sonnet\" as a placeholder (or omit it); routing is unaffected either way.";
+const NO_MODEL_ARG = "NOTE: this agent's real model is pinned by the openprovider proxy — the `model` argument is ignored. Pass model: \"sonnet\" as a placeholder (or omit it); routing is unaffected either way.";
 // after
  * placeholder: any value works; "haiku" is canonical because a haiku-labeled call
  * is visibly a placeholder in the Claude Code UI, while "sonnet" was
  * indistinguishable from a genuine Sonnet call (issue #252).
  */
-const NO_MODEL_ARG = "NOTE: this agent's real model is pinned by the opencodex proxy — the `model` argument is ignored. Pass model: \"haiku\" as a placeholder (or omit it); routing is unaffected either way.";
+const NO_MODEL_ARG = "NOTE: this agent's real model is pinned by the openprovider proxy — the `model` argument is ignored. Pass model: \"haiku\" as a placeholder (or omit it); routing is unaffected either way.";
 ```
 
 Production-source write scope is exactly `src/claude/agents-inject.ts`; test files
@@ -46,11 +46,11 @@ env vars, unrelated to the placeholder).
 
 - Assert generated agent definitions / tool descriptions contain `model: \"haiku\"`
   guidance and NOT `model: \"sonnet\"`.
-- Existing directive test (claude-agents-inject.test.ts:69 proves the ocx-route
+- Existing directive test (claude-agents-inject.test.ts:69 proves the opr-route
   directive is emitted) must stay green.
 - Dispatch-level "routing unaffected" proof lives in tests/claude-messages-endpoint.test.ts
   (audit finding 7c — the injection suite only covers generation): add one case where a
-  request carrying placeholder `model: "haiku"` with an ocx-route directive still routes
+  request carrying placeholder `model: "haiku"` with an opr-route directive still routes
   to the pinned model. If the endpoint suite's harness makes this disproportionate, the
   live dispatch verification from the Design section doubles as the routing proof and is
   recorded in the WP3 evidence instead.

@@ -2,7 +2,7 @@
 
 ## Question
 Routed chat models (GLM/xAI) get their tool cells split in the Codex app while native
-GPT / Claude-via-ocx threads merge. What exactly splits, and what is the native shape?
+GPT / Claude-via-opr threads merge. What exactly splits, and what is the native shape?
 
 ## Evidence (Tier-2, gpt-5.5 explorers Gauss/Aquinas + local captures)
 1. Grouping barriers (codex-rs TUI, openai/codex@dc23c7b): an exec group is extended only
@@ -15,7 +15,7 @@ GPT / Claude-via-ocx threads merge. What exactly splits, and what is the native 
    (`summary[]` + response.reasoning_summary_text.delta, optional encrypted_content); raw
    `content[reasoning_text]` is never emitted by hosted OpenAI models (OpenAI reasoning docs;
    codex-rs models.rs L970-979, event_mapping.rs L171-196).
-3. opencodex bridge asymmetry (THE splitter):
+3. openprovider bridge asymmetry (THE splitter):
    - anthropic `thinking_delta` path RESPECTS `options.hideThinkingSummary` — hidden thinking
      accumulates and flushes as an envelope-only reasoning item (empty summary, encrypted
      round-trip) — INVISIBLE to the app (bridge.ts:419, :228-235).

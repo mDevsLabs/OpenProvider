@@ -15,7 +15,7 @@ no-op(토큰 유실). 수정: id를 `hash(accountId ?? email ?? refresh)`로 결
 회귀 테스트: tests/oauth-store-multi.test.ts "deterministic account id across loads".
 
 P1 — 구 엔트리포인트 경로에 고착된 런처: 구조 개편으로 `src/cli.ts`가 사라졌는데,
-dev 시절 shim/service 래퍼는 그 절대경로를 명령줄에 구웠음. `ocx update`는 설치 후
+dev 시절 shim/service 래퍼는 그 절대경로를 명령줄에 구웠음. `opr update`는 설치 후
 shim/service를 재작성하므로 안전하지만, 맨 `npm install -g`로 올리는 사용자는 죽은
 경로에 좌초. 수정: `src/cli.ts` 호환 스텁(`import "./cli/index.ts"`) 1릴리스 이상 유지.
 
@@ -34,12 +34,12 @@ cursor-errors.ts, bun-runtime.ts) 갱신.
 
 ## 기존 사용자 업그레이드 호환 확인 (감사 결과: 안전)
 
-- config: `~/.opencodex/config.json` 경로/스키마 유지, zod `.passthrough()`로 미지 필드
+- config: `~/.openprovider/config.json` 경로/스키마 유지, zod `.passthrough()`로 미지 필드
   보존, 누락 필드는 기본값 수리. 단일 `apiKey` → 멀티키 풀 자동 시드, 페일오버는
   키 2개 이상일 때만 활성.
 - auth: `auth.json` 경로 유지, 레거시 단일 credential은 로드시 정규화(+최초 변이시
   `.pre-multiauth` 백업). 위 P0 수정으로 identity 없는 레거시도 안전.
-- 상태 파일: usage.jsonl / ocx.pid / 런타임 포트 / codex-accounts.json 전부 경로 불변.
+- 상태 파일: usage.jsonl / opr.pid / 런타임 포트 / codex-accounts.json 전부 경로 불변.
   responses-state.json은 additive.
 - 패키지 엔트리: bin/ocx.mjs → src/cli/index.ts 해석 확인, `node bin/ocx.mjs --version`
   실측 통과. CLI 명령 표면 dev 대비 보존.

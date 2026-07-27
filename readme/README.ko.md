@@ -11,30 +11,30 @@
 
 ```bash
 npm install -g @mdevs/openprovider
-ocx start        # 프록시 + 대시보드: localhost:10100
+opr start        # 프록시 + 대시보드: localhost:10100
 ```
 
 <p align="center">
-  <img src="../assets/claude-code-models.gif" alt="opencodex로 라우팅된 모델에서 돌아가는 Claude Code — 상태 표시줄에 gpt-5.6-luna-medium이 활성 모델로 표시됨" width="820"><br>
+  <img src="../assets/claude-code-models.gif" alt="openprovider로 라우팅된 모델에서 돌아가는 Claude Code — 상태 표시줄에 gpt-5.6-luna-medium이 활성 모델로 표시됨" width="820"><br>
   <sub><b>Claude Code에서 어떤 모델이든.</b> 선택기는 Claude Code 그대로, 돌아가는 모델은 원하는 대로.</sub>
 </p>
 
 <p align="center">
-  <img src="../assets/demo.gif" alt="opencodex 데모 — Codex 앱에서 비-OpenAI 라우팅 모델로 작업 실행" width="820"><br>
+  <img src="../assets/demo.gif" alt="openprovider 데모 — Codex 앱에서 비-OpenAI 라우팅 모델로 작업 실행" width="820"><br>
   <sub><b>Codex에서 어떤 모델이든.</b> 프로바이더만 고르면 끝 — 같은 Codex 워크플로, 다른 두뇌.</sub>
 </p>
 
 <p align="center">
-  <a href="../README.md">English</a> · <b>한국어</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.ja.md">日本語</a> · 📖 <a href="https://opencodex.me/ko/"><b>전체 문서 →</b></a>
+  <a href="../README.md">English</a> · <b>한국어</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.ja.md">日本語</a> · 📖 <a href="https://openprovider.me/ko/"><b>전체 문서 →</b></a>
 </p>
 
 <p align="center">
-  <img src="../assets/architecture.png" alt="opencodex 아키텍처 — Codex CLI가 opencodex 프록시를 통해 모든 LLM 프로바이더로 라우팅" width="820">
+  <img src="../assets/architecture.png" alt="openprovider 아키텍처 — Codex CLI가 openprovider 프록시를 통해 모든 LLM 프로바이더로 라우팅" width="820">
 </p>
 
 Claude, Gemini, Grok, GLM, DeepSeek, Kimi, Qwen, Ollama 등 어떤 LLM이든 Codex에서 — 그리고 **Claude Code**에서도 — 사용하세요. 누군가 지원을 추가해 주길 기다릴 필요 없이.
 
-opencodex는 Codex의 Responses API를 프로바이더가 쓰는 프로토콜로 변환해 주는 가벼운 로컬 프록시입니다. streaming, tool 호출, reasoning 토큰, 이미지까지 양방향으로 모두 동작합니다.
+openprovider는 Codex의 Responses API를 프로바이더가 쓰는 프로토콜로 변환해 주는 가벼운 로컬 프록시입니다. streaming, tool 호출, reasoning 토큰, 이미지까지 양방향으로 모두 동작합니다.
 
 또한 Codex 인증을 위한 **ChatGPT 계정 풀**을 관리할 수 있습니다. 여러 ChatGPT / Codex 계정을 추가하고,
 대시보드에서 5시간 / 주간 / 30일 쿼터를 갱신하며, 새 세션을 사용량이 가장 적은 정상 계정으로 자동
@@ -42,7 +42,7 @@ opencodex는 Codex의 Responses API를 프로바이더가 쓰는 프로토콜로
 세션이 대화 도중 계정을 바꾸지 않습니다.
 
 ```
-Codex CLI / App / SDK ──/v1/responses──▶ opencodex ──▶ Any provider
+Codex CLI / App / SDK ──/v1/responses──▶ openprovider ──▶ Any provider
                                               │
               Anthropic · Google · xAI · Kimi · Ollama Cloud · Groq
               OpenRouter · Azure · DeepSeek · GLM · …and OpenAI itself
@@ -50,7 +50,7 @@ Codex CLI / App / SDK ──/v1/responses──▶ opencodex ──▶ Any provi
 
 ```mermaid
 flowchart LR
-  codex[Codex 세션<br/>CLI, App, SSH, 모바일] --> proxy[opencodex]
+  codex[Codex 세션<br/>CLI, App, SSH, 모바일] --> proxy[openprovider]
   proxy --> existing{기존 스레드?}
   existing -->|예| pinned[같은 ChatGPT<br/>계정 유지]
   existing -->|새 세션| quota[쿼터 갱신<br/>5h, 주간, 30d]
@@ -81,15 +81,15 @@ flowchart LR
 npm install -g @mdevs/openprovider
 
 # 대화형 설정 (config 작성 + Codex 주입 + 자동 시작 shim 설치 선택)
-ocx init
+opr init
 
 # 프록시 시작
-ocx start
+opr start
 
 # init에서 건너뛰었다면 나중에 온디맨드 자동 시작 shim 설치
-ocx codex-shim install
+opr codex-shim install
 
-# Codex를 평소처럼 사용하세요 — opencodex를 통해 라우팅됩니다
+# Codex를 평소처럼 사용하세요 — openprovider를 통해 라우팅됩니다
 codex "Write a hello world in Rust"
 ```
 
@@ -98,7 +98,7 @@ codex "Write a hello world in Rust"
 
 <br/>
 
-opencodex는 Bun 런타임을 의존성으로 번들하고 Node 런처로 실행하므로 Bun을 직접 설치할 필요가 **없습니다**. "bundled Bun runtime is missing" 오류가 보이면 설치 과정에서 lifecycle 스크립트(npm이 `allowScripts`로 bun postinstall을 차단한 경우 포함)나 optional 의존성이 건너뛰어진 경우입니다. bun 설치 스크립트를 허용해서 다시 설치하세요:
+openprovider는 Bun 런타임을 의존성으로 번들하고 Node 런처로 실행하므로 Bun을 직접 설치할 필요가 **없습니다**. "bundled Bun runtime is missing" 오류가 보이면 설치 과정에서 lifecycle 스크립트(npm이 `allowScripts`로 bun postinstall을 차단한 경우 포함)나 optional 의존성이 건너뛰어진 경우입니다. bun 설치 스크립트를 허용해서 다시 설치하세요:
 
 ```bash
 npm install -g --allow-scripts=bun @mdevs/openprovider   # --ignore-scripts, --omit=optional 없이
@@ -120,7 +120,7 @@ sudo로 루트 소유 prefix에 설치했다면 위의 sudo 재설치가 해당 
 가장 쉬운 방법은 웹 대시보드를 이용하는 것입니다.
 
 ```bash
-ocx gui
+opr gui
 ```
 
 `http://localhost:10100` 대시보드가 열립니다. 여기서:
@@ -132,7 +132,7 @@ ocx gui
 
 추가한 프로바이더는 재시작 없이 즉시 사용할 수 있습니다.
 
-`ocx init`(대화형 CLI)이나 `~/.opencodex/config.json` 직접 편집으로도 프로바이더를 추가할 수 있습니다.
+`opr init`(대화형 CLI)이나 `~/.openprovider/config.json` 직접 편집으로도 프로바이더를 추가할 수 있습니다.
 
 ## 모델 라우팅
 
@@ -152,13 +152,13 @@ codex -m "ollama-cloud/glm-5.2" "SQL 마이그레이션을 작성해 줘"
 codex -m "ollama/llama3" "이 함수를 리팩터링해 줘"
 ```
 
-`provider/` 접두사를 생략하면 opencodex는 기본 프로바이더로 라우팅하거나, 모델명 패턴으로 자동
+`provider/` 접두사를 생략하면 openprovider는 기본 프로바이더로 라우팅하거나, 모델명 패턴으로 자동
 매칭합니다 (예: `claude-*`는 Anthropic, `gpt-*`는 OpenAI).
 
 라우팅된 모델은 **Codex App** 모델 선택기에도 모델별 reasoning effort 컨트롤과 함께 나타납니다:
 
 현재 Codex 빌드는 모델이 광고하는 경우 `low`, `medium`, `high`, `xhigh`, `max`, `ultra` reasoning
-컨트롤을 노출할 수 있습니다. opencodex는 프로바이더 config가 명시적으로 alias를 지정하지 않는 한
+컨트롤을 노출할 수 있습니다. openprovider는 프로바이더 config가 명시적으로 alias를 지정하지 않는 한
 `xhigh`와 `max`를 서로 다른 단계로 유지합니다. `ultra`는 업스트림 Codex와 같은 의미입니다:
 클라이언트에서 최대 reasoning과 능동적 멀티에이전트 위임을 켜고, 실제 요청은 `max`로 변환되어
 나갑니다. 라우팅된 모델은 `reasoningEfforts` config로 옵트인한 경우에만 `ultra`를 광고합니다.
@@ -167,11 +167,11 @@ GPT-5.6 Sol/Terra/Luna는 OpenAI API key 및 OpenRouter preset에서 rollout-rea
 seed됩니다(`gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`; OpenRouter는 `openai/...` 사용).
 스펙은 upstream models.json 스냅샷을 그대로 따릅니다 — Sol/Terra는 `ultra`까지, Luna는 `max`까지
 광고하고, Sol의 기본 reasoning은 `low`입니다. 실제
-사용 가능 여부는 upstream preview gate를 따르며, opencodex는 계정/프로바이더가 제공할 때 쓸
+사용 가능 여부는 upstream preview gate를 따르며, openprovider는 계정/프로바이더가 제공할 때 쓸
 routing/catalog metadata를 준비해 둡니다.
 
 <p align="center">
-  <img src="../assets/codex-app-picker.png" alt="opencodex 라우팅 모델을 reasoning effort 선택기와 함께 보여주는 Codex App" width="480">
+  <img src="../assets/codex-app-picker.png" alt="openprovider 라우팅 모델을 reasoning effort 선택기와 함께 보여주는 Codex App" width="480">
 </p>
 
 ## OpenAI 프로바이더 계정 모드
@@ -187,8 +187,8 @@ routing/catalog metadata를 준비해 둡니다.
   `gpt-5.6-sol` 같은 bare 모델 id는 그대로입니다.
 - `openai-apikey/gpt-5.6-sol`은 API를 선택하며 Codex 로그인과 API 자격증명 사이에는 fallback이 없습니다.
 - 현재 marker는 `openaiProviderTierVersion: 2`이고 원본은
-  `~/.opencodex/config.json.pre-openai-tiers-v2.bak`에 보존됩니다.
-  복원: `cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`
+  `~/.openprovider/config.json.pre-openai-tiers-v2.bak`에 보존됩니다.
+  복원: `cp ~/.openprovider/config.json.pre-openai-tiers-v2.bak ~/.openprovider/config.json`
 - 이전 v1 3-provider config는 단일 `openai` 행으로 자동 이관됩니다.
 - API 티어의 GPT-5.6 metadata는 context 1,050,000 / max input 922,000입니다.
   `gpt-5.6-sol-pro`, `terra-pro`, `luna-pro`는 공개 virtual id를 유지하면서 wire에서는 base id와
@@ -197,11 +197,11 @@ routing/catalog metadata를 준비해 둡니다.
 ### Pool 계정 동작
 
 대시보드의 **Codex Auth**를 열어 풀 계정을 추가하고, 다음 Codex 세션을 어느 계정이 처리할지 고르세요.
-opencodex는 두 가지 동작을 분리해서 유지합니다:
+openprovider는 두 가지 동작을 분리해서 유지합니다:
 
 - **기존 세션은 affinity를 유지합니다.** 스레드 id가 선택된 계정에 바인딩되어 이후 턴에서 재사용되므로,
   긴 요청이나 모바일/SSH 연결 세션이 같은 계정을 계속 사용합니다.
-- **새 세션은 자동 라우팅됩니다.** 자동 전환이 켜져 있으면 opencodex는 5시간·주간·30일 사용량 중 가장
+- **새 세션은 자동 라우팅됩니다.** 자동 전환이 켜져 있으면 openprovider는 5시간·주간·30일 사용량 중 가장
   뜨거운 쿼터 창을 비교해, 활성 계정이 임계치를 넘으면 새 세션을 사용량이 낮은 적격 계정으로 보냅니다.
 - **쿼터 조회가 내장되어 있습니다.** 대시보드에서 모든 계정 쿼터를 한 번에 갱신할 수 있고, 요청 로그는
   풀 트래픽을 비-PII 계정 서수로 라벨링합니다.
@@ -211,7 +211,7 @@ opencodex는 두 가지 동작을 분리해서 유지합니다:
 ## 주요 기능
 
 - **어떤 LLM이든 Codex에서.** 5개의 프로토콜 adapter가 Anthropic Messages, Google Gemini, Azure, OpenAI Responses passthrough, 그리고 모든 OpenAI 호환 Chat Completions 엔드포인트를 커버합니다 — 즉 기본 제공 **40개 이상의 프로바이더**입니다.
-- **Claude에서도 어떤 LLM이든.** `ocx claude`로 Claude Code를 프록시에 연결해 실행할 수 있습니다. Claude 대시보드에는 Opus, Fable, Sonnet, Haiku를 관리하는 별도 Desktop 프로필과 드래그/키보드 조작, JSON 가져오기/내보내기도 있습니다.
+- **Claude에서도 어떤 LLM이든.** `opr claude`로 Claude Code를 프록시에 연결해 실행할 수 있습니다. Claude 대시보드에는 Opus, Fable, Sonnet, Haiku를 관리하는 별도 Desktop 프로필과 드래그/키보드 조작, JSON 가져오기/내보내기도 있습니다.
 - **ChatGPT 계정을 안전하게 풀링.** 기존 Codex 스레드는 한 계정에 유지하면서, 새 세션은 쿼터 갱신과 비-PII 요청 라벨과 함께 풀에서 사용량이 낮은 계정을 자동 선택할 수 있습니다.
 - **한 번 로그인하면 API 키는 생략.** xAI, Anthropic, Kimi는 OAuth를 지원하므로 기존 계정으로 인증할 수 있고 토큰은 자동 갱신됩니다. 또는 `codex login`을 forward 하거나, API 키를 붙여넣거나, `${ENV_VAR}` 참조를 쓸 수 있습니다 — 선택은 자유입니다.
 - **Codex가 동작하는 모든 곳에서.** Codex CLI, TUI, App, SDK에 자동으로 주입됩니다. 라우팅된 모델이 네이티브 모델처럼 Codex 모델 선택기에 나타납니다.
@@ -221,7 +221,7 @@ opencodex는 두 가지 동작을 분리해서 유지합니다:
 - **이미지를 네이티브로 생성.** Codex의 독립형 `image_gen` 도구는 생성할 때 `POST /v1/images/generations`, 편집할 때 `POST /v1/images/edits`를 사용합니다. Responses의 hosted `image_generation` 도구와는 별개입니다.
 - **무슨 일이 일어나는지 보이게.** 웹 대시보드가 프로바이더, OAuth 상태, 모델 선택, upstream이 보고한 cached/cache-write 토큰 수를 포함한 실시간 요청 로그를 보여줍니다 — 왜 요청이 실패했는지 더는 추측하지 않아도 됩니다.
 - **백그라운드 실행.** 시스템 서비스(launchd / systemd / Task Scheduler)로 설치하면 부팅 시 자동 시작되어 신경 쓸 필요가 없습니다.
-- **깔끔한 종료, 잔여물 제로.** `ocx stop`(또는 대시보드의 Stop 버튼)은 프록시를 종료하고, 설치된 백그라운드 서비스를 멈추며, Codex를 원래 설정으로 복원합니다. 이후 `codex`는 잔여 설정이나 좀비 프로세스 없이 이전과 똑같이 동작합니다.
+- **깔끔한 종료, 잔여물 제로.** `opr stop`(또는 대시보드의 Stop 버튼)은 프록시를 종료하고, 설치된 백그라운드 서비스를 멈추며, Codex를 원래 설정으로 복원합니다. 이후 `codex`는 잔여 설정이나 좀비 프로세스 없이 이전과 똑같이 동작합니다.
 
 ## 프로바이더 및 adapter
 
@@ -239,28 +239,28 @@ opencodex는 두 가지 동작을 분리해서 유지합니다:
 | Ollama / vLLM / LM Studio (로컬) | `openai-chat` | key (보통 비워둠) |
 | 모든 OpenAI 호환 엔드포인트 | `openai-chat` | key |
 
-그 외에 DeepSeek, Groq, OpenRouter, Together, Fireworks, Cerebras, Mistral, Hugging Face, NVIDIA NIM, MiniMax, Qwen Cloud, Tencent Cloud Coding Plan, SiliconFlow 등이 있습니다. 전체 목록은 `ocx init` 또는 [프로바이더 문서](https://opencodex.me/ko/reference/configuration/)에서 확인하세요.
+그 외에 DeepSeek, Groq, OpenRouter, Together, Fireworks, Cerebras, Mistral, Hugging Face, NVIDIA NIM, MiniMax, Qwen Cloud, Tencent Cloud Coding Plan, SiliconFlow 등이 있습니다. 전체 목록은 `opr init` 또는 [프로바이더 문서](https://openprovider.me/ko/reference/configuration/)에서 확인하세요.
 
 ## CLI
 
 ```bash
-ocx init                       # 대화형 설정
-ocx start [--port 10100]       # 프록시 시작; 포트가 사용 중이면 빈 포트로 자동 전환
-ocx stop                       # 프록시 중지 + Codex 원래 설정 복원
-ocx restore                    # 중지 없이 복원 (별칭: ocx eject)
-ocx uninstall                  # service/shim/config 제거 + Codex 원본 복원
-ocx ensure                     # 필요 시 시작 + Codex config/cache 갱신
-ocx sync                       # 모델 갱신 + Codex에 재주입
-ocx status                     # 프록시 실행 중인지 확인
-ocx login <xai|anthropic|kimi> # OAuth 로그인
-ocx logout <provider>          # 저장된 로그인 정보 삭제
-ocx account <list|current|use> # 계정/API key pool 조회·전환 (마스킹; refresh/auto-switch/remove/add-key 포함)
-ocx gui                        # 웹 대시보드 열기
-ocx claude [args...]           # 프록시에 연결된 Claude Code 실행 (모델 디스커버리 켜짐)
-ocx claude desktop             # Claude Desktop 4개 family 프로필 저장 및 적용
-ocx codex-shim install         # codex 실행 시 `ocx ensure` 실행
-ocx service [install|start|stop|status|uninstall]   # 백그라운드 서비스 설치/갱신/시작
-ocx update [--tag preview]     # opencodex 업데이트; preview 설치는 @preview 유지
+opr init                       # 대화형 설정
+opr start [--port 10100]       # 프록시 시작; 포트가 사용 중이면 빈 포트로 자동 전환
+opr stop                       # 프록시 중지 + Codex 원래 설정 복원
+opr restore                    # 중지 없이 복원 (별칭: opr eject)
+opr uninstall                  # service/shim/config 제거 + Codex 원본 복원
+opr ensure                     # 필요 시 시작 + Codex config/cache 갱신
+opr sync                       # 모델 갱신 + Codex에 재주입
+opr status                     # 프록시 실행 중인지 확인
+opr login <xai|anthropic|kimi> # OAuth 로그인
+opr logout <provider>          # 저장된 로그인 정보 삭제
+opr account <list|current|use> # 계정/API key pool 조회·전환 (마스킹; refresh/auto-switch/remove/add-key 포함)
+opr gui                        # 웹 대시보드 열기
+opr claude [args...]           # 프록시에 연결된 Claude Code 실행 (모델 디스커버리 켜짐)
+opr claude desktop             # Claude Desktop 4개 family 프로필 저장 및 적용
+opr codex-shim install         # codex 실행 시 `opr ensure` 실행
+opr service [install|start|stop|status|uninstall]   # 백그라운드 서비스 설치/갱신/시작
+opr update [--tag preview]     # openprovider 업데이트; preview 설치는 @preview 유지
 ```
 
 ### Claude Desktop 프로필
@@ -272,58 +272,58 @@ family마다 기본 라우트가 하나씩 있습니다. 라우트를 드래그�
 반영됩니다. JSON 가져오기/내보내기로 백업하거나 다른 머신에 같은 설정을 옮길 수도 있습니다.
 
 ```bash
-ocx claude desktop [apply]                         # 현재 프로필 저장 및 적용
-ocx claude desktop show [--json]                   # 라우트, family, 기본값 확인
-ocx claude desktop move <route> <family> [--default]
-ocx claude desktop default <family> <route|none>
-ocx claude desktop export <path|->                 # -를 쓰면 stdout으로 JSON 출력
-ocx claude desktop import <path> [--apply]         # 검증 후 저장, 선택적으로 바로 적용
+opr claude desktop [apply]                         # 현재 프로필 저장 및 적용
+opr claude desktop show [--json]                   # 라우트, family, 기본값 확인
+opr claude desktop move <route> <family> [--default]
+opr claude desktop default <family> <route|none>
+opr claude desktop export <path|->                 # -를 쓰면 stdout으로 JSON 출력
+opr claude desktop import <path> [--apply]         # 검증 후 저장, 선택적으로 바로 적용
 ```
 
 family 값은 `opus`, `fable`, `sonnet`, `haiku`입니다. Anthropic이 아닌 라우트에는 2026 날짜 슬롯을
 쓴 안정적인 Claude 형식 별칭이 붙습니다. 이 날짜는 내부 슬롯이며 모델 출시일이 아닙니다. 실제
 Anthropic Claude 라우트는 원래 모델 id를 유지합니다. `none`은 빈 family에만 쓸 수 있으며,
 비어 있지 않은 family에는 항상 기본값이 필요합니다. 기존 적용 방식인
-`ocx claude desktop --static`, `--hybrid`, `--discovery-only`도 계속 지원됩니다.
+`opr claude desktop --static`, `--hybrid`, `--discovery-only`도 계속 지원됩니다.
 
 ### 자동 시작: service vs shim
 
-opencodex에는 프록시를 자동 시작하는 두 가지 방법이 있습니다:
+openprovider에는 프록시를 자동 시작하는 두 가지 방법이 있습니다:
 
-| | `ocx service` / `ocx service install` | `ocx codex-shim install` |
+| | `opr service` / `opr service install` | `opr codex-shim install` |
 |---|---|---|
 | **방식** | OS 서비스 관리자 (launchd / systemd / schtasks) | `codex` 스크립트 런처를 래핑하며 실제 `codex.exe`는 건드리지 않음 |
-| **시점** | 로그인 후 항상 실행 | 온디맨드 — `codex` 실행 시 `ocx ensure` 실행 |
+| **시점** | 로그인 후 항상 실행 | 온디맨드 — `codex` 실행 시 `opr ensure` 실행 |
 | **재시작** | 크래시 시 자동 재시작 | `codex` 호출마다 한 번 시작 |
-| **Codex 업데이트** | 영향 없음 | 안정적으로 교체가 끝난 런처는 다음 일반 `ocx` 명령에서 복구 |
-| **제거** | `ocx service uninstall` | `ocx codex-shim uninstall` |
+| **Codex 업데이트** | 영향 없음 | 안정적으로 교체가 끝난 런처는 다음 일반 `opr` 명령에서 복구 |
+| **제거** | `opr service uninstall` | `opr codex-shim uninstall` |
 
 항상 프록시를 켜두려면 **service** (개발 머신 권장), 가볍게 온디맨드로 쓰려면 **shim**을 사용하세요.
 
-외부 Codex 업데이트가 설치된 shim을 덮어쓰면 다음 일반 `ocx` 명령이 안정화된 새 런처를 백업하고
+외부 Codex 업데이트가 설치된 shim을 덮어쓰면 다음 일반 `opr` 명령이 안정화된 새 런처를 백업하고
 shim을 복구합니다. 아직 변경 중인 런처는 건드리지 않고 이후 명령에서 다시 시도합니다. 복구 실패는
-요청한 명령을 실패시키지 않고 경고만 출력하며, 수동 대체 명령은 `ocx codex-shim install`입니다.
+요청한 명령을 실패시키지 않고 경고만 출력하며, 수동 대체 명령은 `opr codex-shim install`입니다.
 자동 복구를 끄려면 `codexShimAutoRestore`를 `false`로 설정하거나 프로세스에
 `OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`을 설정하세요.
 shim 자동 시작은 기본으로 켜져 있으며 GUI 대시보드에서 끌 수 있습니다. 설정된 프록시 포트가 이미 사용
-중이면 `ocx start`가 자동으로 다른 빈 로컬 포트를 고르고 Codex 설정도 그 포트로 갱신합니다.
+중이면 `opr start`가 자동으로 다른 빈 로컬 포트를 고르고 Codex 설정도 그 포트로 갱신합니다.
 
 ### 삭제
 
 npm 패키지를 지우기 전에 로컬 상태를 먼저 정리하세요:
 
 ```bash
-ocx uninstall
+opr uninstall
 npm uninstall -g @mdevs/openprovider
 ```
 
-`ocx uninstall`은 프록시 중지, 설치된 service 제거, Codex shim 제거, Codex config/catalog/history
-원복, `~/.opencodex` 삭제를 처리합니다.
+`opr uninstall`은 프록시 중지, 설치된 service 제거, Codex shim 제거, Codex config/catalog/history
+원복, `~/.openprovider` 삭제를 처리합니다.
 
 ## 설정
 
-설정 파일은 `~/.opencodex/config.json`에 저장됩니다. 파일이 깨진 경우(잘못된 JSON 등)
-opencodex는 `config.json.invalid-<timestamp>`로 백업하고 경고를 출력한 뒤 기본값으로 시작합니다.
+설정 파일은 `~/.openprovider/config.json`에 저장됩니다. 파일이 깨진 경우(잘못된 JSON 등)
+openprovider는 `config.json.invalid-<timestamp>`로 백업하고 경고를 출력한 뒤 기본값으로 시작합니다.
 원본 파일이 조용히 사라지는 일은 없습니다.
 
 최소 설정 예시:
@@ -358,12 +358,12 @@ context window를 사용하며, upstream preview access를 우회하지 않습�
 참고하세요.
 
 > **Z.AI 경유 GLM-5.2 1M 컨텍스트:** `openai-chat` adapter에서는 `glm-5.2`와 `glm-5.2[1m]`이 모두
-> 동작합니다 — opencodex가 요청 전에 끝의 `[1m]` 접미사를 제거하기 때문입니다(OpenAI 호환 엔드포인트는
+> 동작합니다 — openprovider가 요청 전에 끝의 `[1m]` 접미사를 제거하기 때문입니다(OpenAI 호환 엔드포인트는
 > 대괄호 id를 거부함, Z.AI 400 code 1211). `[1m]` 접미사는 Claude-Code / Anthropic 엔드포인트 관례이며,
 > 네이티브로 쓰려면 `anthropic` adapter를 Z.AI 코딩 base(`https://api.z.ai/api/coding/paas/v4`)로
 > 향하게 하세요. 1M 컨텍스트 창은 모델명이 아니라 모델 카탈로그(`modelContextWindows`)로 설정합니다.
 
-로컬 모델도 동작합니다. opencodex를 머신에서 실행 중인 OpenAI 호환 서버로 향하게 하세요:
+로컬 모델도 동작합니다. openprovider를 머신에서 실행 중인 OpenAI 호환 서버로 향하게 하세요:
 
 ```json
 {
@@ -392,44 +392,44 @@ WebSocket 전송은 기본적으로 꺼져 있습니다. Codex가 HTTP/SSE 대�
 
 ### 원격 접근
 
-기본적으로 opencodex는 `127.0.0.1`(루프백)에 바인딩되며 별도 인증이 필요 없습니다.
-`"hostname": "0.0.0.0"`으로 LAN에 노출할 경우, opencodex는 관리 API(`/api/*`)와 데이터 플레인
+기본적으로 openprovider는 `127.0.0.1`(루프백)에 바인딩되며 별도 인증이 필요 없습니다.
+`"hostname": "0.0.0.0"`으로 LAN에 노출할 경우, openprovider는 관리 API(`/api/*`)와 데이터 플레인
 (`/v1/responses`, `/v1/images/generations`, `/v1/images/edits`) 모두에 bearer 토큰을 요구합니다:
 
 ```bash
 export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
-ocx start
+opr start
 ```
 
 비루프백 바인딩 시 이 환경 변수가 없으면 프록시 시작이 거부됩니다. LAN 접근용 백그라운드
-서비스를 설치할 때도 같은 셸에서 이 변수를 먼저 설정한 뒤 `ocx service install`을 실행해야 합니다.
+서비스를 설치할 때도 같은 셸에서 이 변수를 먼저 설정한 뒤 `opr service install`을 실행해야 합니다.
 클라이언트(스크립트, 원격 머신)는 모든 요청에 토큰을 포함해야 합니다:
 
 ```
-x-opencodex-api-key: your-secret-token
+x-openprovider-api-key: your-secret-token
 ```
 
 토큰은 타이밍 공격 방지를 위해 상수 시간으로 비교됩니다.
 
-opencodex는 Codex resume 히스토리를 자동으로 remap해, 오래된 OpenAI 채팅과 opencodex가 만든 프로젝트
+openprovider는 Codex resume 히스토리를 자동으로 remap해, 오래된 OpenAI 채팅과 openprovider가 만든 프로젝트
 스레드가 프록시 활성 동안 Codex App에 계속 보이도록 합니다. 원본 provider/source 메타데이터는
-`~/.opencodex/codex-history-backup.json`에 기록됩니다. `ocx stop` / `ocx restore`는 백업된 OpenAI 행을
-OpenAI로 복원하고, 남은 opencodex 유저 스레드도 OpenAI로 eject 하여 네이티브 Codex가 `config.toml`에
+`~/.openprovider/codex-history-backup.json`에 기록됩니다. `opr stop` / `opr restore`는 백업된 OpenAI 행을
+OpenAI로 복원하고, 남은 openprovider 유저 스레드도 OpenAI로 eject 하여 네이티브 Codex가 `config.toml`에
 더 이상 존재하지 않는 provider의 스레드를 resume 하려다 실패하지 않게 합니다.
 
 백업 지원이 생기기 전의 옛 개발 빌드에서 `syncResumeHistory`가 이미 히스토리를 remap 했다면, 명시적
 복구 명령을 실행할 수 있습니다:
 
 ```bash
-ocx recover-history --legacy-openai
+opr recover-history --legacy-openai
 ```
 
-모든 필드에 대한 자세한 내용은 **[설정 레퍼런스](https://opencodex.me/ko/reference/configuration/)** 를 참고하세요.
+모든 필드에 대한 자세한 내용은 **[설정 레퍼런스](https://openprovider.me/ko/reference/configuration/)** 를 참고하세요.
 
 ## 문서
 
 공개 문서(설치, 프로바이더, 라우팅, sidecar, Codex 통합, Codex App 모델 선택기, CLI/설정 레퍼런스)는 [`docs-site/`](../docs-site)의 Astro 사이트로 빌드되어
-**[opencodex.me](https://opencodex.me/ko/)** 에 게시됩니다.
+**[openprovider.me](https://openprovider.me/ko/)** 에 게시됩니다.
 
 유지보수용 source of truth는 [`structure/`](../structure)에, 과거 조사/진단 노트는 [`docs/`](../docs)에 있습니다.
 
@@ -437,7 +437,7 @@ ocx recover-history --legacy-openai
 
 ```bash
 git clone https://github.com/mDevsLabs/OpenProvider.git
-cd opencodex
+cd openprovider
 bun install
 bun run dev:proxy    # dev 모드로 프록시 API 시작
 bun run dev:gui      # 다른 터미널에서 대시보드 dev 서버 시작
@@ -453,13 +453,13 @@ API는 `/healthz`, `/v1/responses`, `POST /v1/images/generations`, `POST /v1/ima
 bun run dev:gui
 ```
 
-**[기여하기](https://opencodex.me/ko/contributing/)** 를 참고하세요.
+**[기여하기](https://openprovider.me/ko/contributing/)** 를 참고하세요.
 
 ## 면책 조항
 
-opencodex는 독립적인 커뮤니티 프로젝트이며, **OpenAI, Anthropic 등 어떤 제공업체와도 제휴하거나 보증을 받지 않습니다.**
+openprovider는 독립적인 커뮤니티 프로젝트이며, **OpenAI, Anthropic 등 어떤 제공업체와도 제휴하거나 보증을 받지 않습니다.**
 
-일부 제공업체 — 특히 Anthropic (Claude) — 는 서드파티 프록시를 통한 API 트래픽 라우팅 시 계정을 정지하거나 제한할 수 있습니다. **사용에 따른 책임은 본인에게 있습니다 (UAYOR).** 제공업체를 연결하기 전에 해당 서비스 약관에서 프록시 기반 접근이 허용되는지 확인하세요. opencodex 유지보수자는 업스트림 제공업체의 계정 조치에 대해 책임을 지지 않습니다.
+일부 제공업체 — 특히 Anthropic (Claude) — 는 서드파티 프록시를 통한 API 트래픽 라우팅 시 계정을 정지하거나 제한할 수 있습니다. **사용에 따른 책임은 본인에게 있습니다 (UAYOR).** 제공업체를 연결하기 전에 해당 서비스 약관에서 프록시 기반 접근이 허용되는지 확인하세요. openprovider 유지보수자는 업스트림 제공업체의 계정 조치에 대해 책임을 지지 않습니다.
 
 ## 라이선스
 

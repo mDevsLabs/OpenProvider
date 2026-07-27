@@ -24,14 +24,14 @@ grok-imagine-image-pro. Source: https://docs.x.ai/developers/migration/may-15-re
 
 ## grok-composer-2.5-fast
 NOT in official docs/pricing (secondary-only: community/OAuth tooling). It WORKS today via the
-user's Grok OAuth account through ocx (present in the live desktop model list), so we KEEP it in
+user's Grok OAuth account through opr (present in the live desktop model list), so we KEEP it in
 the registry as an account-verified entry and let live /v1/models discovery decide its fate
 (Phase 2). Do not treat official-docs absence as removal evidence for OAuth-plan models.
 
 ## Dynamic discovery
 GET /v1/models (authenticated) returns ids + aliases + pricing + context_length ("minimalized");
 richer: /v1/language-models. Source: https://docs.x.ai/developers/rest-api-reference/inference/models
-=> ocx generic fetchProviderModels(/models) can consume context_length via item.context_length.
+=> opr generic fetchProviderModels(/models) can consume context_length via item.context_length.
 
 ## Registry decisions (Phase 1)
 - ADD grok-4.5 (list head), ADD grok-4.20-multi-agent-0309.

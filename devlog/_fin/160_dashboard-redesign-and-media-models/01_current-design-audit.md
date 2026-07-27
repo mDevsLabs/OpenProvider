@@ -73,9 +73,9 @@ gui/src/
 
 ```yaml
 ---
-name: opencodex-dashboard
+name: openprovider-dashboard
 kind: developer tool / local management console
-audience: developers running the opencodex proxy locally
+audience: developers running the openprovider proxy locally
 colors:
   background: "#0b0b0f"
   surface: "#14141a"

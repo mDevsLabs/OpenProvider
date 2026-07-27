@@ -295,7 +295,7 @@ export function formatWindowsSchtasksError(error: unknown, args: string[]): stri
   const guidance = [
     "Windows access denied while running Task Scheduler.",
     `Command: schtasks ${argsText}`,
-    "Approve the Windows UAC prompt to install the background service, or run `ocx service install` from an elevated PowerShell window.",
+    "Approve the Windows UAC prompt to install the background service, or run `opr service install` from an elevated PowerShell window.",
   ].join(" ");
   if (operation === "create") {
     return `${guidance}\n${WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER}`;

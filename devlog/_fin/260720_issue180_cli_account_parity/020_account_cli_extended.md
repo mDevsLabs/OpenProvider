@@ -6,17 +6,17 @@ Audit fold: `021_wp3_audit_synthesis.md` (Gauss R1, 7 findings — all folded he
 
 ## Outcome
 
-`ocx account` covers the remaining read/toggle/remove/add verbs the GUI exposes:
+`opr account` covers the remaining read/toggle/remove/add verbs the GUI exposes:
 quota refresh, auto-switch control, guarded credential removal, and API-key add
 with pipe-only secret intake.
 
-## Command surface (all under `ocx account`)
+## Command surface (all under `opr account`)
 
 ```text
-ocx account refresh openai [--json]
-ocx account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]
-ocx account remove <provider> <id|main> --yes [--json]
-ocx account add-key <provider> [--label <label>] [--json]    # key via stdin pipe only
+opr account refresh openai [--json]
+opr account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]
+opr account remove <provider> <id|main> --yes [--json]
+opr account add-key <provider> [--label <label>] [--json]    # key via stdin pipe only
 ```
 
 ### `refresh <provider>`
@@ -79,8 +79,8 @@ ocx account add-key <provider> [--label <label>] [--json]    # key via stdin pip
 
 - Provider must classify `api-key`; anything else → exit 1 with guidance.
 - Secret intake: stdin ONLY when stdin is not a TTY (pipe/redirect). TTY →
-  exit 1 with guidance `ocx account add-key <provider> <<< "$MY_KEY"` /
-  secret-manager pipe example (`security find-generic-password -w … | ocx
+  exit 1 with guidance `opr account add-key <provider> <<< "$MY_KEY"` /
+  secret-manager pipe example (`security find-generic-password -w … | opr
   account add-key …`) — never a literal `echo <key> |` example (shell history).
 - Read: first line, trimmed, 15s inactivity timeout (secret-manager pipes can
   be slow), reader + timeout injected via `AccountDeps` for deterministic tests;

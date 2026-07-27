@@ -4,7 +4,7 @@
 - Upstream openai/codex commit `5f4d06ef` (merged 2026-06-05, PR #26210) annotates v2 collaboration
   tool schemas (`spawn_agent` / `send_message` / `followup_task` → `properties.message`) with a
   non-standard JSON-Schema keyword `encrypted: true` ("Responses-only marker").
-- opencodex forwards Codex Desktop's v2 `additional_tools` since `99b99bb8` (2026-07-10, in v2.7.3).
+- openprovider forwards Codex Desktop's v2 `additional_tools` since `99b99bb8` (2026-07-10, in v2.7.3).
 - Issue #85: Gemini/Antigravity rejects the whole request with 400 — the Google sanitizer
   ([google-tool-schema.ts](../../src/adapters/google-tool-schema.ts)) blacklist omits `encrypted`.
   Confirmed by local repro (parseRequest → google buildRequest emits `encrypted: true` in all three

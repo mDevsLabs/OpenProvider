@@ -2,7 +2,7 @@
 
 ## Loop-spec
 - Archetype: spec-satisfaction repair. Verifier: bun test + tsc + new roundtrip test.
-- Trigger: proven in-session — patch → ocx restart → expansion miss → upstream 400
+- Trigger: proven in-session — patch → opr restart → expansion miss → upstream 400
   ("No tool call found ..."). Restart wipes the in-memory Map (state.ts:11).
 - Goal: chains survive a proxy restart via best-effort disk snapshot.
 - Non-goals: DB, multi-instance coordination, routed-adapter miss behavior.
@@ -49,7 +49,7 @@
 - Corrupt file: write garbage → load ignores, no throw.
 
 ## Risks / audit questions
-- Multi-instance ocx sharing one home: last-writer-wins on atomic rename — acceptable
+- Multi-instance opr sharing one home: last-writer-wins on atomic rename — acceptable
   (single-user tool, snapshot is best-effort cache).
 - Payload size: 1000 entries of full conversation items can be MBs — acceptable for a local
   file, debounce caps write frequency; TTL prune on load caps growth.
@@ -64,10 +64,10 @@
 - Implementation nuance found in C: the debounced write must capture snapshotPath() at
   SCHEDULE time — tests swap OPENCODEX_HOME between beforeEach blocks, and a late timer
   fired into the real home during the first full-suite run. Fixed; verified the suite no
-  longer creates ~/.opencodex/responses-state.json.
+  longer creates ~/.openprovider/responses-state.json.
 - Evidence: bun test ./tests/ 1505 pass 0 fail (exit 0); tsc --noEmit exit 0; new tests:
   restart roundtrip (memory clear + disk load + conversationId), TTL prune on load,
   corrupt-file ignore, oversized-entry disk skip.
-- LOOP-PESSIMIST-01: multi-instance ocx sharing one home is last-writer-wins (acceptable,
+- LOOP-PESSIMIST-01: multi-instance opr sharing one home is last-writer-wins (acceptable,
   documented); snapshot covers restarts but not chains older than 1h TTL; falsifier for this
   fix = a post-restart miss warn in logs for an id recorded <1h earlier.

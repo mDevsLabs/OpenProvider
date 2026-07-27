@@ -8,7 +8,7 @@
 //     each with a single `inLanguage` value and its own `url`/`@id`.
 // Emitting one shared entity across every page and locale is what made Google
 // fall back to the bare domain, so this component is home-page scoped by design.
-const SITE_URL = 'https://opencodex.me';
+const SITE_URL = 'https://openprovider.me';
 
 interface Props {
 	locale?: 'ko' | 'zh-cn' | 'ru' | 'ja';
@@ -40,8 +40,8 @@ const graph: GraphNode[] = [
 		url: homeUrl,
 		// `name` matches the visible site name (header wordmark + <title> prefix),
 		// which is what Google requires before it will adopt it over the domain.
-		name: 'opencodex',
-		alternateName: 'ocx',
+		name: 'openprovider',
+		alternateName: 'opr',
 		description: descriptions[inLanguage],
 		inLanguage,
 	},
@@ -53,8 +53,8 @@ if (!locale) {
 	graph.push({
 		'@type': 'SoftwareApplication',
 		'@id': `${SITE_URL}/#software`,
-		name: 'opencodex',
-		alternateName: 'ocx',
+		name: 'openprovider',
+		alternateName: 'opr',
 		description:
 			'Local LLM proxy that lets OpenAI Codex (CLI, App, SDK) and Claude Code run on any model — Claude, Gemini, Grok, DeepSeek, Kimi, Qwen, Ollama, OpenRouter, and more — with streaming, tool calls, reasoning tokens, and images working in both directions.',
 		keywords:

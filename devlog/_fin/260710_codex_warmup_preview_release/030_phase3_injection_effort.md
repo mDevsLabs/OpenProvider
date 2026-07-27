@@ -3,7 +3,7 @@
 ## Source of truth and product fit
 
 - Design record: `devlog/260710_injection_effort/000_design.md`
-- Surface: existing opencodex developer Dashboard, global i18n, dense utility form
+- Surface: existing openprovider developer Dashboard, global i18n, dense utility form
 - UX direction: reuse the existing `Select` primitive and delegation panel; add no new design tokens, assets, cards, motion, dependencies, or page structure
 - User outcome: configure both the preferred sub-agent model and the `reasoning_effort` passed to `spawn_agent`
 

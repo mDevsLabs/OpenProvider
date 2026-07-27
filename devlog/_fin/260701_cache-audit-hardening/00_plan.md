@@ -1,10 +1,10 @@
 # 260701 Cache Audit Hardening Plan
 
 ## Objective
-Audit and harden opencodex caching end-to-end: provider prompt-cache request support, cache usage propagation, Google replay cache behavior, model list TTL cache, and Codex model-cache sync. Fix functional gaps found in code and document deliberate non-parity.
+Audit and harden openprovider caching end-to-end: provider prompt-cache request support, cache usage propagation, Google replay cache behavior, model list TTL cache, and Codex model-cache sync. Fix functional gaps found in code and document deliberate non-parity.
 
 ## Evidence read
-- README.md: opencodex is a local Responses proxy with provider adapters, dashboard logs, model sync, and Codex cache refresh.
+- README.md: openprovider is a local Responses proxy with provider adapters, dashboard logs, model sync, and Codex cache refresh.
 - src/server.ts: request parsing, adapter selection, usage logging, model cache invalidation, `/api/usage`, `/v1/models` flow.
 - src/responses/parser.ts and src/responses/schema.ts: `prompt_cache_key` exists in schema/types but is not mapped into `OcxParsedRequest.options`.
 - src/adapters/anthropic.ts: recent commit added block-level `cache_control` for system prompts and final tool definitions; usage maps `cache_read_input_tokens` and `cache_creation_input_tokens`.
@@ -15,8 +15,8 @@ Audit and harden opencodex caching end-to-end: provider prompt-cache request sup
 
 ## External-source baseline
 - Anthropic prompt caching is explicit: cacheable blocks need `cache_control: { type: "ephemeral" }`; system and tool blocks are valid cache surfaces.
-- OpenAI prompt caching is mostly automatic for supported long prompts; `cached_tokens` appears in usage. Responses also exposes `prompt_cache_key` as an affinity/routing hint, but opencodex currently parses the raw field only at schema level.
-- Google Gemini exposes `cachedContentTokenCount`; explicit context caching is a separate API and is out of scope unless opencodex adds persistent cached content resources.
+- OpenAI prompt caching is mostly automatic for supported long prompts; `cached_tokens` appears in usage. Responses also exposes `prompt_cache_key` as an affinity/routing hint, but openprovider currently parses the raw field only at schema level.
+- Google Gemini exposes `cachedContentTokenCount`; explicit context caching is a separate API and is out of scope unless openprovider adds persistent cached content resources.
 
 ## Scope boundary
 
@@ -34,7 +34,7 @@ Audit and harden opencodex caching end-to-end: provider prompt-cache request sup
 1. No multi-account Kiro failover.
 2. No live destructive provider calls.
 3. No persistent Google cached-content resource manager in this pass.
-4. No changes to Codex CLI internals outside opencodex config/cache sync.
+4. No changes to Codex CLI internals outside openprovider config/cache sync.
 5. No push unless explicitly requested.
 
 ## Phase map

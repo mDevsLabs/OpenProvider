@@ -138,7 +138,7 @@ describe("systemd service unit", () => {
     expect(unitCheckAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(-1);
     expect(unitCheckAt).toBeLessThan(startAt);
-    expect(startSystemd).toContain("ocx service install");
+    expect(startSystemd).toContain("opr service install");
     expect(startSystemd).toContain("process.exit(1)");
 
     const writeAt = installSystemd.indexOf('writeFileSync(unitPath(), buildUnit(), "utf8")');
@@ -149,7 +149,7 @@ describe("systemd service unit", () => {
     expect(writeAt).toBeLessThan(reloadAt);
     expect(reloadAt).toBeLessThan(enableAt);
     expect(enableAt).toBeLessThan(restartAt);
-    expect(installSystemd).not.toContain("ocx service install");
+    expect(installSystemd).not.toContain("opr service install");
     expect(installSystemd).not.toContain("process.exit(1)");
   });
 });
@@ -393,15 +393,15 @@ describe("Windows service task", () => {
     const oldApiAuthToken = process.env.OpenProvider_API_AUTH_TOKEN;
     try {
       process.env.PATH = 'C:\\safe" & echo PWNED & rem "';
-      process.env.OpenProvider_HOME = 'C:\\ocx" & del C:\\important & rem "';
+      process.env.OpenProvider_HOME = 'C:\\opr" & del C:\\important & rem "';
       process.env.OpenProvider_API_AUTH_TOKEN = 'token" & echo LEAK & rem "';
       const script = buildWindowsServiceScript();
       expect(script).toContain('set "PATH=C:\\safe & echo PWNED & rem "');
-      expect(script).toContain('set "OpenProvider_HOME=C:\\ocx & del C:\\important & rem "');
+      expect(script).toContain('set "OpenProvider_HOME=C:\\opr & del C:\\important & rem "');
       expect(script).toContain('set "OCX_API_TOKEN_FILE=');
       expect(script).toContain('set /p OpenProvider_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"');
       expect(script).not.toContain('set "PATH=C:\\safe" & echo PWNED');
-      expect(script).not.toContain('set "OpenProvider_HOME=C:\\ocx" & del');
+      expect(script).not.toContain('set "OpenProvider_HOME=C:\\opr" & del');
       expect(script).not.toContain("token & echo LEAK");
     } finally {
       if (oldPath === undefined) delete process.env.PATH;

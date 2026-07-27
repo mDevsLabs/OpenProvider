@@ -5,8 +5,8 @@
 A user followed:
 
 ```sh
-git clone https://github.com/lidge-jun/opencodex.git
-cd opencodex
+git clone https://github.com/lidge-jun/openprovider.git
+cd openprovider
 bun install
 bun run dev
 ```
@@ -47,7 +47,7 @@ Update README.md and README.ko.md development section:
   - terminal 2: `cd gui && bun install && bun run dev`
   - open Vite URL, usually `http://localhost:5173/`.
 - Installed user path:
-  - `ocx gui`.
+  - `opr gui`.
 
 ### 2. Root scripts
 
@@ -69,7 +69,7 @@ Expand `rootFallbackPayload()` with exact clone commands.
 
 ### 4. GUI README
 
-Replace generic Vite template with OpenCodex-specific GUI dev notes.
+Replace generic Vite template with OpenProvider-specific GUI dev notes.
 
 ## Tests
 
@@ -77,7 +77,7 @@ Replace generic Vite template with OpenCodex-specific GUI dev notes.
   - backend dev;
   - built dashboard;
   - Vite GUI dev;
-  - installed `ocx gui` path.
+  - installed `opr gui` path.
 - Banner helper test if banner logic is extracted.
 - Existing server auth/root fallback test remains green.
 

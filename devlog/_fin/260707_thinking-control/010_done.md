@@ -21,7 +21,7 @@ LiteLLM / CLIProxyAPI / models.dev / OpenRouter) + live authenticated Zen Go pro
    reasoning_effort (mapped value is the toggle state); non-toggle models unchanged.
 4. Tests +5 (toggle enabled/disabled/omitted, non-toggle isolation, opencode-go
    registry end-to-end incl. kimi stays knob-free).
-5. `ocx sync` run — catalog now advertises the [low, high] ladder for mimo/glm5 slugs.
+5. `opr sync` run — catalog now advertises the [low, high] ladder for mimo/glm5 slugs.
 
 ## Design notes
 - Peer-proxy consensus (CLIProxyAPI internal/thinking, LiteLLM): normalize effort ->

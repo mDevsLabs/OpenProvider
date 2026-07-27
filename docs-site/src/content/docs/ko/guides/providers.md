@@ -65,14 +65,14 @@ OAuth 로그인을 사용하는 프로바이더 프리셋은 여섯 개입니다
 이 명령은 ChatGPT 자격 증명을 발급받고 `forward` 모드 프로바이더 항목을 만듭니다.
 
 ```bash
-ocx login xai          # xAI Grok
-ocx login anthropic    # Anthropic Claude (Pro/Max)
-ocx login kimi         # Moonshot Kimi
-ocx login kiro         # kiro-cli 자격 증명 가져오기(토큰 폴백 지원)
-ocx login google-antigravity
-ocx login cursor       # Cursor 전용 PKCE 로그인
-ocx login chatgpt      # 별도 ChatGPT OAuth 로그인
-ocx logout <provider>
+opr login xai          # xAI Grok
+opr login anthropic    # Anthropic Claude (Pro/Max)
+opr login kimi         # Moonshot Kimi
+opr login kiro         # kiro-cli 자격 증명 가져오기(토큰 폴백 지원)
+opr login google-antigravity
+opr login cursor       # Cursor 전용 PKCE 로그인
+opr login chatgpt      # 별도 ChatGPT OAuth 로그인
+opr logout <provider>
 ```
 
 | 프로바이더 | 어댑터 | 베이스 URL | 비고 |
@@ -144,13 +144,13 @@ OpenProvider v2.7.1에는 빌트인 프리셋이 50개 들어 있습니다. 키 
 
 ### 터미널에서 계정 전환하기
 
-대시보드를 열지 않고도 `ocx account list`, `ocx account current`, `ocx account use`로 같은 Codex,
+대시보드를 열지 않고도 `opr account list`, `opr account current`, `opr account use`로 같은 Codex,
 OAuth, API-key pool을 확인하고 전환할 수 있습니다. 전체 명령, JSON 출력, 새 세션 적용 방식은
-[CLI 레퍼런스](/ko/reference/cli/#ocx-account-subcommand)를 참고하세요.
+[CLI 레퍼런스](/ko/reference/cli/#opr-account-subcommand)를 참고하세요.
 
 ### GPT-5.6 프리뷰 경로
 
-실시간 모델 카탈로그 갱신이 늦어도 `ocx sync`에서 모델이 사라지지 않도록 GPT-5.6
+실시간 모델 카탈로그 갱신이 늦어도 `opr sync`에서 모델이 사라지지 않도록 GPT-5.6
 Sol/Terra/Luna를 폴백 목록에 넣어 둡니다.
 
 | Codex 경로 | 미리 등록된 모델 id | Codex에 표시되는 컨텍스트 |
@@ -171,13 +171,13 @@ Sol/Terra/Luna를 폴백 목록에 넣어 둡니다.
 Vertex, Antigravity/Cloud Code Assist 모드), `azure` / `azure-openai`, `kiro`, `cursor`입니다.
 Amazon Bedrock 네이티브 API처럼 이 구현 중 어느 것과도 맞지 않는 독자 프로토콜은 직접 지원하지 않습니다.
 **GitHub Copilot**과 **GitLab Duo**는 자신의 범용 OpenAI 호환 엔드포인트에 매핑된 멀티 모델
-게이트웨이입니다. Copilot은 `ocx login github-copilot`으로 GitHub 디바이스 플로우 OAuth 로그인을
+게이트웨이입니다. Copilot은 `opr login github-copilot`으로 GitHub 디바이스 플로우 OAuth 로그인을
 지원합니다(비공식 브리지 — VS Code 공개 클라이언트 id로 로그인 후 단기 Copilot API 토큰으로
 교환하며, 활성 Copilot 구독이 필요하고 GitHub 정책 변경으로 막힐 수 있음). GitLab Duo는 Bearer
 **구독 토큰**(일반 API 키가 아님)으로 인증합니다. **Cloudflare AI
 Gateway**는 URL에 계정 + 게이트웨이 id를 채워야 합니다.
 
-Cursor는 별도의 실험적 어댑터로 추적합니다. `adapter: "cursor"`는 `ocx init`과 dashboard Add
+Cursor는 별도의 실험적 어댑터로 추적합니다. `adapter: "cursor"`는 `opr init`과 dashboard Add
 Provider picker에 실험적 local config 항목으로 표시되며, Cursor의 static fallback model catalog
 metadata를 저장합니다. Cursor access token이 설정되면 OpenProvider는 Cursor live HTTP/2 transport를
 사용합니다. v2.7.1 폴백 목록에는 1M 컨텍스트의 `gpt-5.6-sol` / `terra` / `luna`와 500K 컨텍스트의
@@ -216,7 +216,7 @@ OpenProvider를 로컬 OpenAI 호환 서버로 향하게 하세요 — 보통은
 ## 모든 OpenAI 호환 엔드포인트
 
 프로바이더가 Chat Completions를 사용한다면 `openai-chat` 어댑터가 이를 처리합니다 — 대시보드에서
-**Custom**을 선택하거나 `ocx init`에서 `custom`을 선택한 뒤 베이스 URL을 입력하세요. 모든 프로바이더 필드
+**Custom**을 선택하거나 `opr init`에서 `custom`을 선택한 뒤 베이스 URL을 입력하세요. 모든 프로바이더 필드
 (`headers`, `noReasoningModels`, `noVisionModels`, `models`, …)는
 [설정 레퍼런스](/ko/reference/configuration/)를 참고하세요.
 

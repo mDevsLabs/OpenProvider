@@ -12,7 +12,7 @@ describe("startup health UI decisions", () => {
   test("selects the shared risk-detail message", () => {
     expect(startupRiskDetailKey({ routingKind: "custom-local", shimCoverage: "none" }))
       .toBe("startup.riskDetailCustomLocal");
-    expect(startupRiskDetailKey({ routingKind: "opencodex-local", shimCoverage: "cli-only" }))
+    expect(startupRiskDetailKey({ routingKind: "openprovider-local", shimCoverage: "cli-only" }))
       .toBe("startup.riskDetailWindowsShim");
     expect(startupRiskDetailKey({ routingKind: "unknown", shimCoverage: "none" }))
       .toBe("startup.riskDetail");

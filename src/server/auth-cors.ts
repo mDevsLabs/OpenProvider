@@ -124,7 +124,7 @@ export function isApiAuthRequired(config: OcxConfig): boolean {
 
 export function assertServerAuthConfig(config: OcxConfig): void {
   if (isApiAuthRequired(config) && !configuredApiAuthToken(config)) {
-    throw new Error("OPENCODEX_API_AUTH_TOKEN is required when binding opencodex to a non-loopback hostname");
+    throw new Error("OPENCODEX_API_AUTH_TOKEN is required when binding openprovider to a non-loopback hostname");
   }
 }
 
@@ -172,8 +172,8 @@ export function hasValidApiAuth(req: Request, config: OcxConfig): boolean {
 
 export function requireApiAuth(req: Request, config: OcxConfig, kind: "management" | "data-plane"): Response | null {
   if (hasValidApiAuth(req, config)) return null;
-  if (kind === "management") return jsonResponse({ error: "opencodex API key required" }, 401);
-  return formatErrorResponse(401, "authentication_error", "opencodex API key required");
+  if (kind === "management") return jsonResponse({ error: "openprovider API key required" }, 401);
+  return formatErrorResponse(401, "authentication_error", "openprovider API key required");
 }
 
 /**
@@ -185,7 +185,7 @@ export function requireResponsesApiAuth(req: Request, config: OcxConfig): Respon
   if (!isApiAuthRequired(config)) return null;
   const actual = req.headers.get("X-OpenProvider-API-Key")?.trim();
   if (actual && isProxyAdmissionSecret(actual, config)) return null;
-  return formatErrorResponse(401, "authentication_error", "opencodex API key required");
+  return formatErrorResponse(401, "authentication_error", "openprovider API key required");
 }
 
 const FORBIDDEN_PROVIDER_RUNTIME_FIELDS = [

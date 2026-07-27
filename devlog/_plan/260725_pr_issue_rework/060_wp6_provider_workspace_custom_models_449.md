@@ -155,12 +155,12 @@ harness가 `tests/cursor-hardening.test.ts`에 있다.
 ## 착수 시점 사실
 
 - 기준 시각: 2026-07-25 KST.
-- worktree: `/Users/jun/.codex/worktrees/ebcd/opencodex`.
+- worktree: `/Users/jun/.codex/worktrees/ebcd/openprovider`.
 - 실제 checkout은 **detached HEAD**이며 `HEAD == origin/dev == 037e8f5e4fa32a82e4149acc509554f157656dad`. 브랜치 checkout은 하지 않는다.
 - PR #449: base `dev`, head `eeb61e9b9dae51d88d8db207b9c2287e97076a99`, 6 files, `+388/-7`.
 - PR 파일: `gui/src/components/provider-workspace/ProviderDetails.tsx`, `ProviderModels.tsx`, `gui/src/provider-workspace/report.ts`, `gui/src/styles/provider-workspace-shell.css`, `gui/tests/provider-model-custom-add.test.tsx`, `tests/provider-workspace-state.test.ts`.
-- `gh pr diff 449 --repo lidge-jun/opencodex` 전량 494줄과 `gh issue view 448 --repo lidge-jun/opencodex`의 본문을 확인했다. 이슈는 OPEN이며 provider-scoped add, duplicate/name-spacing guard, immediate appearance, custom-only fallback 보존을 요구한다.
-- apply 확인: `gh pr diff 449 --repo lidge-jun/opencodex | git apply --check -` → exit 0, 출력 없음(clean).
+- `gh pr diff 449 --repo lidge-jun/openprovider` 전량 494줄과 `gh issue view 448 --repo lidge-jun/openprovider`의 본문을 확인했다. 이슈는 OPEN이며 provider-scoped add, duplicate/name-spacing guard, immediate appearance, custom-only fallback 보존을 요구한다.
+- apply 확인: `gh pr diff 449 --repo lidge-jun/openprovider | git apply --check -` → exit 0, 출력 없음(clean).
 - #445와 #449의 changed-file 교집합은 0개다. 기능 충돌은 없지만 #445는 auth/provider validation 보안 경계이므로 이 WP에서 적용하지 않는다.
 
 ## 변경 계약
@@ -170,8 +170,8 @@ harness가 `tests/cursor-hardening.test.ts`에 있다.
 1. 아래 head assertion 뒤 PR patch를 그대로 적용한다.
 
 ```bash
-test "$(gh pr view 449 --repo lidge-jun/opencodex --json headRefOid --jq .headRefOid)" = "eeb61e9b9dae51d88d8db207b9c2287e97076a99"
-gh pr diff 449 --repo lidge-jun/opencodex | git apply -
+test "$(gh pr view 449 --repo lidge-jun/openprovider --json headRefOid --jq .headRefOid)" = "eeb61e9b9dae51d88d8db207b9c2287e97076a99"
+gh pr diff 449 --repo lidge-jun/openprovider | git apply -
 ```
 
 2. PR 파일은 모두 **MODIFY/NEW as-is**로 먼저 들어간다.

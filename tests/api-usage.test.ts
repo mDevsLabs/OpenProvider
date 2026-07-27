@@ -30,7 +30,7 @@ function baseConfig(): OcxConfig {
 function writeFixture(now: number): void {
   const lines = [
     JSON.stringify({
-      requestId: "ocx-old",
+      requestId: "opr-old",
       timestamp: now - 10 * 86_400_000,
       provider: "openai",
       model: "gpt-5.5",
@@ -41,7 +41,7 @@ function writeFixture(now: number): void {
       totalTokens: 150,
     }),
     JSON.stringify({
-      requestId: "ocx-recent",
+      requestId: "opr-recent",
       timestamp: now - 1 * 86_400_000,
       provider: "openai",
       model: "gpt-5.5",
@@ -52,7 +52,7 @@ function writeFixture(now: number): void {
       totalTokens: 15,
     }),
     JSON.stringify({
-      requestId: "ocx-missing",
+      requestId: "opr-missing",
       timestamp: now - 1 * 86_400_000,
       provider: "anthropic",
       model: "claude-x",
@@ -67,8 +67,8 @@ function writeFixture(now: number): void {
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-api-usage-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-api-usage-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-api-usage-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-api-usage-"));
   process.env.OPENCODEX_HOME = testDir;
   resetUsageReadCacheForTests();
   saveConfig(baseConfig());
@@ -114,7 +114,7 @@ describe("GET /api/usage", () => {
       expect(usageReadCacheStatsForTests().fullReads).toBe(1);
 
       appendFileSync(join(testDir, "usage.jsonl"), `${JSON.stringify({
-        requestId: "ocx-appended",
+        requestId: "opr-appended",
         timestamp: Date.now(),
         provider: "openai",
         model: "gpt-5.5",

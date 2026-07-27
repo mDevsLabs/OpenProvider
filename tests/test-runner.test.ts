@@ -11,7 +11,7 @@ describe("test runner isolation", () => {
         PATH: "/test/bin",
         HOME: isolated.root,
         USERPROFILE: isolated.root,
-        OPENCODEX_HOME: join(isolated.root, ".opencodex"),
+        OPENCODEX_HOME: join(isolated.root, ".openprovider"),
         CODEX_HOME: join(isolated.root, ".codex"),
       });
       expect(existsSync(isolated.env.OPENCODEX_HOME!)).toBe(true);

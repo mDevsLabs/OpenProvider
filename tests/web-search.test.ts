@@ -63,7 +63,7 @@ describe("web-search sidecar planning", () => {
     };
     const resolved = await resolveFirstUsableOpenAiSidecar(
       listOpenAiForwardSidecarCandidates(cfg),
-      new Headers({ authorization: "Bearer proxy-secret", "x-opencodex-api-key": "proxy-secret" }),
+      new Headers({ authorization: "Bearer proxy-secret", "x-openprovider-api-key": "proxy-secret" }),
       cfg,
     );
     expect(resolved).toBeUndefined();

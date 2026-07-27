@@ -7,10 +7,10 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
 
-function runScript(codexHome: string, opencodexHome: string, script: string): { stdout: string; status: number; stderr: string } {
+function runScript(codexHome: string, openproviderHome: string, script: string): { stdout: string; status: number; stderr: string } {
   const result = spawnSync(process.execPath, ["--eval", script], {
     cwd: repoRoot,
-    env: { ...process.env, CODEX_HOME: codexHome, OPENCODEX_HOME: opencodexHome },
+    env: { ...process.env, CODEX_HOME: codexHome, OPENCODEX_HOME: openproviderHome },
     encoding: "utf8",
   });
   return { stdout: result.stdout?.trim() ?? "", stderr: result.stderr ?? "", status: result.status ?? 1 };
@@ -42,16 +42,16 @@ function routedEntry(slug: string, priority: number): Record<string, unknown> {
 
 describe("Codex catalog sync hardening", () => {
   let codexHome: string;
-  let opencodexHome: string;
+  let openproviderHome: string;
 
   beforeEach(() => {
-    codexHome = mkdtempSync(join(tmpdir(), "ocx-sync-home-"));
-    opencodexHome = mkdtempSync(join(tmpdir(), "ocx-sync-ocx-"));
+    codexHome = mkdtempSync(join(tmpdir(), "opr-sync-home-"));
+    openproviderHome = mkdtempSync(join(tmpdir(), "opr-sync-opr-"));
   });
 
   afterEach(() => {
     if (existsSync(codexHome)) rmSync(codexHome, { recursive: true, force: true });
-    if (existsSync(opencodexHome)) rmSync(opencodexHome, { recursive: true, force: true });
+    if (existsSync(openproviderHome)) rmSync(openproviderHome, { recursive: true, force: true });
   });
 
   test("Gap B: drops legacy OpenAI-family natives but keeps supported + user natives", () => {
@@ -73,7 +73,7 @@ describe("Codex catalog sync hardening", () => {
       ],
     }, null, 2) + "\n");
 
-    const r = runScript(codexHome, opencodexHome, `
+    const r = runScript(codexHome, openproviderHome, `
       const { syncCatalogModels } = require("./src/codex/catalog");
       syncCatalogModels({ providers: {} }).then(res => console.log(JSON.stringify(res)));
     `);
@@ -105,7 +105,7 @@ describe("Codex catalog sync hardening", () => {
     }, null, 2) + "\n");
 
     // config has NO providers => gatherRoutedModels returns [] (transient empty fetch).
-    const r = runScript(codexHome, opencodexHome, `
+    const r = runScript(codexHome, openproviderHome, `
       const { syncCatalogModels } = require("./src/codex/catalog");
       syncCatalogModels({ providers: {} }).then(res => console.log(JSON.stringify(res)));
     `);
@@ -130,7 +130,7 @@ describe("Codex catalog sync hardening", () => {
       ],
     }, null, 2) + "\n");
 
-    const r = runScript(codexHome, opencodexHome, `
+    const r = runScript(codexHome, openproviderHome, `
       const { syncCatalogModels } = require("./src/codex/catalog");
       syncCatalogModels({ providers: {} }).then(res => console.log(JSON.stringify(res)));
     `);
@@ -154,7 +154,7 @@ describe("Codex catalog sync hardening", () => {
       ],
     }, null, 2) + "\n");
 
-    const r = runScript(codexHome, opencodexHome, `
+    const r = runScript(codexHome, openproviderHome, `
       const { syncCatalogModels } = require("./src/codex/catalog");
       syncCatalogModels({
         providers: {
@@ -186,7 +186,7 @@ describe("Codex catalog sync hardening", () => {
       ],
     }, null, 2) + "\n");
 
-    const r = runScript(codexHome, opencodexHome, `
+    const r = runScript(codexHome, openproviderHome, `
       const { syncCatalogModels } = require("./src/codex/catalog");
       syncCatalogModels({
         providers: {
@@ -212,7 +212,7 @@ describe("Codex catalog sync hardening", () => {
     mkdirSync(alternateHome, { recursive: true });
     writeFileSync(join(alternateHome, "config.toml"), 'model_catalog_json = "nested/catalog.json"\n', "utf8");
 
-    const r = runScript(codexHome, opencodexHome, `
+    const r = runScript(codexHome, openproviderHome, `
       const { readCodexCatalogPath } = require("./src/codex/catalog");
       process.env.CODEX_HOME = ${JSON.stringify(alternateHome)};
       console.log(readCodexCatalogPath());

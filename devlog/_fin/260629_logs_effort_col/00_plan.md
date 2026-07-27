@@ -3,7 +3,7 @@
 Goal ID: 0693b941-5d1
 
 ## Objective
-Add a single "Effort" column to the opencodex request logs (`/api/logs` + GUI Logs table).
+Add a single "Effort" column to the openprovider request logs (`/api/logs` + GUI Logs table).
 Show the **requested reasoning effort label** (e.g. `xhigh`) as one final value — NOT the
 mapped wire value (`max`). All providers, including `kiro`, display the requested label
 verbatim (kiro shows `xhigh`, not a budget %).

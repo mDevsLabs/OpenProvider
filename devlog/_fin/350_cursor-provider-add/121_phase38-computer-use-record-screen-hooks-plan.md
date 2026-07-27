@@ -5,18 +5,18 @@
 
 ## Part 1 — Easy explanation
 
-opencodex is a **headless proxy** — it has no screen, mouse, or recording surface. So it
+openprovider is a **headless proxy** — it has no screen, mouse, or recording surface. So it
 **cannot truthfully** "control the computer" or "record the screen" by itself. The wrong
 move would be to fake a success; that is a lie to the model and exactly the kind of "false
 safety claim" the GPT-Pro review flagged.
 
 The honest move (this work-phase):
 
-1. **By default:** when Cursor asks for computer-use or record-screen, opencodex returns a
+1. **By default:** when Cursor asks for computer-use or record-screen, openprovider returns a
    precise, truthful result: *"not supported in this headless proxy"*. (This already happens
    today — this WP makes the message explicit and keeps it honest.)
-2. **Opt-in bridge:** if you run opencodex somewhere that DOES have a screen and you provide
-   an external executor command in config, opencodex spawns it, hands it the action request
+2. **Opt-in bridge:** if you run openprovider somewhere that DOES have a screen and you provide
+   an external executor command in config, openprovider spawns it, hands it the action request
    as JSON on stdin, and reads the JSON result from stdout — turning a real screenshot/click
    into a real protobuf result. No executor configured → honest "not supported".
 
@@ -45,7 +45,7 @@ import { errorText } from "./native-exec-common";
 import type { CursorNativeToolDeps } from "./native-exec-tools";
 
 export interface DesktopExecutorConfig {
-  computerUseCommand?: string;   // e.g. "ocx-desktop-bridge computer-use"
+  computerUseCommand?: string;   // e.g. "opr-desktop-bridge computer-use"
   recordScreenCommand?: string;
   cwd?: string;
   env?: Record<string, string>;
@@ -85,10 +85,10 @@ config field name (`desktopExecutor.computerUseCommand`):
 
 ```ts
 -      : create(ComputerUseResultSchema, {
--        result: { case: "error", value: create(ComputerUseErrorSchema, { error: "No local computer-use executor is configured inside opencodex.", actionCount: args.actions.length, durationMs: 0 }) },
+-        result: { case: "error", value: create(ComputerUseErrorSchema, { error: "No local computer-use executor is configured inside openprovider.", actionCount: args.actions.length, durationMs: 0 }) },
 -      });
 +      : create(ComputerUseResultSchema, {
-+        result: { case: "error", value: create(ComputerUseErrorSchema, { error: "computer-use is not supported in this headless opencodex proxy. Configure provider.desktopExecutor.computerUseCommand to enable it.", actionCount: args.actions.length, durationMs: 0 }) },
++        result: { case: "error", value: create(ComputerUseErrorSchema, { error: "computer-use is not supported in this headless openprovider proxy. Configure provider.desktopExecutor.computerUseCommand to enable it.", actionCount: args.actions.length, durationMs: 0 }) },
 +      });
 ```
 
@@ -98,14 +98,14 @@ config field name (`desktopExecutor.computerUseCommand`):
 -  const result = deps.recordScreen
 -    ? await deps.recordScreen(args)
 -    : create(RecordScreenResultSchema, {
--      result: { case: "failure", value: create(RecordScreenFailureSchema, { error: "No local record-screen executor is configured inside opencodex." }) },
+-      result: { case: "failure", value: create(RecordScreenFailureSchema, { error: "No local record-screen executor is configured inside openprovider." }) },
 -    });
 -  return execBytes(execMsg, "recordScreenResult", result);
 +  try {
 +    const result = deps.recordScreen
 +      ? await deps.recordScreen(args)
 +      : create(RecordScreenResultSchema, {
-+        result: { case: "failure", value: create(RecordScreenFailureSchema, { error: "record-screen is not supported in this headless opencodex proxy. Configure provider.desktopExecutor.recordScreenCommand to enable it." }) },
++        result: { case: "failure", value: create(RecordScreenFailureSchema, { error: "record-screen is not supported in this headless openprovider proxy. Configure provider.desktopExecutor.recordScreenCommand to enable it." }) },
 +      });
 +    return execBytes(execMsg, "recordScreenResult", result);
 +  } catch (err) {
@@ -128,7 +128,7 @@ config field name (`desktopExecutor.computerUseCommand`):
 
 ```ts
 +  /**
-+   * Cursor adapter only: opt-in external executor for computer-use / record-screen. opencodex is
++   * Cursor adapter only: opt-in external executor for computer-use / record-screen. openprovider is
 +   * headless and cannot control a screen itself; provide commands here only when running on a host
 +   * that can. With no executor, these tools honestly report "not supported".
 +   */
@@ -214,7 +214,7 @@ WP37 with no cycle.
 
 ## Out of scope
 
-- Real OS-level screen/mouse/keyboard automation inside the proxy (the whole point: opencodex
+- Real OS-level screen/mouse/keyboard automation inside the proxy (the whole point: openprovider
   stays headless; a real executor is the host's responsibility).
 - Shipping a reference desktop-bridge binary (documented extension point only).
 - MCP work (WP37 / devlog 120).

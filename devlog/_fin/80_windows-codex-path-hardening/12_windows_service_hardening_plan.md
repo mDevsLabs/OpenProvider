@@ -6,7 +6,7 @@ macOS uses launchd service semantics. Windows currently uses a generated `.cmd` 
 
 Current Windows service shape:
 
-- generated script: `~/.opencodex/opencodex-service.cmd`
+- generated script: `~/.openprovider/openprovider-service.cmd`
 - sets `OCX_SERVICE`, `PATH`, optional `CODEX_HOME`
 - loops only when the child exits non-zero
 - Task Scheduler registration uses bare `/create /tn /tr /sc onlogon /rl highest /f`
@@ -44,13 +44,13 @@ Use structured generation functions so tests can assert fields without running W
 
 ### 2. Add Windows service logging
 
-Update the `.cmd` wrapper to write to opencodex `service.log`:
+Update the `.cmd` wrapper to write to openprovider `service.log`:
 
 - timestamp when wrapper starts;
 - Bun executable path;
 - Bun version when obtainable;
 - CLI path;
-- `CODEX_HOME` and opencodex config dir;
+- `CODEX_HOME` and openprovider config dir;
 - each child start;
 - each child exit code;
 - restart delay/decision;
@@ -62,9 +62,9 @@ Be careful with restart-on-failure and `.cmd` loop changes.
 
 Existing intentional stop flows:
 
-- `ocx stop` calls `stopServiceIfInstalled()` before killing the proxy.
+- `opr stop` calls `stopServiceIfInstalled()` before killing the proxy.
 - dashboard `/api/stop` calls `stopServiceIfInstalled()`, restores native Codex, drains, then exits.
-- `ocx service stop` now stops the task wrapper and kills the tracked proxy.
+- `opr service stop` now stops the task wrapper and kills the tracked proxy.
 
 A new restart loop must not resurrect the child after intentional stop. Prefer stopping the wrapper task first, then child kill, and avoid unconditional restart on clean intentional exits.
 
@@ -94,5 +94,5 @@ On a real Windows host:
 3. Confirm `service.log` appears and records Bun path/version.
 4. Kill only the child proxy process.
 5. Verify restart and log entry.
-6. Run `ocx service stop` and verify no child remains.
-7. Run `ocx service uninstall` and verify task/script removed and native Codex restored.
+6. Run `opr service stop` and verify no child remains.
+7. Run `opr service uninstall` and verify task/script removed and native Codex restored.

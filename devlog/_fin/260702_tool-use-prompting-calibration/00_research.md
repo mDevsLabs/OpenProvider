@@ -332,7 +332,7 @@ Reasonable operational basis:
 - Cursor routes many model families through a product-specific agent runtime.
 - Live Cursor investigations already showed model/tool-name sensitivity around
   `exec_command` and the `run_shell` alias strategy:
-  `/Users/jun/Developer/new/700_projects/opencodex/devlog/_plan/260702_cursor-toolcall-mcp-empty-rca/01_live-codex-exec-stall-alias-spec.md`
+  `/Users/jun/Developer/new/700_projects/openprovider/devlog/_plan/260702_cursor-toolcall-mcp-empty-rca/01_live-codex-exec-stall-alias-spec.md`
 - Non-native model families often need exact-name and schema hints in adapters, even
   when the structured tool schema is technically present.
 
@@ -458,7 +458,7 @@ unless there is a separate migration.
 
 Related active plan:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/devlog/_plan/260702_cursor-toolcall-mcp-empty-rca/01_live-codex-exec-stall-alias-spec.md`
+- `/Users/jun/Developer/new/700_projects/openprovider/devlog/_plan/260702_cursor-toolcall-mcp-empty-rca/01_live-codex-exec-stall-alias-spec.md`
 
 ### 4. Evaluate before broad rollout
 

@@ -28,7 +28,7 @@ export interface InitProvider {
 }
 
 /**
- * The full CLI provider menu, derived from the canonical provider registry so `ocx init`,
+ * The full CLI provider menu, derived from the canonical provider registry so `opr init`,
  * the GUI picker, key-login catalog, OAuth seeds, and metadata aliases cannot drift.
  */
 export function buildInitProviders(): InitProvider[] {
@@ -37,7 +37,7 @@ export function buildInitProviders(): InitProvider[] {
 
 const KIND_HEADING: Record<InitKind, string> = {
   forward: "ChatGPT login",
-  oauth: "Account login (OAuth — then run: ocx login <id>)",
+  oauth: "Account login (OAuth — then run: opr login <id>)",
   key: "API key (paste a key from the provider's dashboard)",
   local: "Local servers (usually no key)",
 };
@@ -83,7 +83,7 @@ export function cleanupOpenAiTierBackupAfterInit(configPath = getConfigPath()): 
 
 export async function runInit(): Promise<void> {
   const prompt = createPrompt();
-  console.log("\n🔧 opencodex (ocx) setup\n");
+  console.log("\n🔧 openprovider (opr) setup\n");
 
   const providers = buildInitProviders();
   printMenu(providers);
@@ -165,14 +165,14 @@ export async function runInit(): Promise<void> {
 
   saveConfig(config);
   // Init writes a fresh config, so a stale pre-migration backup from a previous
-  // installation would make the next `ocx start` crash on a stale-backup
+  // installation would make the next `opr start` crash on a stale-backup
   // collision (issue #257). But only a STALE backup (unparseable, or already a
   // post-migration v2 snapshot) may be deleted; a backup that still parses as a
   // valid pre-migration (v1) config is a user-intentional rollback point and is
   // preserved by renaming it out of the collision path (sol review 260722).
   cleanupOpenAiTierBackupAfterInit();
-  console.log(`\n✅ Config saved to ~/.opencodex/config.json`);
-  if (oauthHint) console.log(`🔐 Authenticate this provider with:  ocx login ${providerName}`);
+  console.log(`\n✅ Config saved to ~/.openprovider/config.json`);
+  if (oauthHint) console.log(`🔐 Authenticate this provider with:  opr login ${providerName}`);
 
   const injectAnswer = await prompt.ask("Inject into Codex config.toml? [Y/n]: ");
   if (injectAnswer.trim().toLowerCase() !== "n") {
@@ -192,6 +192,6 @@ export async function runInit(): Promise<void> {
     }
   }
 
-  console.log(`\n🚀 Setup complete! Run 'ocx start' to start the proxy.`);
+  console.log(`\n🚀 Setup complete! Run 'opr start' to start the proxy.`);
   prompt.close();
 }

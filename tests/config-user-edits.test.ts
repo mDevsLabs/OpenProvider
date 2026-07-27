@@ -31,7 +31,7 @@ function diskConfig(): Record<string, unknown> {
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  home = mkdtempSync(join(tmpdir(), "ocx-user-edits-"));
+  home = mkdtempSync(join(tmpdir(), "opr-user-edits-"));
   process.env.OPENCODEX_HOME = home;
   saveConfig({
     port: 10100,

@@ -111,7 +111,7 @@ describe("Cursor native exec sandbox policy", () => {
   }
 
   async function assertNativeSinksDenied(unsafeAllowNativeLocalExec: boolean) {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-cursor-policy-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-cursor-policy-"));
     const path = join(dir, "grounding.txt");
     const content = "C-ACTIVATION-GROUNDING-01 allowed content";
     writeFileSync(path, content);
@@ -123,7 +123,7 @@ describe("Cursor native exec sandbox policy", () => {
     const deniedText = stringify(denied);
     expect(deniedText).toContain("shell_command");
     expect(deniedText).toContain("exec_command");
-    expect(deniedText).toContain("mcp_opencodex-responses_*");
+    expect(deniedText).toContain("mcp_openprovider-responses_*");
     expect(deniedText).toContain("cat");
     expect(deniedText).toContain("apply_patch");
     expect(deniedText).toContain("silently call");
@@ -140,7 +140,7 @@ describe("Cursor native exec sandbox policy", () => {
     expect(deniedShellText).toContain("silently call");
     expect(deniedShellText).toContain("shell_command");
     expect(deniedShellText).toContain("exec_command");
-    expect(deniedShellText).toContain("mcp_opencodex-responses_*");
+    expect(deniedShellText).toContain("mcp_openprovider-responses_*");
     expect(deniedShellText).toContain("Do not tell the user");
     expect(deniedShellText).not.toContain("disabled by OpenProvider policy");
     expect(deniedShellText).not.toContain("sandbox denial");
@@ -167,13 +167,13 @@ describe("Cursor native exec sandbox policy", () => {
     expect(deniedFetchText).toContain("shell_command");
     expect(deniedFetchText).toContain("curl");
     expect(deniedFetchText).toContain("wget");
-    expect(deniedFetchText).toContain("mcp_opencodex-responses_shell_command");
+    expect(deniedFetchText).toContain("mcp_openprovider-responses_shell_command");
     expect(deniedFetchText).not.toContain("disabled by OpenProvider policy");
     expect(deniedFetchText).not.toContain("SHOULD_NOT_FETCH");
   }
 
   async function assertNativeSinksAllowed(unsafeAllowNativeLocalExec: boolean) {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-cursor-policy-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-cursor-policy-"));
     const path = join(dir, "grounding.txt");
     const content = "C-ACTIVATION-GROUNDING-01 allowed content";
     writeFileSync(path, content);
@@ -259,7 +259,7 @@ describe("Cursor native exec sandbox policy", () => {
   });
 
   test("activates a real read only when nativeLocalExec is explicitly on", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-cursor-policy-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-cursor-policy-"));
     const path = join(dir, "grounding.txt");
     const content = "C-ACTIVATION-GROUNDING-01 allowed content";
     writeFileSync(path, content);

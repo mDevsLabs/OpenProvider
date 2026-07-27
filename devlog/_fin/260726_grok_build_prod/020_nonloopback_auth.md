@@ -54,10 +54,10 @@ if (!isLoopbackHostname(opts.hostname)) {
     changed: false,
     skippedReason: "non-loopback",
     message:
-      `Grok auto-registration skipped: opencodex is bound to a non-loopback host `
+      `Grok auto-registration skipped: openprovider is bound to a non-loopback host `
       + `(${opts.hostname}). Non-loopback requests need your admission token, and a managed `
       + `block would either store that secret in your config or overwrite it on the next start. `
-      + `Add models manually OUTSIDE the opencodex fence — see the Grok Build guide.`,
+      + `Add models manually OUTSIDE the openprovider fence — see the Grok Build guide.`,
   };
 }
 ```

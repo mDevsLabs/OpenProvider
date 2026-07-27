@@ -15,10 +15,10 @@ Make source-checkout users understand that the root dev command starts the proxy
   - Clarify that `GET /` is available only when `gui/dist` exists, and source checkout users should run the GUI dev server separately.
 - REPLACE `gui/README.md`:
   - Remove the Vite template text.
-  - Add opencodex-specific dashboard dev instructions, including proxy prerequisite and common localhost confusion.
+  - Add openprovider-specific dashboard dev instructions, including proxy prerequisite and common localhost confusion.
 - MODIFY `tests/install-scripts.test.ts` or a docs/static test:
   - Assert root package scripts expose `dev:proxy` and `dev:gui`.
-  - Assert GUI README is opencodex-specific rather than generic Vite template text.
+  - Assert GUI README is openprovider-specific rather than generic Vite template text.
 
 ## Non-goals
 

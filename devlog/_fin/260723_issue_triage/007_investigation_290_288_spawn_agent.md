@@ -2,7 +2,7 @@
 
 - Date: 2026-07-23 KST
 - Tree: `codex/issue-triage-260723` at `origin/dev`
-- Issues: [#290](https://github.com/lidge-jun/opencodex/issues/290), [#288](https://github.com/lidge-jun/opencodex/issues/288)
+- Issues: [#290](https://github.com/lidge-jun/openprovider/issues/290), [#288](https://github.com/lidge-jun/openprovider/issues/288)
 - Upstream source check: `openai/codex` commit
   [`0f9fb40f`](https://github.com/openai/codex/tree/0f9fb40fa9c4cc4b1ed0d595ce3ba70468a0c87a),
   read 2026-07-23 KST
@@ -12,8 +12,8 @@
 
 | Issue | Classification | Short conclusion |
 | --- | --- | --- |
-| #288 | **Mixed boundary, configuration/current behavior rather than an OpenCodex routing bug** | OpenCodex supplies catalog order and `multi_agent_version`; Codex performs the pre-proxy validation. In base/default mode, routed Ark rows are unpinned while Sol/Terra are V2-pinned, which explains the two-name error. Force V2 for routed overrides; feature Ark separately only if it should be advertised among the first five. |
-| #290 | **Needs a boundary capture; likely upstream-surface or model/provider tool-call compatibility, with an OpenCodex `{}` finalization step** | OpenCodex preserves the received tool schema and non-empty argument deltas on the ordinary Responses-to-chat path. It does deliberately serialize a tool call with no received argument bytes as `{}`. The missing evidence is whether the parent received an empty schema, whether the custom model emitted no arguments, or whether a provider-specific translation dropped them. |
+| #288 | **Mixed boundary, configuration/current behavior rather than an OpenProvider routing bug** | OpenProvider supplies catalog order and `multi_agent_version`; Codex performs the pre-proxy validation. In base/default mode, routed Ark rows are unpinned while Sol/Terra are V2-pinned, which explains the two-name error. Force V2 for routed overrides; feature Ark separately only if it should be advertised among the first five. |
+| #290 | **Needs a boundary capture; likely upstream-surface or model/provider tool-call compatibility, with an OpenProvider `{}` finalization step** | OpenProvider preserves the received tool schema and non-empty argument deltas on the ordinary Responses-to-chat path. It does deliberately serialize a tool call with no received argument bytes as `{}`. The missing evidence is whether the parent received an empty schema, whether the custom model emitted no arguments, or whether a provider-specific translation dropped them. |
 
 ## Evidence anchors
 
@@ -69,7 +69,7 @@ not change #288's V2 backend gate described in E4/E5.
 >
 > `const e = deriveEntry(`
 >
-> `` `Routed via opencodex → ${m.provider} (${m.owned_by ?? m.provider}).`, ``
+> `` `Routed via openprovider → ${m.provider} (${m.owned_by ?? m.provider}).`, ``
 >
 > `5,`
 >
@@ -154,7 +154,7 @@ Proof command:
 bun -e 'import { buildCatalogEntries } from "./src/codex/catalog.ts"; import { DEFAULT_SUBAGENT_MODELS } from "./src/config.ts"; /* project base and v2 rows */'
 ```
 
-### E5 — Codex owns the rejection, but validates OpenCodex-supplied catalog metadata
+### E5 — Codex owns the rejection, but validates OpenProvider-supplied catalog metadata
 
 Pinned upstream `codex-rs/core/src/tools/handlers/multi_agents_common.rs:31-39`:
 
@@ -187,7 +187,7 @@ This proves two distinct rules:
 2. The error suffix prints only the first five picker-visible, backend-compatible rows.
 
 The literal `Unknown model ... for spawn_agent` sentence is upstream Codex text, not text emitted
-by OpenCodex. Its membership is nevertheless derived from the OpenCodex-injected catalog.
+by OpenProvider. Its membership is nevertheless derived from the OpenProvider-injected catalog.
 
 ## #288 analysis — accepted-model enforcement boundary
 
@@ -195,9 +195,9 @@ by OpenCodex. Its membership is nevertheless derived from the OpenCodex-injected
 
 On a normal fresh config, E1 + E2 + E3 place the native seed ahead of every ordinary routed row.
 In base/default multi-agent mode, E4 leaves `Ark/glm-5.2` without a V2 pin. E5 then rejects the
-explicit Ark override before any child request reaches OpenCodex. Backend filtering removes the
+explicit Ark override before any child request reaches OpenProvider. Backend filtering removes the
 unpinned `gpt-5.5` and `gpt-5.4-mini` rows and the V1-pinned Luna row from the V2 error list, leaving
-Sol and Terra. That is why the reported two-name membership is explainable by OpenCodex's catalog
+Sol and Terra. That is why the reported two-name membership is explainable by OpenProvider's catalog
 plus Codex's V2 filter.
 
 The observed order `terra, sol` is not reproduced by current `origin/dev`'s default priorities
@@ -213,8 +213,8 @@ is `multi_agent_version`.
 
 ### Boundary classification
 
-**Mixed / OpenCodex-influenced.** The enforcement exception and error string run in Codex before
-proxy routing (E5), but OpenCodex controls the model row, visibility, priority, and V2 pin that the
+**Mixed / OpenProvider-influenced.** The enforcement exception and error string run in Codex before
+proxy routing (E5), but OpenProvider controls the model row, visibility, priority, and V2 pin that the
 enforcer consumes (E2-E4). This is not “purely app-side,” and it is not evidence that the Ark data
 plane cannot route the model.
 
@@ -222,17 +222,17 @@ plane cannot route the model.
 
 A decisive report needs all of the following from the same new Codex session:
 
-- Codex Desktop/CLI and OpenCodex versions.
-- `ocx v2 status` output and the persisted `multiAgentMode` value.
+- Codex Desktop/CLI and OpenProvider versions.
+- `opr v2 status` output and the persisted `multiAgentMode` value.
 - `GET /api/subagent-models` (`chosen` and `available`).
 - Sanitized catalog rows for `Ark/glm-5.2`, `Ark/ark-code-latest`, Sol, Terra, and Luna containing
   only `slug`, `priority`, `visibility`, and `multi_agent_version`.
 - Proof that the mode change completed catalog sync and that a **new** session was opened, followed
   by one explicit override and one inheritance control.
-- Confirmation that no `/v1/responses` child request reached OpenCodex for the rejected override;
+- Confirmation that no `/v1/responses` child request reached OpenProvider for the rejected override;
   that distinguishes the Codex validation gate from provider routing.
 
-Expected discriminator: base mode rejects an unpinned Ark row; `ocx v2 mode v2` stamps the row V2
+Expected discriminator: base mode rejects an unpinned Ark row; `opr v2 mode v2` stamps the row V2
 and should let E5 find the exact model even if it is outside the printed first five. Adding Ark to
 `subagentModels` is separately required only to advertise it in those first five.
 
@@ -285,7 +285,7 @@ at the upstream Codex argument parse, before child creation.
 
 ### Incoming Responses schema to routed-provider request
 
-OpenCodex reads collaboration definitions from both normal `tools` and the Responses Lite
+OpenProvider reads collaboration definitions from both normal `tools` and the Responses Lite
 `additional_tools` input shape. `src/responses/parser.ts:100-123`:
 
 > `parameters: (t.parameters ?? {}) as Record<string, unknown>,`
@@ -351,13 +351,13 @@ empty parameter objects for all collaboration tools. `tests/multi-agent-compat.t
 >
 > `{ type: "function", name: "spawn_agent", description: "...", parameters: {} },`
 
-OpenCodex faithfully forwarding `{}` in that input shape gives a custom parent no public argument
+OpenProvider faithfully forwarding `{}` in that input shape gives a custom parent no public argument
 contract to follow. The issue report does not include the inbound request, so this upstream-surface
 hypothesis cannot yet be separated from a model that ignored a complete schema.
 
 ### Upstream model output to Codex Responses output
 
-For streamed OpenAI-compatible responses, OpenCodex accumulates the provider's argument bytes
+For streamed OpenAI-compatible responses, OpenProvider accumulates the provider's argument bytes
 without parsing or rewriting them. `src/adapters/openai-chat.ts:590-599`, `:664-683`:
 
 > `interface PendingToolCall { key: string; id: string; name: string; args: string }`
@@ -389,7 +389,7 @@ The non-streaming bridge has the same fallback at `src/bridge.ts:843-848`:
 
 > `arguments: currentToolCallArgs || "{}", status: "completed",`
 
-Thus OpenCodex **can be the component that materializes the literal `{}`**, but only after the
+Thus OpenProvider **can be the component that materializes the literal `{}`**, but only after the
 adapter reported a tool-call start/end with no argument bytes. Current code does not show a path
 that converts a non-empty `message`/`task_name` JSON argument string into `{}`. The replay parser
 also defaults empty/non-JSON historical calls to `{}` (`src/responses/parser.ts:400-412`), but that
@@ -402,7 +402,7 @@ They fail at different times and carry different missing data:
 | Issue | Last successful step | Failure point | Missing data |
 | --- | --- | --- | --- |
 | #290 | Routed parent selects/calls the `spawn_agent` tool name | Parent output reaches Codex as `{}` or incomplete JSON; `SpawnAgentArgs` parse fails before a child exists (upstream `spawn.rs:49-58,173-184`) | Public tool arguments, especially `message` and `task_name` |
-| #92 | Native parent emits a valid spawn; Codex creates the routed child | Child's later `NEW_TASK` request reaches OpenCodex with an empty plaintext payload and genuine Fernet `encrypted_content` | Plaintext task body after successful spawn |
+| #92 | Native parent emits a valid spawn; Codex creates the routed child | Child's later `NEW_TASK` request reaches OpenProvider with an empty plaintext payload and genuine Fernet `encrypted_content` | Plaintext task body after successful spawn |
 
 The local #92 boundary preserves real ciphertext by design. `src/server/responses.ts:342-370`:
 
@@ -427,39 +427,39 @@ spawn; #92 is an unreadable child-input payload after spawn.
 One controlled run must capture four sanitized boundaries, preserving tool names, schema keys, and
 argument strings while removing prompts, credentials, headers, and unrelated content:
 
-1. **Codex → OpenCodex request:** the exact `spawn_agent` entry from top-level `tools` or
+1. **Codex → OpenProvider request:** the exact `spawn_agent` entry from top-level `tools` or
    `input[].additional_tools`, including `properties`, `required`, `encrypted`, namespace, and
    `tool_choice`.
-2. **OpenCodex → provider request:** the translated `spawn_agent` tool definition and tool choice.
-3. **Provider → OpenCodex raw response:** every `tool_calls[].function.{name,arguments}` fragment
+2. **OpenProvider → provider request:** the translated `spawn_agent` tool definition and tool choice.
+3. **Provider → OpenProvider raw response:** every `tool_calls[].function.{name,arguments}` fragment
    (or the provider-native equivalent) for the failed call, before adapter parsing.
-4. **OpenCodex → Codex response:** `response.function_call_arguments.delta`,
+4. **OpenProvider → Codex response:** `response.function_call_arguments.delta`,
    `response.function_call_arguments.done`, and final `response.output_item.done.item.arguments`,
    plus Codex stderr's parse error and retry count.
 
 Controls must use the same prompt and schema with: native parent, the failing custom parent, one
 known tool-capable custom model, streaming and non-streaming if supported, and a trivial required
-argument function alongside `spawn_agent`. Existing OpenCodex debug logging intentionally does not
-capture full request bodies, so `ocx debug provider on` alone is not definitive; use a local
+argument function alongside `spawn_agent`. Existing OpenProvider debug logging intentionally does not
+capture full request bodies, so `opr debug provider on` alone is not definitive; use a local
 sanitized harness or temporary maintainer instrumentation, never post credentials or full prompts.
 
 The classification decision is mechanical:
 
 - Inbound schema already `{}` → upstream Codex/Desktop surface issue; label `upstream-tracking`.
-- Inbound full, outbound schema damaged → OpenCodex adapter bug; keep `bug` and add a regression.
+- Inbound full, outbound schema damaged → OpenProvider adapter bug; keep `bug` and add a regression.
 - Outbound full, provider raw arguments empty/`{}` → model/provider tool-call capability; label
   `provider-compatibility`, document support, and close unless a supported-provider regression.
-- Provider raw arguments non-empty, emitted Responses arguments empty → OpenCodex bridge bug; keep
+- Provider raw arguments non-empty, emitted Responses arguments empty → OpenProvider bridge bug; keep
   `bug` and add byte-preservation coverage.
 
 ## Verdict
 
-- **#288: mixed boundary, OpenCodex-influenced, not upstream-only.** OpenCodex controls the catalog
+- **#288: mixed boundary, OpenProvider-influenced, not upstream-only.** OpenProvider controls the catalog
   rows and V2 pins; Codex enforces them before proxy routing. Base mode's Sol/Terra-only V2 pins
   explain the reported available membership. This can move to **bucket 1 (answer/configuration +
   close)** because forced V2 is the existing supported control; re-open only if a freshly synced
   `Ark/*` row marked `multi_agent_version: "v2"` is still rejected.
-- **#290: needs-repro, likely upstream-surface or provider/model compatibility; not #92.** OpenCodex
+- **#290: needs-repro, likely upstream-surface or provider/model compatibility; not #92.** OpenProvider
   does materialize `{}` for a call with zero received argument bytes, but no inspected path erases
   non-empty arguments. Keep open until the four-boundary capture identifies where the bytes vanish.
 
@@ -470,13 +470,13 @@ The classification decision is mechanical:
 Reply in Chinese, label `question` + `provider-compatibility`, and close as configuration/current
 behavior after giving this workaround:
 
-> 这个错误文本由 Codex 客户端生成，但候选模型来自 OpenCodex 注入的 catalog。默认/base
+> 这个错误文本由 Codex 客户端生成，但候选模型来自 OpenProvider 注入的 catalog。默认/base
 > 模式只保留上游 V2 pin，因此当前只有 `gpt-5.6-sol` / `gpt-5.6-terra` 通过 V2
-> `spawn_agent` 校验；普通 `Ark/*` catalog 行没有 V2 pin。请运行 `ocx v2 mode v2`，确认
+> `spawn_agent` 校验；普通 `Ark/*` catalog 行没有 V2 pin。请运行 `opr v2 mode v2`，确认
 > catalog 同步完成后新建 Codex 会话再测试。若希望 Ark 模型同时出现在工具描述的前五个
 > 候选中，再把它加入 Dashboard 的 Sub-agents 列表（`subagentModels`）；一旦该行已标记
 > `multi_agent_version: "v2"`，显式精确 ID 的校验并不要求它必须位于前五。省略 `model`
-> 继续是继承父模型的可用方案。若强制 V2 后仍失败，请附上脱敏后的 `ocx v2 status`、
+> 继续是继承父模型的可用方案。若强制 V2 后仍失败，请附上脱敏后的 `opr v2 status`、
 > `/api/subagent-models`，以及 Ark/Sol/Terra catalog 行的 `slug/priority/visibility/multi_agent_version`。
 
 ### #290 response
@@ -490,15 +490,15 @@ inbound schema capture proves the Codex surface supplied `{}`. Recommended respo
 > item remains valid JSON. We therefore need one sanitized four-boundary capture: incoming
 > `spawn_agent` schema, outgoing provider schema, raw provider tool-call arguments, and emitted
 > Responses argument events. That will distinguish an empty Codex `additional_tools` schema, a
-> model/provider structured-tool limitation, and an OpenCodex translation defect. This is separate
+> model/provider structured-tool limitation, and an OpenProvider translation defect. This is separate
 > from #92: #290 fails before child creation, while #92 loses the task after a valid spawn. Until
-> the capture is available, use `ocx v2 mode v1` for heterogeneous/custom-model delegation; if no
+> the capture is available, use `opr v2 mode v1` for heterogeneous/custom-model delegation; if no
 > model override is required, inheriting the parent model is another control, not proof of V2
 > structured-call support.
 
 If the capture identifies an inbound empty schema, cross-link a new/existing upstream Codex issue
 and switch #290 to `upstream-tracking`. If it identifies a provider raw `{}`, retain only
-`provider-compatibility` and document the incompatible model. If it identifies OpenCodex damage,
+`provider-compatibility` and document the incompatible model. If it identifies OpenProvider damage,
 retain `bug` and implement the narrow adapter/bridge regression fix.
 
 ## Effort estimate

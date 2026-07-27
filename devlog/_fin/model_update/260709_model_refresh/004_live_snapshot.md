@@ -1,6 +1,6 @@
 # 004 — Live /api/models snapshot (2026-07-09, local proxy, read-only)
 
-Captured from the RUNNING ocx proxy (pre-Phase-1 binary) via GET http://127.0.0.1:10100/api/models.
+Captured from the RUNNING opr proxy (pre-Phase-1 binary) via GET http://127.0.0.1:10100/api/models.
 xai rows come from live /v1/models via the user OAuth token; cursor rows are the old static seed
 filtered by live GetUsableModels (survival == live-callable base id).
 

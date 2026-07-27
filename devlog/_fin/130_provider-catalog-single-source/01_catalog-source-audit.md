@@ -35,7 +35,7 @@ already in static** (`opencode-go` deduped at `AddProviderModal.tsx:95-96`) → 
 presets** — same cardinality as `buildInitProviders()`, plus a `custom` escape hatch.
 
 When the proxy is **not** running, the fetch fails silently (`AddProviderModal.tsx:90`) → GUI
-shows only the **13 non-custom static presets**. CLI `ocx init` still lists all 43 built-in rows.
+shows only the **13 non-custom static presets**. CLI `opr init` still lists all 43 built-in rows.
 
 ## Surface B — CLI / registry
 
@@ -77,7 +77,7 @@ instead of importing a shared constant.
 
 ### `PROVIDER_ALIASES` (`generate-jawcode-metadata.ts:4-17`)
 
-| opencodex id (alias key) | jawcode bundle id |
+| openprovider id (alias key) | jawcode bundle id |
 |--------------------------|-------------------|
 | `xai` | `xai` |
 | `anthropic` | `anthropic` |
@@ -118,7 +118,7 @@ Lookup is **exact string match** on `modelId` (`jawcode-model-metadata.ts:42-43`
 the provider alias but **misses** metadata because `modelId` casing differs.
 
 **jawcode naming (external):** jawcode `models.json` defines separate provider keys
-`minimax`, `minimax-code`, `minimax-code-cn` (e.g. `models.json:37381`, `:37821`). opencodex
+`minimax`, `minimax-code`, `minimax-code-cn` (e.g. `models.json:37381`, `:37821`). openprovider
 maps only `minimax` / `minimax-cn` → jawcode `minimax` (not `minimax-code*`).
 
 ---
@@ -225,7 +225,7 @@ structural asymmetry (not necessarily a bug).
 
 1. **ID parity** between `buildInitProviders()` and GUI-with-proxy is now **43 vs 43** (excluding
    GUI `custom`), but **static GUI alone** matches only **13** ids — a user adding providers from
-   a cold GUI sees a much smaller list than `ocx init`.
+   a cold GUI sees a much smaller list than `opr init`.
 2. **Field parity** is broken for **`kimi` (baseUrl)**, **`anthropic` (defaultModel)**, and
    **`azure-openai` (adapter)** even when ids align.
 3. **Metadata coverage** is intentionally sparse (7 jawcode bundles) but **alias maintenance is

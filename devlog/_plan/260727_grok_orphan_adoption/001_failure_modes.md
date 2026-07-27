@@ -5,10 +5,10 @@ documented so a later change cannot reintroduce them silently.
 
 ## F1 — adopting a genuine user model (WORST)
 
-A human writes their own `[model.my-local]` pointing at the opencodex proxy for their
+A human writes their own `[model.my-local]` pointing at the openprovider proxy for their
 own reasons. If our ownership test is loose enough to match it, the adoption sweep
 DELETES their entry on the next sync. There is no undo in-product; only
-`config.toml.bak-opencodex` (written once, at first injection — so possibly ancient).
+`config.toml.bak-openprovider` (written once, at first injection — so possibly ancient).
 
 Defence: adoption requires a signal a human would not plausibly reproduce, and the test
 must be conjunctive rather than "any one of". `base_url` pointing at loopback is
@@ -17,7 +17,7 @@ documented thing to do.
 
 ## F2 — dangling `default` / `fork_secondary_model` after removal
 
-`[models] default = "ocx-gpt-5-6-sol"` and `[ui] fork_secondary_model` name aliases by
+`[models] default = "opr-gpt-5-6-sol"` and `[ui] fork_secondary_model` name aliases by
 string. Removing an adopted orphan without rewriting those references leaves Grok
 pointing at a nonexistent model. On this machine `default` names an orphan, so this
 fires on the FIRST run for the reporting user — it is the common path.
@@ -35,7 +35,7 @@ routed-around" set into the "we now generate this name" set.
 
 Defence: an alias is only freed for reuse after its orphan table is actually removed
 from the content we write. Array-of-table (`[[model.x]]`) and sub-table
-(`[model.x.sub]`) spellings are NEVER adopted — a genuine opencodex write is always a
+(`[model.x.sub]`) spellings are NEVER adopted — a genuine openprovider write is always a
 plain `[model.x]`, so those spellings mark human authorship and stay reserved.
 
 ## F4 — partial-table removal corrupting the file
@@ -56,7 +56,7 @@ If a model exists solely as an orphan and is not in the current catalog (a provi
 removed, a model was retired), adopting it means deleting it outright. The user loses
 a model they may still be selecting.
 
-Defence: this is acceptable ONLY because the entry is opencodex-owned and points at our
+Defence: this is acceptable ONLY because the entry is openprovider-owned and points at our
 proxy — if the model is gone from the catalog, the entry was already dead (the proxy
 would 404 it). Recorded here so the behaviour is deliberate, and the `default` rewrite
 (F2) must still find a live target; if none exists, leave `default` alone rather than

@@ -54,7 +54,7 @@ async function collectSse(stream: ReadableStream<Uint8Array>): Promise<{ event?:
 }
 
 describe("Phase 100 Codex-native parity smoke", () => {
-  test("routed model keeps native-like catalog affordances while runtime routes through opencodex sidecars and bridge errors", async () => {
+  test("routed model keeps native-like catalog affordances while runtime routes through openprovider sidecars and bridge errors", async () => {
     const routedProvider: OcxProviderConfig = {
       adapter: "openai-chat",
       baseUrl: "https://routed.example/v1",

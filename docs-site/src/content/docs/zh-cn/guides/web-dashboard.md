@@ -9,14 +9,14 @@ OpenProvider 内置了一个由代理提供服务的本地 web 仪表盘（`gui/
 ## 打开仪表盘
 
 ```bash
-ocx gui
+opr gui
 ```
 
 该命令会在浏览器中打开 `http://localhost:<port>`；如果代理尚未运行，会先自动启动。开发时也可
 让 GUI dev server 单独连接到正在运行的代理：
 
 ```bash
-ocx start
+opr start
 bun run dev:gui
 ```
 
@@ -30,7 +30,7 @@ bun run dev:gui
 | **Maintenance** | 重新同步 Codex 模型目录，查看项目级配置绕过警告，检查 latest/preview 版本，并可在更新后重启代理。 |
 | **启动安全** | 显示注入的 Codex 路由能否在重启后继续工作，并分别显示服务、launcher shim 状态和准确的修复命令。 |
 | **Windows 托盘** | 安装用户登录托盘，一键控制代理启动、停止、重启、面板和状态。托盘不是代理重启服务。 |
-| **Codex 自动启动** | 允许已安装的 Codex launcher shim 运行 `ocx ensure`。此开关不会安装 shim 或后台服务。 |
+| **Codex 自动启动** | 允许已安装的 Codex launcher shim 运行 `opr ensure`。此开关不会安装 shim 或后台服务。 |
 | **Providers** | 添加、编辑、启用/禁用、删除 provider，并在支持时管理 OAuth 账号池和 API key 池。 |
 | **Add provider** | 搜索 registry preset，选择账号登录、API key 服务、本地服务器或自定义 endpoint。 |
 | **Codex Auth** | 添加 ChatGPT/Codex 池账号，选择下一 session 的账号，刷新 5h / 每周 / 30d 配额，启用或停用配额自动切换，设置其 1–100% 阈值和临时故障 failover。 |

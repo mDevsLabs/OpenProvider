@@ -35,7 +35,7 @@ export async function handleLogin(provider?: string): Promise<void> {
   if (isPublicOAuthProvider(name)) return handleOAuthLogin(name);
   if (isKeyLoginProvider(name)) return handleKeyLogin(name);
   console.error(
-    `Usage: ocx login <provider>\n` +
+    `Usage: opr login <provider>\n` +
       `  OAuth login:   ${listOAuthProviders().join(", ")}\n` +
       `  API-key login: ${Object.keys(KEY_LOGIN_PROVIDERS).join(", ")}`,
   );
@@ -59,7 +59,7 @@ async function handleOAuthLogin(name: string): Promise<void> {
     rl.close();
   }
   await notifyRunningProxy(name, OAUTH_PROVIDERS[name].providerConfig);
-  console.log(`\n✅ Logged in to ${name}. Try: ocx sync`);
+  console.log(`\n✅ Logged in to ${name}. Try: opr sync`);
 }
 
 export function providerConfigFromKeyLoginProvider(def: KeyLoginProvider, key: string, baseUrlOverride?: string): OcxProviderConfig {
@@ -124,7 +124,7 @@ async function handleKeyLogin(name: string): Promise<void> {
   config.providers[name] = provider;
   saveConfig(config);
   await notifyRunningProxy(name, provider);
-  console.log(`✅ ${def.label} added. Try: ocx sync`);
+  console.log(`✅ ${def.label} added. Try: opr sync`);
 }
 
 function cloneRecordOfArrays(input: Record<string, string[]>): Record<string, string[]> {

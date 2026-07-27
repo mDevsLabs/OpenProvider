@@ -92,7 +92,7 @@ function listenerIdentity10100(): ListenerIdentity {
 }
 
 async function checkLiveKey(): Promise<void> {
-  const configHome = process.env.OPENCODEX_HOME?.trim() || join(homedir(), ".opencodex");
+  const configHome = process.env.OPENCODEX_HOME?.trim() || join(homedir(), ".openprovider");
   const configPath = join(configHome, "config.json");
   let key: string | null = null;
   if (existsSync(configPath)) {
@@ -155,31 +155,31 @@ if (Bun.argv.includes("--check-live-key")) {
   }
 
   const liveBefore = listenerIdentity10100();
-  const realOcxHome = process.env.OPENCODEX_HOME?.trim() || join(homedir(), ".opencodex");
+  const realOcxHome = process.env.OPENCODEX_HOME?.trim() || join(homedir(), ".openprovider");
   const realCodexHome = process.env.CODEX_HOME?.trim() || join(homedir(), ".codex");
   const realState = [
-    ["opencodex-config", join(realOcxHome, "config.json")],
-    ["opencodex-oauth", join(realOcxHome, "auth.json")],
-    ["opencodex-codex-accounts", join(realOcxHome, "codex-accounts.json")],
+    ["openprovider-config", join(realOcxHome, "config.json")],
+    ["openprovider-oauth", join(realOcxHome, "auth.json")],
+    ["openprovider-codex-accounts", join(realOcxHome, "codex-accounts.json")],
     ["codex-config", join(realCodexHome, "config.toml")],
     ["codex-auth", join(realCodexHome, "auth.json")],
   ] as const;
   const hashesBefore = stateHashes(realState);
 
-  const root = mkdtempSync(join(tmpdir(), "ocx-provider-option-runtime-smoke-"));
-  const opencodexHome = join(root, "opencodex");
+  const root = mkdtempSync(join(tmpdir(), "opr-provider-option-runtime-smoke-"));
+  const openproviderHome = join(root, "openprovider");
   const codexHome = join(root, "codex");
   const workdir = join(root, "work");
   const capturePath = join(root, "capture.json");
   mkdirSync(workdir, { recursive: true, mode: 0o700 });
-  const env = buildSanitizedRuntimeEnv(process.env, opencodexHome, codexHome);
+  const env = buildSanitizedRuntimeEnv(process.env, openproviderHome, codexHome);
   const children: Bun.Subprocess[] = [];
 
   async function startChild(): Promise<{ child: Bun.Subprocess; ready: ChildReady }> {
     const child = Bun.spawn([
       process.execPath,
       join(import.meta.dir, "openai-provider-option-runtime-child.ts"),
-      opencodexHome,
+      openproviderHome,
       codexHome,
       capturePath,
     ], { cwd: workdir, env, stdout: "pipe", stderr: "pipe" });

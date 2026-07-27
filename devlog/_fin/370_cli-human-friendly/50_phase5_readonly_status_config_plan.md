@@ -4,13 +4,13 @@ Status: implementation plan for the second GPT Pro hardening PABCD cycle.
 
 ## Source
 
-Parent plan: /Users/jun/Developer/new/700_projects/opencodex/devlog/370_cli-human-friendly/40_gptpro_hardening_followup_plan.md
+Parent plan: /Users/jun/Developer/new/700_projects/openprovider/devlog/370_cli-human-friendly/40_gptpro_hardening_followup_plan.md
 
-GPT Pro finding: `ocx status --json` is documented as diagnostics, but the status collection path currently calls `loadConfig()`. That helper is intentionally mutating for normal runtime use: it hardens file modes, repairs partially invalid configs, and backs up malformed configs.
+GPT Pro finding: `opr status --json` is documented as diagnostics, but the status collection path currently calls `loadConfig()`. That helper is intentionally mutating for normal runtime use: it hardens file modes, repairs partially invalid configs, and backs up malformed configs.
 
 ## Objective
 
-Make `ocx status` and `ocx status --json` use a diagnostics-only config reader so status remains read-only even when the config file is malformed. Keep normal `loadConfig()` behavior unchanged for runtime commands.
+Make `opr status` and `opr status --json` use a diagnostics-only config reader so status remains read-only even when the config file is malformed. Keep normal `loadConfig()` behavior unchanged for runtime commands.
 
 ## Current Problem
 
@@ -26,24 +26,24 @@ src/cli.ts handleStatus()
       -> may repair invalid partial config
 ```
 
-That means a user or agent can run `ocx status --json` expecting inspection-only output, but malformed config can produce stderr and filesystem changes before JSON is printed.
+That means a user or agent can run `opr status --json` expecting inspection-only output, but malformed config can produce stderr and filesystem changes before JSON is printed.
 
 ## Files
 
 Modify:
 
 ```path
-/Users/jun/Developer/new/700_projects/opencodex/src/config.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/cli-status.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/cli-status-json.test.ts
-/Users/jun/Developer/new/700_projects/opencodex/tests/config.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/config.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/cli-status.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/cli-status-json.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/config.test.ts
 ```
 
 ## Planned Changes
 
 ### 1. Add a non-mutating diagnostics config reader
 
-In `/Users/jun/Developer/new/700_projects/opencodex/src/config.ts` add exported types/functions similar to:
+In `/Users/jun/Developer/new/700_projects/openprovider/src/config.ts` add exported types/functions similar to:
 
 ```ts
 export type ConfigDiagnostics = {
@@ -74,7 +74,7 @@ schema_invalid: defaultProvider, providers.cursor
 
 ### 2. Route status through diagnostics reader
 
-In `/Users/jun/Developer/new/700_projects/opencodex/src/cli-status.ts`:
+In `/Users/jun/Developer/new/700_projects/openprovider/src/cli-status.ts`:
 
 - replace `loadConfig()` import/use with `readConfigDiagnostics()`;
 - use `diagnostics.config` for port, hostname, autostart, and defaultProvider;
@@ -91,9 +91,9 @@ Human status may print a short warning line only when the diagnostics reader ret
 
 ### 3. Regression tests
 
-In `/Users/jun/Developer/new/700_projects/opencodex/tests/cli-status-json.test.ts` add coverage:
+In `/Users/jun/Developer/new/700_projects/openprovider/tests/cli-status-json.test.ts` add coverage:
 
-- malformed `config.json` + `ocx status --json` exits 0;
+- malformed `config.json` + `opr status --json` exits 0;
 - stdout is parseable JSON;
 - stderr is empty;
 - no `config.json.invalid-*` backup is created;
@@ -101,7 +101,7 @@ In `/Users/jun/Developer/new/700_projects/opencodex/tests/cli-status-json.test.t
 - JSON contains `config.source === "fallback"` and a string `config.error`.
 - JSON error summary does not include raw malformed config content or secret-looking values.
 
-In `/Users/jun/Developer/new/700_projects/opencodex/tests/config.test.ts` add direct unit coverage:
+In `/Users/jun/Developer/new/700_projects/openprovider/tests/config.test.ts` add direct unit coverage:
 
 - `readConfigDiagnostics()` returns parsed config for valid file;
 - missing file returns default without creating config dir/files;
@@ -109,9 +109,9 @@ In `/Users/jun/Developer/new/700_projects/opencodex/tests/config.test.ts` add di
 
 ## Acceptance Criteria
 
-- `ocx status --json` on malformed config still prints parseable JSON and exits 0.
-- `ocx status --json` writes no stderr on malformed config.
-- `ocx status --json` creates no `config.json.invalid-*` file.
+- `opr status --json` on malformed config still prints parseable JSON and exits 0.
+- `opr status --json` writes no stderr on malformed config.
+- `opr status --json` creates no `config.json.invalid-*` file.
 - `status` diagnostics do not chmod/harden as part of config reading; tests prove no backup/files are created, and implementation proves no harden helper calls in diagnostics reader.
 - `config.error` uses only fixed categories plus safe field paths; raw parser messages, raw config content, and secret-looking values are not exposed.
 - Existing `loadConfig()` mutating repair/backup behavior remains unchanged and covered by existing config tests.

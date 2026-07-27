@@ -2,7 +2,7 @@ param(
   [Parameter(Mandatory = $true)][string]$BunPath,
   [Parameter(Mandatory = $true)][string]$CliPath,
   [Parameter(Mandatory = $true)][string]$CodexHome,
-  [Parameter(Mandatory = $true)][string]$OpenCodexHome,
+  [Parameter(Mandatory = $true)][string]$OpenProviderHome,
   [ValidateSet("Run", "Stop")][string]$Mode = "Run",
   [int]$HostPid = 0
 )
@@ -19,12 +19,12 @@ function Normalize-HomePath([string]$Value) {
   if ($full -eq $root) { return $full }
   return $full.TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
 }
-$OpenCodexHome = Normalize-HomePath $OpenCodexHome
+$OpenProviderHome = Normalize-HomePath $OpenProviderHome
 $CodexHome = Normalize-HomePath $CodexHome
 
 $script:ownedIcons = New-Object System.Collections.Generic.List[System.Drawing.Icon]
 function Load-TrayIcon([string]$Name, [System.Drawing.Icon]$Fallback) {
-  $path = Join-Path $OpenCodexHome $Name
+  $path = Join-Path $OpenProviderHome $Name
   if (-not [System.IO.File]::Exists($path)) { return $Fallback }
   try {
     $icon = New-Object System.Drawing.Icon($path)
@@ -34,9 +34,9 @@ function Load-TrayIcon([string]$Name, [System.Drawing.Icon]$Fallback) {
     return $Fallback
   }
 }
-$onlineIcon = Load-TrayIcon "opencodex-tray-online.ico" ([System.Drawing.SystemIcons]::Information)
-$warningIcon = Load-TrayIcon "opencodex-tray-warning.ico" ([System.Drawing.SystemIcons]::Warning)
-$offlineIcon = Load-TrayIcon "opencodex-tray-offline.ico" ([System.Drawing.SystemIcons]::Error)
+$onlineIcon = Load-TrayIcon "openprovider-tray-online.ico" ([System.Drawing.SystemIcons]::Information)
+$warningIcon = Load-TrayIcon "openprovider-tray-warning.ico" ([System.Drawing.SystemIcons]::Warning)
+$offlineIcon = Load-TrayIcon "openprovider-tray-offline.ico" ([System.Drawing.SystemIcons]::Error)
 
 function Get-StableHash([string]$Value) {
   $sha = [System.Security.Cryptography.SHA256]::Create()
@@ -49,9 +49,9 @@ function Get-StableHash([string]$Value) {
   }
 }
 
-$stableHash = Get-StableHash $OpenCodexHome
+$stableHash = Get-StableHash $OpenProviderHome
 $stopEventCreated = $false
-$stopEvent = New-Object System.Threading.EventWaitHandle($false, [System.Threading.EventResetMode]::AutoReset, "Local\OpenCodexTrayStop-$stableHash", [ref]$stopEventCreated)
+$stopEvent = New-Object System.Threading.EventWaitHandle($false, [System.Threading.EventResetMode]::AutoReset, "Local\OpenProviderTrayStop-$stableHash", [ref]$stopEventCreated)
 if ($Mode -eq "Stop") {
   [void]$stopEvent.Set()
   $stopEvent.Dispose()
@@ -59,15 +59,15 @@ if ($Mode -eq "Stop") {
 }
 
 $createdNew = $false
-$mutex = New-Object System.Threading.Mutex($true, "Local\OpenCodexTray-$stableHash", [ref]$createdNew)
+$mutex = New-Object System.Threading.Mutex($true, "Local\OpenProviderTray-$stableHash", [ref]$createdNew)
 if (-not $createdNew) {
   $stopEvent.Dispose()
   $mutex.Dispose()
   exit 0
 }
 
-$heartbeatPath = Join-Path $OpenCodexHome "tray-heartbeat.json"
-$actionLogPath = Join-Path $OpenCodexHome "tray-actions.log"
+$heartbeatPath = Join-Path $OpenProviderHome "tray-heartbeat.json"
+$actionLogPath = Join-Path $OpenProviderHome "tray-actions.log"
 
 function Write-ActionLog([string]$Message) {
   $line = "[$([DateTimeOffset]::Now.ToString('o'))] $Message"
@@ -91,20 +91,20 @@ function Start-OcxCommand([string[]]$CommandArgs) {
     $psi.CreateNoWindow = $true
     $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     $psi.EnvironmentVariables["CODEX_HOME"] = $CodexHome
-    $psi.EnvironmentVariables["OPENCODEX_HOME"] = $OpenCodexHome
+    $psi.EnvironmentVariables["OPENCODEX_HOME"] = $OpenProviderHome
     $process = [System.Diagnostics.Process]::Start($psi)
     if ($null -ne $process) { $process.Dispose() }
     Write-ActionLog "dispatched $($CommandArgs -join ' ')"
     return $true
   } catch {
     Write-ActionLog "launch failed: $($_.Exception.GetType().Name)"
-    $notify.ShowBalloonTip(5000, "opencodex action failed", "The action could not start. Open the logs folder or run ocx doctor.", [System.Windows.Forms.ToolTipIcon]::Error)
+    $notify.ShowBalloonTip(5000, "openprovider action failed", "The action could not start. Open the logs folder or run opr doctor.", [System.Windows.Forms.ToolTipIcon]::Error)
     return $false
   }
 }
 
 function Read-ListenTarget {
-  foreach ($path in @((Join-Path $OpenCodexHome "runtime-port.json"), (Join-Path $OpenCodexHome "config.json"))) {
+  foreach ($path in @((Join-Path $OpenProviderHome "runtime-port.json"), (Join-Path $OpenProviderHome "config.json"))) {
     try {
       $value = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
       $candidate = [int]$value.port
@@ -177,10 +177,10 @@ function Complete-PendingAction([bool]$Success) {
   $script:pendingAction = $null
   if ($Success) {
     Write-ActionLog "$action completed (port=$($script:port), pid=$($script:proxyPid))"
-    $notify.ShowBalloonTip(2500, "opencodex", "$action completed.", [System.Windows.Forms.ToolTipIcon]::Info)
+    $notify.ShowBalloonTip(2500, "openprovider", "$action completed.", [System.Windows.Forms.ToolTipIcon]::Info)
   } else {
     Write-ActionLog "$action failed to reach the expected state"
-    $notify.ShowBalloonTip(5000, "opencodex action failed", "$action did not reach the expected state. Open the logs folder or run ocx doctor.", [System.Windows.Forms.ToolTipIcon]::Error)
+    $notify.ShowBalloonTip(5000, "openprovider action failed", "$action did not reach the expected state. Open the logs folder or run opr doctor.", [System.Windows.Forms.ToolTipIcon]::Error)
   }
 }
 
@@ -191,11 +191,11 @@ function Update-TrayState {
   $origin = "http://$($target.host):$($script:port)"
   try { $health = Read-JsonUrl "$origin/healthz" } catch { }
   $pidMatches = $null -eq $target.pid -or [int]$target.pid -eq [int]$health.pid
-  $script:online = $null -ne $health -and $health.status -eq "ok" -and $health.service -eq "opencodex" -and [int]$health.port -eq $script:port -and $pidMatches
+  $script:online = $null -ne $health -and $health.status -eq "ok" -and $health.service -eq "openprovider" -and [int]$health.port -eq $script:port -and $pidMatches
   $script:proxyPid = if ($script:online) { [int]$health.pid } else { $null }
   if ($script:online) {
     $statusItem.Text = "Proxy: Online (port $($script:port))"
-    $notify.Text = "opencodex: Online"
+    $notify.Text = "openprovider: Online"
     $startItem.Enabled = $false
     $stopItem.Enabled = $true
     $restartItem.Enabled = $true
@@ -211,7 +211,7 @@ function Update-TrayState {
   } else {
     $statusItem.Text = "Proxy: Offline"
     $safetyItem.Text = "Restart safety: start the proxy to inspect"
-    $notify.Text = "opencodex: Offline"
+    $notify.Text = "openprovider: Offline"
     $notify.Icon = $offlineIcon
     $startItem.Enabled = $true
     $stopItem.Enabled = $false
@@ -251,7 +251,7 @@ $restartItem.add_Click({
 })
 $logsItem.add_Click({
   $psi = New-Object System.Diagnostics.ProcessStartInfo
-  $psi.FileName = $OpenCodexHome
+  $psi.FileName = $OpenProviderHome
   $psi.UseShellExecute = $true
   [void][System.Diagnostics.Process]::Start($psi)
 })
@@ -270,7 +270,7 @@ $timer.add_Tick({
 $notify.ContextMenuStrip = $menu
 $notify.Icon = $offlineIcon
 $notify.Visible = $true
-$notify.Text = "opencodex: Checking..."
+$notify.Text = "openprovider: Checking..."
 
 try {
   Update-TrayState

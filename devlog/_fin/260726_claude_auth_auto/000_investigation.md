@@ -25,7 +25,7 @@ and folded into the phase docs below.
   (the proxy admission key) — `:55-57`. This axis is INDEPENDENT of auth mode and is
   not changed by this unit (`002` §2);
 - when no AUTH_TOKEN ended up set and `authMode === "proxy"`, it injects
-  `ANTHROPIC_AUTH_TOKEN = "opencodex-proxy"` — `:58-60`. This is the proxy-mode marker:
+  `ANTHROPIC_AUTH_TOKEN = "openprovider-proxy"` — `:58-60`. This is the proxy-mode marker:
   the proxy accepts it and serves routed models;
 - `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST = "1"` is injected ONLY when an AUTH_TOKEN is
   present (`:79-81`) — the #253 fix: the flag without a host token makes a valid
@@ -59,15 +59,15 @@ must honour the same resolution or auto never reaches ordinary `claude` launches
 | S3 | macOS Keychain `Claude Code-credentials` | `security find-generic-password` exit 0 | present here |
 | S5 | `ANTHROPIC_API_KEY` / a USER's `ANTHROPIC_AUTH_TOKEN` | user-exported | — |
 
-S4 (opencodex's own anthropic OAuth credential) was REMOVED by the audit (`002` §5):
-`getCredential("anthropic")` reads opencodex's PROVIDER store, which the Claude CLI
+S4 (openprovider's own anthropic OAuth credential) was REMOVED by the audit (`002` §5):
+`getCredential("anthropic")` reads openprovider's PROVIDER store, which the Claude CLI
 never consumes — it is not evidence the client can run natively.
 
 S1 is the cheapest cross-platform read but is best-effort evidence, not a documented
 Anthropic contract; the aggregation rule is what keeps that safe. S3 spawns
 `security` with metadata flags only (no `-g`/`-w`, which print secret material) and a
 failure there must be `unknown`, never `absent`. S5 doubles as detection and
-launch-env input — and must exclude our own `opencodex-proxy` marker, or auto feeds
+launch-env input — and must exclude our own `openprovider-proxy` marker, or auto feeds
 back on itself (`002` §1).
 
 ## The design that follows (locked after the failure-mode inventory in 001)
@@ -80,7 +80,7 @@ migrate; the next resolution simply sees the credential.
 - auto + auth present → subscription behaviour (no proxy-marker injection; native
   passthrough for claude models). An admission key, if configured, is still injected —
   that axis is orthogonal.
-- auto + auth absent → proxy behaviour (`ANTHROPIC_AUTH_TOKEN = "opencodex-proxy"`).
+- auto + auth absent → proxy behaviour (`ANTHROPIC_AUTH_TOKEN = "openprovider-proxy"`).
 - auto + detection unknown → subscription behaviour + a visible warning. **This is
   the safety rule**: flipping a subscriber into proxy mode because a keychain prompt
   was denied is the worst outcome this feature can produce, so unknown degrades to

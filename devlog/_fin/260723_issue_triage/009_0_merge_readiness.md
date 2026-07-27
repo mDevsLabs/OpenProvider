@@ -41,7 +41,7 @@ opened, no merge executed (user instruction).
 - Branch policy: `main` moves only by maintainer promotion from `dev`;
   `preview` is the prerelease train. `scripts/release.ts` enforces: preview
   branch → version must contain `-preview.`; main → no prerelease suffix.
-- Release train gates (memory skill opencodex-release-train): push dev → wait
+- Release train gates (memory skill openprovider-release-train): push dev → wait
   for BOTH `ci.yml` and `service-lifecycle.yml` green on the exact release SHA
   → dev→preview, publish preview → preview→main, publish stable → verify
   `npm view @mdevs/openprovider dist-tags --json`.

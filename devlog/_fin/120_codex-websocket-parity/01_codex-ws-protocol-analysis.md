@@ -11,7 +11,7 @@ Files: `codex-api/src/endpoint/responses_websocket.rs` (WS client), `codex-api/s
 (request frames), `codex-api/src/provider.rs` (URL), `codex-api/src/sse/responses.rs` (event
 schema — shared with SSE), `core/src/client.rs` (selection + headers).
 
-This is the contract a Responses-WS **server** (opencodex) must satisfy. Implementation plans
+This is the contract a Responses-WS **server** (openprovider) must satisfy. Implementation plans
 (`10_`–`13_`) cite specific rows here.
 
 ## 1. Path selection (when Codex uses WS)
@@ -90,7 +90,7 @@ Envelope `ResponsesWsRequest`, serde `#[serde(tag = "type")]` (`codex-api/src/co
 | Transport/WS error | `ApiError::Stream(err)` | `:690-691` |
 | Cancel | Codex drops the stream; **no explicit close frame** — server detects socket EOF | (no send-close in source) |
 
-## 7. Minimum server obligations (opencodex MUST)
+## 7. Minimum server obligations (openprovider MUST)
 
 Derived strictly from §3–§6:
 
@@ -113,7 +113,7 @@ Derived strictly from §3–§6:
 - Idle timeout is **per-message**, so a WS stall needs the same heartbeat strategy as RC3 — but
   note Codex auto-Pongs server **Ping** frames (`:93-98`), so a WS keep-alive can be a real
   `Ping` (cheaper than the SSE `response.heartbeat` workaround).
-- Auth only at handshake — no per-frame token. opencodex's existing per-request auth must move
+- Auth only at handshake — no per-frame token. openprovider's existing per-request auth must move
   to upgrade time.
 - `previous_response_id` + connection reuse means the WS endpoint is **stateful per connection**
   (multiple `response.create` over one socket), unlike the stateless HTTP handler.

@@ -597,7 +597,7 @@ Insert the contributor's final-log coverage before that anchor:
   test("final 403 logs use permission/subscription codes instead of invalid_api_key", () => {
     const entries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-403-perm",
+      "opr-test-403-perm",
       Date.now(),
       {
         model: "kimi-k2.7-code",
@@ -616,7 +616,7 @@ Insert the contributor's final-log coverage before that anchor:
 
     const subEntries: RequestLogEntry[] = [];
     addFinalRequestLog(
-      "ocx-test-403-sub",
+      "opr-test-403-sub",
       Date.now(),
       {
         model: "kimi-k2.7-code",
@@ -697,8 +697,8 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-403-e2e-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-403-e2e-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-403-e2e-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-403-e2e-"));
   process.env.OPENCODEX_HOME = testDir;
   clearRequestLogsForTests();
 });
@@ -821,7 +821,7 @@ describe("upstream 401/403 classification (end-to-end)", () => {
 ```
 
 Why this is integration rather than a hand-injected classifier fixture: the first two
-tests start a real local upstream and a real opencodex HTTP server, route a Responses
+tests start a real local upstream and a real openprovider HTTP server, route a Responses
 request through the `openai-chat` adapter (proved by the observed
 `/v1/chat/completions` path), feed the actual Ollama body shape
 `{"error":"..."}`, consume the classified client response, and inspect the resulting

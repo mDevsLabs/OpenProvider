@@ -90,7 +90,7 @@ export function cooldownErrorResponse(err: CodexAccountCooldownError): Response 
     "rate_limit_error",
     `Selected Codex account is cooling down until ${until}`
       + ` (source: ${err.cooldownSource ?? "default"}).`
-      + ` Run 'ocx account clear-cooldown openai <account-id>' to lift it, or 'ocx account use openai <other>' to switch.`,
+      + ` Run 'opr account clear-cooldown openai <account-id>' to lift it, or 'opr account use openai <other>' to switch.`,
   );
   const headers = new Headers(res.headers);
   headers.set("Retry-After", String(seconds));
@@ -106,8 +106,8 @@ export function cooldownErrorResponse(err: CodexAccountCooldownError): Response 
 
 확정 규칙: 데이터 플레인 429 본문에 raw 계정 id를 넣지 않는다.
 `__main__`은 `main`으로, 나머지는 `maskAccountId`(`src/lib/privacy.ts:13`) 결과를 쓴다.
-명령은 템플릿으로 안내한다: `ocx account list openai`로 id를 확인한 뒤
-`ocx account clear-cooldown openai <id>`. raw id는 인증된 관리/CLI 목록 표면에만 남는다.
+명령은 템플릿으로 안내한다: `opr account list openai`로 id를 확인한 뒤
+`opr account clear-cooldown openai <id>`. raw id는 인증된 관리/CLI 목록 표면에만 남는다.
 
 치환 대상 (모두 동일 패턴):
 
@@ -150,12 +150,12 @@ CLI가 이를 구분해 출력한다. 계정 존재 여부로 404를 나누지 *
 선택이다: 쿨다운 맵은 계정 목록과 독립적인 런타임 상태이고, 404/200을 가르면
 이 라우트가 계정 존재 여부를 알려주는 오라클이 된다(A 감사 블로커 6).
 
-## MODIFY 5 — CLI: `ocx account clear-cooldown`
+## MODIFY 5 — CLI: `opr account clear-cooldown`
 
 `src/cli/account.ts`:
 
 - `ACCOUNT_USAGE`(`:18`)에 한 줄 추가:
-  `  ocx account clear-cooldown <provider> <id|main> [--json]`
+  `  opr account clear-cooldown <provider> <id|main> [--json]`
 - `cmdAccount` 디스패치(`:259` 근처)에 추가:
   `if (sub === "clear-cooldown") return await cmdClearCooldown(rest, deps);`
 - `cmdClearCooldown`은 `src/cli/account-extended.ts`에 NEW — `cmdAlias`/`cmdRemove`와

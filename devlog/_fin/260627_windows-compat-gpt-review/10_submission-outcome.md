@@ -8,11 +8,11 @@ Submitted and waiting on the external GPT Pro review.
 
 - Branch: `dev`
 - Commit: `d3303bf2fcf795a7af3236b38719ad0c538e7ef5`
-- GitHub URL: `https://github.com/lidge-jun/opencodex/tree/dev`
-- Zip: `/tmp/opencodex-windows-compat-review-260627/opencodex-windows-compat-review-dev-d3303bf.zip`
+- GitHub URL: `https://github.com/lidge-jun/openprovider/tree/dev`
+- Zip: `/tmp/openprovider-windows-compat-review-260627/openprovider-windows-compat-review-dev-d3303bf.zip`
 - Zip size/count: `74624` bytes, `58` files
-- Prompt file: `/tmp/opencodex-windows-compat-review-260627/prompt.txt`
-- Included request: `/tmp/opencodex-windows-compat-review-260627/package/REVIEW_REQUEST.md`
+- Prompt file: `/tmp/openprovider-windows-compat-review-260627/prompt.txt`
+- Included request: `/tmp/openprovider-windows-compat-review-260627/package/REVIEW_REQUEST.md`
 - ChatGPT/GPT Pro session: `01KW41ADNQHG975C8HS7BWBZW3`
 - ChatGPT URL: `https://chatgpt.com/c/6a3f8263-1eb8-83ee-a20d-0d56d4650a29`
 - Durable bgtask: `bg_4b52dcb6-93bd-4e3c-9ebb-8f7ccd9a0aca`
@@ -23,7 +23,7 @@ Submitted and waiting on the external GPT Pro review.
 | Requirement | Evidence | Status |
 |---|---|---|
 | Switch to `dev` | `git status --short --branch` -> `## dev...origin/dev` | PROVEN |
-| Use current dev branch URL | Prompt and `REVIEW_REQUEST.md` include `https://github.com/lidge-jun/opencodex/tree/dev` | PROVEN |
+| Use current dev branch URL | Prompt and `REVIEW_REQUEST.md` include `https://github.com/lidge-jun/openprovider/tree/dev` | PROVEN |
 | Package relevant Windows/cross-platform evidence | Zip has 58 files including Windows devlogs, workflows, `bin/ocx.mjs`, service/runtime sources, and tests | PROVEN |
 | Submit via `agbrowse web-ai` | ChatGPT session `01KW41ADNQHG975C8HS7BWBZW3` created successfully | PROVEN |
 | Register durable bgtask | `cli-jaw bgtask show bg_4b52dcb6-93bd-4e3c-9ebb-8f7ccd9a0aca` shows running poll command for the session | PROVEN |

@@ -78,15 +78,15 @@ function appendRolloutLine(path: string, line: string): void {
  * (covered by appending a trailing meta), but `read_session_meta_line` reads only the FIRST line
  * and `update_thread_metadata` clones it when the app later writes git/memory-mode metadata
  * (codex-rs `thread-store/src/local/update_thread_metadata.rs`). If the first line still says
- * `opencodex` after a native restore, that clone re-appends `opencodex` and last-writer-wins
+ * `openprovider` after a native restore, that clone re-appends `openprovider` and last-writer-wins
  * resurrects the routed provider. So a durable restore must also fix line 1.
  *
  * Safety: Codex parses each rollout line as `serde_json::from_str(line.trim())`, which tolerates
  * insignificant JSON whitespace. We therefore replace the provider value and pad the removed bytes
  * with spaces so the line's byte length is unchanged. Equal length means we can write at offset 0
  * with no truncate and no inode swap, so this composes safely with the app's cached append handle.
- * Only length-preserving shrinks are handled (e.g. "opencodex" -> "openai"); callers that would
- * grow the value fall back to append-only, which is correct for the opencodex direction.
+ * Only length-preserving shrinks are handled (e.g. "openprovider" -> "openai"); callers that would
+ * grow the value fall back to append-only, which is correct for the openprovider direction.
  *
  * Returns true when line 1 was patched, false when it could not be done safely (missing file,
  * non-`session_meta` first line, id mismatch, value already correct, or a length-growing change).
@@ -149,7 +149,7 @@ function patchFirstLineProviderInPlace(path: string, expectedId: string, provide
   }
 }
 
-type CodexHistoryProvider = "openai" | "opencodex";
+type CodexHistoryProvider = "openai" | "openprovider";
 
 export interface CodexHistorySyncResult {
   rows: number;
@@ -314,7 +314,7 @@ function updateSessionMeta(path: string, expectedId: string, patch: { provider?:
 }
 
 function toNativeRestoreTarget(entry: BackupEntry): NativeRestoreTarget {
-  if (entry.modelProvider !== "opencodex") {
+  if (entry.modelProvider !== "openprovider") {
     return {
       modelProvider: entry.modelProvider,
       source: entry.source,
@@ -333,7 +333,7 @@ function ejectRemainingOpencodexHistory(db: Database): { rows: number; files: nu
     .query<ThreadRow, []>(`
       SELECT id, rollout_path, model_provider, source, has_user_event
       FROM threads
-      WHERE model_provider = 'opencodex'
+      WHERE model_provider = 'openprovider'
         AND trim(coalesce(first_user_message, '')) != ''
     `)
     .all();
@@ -406,7 +406,7 @@ export function withHistoryRetry<T>(fn: () => T, io: { sleepFn?: (ms: number) =>
 
 /**
  * True when a READONLY probe proves the openai-direction restore would be a no-op:
- * zero threads still tagged opencodex AND an empty backup manifest. Used to skip the
+ * zero threads still tagged openprovider AND an empty backup manifest. Used to skip the
  * write-open entirely in the Design B steady state — on Windows the Codex app holds
  * `state_5.sqlite` (WAL, busy_timeout 5s), so an unnecessary write open can stall for
  * seconds and surface a false lock warning, while WAL always admits readers. A failed
@@ -453,7 +453,7 @@ function syncCodexHistoryProviderUnsafe(provider: CodexHistoryProvider, stateDbP
       .query<ThreadRow, []>(`
         SELECT id, rollout_path, model_provider, source, has_user_event
         FROM threads
-        WHERE model_provider = 'opencodex'
+        WHERE model_provider = 'openprovider'
           AND source = 'exec'
           AND trim(coalesce(first_user_message, '')) != ''
       `)
@@ -466,7 +466,7 @@ function syncCodexHistoryProviderUnsafe(provider: CodexHistoryProvider, stateDbP
     let files = 0;
     for (const row of openaiRows) {
       try {
-        if (updateSessionMeta(row.rollout_path, row.id, { provider: "opencodex" })) files++;
+        if (updateSessionMeta(row.rollout_path, row.id, { provider: "openprovider" })) files++;
       } catch {
         /* best-effort; keep DB migration moving even if one old rollout is malformed */
       }
@@ -489,14 +489,14 @@ function syncCodexHistoryProviderUnsafe(provider: CodexHistoryProvider, stateDbP
       for (const row of [...openaiRows, ...execRows]) markUserEvent.run(row.id);
       db.query(`
         UPDATE threads
-        SET model_provider = 'opencodex'
+        SET model_provider = 'openprovider'
         WHERE model_provider = 'openai'
           AND source IN (${placeholders})
       `).run(...RESUMABLE_SOURCES);
       db.query(`
         UPDATE threads
         SET source = 'cli'
-        WHERE model_provider = 'opencodex'
+        WHERE model_provider = 'openprovider'
           AND source = 'exec'
           AND trim(coalesce(first_user_message, '')) != ''
       `).run();
@@ -568,7 +568,7 @@ export function restoreLegacyOpenaiHistory(stateDbPath = STATE_DB_PATH): { rows:
 
 /**
  * One-time Design-B migration: restore backed-up originals, then eject any remaining
- * opencodex-tagged threads to openai. Thin wrapper over the restore path with a
+ * openprovider-tagged threads to openai. Thin wrapper over the restore path with a
  * configurable retry budget — the daemon migration guardian uses `{ attempts: 1 }`
  * per tick so a locked DB never stalls the event loop beyond one sqlite busy wait.
  */
@@ -588,7 +588,7 @@ export function migrateHistoryToOpenai(
 }
 
 export interface PendingHistoryCount {
-  /** Threads still tagged opencodex that the eject path WOULD move (mirrors its WHERE). */
+  /** Threads still tagged openprovider that the eject path WOULD move (mirrors its WHERE). */
   pendingRows: number;
   /** Entries still recorded in the backup manifest (restore targets). */
   backupEntries: number;
@@ -597,7 +597,7 @@ export interface PendingHistoryCount {
 }
 
 /**
- * Read-only migration progress probe for the guardian and `ocx doctor`. Opens sqlite
+ * Read-only migration progress probe for the guardian and `opr doctor`. Opens sqlite
  * readonly with a SHORT busy timeout so a locked DB cannot stall a daemon tick. The
  * pending predicate mirrors ejectRemainingOpencodexHistory exactly — rows eject ignores
  * (empty first_user_message) are not counted, so 0 really means "migration done".
@@ -617,7 +617,7 @@ export function countPendingOpencodexHistory(stateDbPath = STATE_DB_PATH, backup
       const row = db.query<{ n: number }, []>(`
         SELECT count(*) AS n
         FROM threads
-        WHERE model_provider = 'opencodex'
+        WHERE model_provider = 'openprovider'
           AND trim(coalesce(first_user_message, '')) != ''
       `).get();
       return { pendingRows: row?.n ?? 0, backupEntries };

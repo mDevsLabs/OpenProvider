@@ -25,10 +25,10 @@ would be a regression. Left as-is, documented here.
 
 ## Part 1 — Easy explanation
 
-When an MCP tool returns an image (e.g. a screenshot or chart), opencodex currently throws
+When an MCP tool returns an image (e.g. a screenshot or chart), openprovider currently throws
 the picture away and tells the model "[image]". This work-phase passes the real image bytes
 through to the model. It also adds a test that spawns a real MCP server as a child process
-over stdio (not just an in-memory fake), proving the stdio path opencodex advertises.
+over stdio (not just an in-memory fake), proving the stdio path openprovider advertises.
 
 ## Part 2 — Diff-level plan
 

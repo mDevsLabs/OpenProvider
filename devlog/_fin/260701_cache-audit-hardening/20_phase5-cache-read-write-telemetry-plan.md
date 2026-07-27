@@ -83,7 +83,7 @@ After:
 
 Rationale:
 
-- Persist optional detail in `~/.opencodex/usage.jsonl` without changing existing rows or totals.
+- Persist optional detail in `~/.openprovider/usage.jsonl` without changing existing rows or totals.
 
 ### MODIFY: `gui/src/pages/Logs.tsx`
 

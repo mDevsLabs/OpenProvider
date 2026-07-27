@@ -33,15 +33,15 @@
   "clientHistoryVerified": true,
   "codexVersion": "codex-cli 0.144.4",
   "userState": {
-    "opencodex-config": {
+    "openprovider-config": {
       "exists": true,
       "sha256": "25d42a271c02c01049ac3396bd4453b9ef666ded7d5dbf4c5e050a3f7e018375"
     },
-    "opencodex-oauth": {
+    "openprovider-oauth": {
       "exists": true,
       "sha256": "1e3cdf7b8a221e7a03c8bbf1f6e8179d1b3551aa0885a1eff06c3f657e00895d"
     },
-    "opencodex-codex-accounts": {
+    "openprovider-codex-accounts": {
       "exists": true,
       "sha256": "8a2fec3b902261fa1a9371d3616e63c64e40fd9d5b2dc94f3107496844b89207"
     },

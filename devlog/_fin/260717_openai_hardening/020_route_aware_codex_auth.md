@@ -231,7 +231,7 @@ usable main token, or disappearance of the selected-main token throws typed
 ### MODIFY `src/server/auth-cors.ts` and `src/adapters/openai-responses.ts`
 
 Separate proxy admission from provider auth. For `/v1/responses`, compact, and WS
-frames, proxy admission consumes only dedicated `X-OpenCodex-API-Key`; it never treats
+frames, proxy admission consumes only dedicated `X-OpenProvider-API-Key`; it never treats
 caller `Authorization` as the proxy key. Preserve that header until `routeModel`.
 After routing, only Direct calls
 `validateDirectCodexCredential(headers): void`, which requires a nonblank Bearer and

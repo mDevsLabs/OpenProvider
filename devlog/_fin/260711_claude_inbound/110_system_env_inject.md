@@ -1,11 +1,11 @@
 # 110 — Dynamic system-wide env injection for Claude Code
 
-When `ocx start` runs, inject `ANTHROPIC_BASE_URL`, `_CLAUDE_CODE_ASSUME_FIRST_PARTY_BASE_URL`,
+When `opr start` runs, inject `ANTHROPIC_BASE_URL`, `_CLAUDE_CODE_ASSUME_FIRST_PARTY_BASE_URL`,
 and `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY` into the macOS user domain via `launchctl setenv`.
 New terminal windows / GUI-launched processes inherit them automatically — `claude` routes
-through the proxy without `ocx claude`.
+through the proxy without `opr claude`.
 
-On `ocx stop`, Ctrl+C, SIGTERM, or process exit: revert via `launchctl unsetenv`.
+On `opr stop`, Ctrl+C, SIGTERM, or process exit: revert via `launchctl unsetenv`.
 
 ## Plan
 
@@ -23,7 +23,7 @@ On `ocx stop`, Ctrl+C, SIGTERM, or process exit: revert via `launchctl unsetenv`
 ### Architecture
 
 ```
-ocx start
+opr start
   └─ startServer(port)
   └─ injectSystemEnv(port, config)   ← NEW
        ├─ cleanStaleSystemEnv()      ← health-check existing value
@@ -75,8 +75,8 @@ shutdown / Ctrl+C / SIGTERM
 
 ### Accept criteria
 
-- C1: New terminals inherit env vars after `ocx start`
-- C2: Env vars gone after `ocx stop` / Ctrl+C
+- C1: New terminals inherit env vars after `opr start`
+- C2: Env vars gone after `opr stop` / Ctrl+C
 - C3: Stale value cleaned on startup
 - C4: `claudeCode.systemEnv: false` skips injection
 - C5: Tests pass
@@ -84,7 +84,7 @@ shutdown / Ctrl+C / SIGTERM
 
 ## Verification
 
-NEEDS_HUMAN: manual `ocx start` + new terminal + `launchctl getenv` check
+NEEDS_HUMAN: manual `opr start` + new terminal + `launchctl getenv` check
 
 ## Audit Round 1 — FAIL (6 blockers)
 
@@ -103,10 +103,10 @@ Reviewer: Hegel (sol). Evidence: `.codexclaw/evidence/260711-system-env-plan-aud
    - `injectSystemEnv` reads current `launchctl getenv` value first. If non-empty and
      doesn't match our pattern (`http://127.0.0.1:<port>`), skip with a log warning.
    - `revertSystemEnv` only unsets if current value matches the port we injected.
-   - Track injected port in a file: `~/.opencodex/system-env-port` (written on inject,
+   - Track injected port in a file: `~/.openprovider/system-env-port` (written on inject,
      deleted on revert).
 
-3. **Concurrent instance conflict**: Two `ocx start` on different ports.
+3. **Concurrent instance conflict**: Two `opr start` on different ports.
    **Amendment**: `system-env-port` file includes PID. Only the owning PID reverts.
    On inject, if another instance already owns it, skip with warning.
 

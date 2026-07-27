@@ -17,13 +17,13 @@
 - Cinematic motion: scroll(root) hero-away (0-90vh) + field photo zoom settle
   (0-130vh), terminal clip-path wipe, 38px alternating slides, 11-chip stagger,
   stage settle 46px/0.965 — all reduced-motion gated.
-- Opacity pass: --ocx-glass-panel 0.96 both themes, ghost button solid white,
+- Opacity pass: --opr-glass-panel 0.96 both themes, ghost button solid white,
   chips 0.95/0.94.
 
 ## Bugs found by audits (Anscombe, gpt-5.5)
 
 1. lightningcss merged animation-timeline into the `animation` shorthand
-   (`animation:linear both ocx-hero-away scroll(root)`) — Chrome rejects the
+   (`animation:linear both opr-hero-away scroll(root)`) — Chrome rejects the
    whole declaration; scroll-driven motion silently dead in dist. Fix:
    vite.build.cssMinify = "esbuild" in astro.config.mjs. Verified computed
    animationName/Timeline live.

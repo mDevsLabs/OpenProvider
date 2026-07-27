@@ -48,7 +48,7 @@ const CASES = [
   {
     path: "../README.md",
     distinction: /published npm\s+package's bundled Bun runtime/,
-    contrast: /installed `ocx` commands/,
+    contrast: /installed `opr` commands/,
   },
   {
     path: "../docs-site/src/content/docs/contributing.md",

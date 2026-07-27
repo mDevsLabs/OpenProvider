@@ -50,7 +50,7 @@ src/codex-auth-context.ts:70 to `true` and evicts the account. A transient
 drvfs hiccup on `/mnt/c` thus reads as a revoked credential and silently drops a
 pool account from rotation until restart.
 
-`getConfigDir()` resolves to `OPENCODEX_HOME` or `~/.opencodex`
+`getConfigDir()` resolves to `OPENCODEX_HOME` or `~/.openprovider`
 (src/config.ts:148, via `resolveConfigDir` src/config.ts:21). If a WSL user
 points `OPENCODEX_HOME` under `/mnt/c`, every lock and atomic write above runs
 on drvfs.
@@ -110,7 +110,7 @@ diagnostics" guidance and the `OPENCODEX_*` env convention already used by
 
 Warning copy (single line, ASCII): state dir is on a Windows drive mount
 (`/mnt/...`); file locks and atomic renames may behave unexpectedly; prefer a
-native Linux path such as `~/.opencodex`; set `OPENCODEX_ALLOW_DRVFS=1` to
+native Linux path such as `~/.openprovider`; set `OPENCODEX_ALLOW_DRVFS=1` to
 silence.
 
 ## Diff-level plan

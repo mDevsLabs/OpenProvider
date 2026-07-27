@@ -65,14 +65,14 @@ OAuth ログインを使うプロバイダープリセットは 6 つです。�
 このコマンドは ChatGPT 認証情報を発行し `forward` モードのプロバイダーエントリを作成します。
 
 ```bash
-ocx login xai          # xAI Grok
-ocx login anthropic    # Anthropic Claude (Pro/Max)
-ocx login kimi         # Moonshot Kimi
-ocx login kiro         # kiro-cli 認証情報の取り込み(トークンフォールバック対応)
-ocx login google-antigravity
-ocx login cursor       # Cursor 専用 PKCE ログイン
-ocx login chatgpt      # 別途 ChatGPT OAuth ログイン
-ocx logout <provider>
+opr login xai          # xAI Grok
+opr login anthropic    # Anthropic Claude (Pro/Max)
+opr login kimi         # Moonshot Kimi
+opr login kiro         # kiro-cli 認証情報の取り込み(トークンフォールバック対応)
+opr login google-antigravity
+opr login cursor       # Cursor 専用 PKCE ログイン
+opr login chatgpt      # 別途 ChatGPT OAuth ログイン
+opr logout <provider>
 ```
 
 | プロバイダー | アダプター | ベース URL | 備考 |
@@ -144,13 +144,13 @@ OpenProvider v2.7.1 には組み込みプリセットが 50 個含まれてい�
 
 ### ターミナルでアカウントを切り替え
 
-ダッシュボードを開かずに `ocx account list`、`ocx account current`、`ocx account use` で同じ Codex、
+ダッシュボードを開かずに `opr account list`、`opr account current`、`opr account use` で同じ Codex、
 OAuth、API キープールを確認・切り替えできます。完全なコマンド、JSON 出力、新規セッション適用方式は
-[CLI リファレンス](/ja/reference/cli/#ocx-account-subcommand)を参照してください。
+[CLI リファレンス](/ja/reference/cli/#opr-account-subcommand)を参照してください。
 
 ### GPT-5.6 プレビュー経路
 
-ライブモデルカタログの更新が遅れても `ocx sync` でモデルが消えないよう、GPT-5.6
+ライブモデルカタログの更新が遅れても `opr sync` でモデルが消えないよう、GPT-5.6
 Sol/Terra/Luna をフォールバックリストに入れています。
 
 | Codex 経路 | 事前登録されたモデル ID | Codex に表示されるコンテキスト |
@@ -170,13 +170,13 @@ Sol/Terra/Luna をフォールバックリストに入れています。
 Vertex、Antigravity/Cloud Code Assist モード)、`azure` / `azure-openai`、`kiro`、`cursor` です。
 Amazon Bedrock ネイティブ API のような、これらの実装のいずれにも合わない独自プロトコルは直接サポートしません。
 **GitHub Copilot** と **GitLab Duo** は独自の汎用 OpenAI 互換エンドポイントにマッピングされたマルチモデル
-ゲートウェイです。Copilot は `ocx login github-copilot` で GitHub デバイスフロー OAuth ログインを
+ゲートウェイです。Copilot は `opr login github-copilot` で GitHub デバイスフロー OAuth ログインを
 サポートします(非公式ブリッジ — VS Code 公開クライアント ID でログイン後、短期 Copilot API トークンに
 交換し、有効な Copilot サブスクリプションが必要で GitHub ポリシー変更でブロックされる可能性あり)。GitLab Duo は Bearer
 **サブスクリプショントークン**(通常の API キーではない)で認証します。**Cloudflare AI
 Gateway** は URL にアカウント + ゲートウェイ ID を埋める必要があります。
 
-Cursor は別の実験的アダプターとして追跡します。`adapter: "cursor"` は `ocx init` とダッシュボード Add
+Cursor は別の実験的アダプターとして追跡します。`adapter: "cursor"` は `opr init` とダッシュボード Add
 Provider ピッカーに実験的 local config 項目として表示され、Cursor の静的フォールバックモデルカタログ
 メタデータを保存します。Cursor アクセストークンを設定すると OpenProvider は Cursor ライブ HTTP/2 トランスポートを
 使います。v2.7.1 フォールバックリストには 1M コンテキストの `gpt-5.6-sol` / `terra` / `luna` と 500K コンテキストの
@@ -215,7 +215,7 @@ OpenProvider をローカルの OpenAI 互換サーバーに向けてくださ�
 ## すべての OpenAI 互換エンドポイント
 
 プロバイダーが Chat Completions を使うなら `openai-chat` アダプターが処理します — ダッシュボードで
-**Custom** を選ぶか `ocx init` で `custom` を選んだ後ベース URL を入力してください。すべてのプロバイダーフィールド
+**Custom** を選ぶか `opr init` で `custom` を選んだ後ベース URL を入力してください。すべてのプロバイダーフィールド
 (`headers`、`noReasoningModels`、`noVisionModels`、`models`、…)は
 [設定リファレンス](/ja/reference/configuration/)を参照してください。
 

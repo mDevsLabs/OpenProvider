@@ -113,8 +113,8 @@ beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
   previousCursorToken = process.env.OPENCODEX_CURSOR_TEST_TOKEN;
   delete process.env.OPENCODEX_CURSOR_TEST_TOKEN;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-combo-030-codex-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-combo-030-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-combo-030-codex-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-combo-030-"));
   process.env.OPENCODEX_HOME = testDir;
   clearComboSelectionState();
   clearComboTargetCooldowns();

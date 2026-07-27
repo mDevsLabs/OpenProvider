@@ -22,7 +22,7 @@
 
 ## 착수 시점 사실
 
-- 작업 워크트리: `/Users/jun/.codex/worktrees/404d/opencodex`
+- 작업 워크트리: `/Users/jun/.codex/worktrees/404d/openprovider`
 - 버그 스윕 tip: `f76d79ef907185644997010d0091fc64e3b7d5c8`
 - local `dev` tip: `f0db9188d11b87f45f5cca0f52d6e447b6b51428`
 - fetch 뒤 `origin/dev`: `9b37ef5a926388e7570bd819512ac3dbc8ae18e5`
@@ -77,7 +77,7 @@ cd gui && bun test tests && bun run build
 + dev: <rebased sweep tip>
 ```
 
-- `/Users/jun/Developer/new/700_projects/opencodex`에서 `git merge --ff-only
+- `/Users/jun/Developer/new/700_projects/openprovider`에서 `git merge --ff-only
   codex/260725-bug-sweep`를 실행한다.
 - fast-forward 전에 `.DS_Store`의 `git hash-object` 값을 기록하고, 작업 뒤 같은 값인지 확인한다.
   수정 상태뿐 아니라 내용 해시가 같아야 한다.
@@ -145,9 +145,9 @@ cd gui && bun test tests && bun run build
 - `IMPLEMENTATION_SHA`: `a5ec15e37f0ba39bf226ceb4357a6cc341efbfc0`
 - local `dev` fast-forward: 성공
 - `origin/dev` push: 성공, force 없음
-- [Cross-platform CI run 30159409645](https://github.com/lidge-jun/opencodex/actions/runs/30159409645):
+- [Cross-platform CI run 30159409645](https://github.com/lidge-jun/openprovider/actions/runs/30159409645):
   success. Ubuntu/macOS/Windows와 npm-global 3개 job 전부 통과.
-- [Service lifecycle run 30159409637](https://github.com/lidge-jun/opencodex/actions/runs/30159409637):
+- [Service lifecycle run 30159409637](https://github.com/lidge-jun/openprovider/actions/runs/30159409637):
   success. Windows Task Scheduler, Linux systemd, macOS launchd 전부 통과.
 
 ### GitHub 코멘트와 종료
@@ -156,12 +156,12 @@ cd gui && bun test tests && bun run build
 
 | 항목 | 코멘트 | 최종 상태 |
 |---|---|---|
-| #433 | [issuecomment-5078643748](https://github.com/lidge-jun/opencodex/issues/433#issuecomment-5078643748) | CLOSED / COMPLETED |
-| #432 | [issuecomment-5078643797](https://github.com/lidge-jun/opencodex/issues/432#issuecomment-5078643797) | CLOSED / COMPLETED |
-| #422 | [issuecomment-5078643875](https://github.com/lidge-jun/opencodex/issues/422#issuecomment-5078643875) | CLOSED / COMPLETED |
-| #373 | [issuecomment-5078643829](https://github.com/lidge-jun/opencodex/issues/373#issuecomment-5078643829) | CLOSED / COMPLETED |
-| #404 | [issuecomment-5078643932](https://github.com/lidge-jun/opencodex/issues/404#issuecomment-5078643932) | CLOSED / COMPLETED |
-| PR #376 | [issuecomment-5078643983](https://github.com/lidge-jun/opencodex/pull/376#issuecomment-5078643983) | CLOSED / not merged |
+| #433 | [issuecomment-5078643748](https://github.com/lidge-jun/openprovider/issues/433#issuecomment-5078643748) | CLOSED / COMPLETED |
+| #432 | [issuecomment-5078643797](https://github.com/lidge-jun/openprovider/issues/432#issuecomment-5078643797) | CLOSED / COMPLETED |
+| #422 | [issuecomment-5078643875](https://github.com/lidge-jun/openprovider/issues/422#issuecomment-5078643875) | CLOSED / COMPLETED |
+| #373 | [issuecomment-5078643829](https://github.com/lidge-jun/openprovider/issues/373#issuecomment-5078643829) | CLOSED / COMPLETED |
+| #404 | [issuecomment-5078643932](https://github.com/lidge-jun/openprovider/issues/404#issuecomment-5078643932) | CLOSED / COMPLETED |
+| PR #376 | [issuecomment-5078643983](https://github.com/lidge-jun/openprovider/pull/376#issuecomment-5078643983) | CLOSED / not merged |
 
 - #433 코멘트는 핵심 pinning 수정과 미구현 CLI/GUI 후속을 분리했다.
 - #404/#422 코멘트는 live private gateway 재검증이 아니라 회귀 계약으로 닫는다고 명시했다.

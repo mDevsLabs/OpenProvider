@@ -1,4 +1,4 @@
-/** Usage-shape diagnostic JSONL. Enable with `ocx debug usage on` or OPENCODEX_USAGE_DEBUG=1. */
+/** Usage-shape diagnostic JSONL. Enable with `opr debug usage on` or OPENCODEX_USAGE_DEBUG=1. */
 
 import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";

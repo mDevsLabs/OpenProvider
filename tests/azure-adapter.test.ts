@@ -55,7 +55,7 @@ describe("Azure OpenAI adapter hardening", () => {
 
   test("reports unresolved placeholders as non-fatal config diagnostics", () => {
     const previousHome = process.env.OPENCODEX_HOME;
-    const testDir = mkdtempSync(join(tmpdir(), "ocx-azure-diagnostics-"));
+    const testDir = mkdtempSync(join(tmpdir(), "opr-azure-diagnostics-"));
     process.env.OPENCODEX_HOME = testDir;
 
     try {

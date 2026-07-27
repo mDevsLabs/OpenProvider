@@ -110,7 +110,7 @@ describe("Cursor desktop executor hooks", () => {
     }), {}))[0]);
     expect(computer.message.value.result.case).toBe("error");
     if (computer.message.value.result.case === "error") {
-      expect(computer.message.value.result.value.error).toContain("headless opencodex proxy");
+      expect(computer.message.value.result.value.error).toContain("headless openprovider proxy");
     }
 
     const record = decode((await handleCursorNativeExec(execMessage({
@@ -119,7 +119,7 @@ describe("Cursor desktop executor hooks", () => {
     }), {}))[0]);
     expect(record.message.value.result.case).toBe("failure");
     if (record.message.value.result.case === "failure") {
-      expect(record.message.value.result.value.error).toContain("headless opencodex proxy");
+      expect(record.message.value.result.value.error).toContain("headless openprovider proxy");
     }
   });
 });

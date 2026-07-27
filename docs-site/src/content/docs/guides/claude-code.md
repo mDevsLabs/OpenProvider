@@ -10,10 +10,10 @@ included — with zero extra auth work.
 ## Quickstart
 
 ```bash
-ocx claude
+opr claude
 ```
 
-`ocx claude` ensures the proxy is running, then launches Claude Code with the environment wired:
+`opr claude` ensures the proxy is running, then launches Claude Code with the environment wired:
 
 | Variable | Value |
 | --- | --- |
@@ -26,7 +26,7 @@ ocx claude
 | `ANTHROPIC_DEFAULT_{OPUS,SONNET,FABLE}_MODEL` | `claudeCode.tierModels.*` (optional) |
 | `CLAUDE_CODE_ALWAYS_ENABLE_EFFORT` | `1` when `alwaysEnableEffort` is on (conditional) |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS` / `DISABLE_COMPACT` | Legacy context override when `maxContextTokens` is set (conditional) |
-Variables you export yourself always win. Extra arguments pass through: `ocx claude -p "hello"`.
+Variables you export yourself always win. Extra arguments pass through: `opr claude -p "hello"`.
 
 ## Auth mode
 
@@ -44,15 +44,15 @@ decides at each launch:
 | It cannot tell (unreadable keychain, corrupt file) | Assumes subscription and prints a warning — it never moves a paying subscriber onto the proxy on a failed read |
 
 This is recomputed every launch, not remembered, so logging in or out is picked up on the
-next `ocx claude` with nothing to reconfigure.
+next `opr claude` with nothing to reconfigure.
 
 Pick **Subscription** or **Proxy** explicitly when you want it fixed. An explicit choice is
 stored in `claudeCode.authMode` and detection never overrides it — including after you log
 in or out later. Switch back to Auto to hand the decision back.
 
 On macOS, auto-connect (`claudeCode.systemEnv`) follows the same resolution, so a plain
-`claude` launched outside `ocx` behaves the same way. That file is a snapshot refreshed when
-the proxy starts or you save settings, while `ocx claude` always resolves live.
+`claude` launched outside `opr` behaves the same way. That file is a snapshot refreshed when
+the proxy starts or you save settings, while `opr claude` always resolves live.
 
 ## System environment integration (macOS)
 
@@ -71,15 +71,15 @@ is temporarily unavailable, the first available route in that family is used unt
 You can also manage the same profile from the command line:
 
 ```bash
-ocx claude desktop [apply]
-ocx claude desktop show [--json]
-ocx claude desktop move <route> <opus|fable|sonnet|haiku> [--default]
-ocx claude desktop default <opus|fable|sonnet|haiku> <route|none>
-ocx claude desktop export <path|->
-ocx claude desktop import <path> [--apply]
+opr claude desktop [apply]
+opr claude desktop show [--json]
+opr claude desktop move <route> <opus|fable|sonnet|haiku> [--default]
+opr claude desktop default <opus|fable|sonnet|haiku> <route|none>
+opr claude desktop export <path|->
+opr claude desktop import <path> [--apply]
 ```
 
-`ocx claude desktop` and `apply` both write the current profile to Claude Desktop. `show` gives a
+`opr claude desktop` and `apply` both write the current profile to Claude Desktop. `show` gives a
 readable summary; add `--json` for scripts. `export -` writes versioned JSON to standard output.
 Import validates the complete file before saving, so an invalid file leaves the current profile
 unchanged. Add `--apply` to write a valid imported profile to Desktop immediately. Use `none` only
@@ -93,17 +93,17 @@ remain available for existing scripts.
 
 ## System Environment Integration
 
-When `claudeCode.systemEnv` is set to `true` (default: **off**), `ocx start` uses `launchctl setenv`
+When `claudeCode.systemEnv` is set to `true` (default: **off**), `opr start` uses `launchctl setenv`
 to inject `ANTHROPIC_BASE_URL` and the related Claude Code environment variables system-wide.
 New terminal windows and tabs therefore route plain `claude` commands through the proxy without
-requiring the `ocx claude` wrapper. Already-open shells are unaffected and must be reopened.
+requiring the `opr claude` wrapper. Already-open shells are unaffected and must be reopened.
 
-`ocx stop` and proxy shutdown **unset the injected keys** (it does not restore previous values —
+`opr stop` and proxy shutdown **unset the injected keys** (it does not restore previous values —
 only the keys OpenProvider injected are removed). The proxy also writes `~/.OpenProvider/claude-env.sh`;
-`ocx start` installs a `.zshrc` source hook that loads it automatically.
+`opr start` installs a `.zshrc` source hook that loads it automatically.
 
 Disable with `claudeCode.systemEnv: false` in the configuration or with the GUI toggle. This
-feature is macOS-only; on other platforms, use `ocx claude`.
+feature is macOS-only; on other platforms, use `opr claude`.
 
 ## Native Claude passthrough (subscription pierce)
 
@@ -120,7 +120,7 @@ via the picker aliases.
 The passthrough fires when **all four** conditions are met: `nativePassthrough` is not `false`;
 the model begins with `claude` or `anthropic`; the bearer or `x-api-key` starts with `sk-ant-`;
 and alias/model-map resolution returns the same model unchanged. This also means the
-"claude.ai connectors are disabled" warning no longer appears with `ocx claude`.
+"claude.ai connectors are disabled" warning no longer appears with `opr claude`.
 
 Disable with `claudeCode.nativePassthrough: false`; point elsewhere with
 `claudeCode.anthropicBaseUrl`.
@@ -133,7 +133,7 @@ with `claude` or `anthropic`, OpenProvider exposes routed models as stable, reve
 
 | Surface | Format | Example |
 | --- | --- | --- |
-| Claude Code CLI | `claude-ocx-<provider>--<model>` | `claude-ocx-native--gpt-5.6-sol` |
+| Claude Code CLI | `claude-opr-<provider>--<model>` | `claude-opr-native--gpt-5.6-sol` |
 | Claude Desktop 3P | `claude-opus-4-8-<code>` (3-char base36 hash) | `claude-opus-4-8-ncb` |
 
 The proxy picks the family per request: `?ids=cli` or `?ids=desktop` wins; otherwise the
@@ -143,7 +143,7 @@ Each entry carries an honest display name such as `gemini-3-pro (gemini)`, plus 
 capabilities (reasoning-effort ladder, thinking types) in the official ModelInfo shape so Claude
 Desktop's third-party gateway mode can offer its effort selector. Real Anthropic models keep their
 canonical ids. The synthetic 2026 date is an internal slot, not a release date. Legacy hash aliases
-and `claude-ocx-<provider>--<model>` ids from older configs still resolve.
+and `claude-opr-<provider>--<model>` ids from older configs still resolve.
 Models with an authoritative 1M context window get an extra `…[1m]` picker row: selecting it makes
 Claude Code account a full 1M context for that model (auto-compaction stays on) — the proxy strips
 the marker before routing.
@@ -195,7 +195,7 @@ fall back to 350k.
 
 ### Effective model environment
 
-`effectiveModelEnv` computes six slots injected by `ocx claude` / system env / shell file:
+`effectiveModelEnv` computes six slots injected by `opr claude` / system env / shell file:
 `ANTHROPIC_MODEL`, four `ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU,FABLE}_MODEL`, and legacy
 `ANTHROPIC_SMALL_FAST_MODEL`. The effective Haiku is `tierModels.haiku ?? smallFastModel`, fed
 to both Haiku variables.
@@ -204,22 +204,22 @@ When both `tierModels.haiku` and `smallFastModel` are absent, OpenProvider leave
 
 ## Roster agents (injectAgents)
 
-`ocx claude` (and the system-env daemon) syncs your featured subagent roster (Subagents tab,
-up to 5 models) plus `ocx-self` into `~/.claude/agents/ocx-*.md`.
+`opr claude` (and the system-env daemon) syncs your featured subagent roster (Subagents tab,
+up to 5 models) plus `opr-self` into `~/.claude/agents/opr-*.md`.
 
-- **`ocx-self`** pins your `/model` picker default (falling back to `claudeCode.model`); omitted
+- **`opr-self`** pins your `/model` picker default (falling back to `claudeCode.model`); omitted
   when neither exists. It does NOT use model inheritance.
-- Each agent body contains an `<!-- ocx-route: <model> -->` directive — the proxy uses this to
+- Each agent body contains an `<!-- opr-route: <model> -->` directive — the proxy uses this to
   pin the real route. The Agent tool's `model` argument is therefore inert; pass `"haiku"` as a
   placeholder.
 - Frontmatter carries the alias; routing is directive-driven.
-- Only marker-verified `ocx-*.md` files containing `generated-by: OpenProvider` are ever
+- Only marker-verified `opr-*.md` files containing `generated-by: OpenProvider` are ever
   overwritten or pruned; your own agents are never touched.
 - Files are atomically synced per file (write + rename).
 - `enabled: false` or `injectAgents: false` prunes all verified-owned definitions.
 - GUI PUT and roster changes resync immediately; launcher/system-env sync at launch.
 
-Dispatch: `subagent_type: "ocx-gpt-5-6-sol"`. 1M-capable targets carry `[1m]` automatically.
+Dispatch: `subagent_type: "opr-gpt-5-6-sol"`. 1M-capable targets carry `[1m]` automatically.
 
 ## Bundled-skill elision (blockedSkills)
 
@@ -387,7 +387,7 @@ Anthropic `/v1/messages/count_tokens` endpoint.
 
 ## Debug capture
 
-`ocx debug claude on|off|status|reset`, `OCX_CLAUDE_DEBUG=1`, or `PUT /api/debug {"claude": true}`
+`opr debug claude on|off|status|reset`, `OCX_CLAUDE_DEBUG=1`, or `PUT /api/debug {"claude": true}`
 controls inbound capture. `GET /api/claude/inbound-debug` returns `{enabled, entries}` (newest
 first, ring of 20).
 
@@ -403,7 +403,7 @@ The dashboard sidebar has a dedicated **Claude** page (below API) and a **Claude
 (label intentionally identical in every language). The page shows:
 
 - Inbound kill switch (enabled toggle)
-- Quickstart (`ocx claude`) and manual env block
+- Quickstart (`opr claude`) and manual env block
 - Fast Mode selector (Auto / ON / OFF)
 - Auto-context toggle and compaction threshold dropdown
 - Subagent auto-registration toggle
@@ -427,15 +427,15 @@ Anthropic OAuth account is not marked `needsReauth`. An explicit Anthropic selec
 credential intentionally fails closed.
 
 **"claude.ai connectors are disabled"** — An `ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN` is set
-in your shell. `ocx claude` deliberately does NOT set `ANTHROPIC_API_KEY`; if you have it exported,
-unset it. `ocx claude` injects `ANTHROPIC_BASE_URL`, discovery, auto-context, and configured model slots — but never `ANTHROPIC_API_KEY`.
+in your shell. `opr claude` deliberately does NOT set `ANTHROPIC_API_KEY`; if you have it exported,
+unset it. `opr claude` injects `ANTHROPIC_BASE_URL`, discovery, auto-context, and configured model slots — but never `ANTHROPIC_API_KEY`.
 
 **Models not showing in /model picker** — Verify `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` is
-set (automatic with `ocx claude`). Run `ocx claude` to refresh the gateway model cache at
+set (automatic with `opr claude`). Run `opr claude` to refresh the gateway model cache at
 `~/.claude/cache/gateway-models.json`. Check `claudeCode.enabled` is not `false`.
 
 **Stale environment after port change** — If the proxy port changed, old shells may have a stale
-`ANTHROPIC_BASE_URL`. Open a new terminal, or re-run `ocx claude`.
+`ANTHROPIC_BASE_URL`. Open a new terminal, or re-run `opr claude`.
 
 **200k context ceiling despite big model** — Select the `[1m]` variant in the picker, or enable
 auto-context (on by default). If the picker shows no `[1m]` row, the model's authoritative context
@@ -445,7 +445,7 @@ window may be below the auto-compact threshold.
 on Claude model mentions. This is normal for native passthrough; on routed models, OpenProvider stubs
 it by default (`blockedSkills: ["claude-api"]`).
 
-**Subagent dispatches to wrong model** — Roster agents (`ocx-*`) use `<!-- ocx-route: ... -->`
+**Subagent dispatches to wrong model** — Roster agents (`opr-*`) use `<!-- opr-route: ... -->`
 directives, not the Agent tool's `model` argument. Make sure the directive matches the intended
 route. Pass `"haiku"` as the model placeholder.
 

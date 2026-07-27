@@ -1,4 +1,4 @@
-# 020 — Phase 2: `ocx claude` launcher + gateway model discovery
+# 020 — Phase 2: `opr claude` launcher + gateway model discovery
 
 Work class: **C2-C3** (CLI slice + one new data-plane list surface). One PABCD
 cycle. Depends on: Phase 1 shipped; 002 claims 4-6 (discovery protocol).
@@ -15,7 +15,7 @@ cycle. Depends on: Phase 1 shipped; 002 claims 4-6 (discovery protocol).
   `client_version` (Codex catalog) and default OpenAI list byte-stable.
 - Discovery has a 3s client timeout + redirects=failure (G8): the branch must
   answer from the in-process/catalog cache — no blocking network refresh.
-- Alias `claude-ocx-<provider>--<slug>` satisfies the prefix rule (begins with
+- Alias `claude-opr-<provider>--<slug>` satisfies the prefix rule (begins with
   `claude`); `display_name` = `"<model> (<provider>)"` — honest, no "Claude" in
   the display name for non-Anthropic models.
 - Launcher env (E1/E2): inject `ANTHROPIC_AUTH_TOKEN` ONLY (never also
@@ -30,9 +30,9 @@ cycle. Depends on: Phase 1 shipped; 002 claims 4-6 (discovery protocol).
 
 ## Objective
 
-`ocx claude [args...]` starts/finds the proxy and launches Claude Code fully
+`opr claude [args...]` starts/finds the proxy and launches Claude Code fully
 wired (base URL, auth token, model slots, discovery flag) — and the native
-`/model` picker lists opencodex's routed models via the official gateway model
+`/model` picker lists openprovider's routed models via the official gateway model
 discovery protocol with honest display names.
 
 ## Task 0 (blocking, A-gate input): Tier-2 verification of discovery
@@ -55,7 +55,7 @@ If any claim fails verification, amend D6 here BEFORE building the alias layer.
 ### Alias layer — new `src/anthropic/alias.ts`
 
 - Deterministic, reversible: routed `"<provider>/<model>"` <->
-  `claude-ocx-<provider>--<model-slug>` (exact format finalized by Task 0's
+  `claude-opr-<provider>--<model-slug>` (exact format finalized by Task 0's
   prefix rule; `--` separates provider from model; slug keeps [a-z0-9.-]).
 - `aliasForRoute(provider, modelId)` / `resolveAlias(id)` — pure functions +
   collision test. `resolveInboundModel` (Phase 1) gains alias resolution BEFORE
@@ -67,7 +67,7 @@ If any claim fails verification, amend D6 here BEFORE building the alias layer.
   header / `x-api-key` presence; fallback `?flavor=anthropic`) and return
   discovery entries for the SAME visible routed set the Codex catalog exposes
   (`filterCatalogVisibleModels` + `orderForSubagents`):
-  `{ id: alias, display_name: "<model> (<provider>) — opencodex", ... }`.
+  `{ id: alias, display_name: "<model> (<provider>) — openprovider", ... }`.
 - Codex/OpenAI callers keep today's shapes byte-identical (suite proves).
 
 ### Launcher — new `src/cli/claude.ts` + registration
@@ -82,7 +82,7 @@ If any claim fails verification, amend D6 here BEFORE building the alias layer.
 - `spawn("claude", args, {stdio:"inherit"})`; ENOENT -> install hint
   (`npm install -g @anthropic-ai/claude-code`); exit-code passthrough.
 - `src/cli/index.ts` `case "claude"`, `src/cli/help.ts` usage row
-  (`ocx claude [claude args...]`).
+  (`opr claude [claude args...]`).
 
 ### Config
 
@@ -104,7 +104,7 @@ If any claim fails verification, amend D6 here BEFORE building the alias layer.
 - CLI: help includes `claude`; spawn-arg/env unit test following the pattern in
   `tests/codex-exec-invocation.test.ts` (env dict assembled, not a real spawn).
 - Commands: `bun test ./tests/`, `bun x tsc --noEmit`.
-- Manual smoke: `ocx claude` -> `/model` picker shows "From gateway" entries;
+- Manual smoke: `opr claude` -> `/model` picker shows "From gateway" entries;
   select a Gemini alias -> streamed turn logs the resolved provider/model.
 
 ## Gate criteria

@@ -14,7 +14,7 @@ Entry point: `src/server/responses.ts` -> `planWebSearch()` -> `runWithWebSearch
 
 ## Evidence-backed hypotheses
 
-- **H1 — provider-only slowness. Rejected.** The exact 200000 ms value is supplied by OpenCodex,
+- **H1 — provider-only slowness. Rejected.** The exact 200000 ms value is supplied by OpenProvider,
   and the error text is constructed locally in `src/web-search/loop.ts`.
 - **H2 — hosted search-sidecar timeout. Rejected.** The first routed-model iteration is drained
   before `runWebSearch()` can execute; the hosted sidecar was not reached in the reported failure.

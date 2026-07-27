@@ -9,9 +9,9 @@ Key changes:
 - `9b412d8e` fix: preserve configured Alibaba Token Plan base URL (allowBaseUrlOverride: true)
 - `def60bce` fix(alibaba): preserve reasoning_content for qwen3.8-max-preview
 - `2ea15d85` feat(providers): add Cloudflare Workers AI provider (#191)
-- `477f6dd1` fix: restore GUI request logs after ocx stop/start (#195)
+- `477f6dd1` fix: restore GUI request logs after opr stop/start (#195)
 - `e84e3aa2` fix(update): hard-pin listen port after update (#193)
-- Plus: ocx account CLI docs, redaction fixes, provider-quotas routing (#180)
+- Plus: opr account CLI docs, redaction fixes, provider-quotas routing (#180)
 
 ## Constraints
 - No breaking changes, no config schema changes

@@ -78,7 +78,7 @@ Rationale: request logs should answer "which pool slot was used?" without exposi
 
 All Codex Auth management mutations must update both:
 
-1. persisted `~/.opencodex/config.json`
+1. persisted `~/.openprovider/config.json`
 2. in-memory runtime `OcxConfig` used by the running proxy
 
 Previously fixed paths:

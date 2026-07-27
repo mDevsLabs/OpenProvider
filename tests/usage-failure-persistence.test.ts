@@ -10,7 +10,7 @@ let previousHome: string | undefined;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  testDir = mkdtempSync(join(tmpdir(), "ocx-usage-fail-"));
+  testDir = mkdtempSync(join(tmpdir(), "opr-usage-fail-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 
@@ -27,7 +27,7 @@ function lastPersistedLine(): Record<string, unknown> {
 
 test("5xx entry persists failure diagnostics to usage.jsonl (survives the ring buffer)", () => {
   addRequestLog({
-    requestId: "ocx-test-502",
+    requestId: "opr-test-502",
     timestamp: Date.now(),
     model: "gpt-test",
     provider: "openai",
@@ -49,7 +49,7 @@ test("5xx entry persists failure diagnostics to usage.jsonl (survives the ring b
 
 test("successful entry keeps the existing persisted shape (no diagnostic fields)", () => {
   addRequestLog({
-    requestId: "ocx-test-200",
+    requestId: "opr-test-200",
     timestamp: Date.now(),
     model: "gpt-test",
     provider: "openai",

@@ -81,7 +81,7 @@ independent review retired the deferral rationale — see the RC3 subsection abo
 
 ## Remaining acceptance gate
 
-The symptom is only fully reproducible with a live Codex CLI pointed at `ocx` using a routed
+The symptom is only fully reproducible with a live Codex CLI pointed at `opr` using a routed
 model over a multi-turn session that includes interrupts. Unit + regression tests prove the
 mechanism-level fixes; the end-to-end confirmation (no `ApiError::Stream`, no leaked upstream
 connections) is owed in the user's environment.

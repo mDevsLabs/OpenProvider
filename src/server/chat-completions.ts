@@ -66,7 +66,7 @@ export async function handleChatCompletions(
   // Best-effort Grok attribution: the managed fence stamps this header on every model
   // it registers (extra_headers, sent verbatim by upstream Grok). Dashboard usage
   // bucketing only — never an auth or billing signal.
-  if (req.headers.get("x-opencodex-grok") === "1") logCtx.surface = "grok";
+  if (req.headers.get("x-openprovider-grok") === "1") logCtx.surface = "grok";
   // Routed adapters only support streamed turns; always stream internally and fold
   // for non-streaming clients.
   internalBody.stream = true;

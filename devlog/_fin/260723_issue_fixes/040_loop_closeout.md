@@ -33,7 +33,7 @@ edges, Sol review verdicts, and green verification at every C gate.
 2. docs-site build not run locally (astro deps absent); CI covers it.
 3. #252 live enum-acceptance dispatch (model:"haiku" through a real Claude Code
    client) not executed in-loop; corroborated by tier-alias slots + proxy-inert
-   argument (ocx-route authority, claude-messages.ts:529). Verify on next live session.
+   argument (opr-route authority, claude-messages.ts:529). Verify on next live session.
 
 ## Push status
 

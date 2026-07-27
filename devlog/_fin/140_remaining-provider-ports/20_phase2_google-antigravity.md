@@ -26,12 +26,12 @@ wraps the flat Gemini body in a CCA envelope. Reuses the `google` adapter (mode 
 - **Headers** (`:314-352`): Antigravity User-Agent; `anthropic-beta: interleaved-thinking-2025-05-14` for Claude+reasoning (`:101-102,329`).
 - **Quirks** (`:814-842`): drop `maxOutputTokens` for non-Claude; inject system instruction for Claude+Gemini-3; tool mode `VALIDATED` for Claude forced choice; `parametersJsonSchema → parameters` normalize (`:729`). sessionId = hash of first user text (`:686-714`).
 
-## opencodex fit
+## openprovider fit
 
 - **OAuth** (`src/oauth/`): NEW `src/oauth/google-antigravity.ts` (login + refresh + discoverProject/onboard). Extend `OAuthCredentials` (`src/oauth/types.ts`) with `projectId?`. Register in `OAUTH_PROVIDERS` (`src/oauth/index.ts:36-61`).
-- **projectId wiring (audit fix):** the CCA envelope needs `project` from the stored credential, but opencodex's server injects only the bare access token into `apiKey` (`server.ts:299-301`). So the adapter must read the credential's `projectId` directly (`getCredential("google-antigravity").projectId`) — store `{token, projectId}` like jawcode `parseGeminiCliCredentials` (`google-gemini-cli.ts:143-159`), and use it in both the envelope and the refresh closure.
+- **projectId wiring (audit fix):** the CCA envelope needs `project` from the stored credential, but openprovider's server injects only the bare access token into `apiKey` (`server.ts:299-301`). So the adapter must read the credential's `projectId` directly (`getCredential("google-antigravity").projectId`) — store `{token, projectId}` like jawcode `parseGeminiCliCredentials` (`google-gemini-cli.ts:143-159`), and use it in both the envelope and the refresh closure.
 - **Adapter** (`src/adapters/google.ts`): extend the Phase-10 `googleMode` branch with `cloud-code-assist` → wrap body in CCA envelope + antigravity headers.
-- **⚠️ `parseStream` IS changed for antigravity (audit fix):** antigravity nests output under `chunk.response.candidates` + thinking parts (jawcode `google-gemini-cli.ts:399-402`), but opencodex's current parser reads **top-level** `chunk.candidates` (`google.ts:155`). Phase 20 adds a **mode-aware** `parseStream` that unwraps `response` and handles thinking deltas. (Phase 10 vertex is top-level, so it left `parseStream` untouched — this change is antigravity-only.)
+- **⚠️ `parseStream` IS changed for antigravity (audit fix):** antigravity nests output under `chunk.response.candidates` + thinking parts (jawcode `google-gemini-cli.ts:399-402`), but openprovider's current parser reads **top-level** `chunk.candidates` (`google.ts:155`). Phase 20 adds a **mode-aware** `parseStream` that unwraps `response` and handles thinking deltas. (Phase 10 vertex is top-level, so it left `parseStream` untouched — this change is antigravity-only.)
 - **Registry:** `adapter:"google"`, `authKind:"oauth"`, `oauthId:"google-antigravity"`, baseUrl `daily-cloudcode-pa.googleapis.com` **with prod fallback `cloudcode-pa.googleapis.com`** (`google-gemini-cli.ts:69-71`), ~15 bundled models.
 
 ## Sub-steps (this PABCD pass)
@@ -39,7 +39,7 @@ wraps the flat Gemini body in a CCA envelope. Reuses the `google` adapter (mode 
 1. **A:** port `src/oauth/google-antigravity.ts` (login/refresh/onboard); extend creds with `projectId`; register in `OAUTH_PROVIDERS`. Unit-test mocked `loadCodeAssist`/`onboardUser`.
 2. **B:** extend `createGoogleAdapter` with the CCA-envelope branch + headers + a **mode-aware `parseStream`** (unwrap `response.candidates` + thinking deltas) + the quirks table (maxTokens drop, system-instr inject, tool-mode map, schema normalize, sessionId hash).
 3. **B:** registry entry + 15 models.
-4. **C:** `ocx login google-antigravity` → creds with projectId; envelope-builder asserts (`project`, `requestType:"agent"`); one text stream + one tool call (schema normalization); `tsc`/`bun test`.
+4. **C:** `opr login google-antigravity` → creds with projectId; envelope-builder asserts (`project`, `requestType:"agent"`); one text stream + one tool call (schema normalization); `tsc`/`bun test`.
 
 ## Risks
 
@@ -53,7 +53,7 @@ wraps the flat Gemini body in a CCA envelope. Reuses the `google` adapter (mode 
 
 ## Verify (minimal proof)
 
-`ocx login google-antigravity`; one tool-call + thinking-model stream (`02:217`).
+`opr login google-antigravity`; one tool-call + thinking-model stream (`02:217`).
 
 ## Depends-on / enables
 

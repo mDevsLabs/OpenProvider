@@ -3,7 +3,7 @@
 Date: 2026-06-27
 Branch: dev
 Work phase: close findings **#5 (High, async race / completion)** and **#2 (High, turnEnded contract)**
-from the GPT Pro review — opencodex completes the turn on the HTTP/2 `stream.end`, not on the protobuf
+from the GPT Pro review — openprovider completes the turn on the HTTP/2 `stream.end`, not on the protobuf
 `turnEnded` signal jawcode/GJC treat as authoritative, and fires native-exec handlers without awaiting.
 
 > Status: **PLAN**. C3-class (transport correctness; can hang/mis-complete live turns).
@@ -13,16 +13,16 @@ from the GPT Pro review — opencodex completes the turn on the HTTP/2 `stream.e
 ## 1. Easy explanation
 
 Cursor tells you a turn is done two ways: an explicit "turnEnded" message *inside* the stream, and
-later the raw HTTP connection closing. opencodex only listens for the connection closing. jawcode
+later the raw HTTP connection closing. openprovider only listens for the connection closing. jawcode
 listens for "turnEnded" first (with a comment that the alternative `stopReason` is unreliable) and
-treats the connection close as a fallback. Result: opencodex can appear to hang after the model has
-actually finished, or finish before async tool replies have been sent. The fix aligns opencodex with
+treats the connection close as a fallback. Result: openprovider can appear to hang after the model has
+actually finished, or finish before async tool replies have been sent. The fix aligns openprovider with
 jawcode: complete on `turnEnded`, keep `stream.end` as a fallback, and make sure in-flight native-exec
 replies are drained before the generator ends.
 
 ## 2. Pre-write evidence
 
-### Current opencodex — completes on stream end only
+### Current openprovider — completes on stream end only
 ```169:204:src/adapters/cursor/live-transport.ts
 this.stream.on("trailers", trailers => {
   const status = trailers["grpc-status"];
@@ -59,10 +59,10 @@ if (message.message.case === "execServerMessage") {
   `interactionUpdate → turnEnded`.
 - HTTP `end` is a **fallback** that resolves unless a Connect end-stream error was seen
   (`cursor.ts:481-499`).
-- Trailers `grpc-status != "0"` → reject (`cursor.ts:484-489`) — opencodex already matches this.
+- Trailers `grpc-status != "0"` → reject (`cursor.ts:484-489`) — openprovider already matches this.
 - NOTE (parity caveat): jawcode is **also** fire-and-forget at the frame level and has **no** in-flight
   drain before resolve (`cursor.ts:437-451`; research §4 "NOT FOUND"). So the async-drain improvement
-  is opencodex going *beyond* jawcode — justified by review finding #5; document it as an intentional
+  is openprovider going *beyond* jawcode — justified by review finding #5; document it as an intentional
   hardening, not a jawcode port.
 
 ## 3. Decision

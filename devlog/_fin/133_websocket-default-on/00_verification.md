@@ -10,25 +10,25 @@ WebSocket advertisement is restored to default-on for `1.9.1`.
 ## Behavior
 
 - Missing `websockets` now means enabled.
-- Fresh `~/.opencodex/config.json` writes `"websockets": true`.
+- Fresh `~/.openprovider/config.json` writes `"websockets": true`.
 - Explicit `"websockets": false` still suppresses provider/catalog `supports_websockets`.
 
 ## Changed
 
-- `/Users/jun/Developer/new/700_projects/opencodex/src/config.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/types.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/codex-inject.test.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/config.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/types.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/codex-inject.test.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts`
 
 ## Verification Plan
 
 - `bun test tests/codex-inject.test.ts tests/codex-catalog.test.ts`
 - `bun test tests`
 - `bun x tsc --noEmit`
-- `ocx start` smoke:
+- `opr start` smoke:
   - `/healthz` returns HTTP 200.
   - `/v1/models?client_version=0.141.0` advertises `supports_websockets` by default.
-  - `ocx stop` leaves the proxy stopped before release.
+  - `opr stop` leaves the proxy stopped before release.
 
 ## Verification Results
 
@@ -47,4 +47,4 @@ WebSocket advertisement is restored to default-on for `1.9.1`.
   - Context values stayed correct for the checked routed models:
     - `opencode-go/kimi-k2.7-code`: `262144`, auto compact `235929`
     - `opencode-go/minimax-m3`: `512000`, auto compact `460800`
-  - `ocx stop` stopped the proxy and final `ocx status` returned `Proxy not running`.
+  - `opr stop` stopped the proxy and final `opr status` returned `Proxy not running`.

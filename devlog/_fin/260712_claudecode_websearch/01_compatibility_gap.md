@@ -100,7 +100,7 @@ Claude Code (consumer):
 - src/tools/WebSearchTool/WebSearchTool.ts - makeOutputFromSearchResponse() parses results
 - src/tools/WebSearchTool/UI.tsx - getSearchSummary() counts SearchResult objects
 
-OpenCodex (proxy):
+OpenProvider (proxy):
 - src/claude/inbound.ts:294 - converts web_search_* to {type:"web_search"}
 - src/claude/outbound.ts:268 - IGNORES web_search_call frames
 - src/web-search/index.ts - planWebSearch() sidecar activation

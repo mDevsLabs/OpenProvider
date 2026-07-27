@@ -1,23 +1,23 @@
 ---
 title: Справочник CLI
-description: Все команды и флаги ocx.
+description: Все команды и флаги opr.
 ---
 
-CLI OpenProvider — это `ocx`. Запустите `ocx help` (или `--help` / `-h`) для общей справки по
-использованию. Для команд, зарегистрированных в таблице справки, используйте `ocx help <command>`.
+CLI OpenProvider — это `opr`. Запустите `opr help` (или `--help` / `-h`) для общей справки по
+использованию. Для команд, зарегистрированных в таблице справки, используйте `opr help <command>`.
 Команды справки и версии доступны только для чтения и не запускают, не останавливают, не
 устанавливают, не удаляют и не переписывают состояние Codex/OpenProvider.
 
 ## Настройка и жизненный цикл
 
-### `ocx init`
+### `opr init`
 
 Интерактивный мастер настройки. Запрашивает провайдера (пресет или пользовательский), API-ключ
 (литерал или `${ENV}`), модель по умолчанию и порт прокси; сохраняет `~/.OpenProvider/config.json`;
 по желанию внедряет прокси в `$CODEX_HOME/config.toml` (по умолчанию `~/.codex/config.toml`); и
 по желанию устанавливает shim автозапуска Codex.
 
-### `ocx start [--port <port>]`
+### `opr start [--port <port>]`
 
 Запускает прокси-сервер (предпочтительный порт `10100`). Если этот порт занят, OpenProvider выбирает
 и записывает другой свободный порт. Команда сохраняет состояние PID/runtime-порта и отказывается
@@ -26,17 +26,17 @@ CLI OpenProvider — это `ocx`. Запустите `ocx help` (или `--help
 запущен как управляемый сервис (`OCX_SERVICE=1`).
 
 ```bash
-ocx start
-ocx start --port 8080
+opr start
+opr start --port 8080
 ```
 
-### `ocx stop`
+### `opr stop`
 
 Останавливает работающий прокси (по PID), удаляет PID-файл и восстанавливает нативный Codex. Если
-установлен управляемый фоновый сервис, `ocx stop` сначала останавливает и его (чтобы он не
+установлен управляемый фоновый сервис, `opr stop` сначала останавливает и его (чтобы он не
 перезапустил прокси). То же действие доступно по кнопке **Stop** веб-дашборда (`POST /api/stop`).
 
-### `ocx restore` &nbsp;·&nbsp; `ocx eject`
+### `opr restore` &nbsp;·&nbsp; `opr eject`
 
 Восстанавливает нативный Codex **без** остановки прокси — удаляет внедрённые строки конфигурации
 и маршрутизируемые записи каталога, чтобы обычный `codex` снова работал нативно. `eject` — алиас
@@ -46,28 +46,28 @@ ocx start --port 8080
 работающий прокси, не меняя жизненный цикл прокси:
 
 ```bash
-ocx restore back
-ocx eject back
+opr restore back
+opr eject back
 ```
 
-### `ocx recover-history --legacy-openai`
+### `opr recover-history --legacy-openai`
 
 Явное восстановление для старых сборок времён разработки, которые переназначали историю Codex App
 до появления поддержки обратимых резервных копий. Если база данных истории заблокирована, сначала
 закройте Codex.
 
-### `ocx restart`
+### `opr restart`
 
 Выполняет `stop`, затем `ensure`: останавливает прокси/сервис, восстанавливает нативный Codex,
 запускает прокси в фоне и синхронизирует фактический порт обратно в Codex.
 
-### `ocx ensure`
+### `opr ensure`
 
 Идемпотентно гарантирует, что фоновый прокси запущен, затем синхронизирует его живой каталог
 моделей. Если `codexAutoStart` равен `false`, команда сообщает, что автозапуск отключён, и ничего
 не делает.
 
-### `ocx status [--json]`
+### `opr status [--json]`
 
 Печатает диагностическую сводку только для чтения: PID прокси, доступность `/healthz`, URL
 дашборда, путь к конфигурации, провайдера по умолчанию, настройку автозапуска Codex, состояние
@@ -78,7 +78,7 @@ ocx eject back
 Используйте `--json` для машиночитаемого диагностического контракта только для чтения:
 
 ```bash
-ocx status --json
+opr status --json
 ```
 
 Сокращённый пример структуры:
@@ -100,7 +100,7 @@ ocx status --json
   },
   "paths": {
     "config": "/Users/example/.OpenProvider/config.json",
-    "pid": "/Users/example/.OpenProvider/ocx.pid",
+    "pid": "/Users/example/.OpenProvider/opr.pid",
     "runtime": "/path/to/bun"
   },
   "runtime": {
@@ -130,13 +130,13 @@ ocx status --json
 оставаться стабильными. Она намеренно исключает API-ключи, OAuth-токены, заголовки authorization,
 содержимое запросов, адреса электронной почты и идентификаторы аккаунтов.
 
-### `ocx health [--json]`
+### `opr health [--json]`
 
 Проверяет идентичность работающего прокси. Человекочитаемый вывод сообщает PID/порт; `--json`
 выдаёт `{ok, pid, port}`. Команда завершается с кодом 0 только когда прокси здоров, и с кодом 1 в
 остальных случаях, что делает её пригодной для сервисных проб.
 
-### `ocx uninstall` &nbsp;·&nbsp; `ocx remove`
+### `opr uninstall` &nbsp;·&nbsp; `opr remove`
 
 Останавливает сервис и прокси, удаляет сервис и shim Codex, восстанавливает нативный Codex, затем
 удаляет локальную конфигурацию OpenProvider только если все шаги восстановления завершились успешно.
@@ -144,18 +144,18 @@ ocx status --json
 
 ## Модели и Codex
 
-### `ocx sync`
+### `opr sync`
 
 Получает живой список моделей от каждого настроенного провайдера и заново внедряет объединённый
 каталог в Codex. Запускайте после добавления провайдера или для обновления списка доступных
 моделей.
 
-### `ocx sync-cache`
+### `opr sync-cache`
 
 Инвалидирует локальный кэш селектора моделей Codex, чтобы он был перестроен из активного каталога
 OpenProvider.
 
-### `ocx v2 [subcommand]`
+### `opr v2 [subcommand]`
 
 Управляет флагом функции Codex `multi_agent_v2` и трёхпозиционным режимом multi-agent surface.
 
@@ -170,11 +170,11 @@ OpenProvider.
 | `threads <n>` | Устанавливает активный лимит потоков v1/v2 (целое число >= 1). |
 
 ```bash
-ocx v2 status
-ocx v2 mode v1
-ocx v2 mode default
-ocx v2 on
-ocx v2 threads 16
+opr v2 status
+opr v2 mode v1
+opr v2 mode default
+opr v2 on
+opr v2 threads 16
 ```
 
 Подкоманда `mode` записывает `multiAgentMode` в конфигурацию OpenProvider и повторно синхронизирует
@@ -184,14 +184,14 @@ ocx v2 threads 16
 Изменения применяются к новым сессиям Codex; работающие сессии сохраняют закреплённую за ними
 поверхность.
 
-### `ocx models [--provider <name>] [--json]`
+### `opr models [--provider <name>] [--json]`
 
 Перечисляет модели, статически заданные в настроенных провайдерах. `--provider` фильтрует одного
 настроенного провайдера, а `--json` возвращает метаданные моделей плюс напоминание о том, что
 `liveModels` может добавлять записи, существующие только во время выполнения. Эта команда не
-запрашивает живые каталоги; для этого используйте `ocx sync` или дашборд.
+запрашивает живые каталоги; для этого используйте `opr sync` или дашборд.
 
-### `ocx provider <subcommand>`
+### `opr provider <subcommand>`
 
 Неинтерактивное управление провайдерами. Записи реестра задаются по имени; для пользовательского
 имени требуются и `--adapter`, и `--base-url`.
@@ -205,20 +205,20 @@ ocx v2 threads 16
 | `set-default <name>` | `--json` | Выбирает существующего провайдера в качестве провайдера по умолчанию. |
 
 ```bash
-ocx provider list --json
-ocx provider add anthropic --api-key sk-ant-... --set-default --sync
-ocx provider add local-dev --adapter openai-chat --base-url http://localhost:11434/v1
-ocx provider show anthropic --json
-ocx models --provider anthropic --json
+opr provider list --json
+opr provider add anthropic --api-key sk-ant-... --set-default --sync
+opr provider add local-dev --adapter openai-chat --base-url http://localhost:11434/v1
+opr provider show anthropic --json
+opr models --provider anthropic --json
 ```
 
-### `ocx account <subcommand>`
+### `opr account <subcommand>`
 
 Перечисляет и переключает аккаунты провайдеров и пулы API-ключей через работающий прокси.
 Поставляемая справка выглядит так:
 
 ```text
-Usage: ocx account <list|current|use|refresh|auto-switch|remove|add-key> ...
+Usage: opr account <list|current|use|refresh|auto-switch|remove|add-key> ...
 
 List and switch provider accounts and API-key pools (GUI parity).
 
@@ -260,7 +260,7 @@ plan/label по цепочке фолбэков использует план, �
 }
 ```
 
-#### `ocx account list [provider] [--json] [--all]`
+#### `opr account list [provider] [--json] [--all]`
 
 Без указания провайдера перечисляет пул Codex, OAuth-аккаунты и настроенные пулы API-ключей.
 Пустые провайдеры пропускаются, если не передан `--all`. С указанным провайдером перечисляет
@@ -274,7 +274,7 @@ plan/label по цепочке фолбэков использует план, �
 { accounts: AccountRow[], notes: string[] }
 ```
 
-#### `ocx account current <provider> [--json]`
+#### `opr account current <provider> [--json]`
 
 Показывает активный аккаунт или ключ. Пул Codex без ручного закрепления сообщает об
 автоматическом выборе аккаунта с наименьшим использованием; другое семейство без активных учётных
@@ -284,7 +284,7 @@ plan/label по цепочке фолбэков использует план, �
 { provider, type, activeId: string | null, autoSwitchThreshold?: number, account: AccountRow | null }
 ```
 
-#### `ocx account use <provider> <account-or-key-id|main> [--json]`
+#### `opr account use <provider> <account-or-key-id|main> [--json]`
 
 Выбирает существующий аккаунт Codex, OAuth-аккаунт или API-ключ. Для `openai` значение `main`
 выбирает вход Codex App. Выбор для Codex применяется только к **новым сессиям**; существующие
@@ -295,9 +295,9 @@ plan/label по цепочке фолбэков использует план, �
 { ok: true, provider, type, activeId }
 ```
 
-#### `ocx account refresh <provider> [--json]`
+#### `opr account refresh <provider> [--json]`
 
-Для пула Codex используйте `ocx account refresh openai [--json]`. Команда принудительно обновляет
+Для пула Codex используйте `opr account refresh openai [--json]`. Команда принудительно обновляет
 квоты аккаунтов и печатает доступные недельные/месячные проценты и время сброса; отсутствующие
 данные о квоте сообщаются как неизвестные, а не как 0%. JSON-обёртка команды —
 `{ accounts: AccountRow[] }` с полем `quota` в каждой строке Codex.
@@ -310,7 +310,7 @@ plan/label по цепочке фолбэков использует план, �
 истёкшая по времени вышестоящая проверка квоты вместо этого деградирует до null-отчёта или
 устаревшего отчёта (код 0), как и полосы квот в дашборде.
 
-#### `ocx account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]`
+#### `opr account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]`
 
 Управляет только пулом аккаунтов Codex `openai`. `on` устанавливает 80%, `off` устанавливает 0%,
 `status` читает текущее значение, а `threshold <n>` принимает целое число от 0 до 100. Другие
@@ -320,7 +320,7 @@ plan/label по цепочке фолбэков использует план, �
 { provider, autoSwitchThreshold: number, enabled: boolean }
 ```
 
-#### `ocx account remove <provider> <id|main> --yes [--json]`
+#### `opr account remove <provider> <id|main> --yes [--json]`
 
 Это защищённое неинтерактивное удаление требует `--yes`. Перед удалением команда проверяет, что
 id существует; отсутствующий id завершается с кодом 1 без отправки DELETE. Основной вход Codex App
@@ -335,7 +335,7 @@ id существует; отсутствующий id завершается с
 { error: string } // stderr, exit 1
 ```
 
-#### `ocx account add-key <provider> [--label <label>] [--json]`
+#### `opr account add-key <provider> [--label <label>] [--json]`
 
 Добавляет и активирует ключ для провайдера с API-ключами. Ключ читается только из
 неинтерактивного (не-TTY) stdin — через конвейер или перенаправление; интерактивный ввод в TTY,
@@ -344,15 +344,15 @@ id существует; отсутствующий id завершается с
 here-string:
 
 ```bash
-ocx account add-key openrouter --label personal <<< "$OPENROUTER_API_KEY"
-security find-generic-password -w openrouter | ocx account add-key openrouter --json
+opr account add-key openrouter --label personal <<< "$OPENROUTER_API_KEY"
+security find-generic-password -w openrouter | opr account add-key openrouter --json
 ```
 
 `--json` возвращает `{ ok: true, id: string | null, label?: string }` и никогда не включает ключ.
 
 ## Аутентификация
 
-### `ocx login <provider>`
+### `opr login <provider>`
 
 Запускает зарегистрированный процесс входа провайдера. OAuth-провайдеры открывают браузер и
 сохраняют автоматически обновляемые учётные данные в `~/.OpenProvider/`; провайдеры со входом по
@@ -361,23 +361,23 @@ API-ключу открывают свой дашборд ключей, запр
 печатает принимаемые в данный момент id OAuth-провайдеров и провайдеров с API-ключами.
 
 ```bash
-ocx login xai
+opr login xai
 ```
 
-### `ocx logout <provider>`
+### `opr logout <provider>`
 
 Удаляет сохранённые OAuth-учётные данные провайдера.
 
 ## Дашборд
 
-### `ocx gui`
+### `opr gui`
 
 Открывает [веб-дашборд](/ru/guides/web-dashboard/) по адресу `http://localhost:<port>`,
 автоматически запуская прокси, если он не работает.
 
 ## Фоновый сервис
 
-### `ocx service [subcommand]`
+### `opr service [subcommand]`
 
 Запускает OpenProvider как фоновый сервис, управляемый при входе в систему (macOS **launchd**, Linux
 **systemd user unit**, Windows **Task Scheduler**), который автоматически стартует при входе и
@@ -395,22 +395,22 @@ ocx login xai
 | `remove` | Алиас `uninstall`. |
 
 ```bash
-ocx service
-ocx service install
-ocx service status
-ocx service uninstall
+opr service
+opr service install
+opr service status
+opr service uninstall
 ```
 
-### `ocx codex-shim <subcommand>`
+### `opr codex-shim <subcommand>`
 
 Оборачивает скриптовый лаунчер `codex` в PATH лёгким скриптом автозапуска. Настоящие цели
 `codex.exe` не затрагиваются, чтобы не ломать вызовы точного исполняемого файла.
 
 Если завершённое внешнее обновление Codex перезаписало установленный shim, следующая обычная команда
-`ocx` до запуска сохранит стабильный новый лончер в резервную копию и восстановит shim. Лончер,
+`opr` до запуска сохранит стабильный новый лончер в резервную копию и восстановит shim. Лончер,
 который ещё меняется, остаётся нетронутым до следующей попытки. Ошибка восстановления выдаёт
 предупреждение, но не приводит к сбою запрошенной команды; ручной вариант —
-`ocx codex-shim install`. Для отключения установите `codexShimAutoRestore` в `false` или задайте
+`opr codex-shim install`. Для отключения установите `codexShimAutoRestore` в `false` или задайте
 процессу `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0`.
 
 | Subcommand | Action |
@@ -421,20 +421,20 @@ ocx service uninstall
 | `status` | Сообщает состояние shim (установлен / устарел / отсутствует). |
 
 ```bash
-ocx codex-shim install
-ocx codex-shim status
-ocx codex-shim uninstall
+opr codex-shim install
+opr codex-shim status
+opr codex-shim uninstall
 ```
 
 :::tip[Service vs Shim]
-Используйте `ocx service` для постоянно работающего фонового прокси (рекомендуется). Используйте
-`ocx codex-shim` для лёгкого запуска по требованию без демона — прокси стартует только при
+Используйте `opr service` для постоянно работающего фонового прокси (рекомендуется). Используйте
+`opr codex-shim` для лёгкого запуска по требованию без демона — прокси стартует только при
 запуске `codex`.
 :::
 
 ## Диагностика
 
-### `ocx doctor`
+### `opr doctor`
 
 Выполняет диагностику окружения и связности только для чтения: пути состояния и тип файловой
 системы, двойные установки в WSL, окружение/конфигурация прокси, доступность ChatGPT,
@@ -443,37 +443,37 @@ Codex app-home targeting также узко обнаруживает расхо
 необходимости объясняет миграцию службы. В новых путях скрывается имя пользователя ОС. Команда
 печатает подсказки по исправлению, но не применяет их.
 
-### `ocx debug [provider|usage …]`
+### `opr debug [provider|usage …]`
 
 Читает или изменяет отладочные переопределения времени выполнения через management API
 работающего прокси.
 
 ```bash
-ocx debug provider on|off|status|reset
-ocx debug provider logs [-f|--follow]
-ocx debug usage on|off|status|reset
-ocx debug usage logs [-f|--follow]
+opr debug provider on|off|status|reset
+opr debug provider logs [-f|--follow]
+opr debug usage on|off|status|reset
+opr debug usage logs [-f|--follow]
 ```
 
-Без указания области `ocx debug` печатает справку по использованию, а когда прокси остановлен —
+Без указания области `opr debug` печатает справку по использованию, а когда прокси остановлен —
 ещё и значения окружения по умолчанию для следующего запуска. Отладка провайдеров по умолчанию
 включается через `OCX_DEBUG=1` (устаревший `OCX_DEBUG_FRAMES=1` тоже работает); отладка
 использования — через `OpenProvider_USAGE_DEBUG=1`.
 
 ## Обновление
 
-### `ocx update`
+### `opr update`
 
 Самообновление OpenProvider из npm. Стабильные установки используют `@latest`; preview-установки
 остаются на `@preview`, если не передать `--tag latest|preview`. Команда обнаруживает checkout
 исходного кода и предлагает вместо этого выполнить `git pull && bun install`, и ничего не делает,
 если у вас уже новейшая версия для этого тега. Работающий прокси останавливается перед заменой
 файлов; установленный сервис пересобирается и запускается автоматически, а при установке,
-работающей на переднем плане, команда печатает `ocx start` как следующий шаг.
+работающей на переднем плане, команда печатает `opr start` как следующий шаг.
 
 ```bash
-ocx update
-ocx update --tag preview
+opr update
+opr update --tag preview
 ```
 
 Новые версии становятся доступны в момент, когда [workflow Release](https://github.com/mDevsLabs/OpenProvider/actions/workflows/release.yml)
@@ -481,9 +481,9 @@ ocx update --tag preview
 
 ## Справка
 
-`ocx help`, `ocx --help`, `ocx -h` — печатают общую справку по использованию и примеры.
+`opr help`, `opr --help`, `opr -h` — печатают общую справку по использованию и примеры.
 
-`ocx help <command>`, `ocx <command> --help`, `ocx <command> -h` — печатают справку по конкретной
+`opr help <command>`, `opr <command> --help`, `opr <command> -h` — печатают справку по конкретной
 команде для команд, зарегистрированных в `src/cli/help.ts`. Полные контракты подкоманд
 `provider`, `debug` и `v2` документированы выше.
 
@@ -492,7 +492,7 @@ ocx update --tag preview
 
 ## Версия
 
-`ocx --version`, `ocx -v`, `ocx version` — печатают одну удобную для скриптов строку версии и
+`opr --version`, `opr -v`, `opr version` — печатают одну удобную для скриптов строку версии и
 завершаются.
 
 ## Внутренние команды

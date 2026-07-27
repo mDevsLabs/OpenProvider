@@ -17,7 +17,7 @@ Depends on: Phase 1-2 shipped (config.claudeCode consumed, discovery live).
 2. **Dedicated nav tab "Claude"** — new NAV entry in App.tsx directly BELOW the
    `api` item (`{id:"claude", tkey:"nav.claude", Icon:<sparkle/bot-ish lucide>}`)
    rendering new `gui/src/pages/ClaudeCode.tsx`: enable state, quickstart
-   (`ocx claude` one-liner + manual env block for non-ocx launches), slot pickers
+   (`opr claude` one-liner + manual env block for non-opr launches), slot pickers
    (default/haiku over the routed-model list, reusing the Subagents fetch
    pattern), modelMap editor (key/value rows), discovery alias preview (count +
    first N aliases with display names).
@@ -47,7 +47,7 @@ docs-site article (3 locales), README row (3 locales).
     routed-model list the Subagents page uses (reuse its fetch/store).
   - modelMap editor: key/value rows (inbound id -> routed id), add/remove.
   - Discovery status hint: read-only line showing the alias count exposed to the
-    picker, with the `ocx claude` one-liner for setup.
+    picker, with the `opr claude` one-liner for setup.
 - i18n: new keys in `gui/src/i18n/{en,ko,zh,de}.ts` — all four locales in the
   same commit (repo convention observed in git log: i18n sync ships with the
   feature).
@@ -59,8 +59,8 @@ docs-site article (3 locales), README row (3 locales).
 - `docs-site/src/content/docs/guides/claude-code.md` (en) + `ko/` + `zh-cn/`
   translations; astro.config.mjs sidebar entry (after the CLI reference or in
   Guides — match the model-ordering unit's placement pattern).
-- Content: quickstart (`ocx claude`), how discovery/picker works (with the
-  prefix-alias explanation), slot mapping table, manual env setup for non-ocx
+- Content: quickstart (`opr claude`), how discovery/picker works (with the
+  prefix-alias explanation), slot mapping table, manual env setup for non-opr
   launches, count_tokens approximation note, troubleshooting (version gate,
   auth on non-loopback).
 

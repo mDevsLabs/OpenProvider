@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build persistent local usage accounting for opencodex and expose it in the dashboard:
+Build persistent local usage accounting for openprovider and expose it in the dashboard:
 
 - append request token usage to durable local state;
 - keep request logs useful by showing token totals per request;
@@ -23,10 +23,10 @@ This is not a billing system. It is a local observability surface for the proxy 
 
 ## Storage
 
-Use the opencodex config directory:
+Use the openprovider config directory:
 
 ```text
-~/.opencodex/usage.jsonl
+~/.openprovider/usage.jsonl
 ```
 
 Resolve it through `getConfigDir()` so `OPENCODEX_HOME` test fixtures and custom homes work.
@@ -216,7 +216,7 @@ Per phase:
 
 Full-goal stop audit must prove:
 
-- `~/.opencodex/usage.jsonl` is secret-safe and append-only;
+- `~/.openprovider/usage.jsonl` is secret-safe and append-only;
 - reported/unreported/unsupported semantics are visible in code and GUI;
 - `/api/logs` and `/api/usage` behavior is tested;
 - Usage GUI tab and Logs token column build cleanly;

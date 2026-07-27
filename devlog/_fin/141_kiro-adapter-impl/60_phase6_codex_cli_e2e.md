@@ -1,4 +1,4 @@
-# Phase 6 — Full Codex CLI E2E (real `codex exec` → ocx → kiro)
+# Phase 6 — Full Codex CLI E2E (real `codex exec` → opr → kiro)
 
 ## Symptom reported by user
 Interactive Codex (model `kiro/claude-sonnet-4.6`) showed "Reconnecting… high demand,
@@ -7,7 +7,7 @@ temporary errors" and never produced output. "안되는데?" → "codex exec으�
 ## Root cause (confirmed, not guessed)
 The proxy listening on `localhost:10100` was the **globally-installed published build**
 `/opt/homebrew/lib/node_modules/@mdevs/openprovider/dist` (v2.6.0) — which has **no kiro
-adapter**. Evidence: `grep 'kiro/' /Users/jun/.codex/opencodex-catalog.json` returned
+adapter**. Evidence: `grep 'kiro/' /Users/jun/.codex/openprovider-catalog.json` returned
 **empty** → kiro models were never advertised to Codex, so `kiro/*` requests failed.
 My kiro implementation lives only on `feat/kiro-on-dev` in the workspace, never published.
 
@@ -17,7 +17,7 @@ Replace the running proxy on 10100 with the **branch build**:
 2. `bun run src/cli.ts start --port 10100` (dev run — `bin/ocx.mjs` is the npm shim that
    execs the *bundled published* package, so dev MUST use `src/cli.ts` directly).
 3. Branch `start` auto-injected **23 models incl. 11 `kiro/*`** into the Codex catalog
-   (`/Users/jun/.codex/opencodex-catalog.json`) — verified `kiro/claude-sonnet-4.6` present.
+   (`/Users/jun/.codex/openprovider-catalog.json`) — verified `kiro/claude-sonnet-4.6` present.
 
 ## Verification (live, real Codex CLI 0.142.3)
 - Direct `POST /v1/responses` to the proxy → **HTTP 200** + full Responses SSE
@@ -36,8 +36,8 @@ interactive "Reconnecting 1/5…" retry storm, not a proxy/adapter defect.
 
 ## Operational caveat (for the user)
 10100 is now served by the **workspace dev proxy** (`bun run src/cli.ts start`, PID at
-write-time 62725). To make this permanent in the normal `ocx` flow, the published install
+write-time 62725). To make this permanent in the normal `opr` flow, the published install
 must be updated to include the kiro adapter (publish from `feat/kiro-on-dev`, then
-`ocx update`) — otherwise a future `ocx start` from the global binary reverts to the
+`opr update`) — otherwise a future `opr start` from the global binary reverts to the
 kiro-less build. The full Codex CLI path is now proven working against the branch build.
 

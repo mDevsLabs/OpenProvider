@@ -97,7 +97,7 @@ directory from `OPENCODEX_HOME`, so a throwaway home reproduces a genuine first
 run on demand:
 
 ```
-OPENCODEX_HOME=$(mktemp -d) ocx start
+OPENCODEX_HOME=$(mktemp -d) opr start
 ```
 
 Worth writing down now, because H3 already establishes that the highlight
@@ -236,14 +236,14 @@ normally run BEFORE anyone opens the dashboard, each verified in source:
 
 | Path | Writes config |
 |---|---|
-| `ocx init` | `src/cli/init.ts:166` |
+| `opr init` | `src/cli/init.ts:166` |
 | proxy startup seeding/migration | `src/server/index.ts:248`, `:265` |
 | port-fallback persistence | `src/cli/index.ts:133` |
 | OAuth login | `src/oauth/login-cli.ts:125` |
 
 So `firstRun` actually measures *whether the user opened the dashboard before
 touching the CLI* — not whether they are new. A brand-new user following the
-documented `ocx init` → `ocx login` path stamps `firstRun: false` and never sees
+documented `opr init` → `opr login` path stamps `firstRun: false` and never sees
 the tour.
 
 This was survivable while `firstRun` was one of two conditions. As the SOLE gate
@@ -298,10 +298,10 @@ proposals:
 
 | # | Proposal | Why it fell |
 |---|---|---|
-| D1 | "New install = exactly the seeded canonical `openai` provider" | `ocx init` REPLACES `providers` wholesale (`src/cli/init.ts:159-164`), and its featured first option is that same canonical openai row — so the documented onboarding path lands in the "new" bucket forever. Meanwhile ChatGPT pool accounts persist to `codex-accounts.json` (`src/codex/account-store.ts:17`), not `config.providers`, so a heavily-configured user still reads as new. Legacy tier migration (`src/providers/openai-tiers.ts`) can also rebuild an upgrader's row byte-identical to the seed. |
+| D1 | "New install = exactly the seeded canonical `openai` provider" | `opr init` REPLACES `providers` wholesale (`src/cli/init.ts:159-164`), and its featured first option is that same canonical openai row — so the documented onboarding path lands in the "new" bucket forever. Meanwhile ChatGPT pool accounts persist to `codex-accounts.json` (`src/codex/account-store.ts:17`), not `config.providers`, so a heavily-configured user still reads as new. Legacy tier migration (`src/providers/openai-tiers.ts`) can also rebuild an upgrader's row byte-identical to the seed. |
 | D2 | Split into `onboarding.stepper` / `onboarding.tour` | No migration was specified for configs the stepper release already wrote in the flat shape, so every graduate would see the stepper again. |
 | D3 | Suppress announcements only "in this session" | There is no session identity in a config-backed HTTP route, so the priority rule would silently move client-side, out of the substrate that exists to enforce it. |
-| D4 | `OPENCODEX_HOME=$(mktemp -d) ocx start` as a safe first-run harness | `OPENCODEX_HOME` scopes only the ocx config dir. The same `ocx start` still rewrites the real `~/.codex/config.toml`, the shell hook, system env and `~/.grok/config.toml`, and fights the real proxy for port 10100. "Real config untouched" was false. |
+| D4 | `OPENCODEX_HOME=$(mktemp -d) opr start` as a safe first-run harness | `OPENCODEX_HOME` scopes only the opr config dir. The same `opr start` still rewrites the real `~/.codex/config.toml`, the shell hook, system env and `~/.grok/config.toml`, and fights the real proxy for port 10100. "Real config untouched" was false. |
 | D5 | Ship sidebar-only highlighting first | Reverses an explicit user answer without asking, and H2 already established the two highlight tiers are separate mechanisms — so the cost is duplicated later, not deferred. |
 
 ### The pattern behind all five failures
@@ -328,7 +328,7 @@ first write stamps an explicit marker:
 Onboarding eligibility then reads a fact rather than a proxy: the marker is
 absent on every pre-existing installation (they were created before the field
 existed), and present with a known version on every new one. No path through
-`ocx init`, tier migration, pool accounts or port fallback can forge it, because
+`opr init`, tier migration, pool accounts or port fallback can forge it, because
 none of them can make an existing file not exist.
 
 The earlier objection to this candidate — "startup seeding also creates the
@@ -400,7 +400,7 @@ Closes R3. Since H3 makes the geometry unassertable in happy-dom, the gate list
 must contain a way to make the tour APPEAR, not only checks that it stays hidden:
 
 ```
-OPENCODEX_HOME=$(mktemp -d) ocx start   # genuine first run, real config untouched
+OPENCODEX_HOME=$(mktemp -d) opr start   # genuine first run, real config untouched
 ```
 
 ### D5 — the cost question is answered by scope, not by argument

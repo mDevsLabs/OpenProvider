@@ -2,7 +2,7 @@
 
 ## Source state
 
-- OpenCodex base: `dev` at `0167b415` when this audit started.
+- OpenProvider base: `dev` at `0167b415` when this audit started.
 - jawcode source: local working tree on 2026-07-17.
 - jawcode `packages/ai/src/models.json`, provider/model logic, and all `struct_har/chase/model/` files are modified or untracked. Therefore this is a sibling-working-copy comparison, not an upstream release claim.
 - jawcode chase pins currently reviewed GJC `4a80bac9..3ddf26079` and OMP `7aa1d581c..b0d04e517`; those pins are provenance only.
@@ -28,18 +28,18 @@ If any fingerprint differs at closeout, this audit must report the drift and rer
 ## Provider namespace snapshot
 
 - jawcode generated catalog: 48 top-level provider keys.
-- OpenCodex built-in registry: 52 provider IDs at audit start.
+- OpenProvider built-in registry: 52 provider IDs at audit start.
 - Exact shared IDs include `anthropic`, `azure-openai`, `cursor`, `google`, `openai`, `openrouter`, `opencode-go`, `xai`, and 32 others.
 - jawcode-only generated IDs: `alibaba-coding-plan`, `amazon-bedrock`, `deepinfra`, `google-gemini-cli`, `minimax-code`, `minimax-code-cn`, `openai-codex`, `opencode`.
-- OpenCodex-only registry IDs: `alibaba`, `anthropic-apikey`, `kimi`, `lm-studio`, `mimo-free`, `neuralwatt`, `ollama`, `openai-apikey`, `opencode-free`, `parallel`, `umans`, `vllm`.
-- Namespace differences are not automatically missing providers. In particular, OpenCodex `openai` is forwarded Codex auth while jawcode `openai-codex` is the closer transport counterpart; OpenCodex `openai-apikey` is closer to jawcode `openai`.
+- OpenProvider-only registry IDs: `alibaba`, `anthropic-apikey`, `kimi`, `lm-studio`, `mimo-free`, `neuralwatt`, `ollama`, `openai-apikey`, `opencode-free`, `parallel`, `umans`, `vllm`.
+- Namespace differences are not automatically missing providers. In particular, OpenProvider `openai` is forwarded Codex auth while jawcode `openai-codex` is the closer transport counterpart; OpenProvider `openai-apikey` is closer to jawcode `openai`.
 
 ## Jawcode metadata bridge snapshot
 
-- OpenCodex maps seven jawcode bundles: `anthropic`, `google`, `minimax`, `moonshot`, `opencode-go`, `openrouter`, `xai`.
+- OpenProvider maps seven jawcode bundles: `anthropic`, `google`, `minimax`, `moonshot`, `opencode-go`, `openrouter`, `xai`.
 - Missing rows are appended only for `opencode-go`; other bundles enrich an existing model row.
 - Generated rows contain `contextWindow`, `maxTokens`, `input`, `reasoning`, and `wireModelId`.
-- Current OpenCodex catalog application consumes only `contextWindow` and `input`; `maxTokens`, `reasoning`, and `wireModelId` do not affect the catalog.
+- Current OpenProvider catalog application consumes only `contextWindow` and `input`; `maxTokens`, `reasoning`, and `wireModelId` do not affect the catalog.
 
 ## Source versus generated snapshot
 
@@ -48,18 +48,18 @@ If any fingerprint differs at closeout, this audit must report the drift and rer
 | `anthropic` | Same 25 IDs. Source raises several Sonnet 4.5/4.6 windows; 4.6 is intentionally overridden back to 200K by the generator, while 4.5 has no such override. |
 | `google`, `minimax`, `moonshot`, `opencode-go` | No ID/metadata delta found. |
 | `openrouter` | 17 source IDs absent from generated snapshot, including GPT-5.6 tier/pro variants, `x-ai/grok-4.5`, and `~x-ai/grok-latest`; 11 `maxTokens` values differ. |
-| `xai` | Source adds `grok-4.5`; the OpenCodex registry already exposes that model explicitly. |
+| `xai` | Source adds `grok-4.5`; the OpenProvider registry already exposes that model explicitly. |
 
-The OpenRouter `maxTokens` differences are deferred contract evidence because OpenCodex currently does not consume generated `maxTokens`.
+The OpenRouter `maxTokens` differences are deferred contract evidence because OpenProvider currently does not consume generated `maxTokens`.
 
 ## High-signal logic findings
 
-1. Cursor discovery and run report different client versions in OpenCodex; jawcode centralizes one constant.
-2. jawcode prevents OpenAI SDK-internal long 429 retries; OpenCodex does not use that retry path, excludes 429 from generic transient retry, and separately rotates key pools.
-3. jawcode retires `google-antigravity/gemini-3.1-pro-high`; OpenCodex still publishes and tests the alias.
-4. jawcode maps unsupported OpenCode Go Kimi efforts; OpenCodex currently suppresses reasoning for `kimi-k2.7-code` entirely.
-5. jawcode's general Anthropic path omits disabled thinking; OpenCodex already emits thinking only for a non-`none` effort. Its web-search sidecar has a separate explicit-disabled contract.
-6. jawcode generates GPT-5.6 Luna/Sol/Terra at 1.05M for OpenAI API and 373K for Codex, then a later policy caps both transports to 373K. OpenCodex already has the same three IDs with 372K native/API-key and 1.05M OpenRouter contracts.
+1. Cursor discovery and run report different client versions in OpenProvider; jawcode centralizes one constant.
+2. jawcode prevents OpenAI SDK-internal long 429 retries; OpenProvider does not use that retry path, excludes 429 from generic transient retry, and separately rotates key pools.
+3. jawcode retires `google-antigravity/gemini-3.1-pro-high`; OpenProvider still publishes and tests the alias.
+4. jawcode maps unsupported OpenCode Go Kimi efforts; OpenProvider currently suppresses reasoning for `kimi-k2.7-code` entirely.
+5. jawcode's general Anthropic path omits disabled thinking; OpenProvider already emits thinking only for a non-`none` effort. Its web-search sidecar has a separate explicit-disabled contract.
+6. jawcode generates GPT-5.6 Luna/Sol/Terra at 1.05M for OpenAI API and 373K for Codex, then a later policy caps both transports to 373K. OpenProvider already has the same three IDs with 372K native/API-key and 1.05M OpenRouter contracts.
 
 ## Evidence kinds
 

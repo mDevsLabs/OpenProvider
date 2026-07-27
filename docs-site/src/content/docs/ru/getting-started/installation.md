@@ -1,9 +1,9 @@
 ---
 title: Установка
-description: Установите прокси OpenProvider (ocx) и необходимые компоненты и убедитесь, что он запускается.
+description: Установите прокси OpenProvider (opr) и необходимые компоненты и убедитесь, что он запускается.
 ---
 
-OpenProvider устанавливает два эквивалентных имени команды: `ocx` и `OpenProvider`. Обе запускают один и
+OpenProvider устанавливает два эквивалентных имени команды: `opr` и `OpenProvider`. Обе запускают один и
 тот же небольшой локальный HTTP-сервер (построенный на Bun). Запросы к моделям идут к провайдеру,
 выбранному маршрутизацией; опциональные сайдкары для vision и веб-поиска также могут использовать
 ваш вход в ChatGPT, когда они нужны маршрутизируемой модели.
@@ -12,7 +12,7 @@ OpenProvider устанавливает два эквивалентных име
 
 | Требование | Зачем |
 | --- | --- |
-| **[Node](https://nodejs.org) ≥ 18** | `ocx` работает на рантайме Bun, но рантайм автоматически поставляется в комплекте при `npm install` — устанавливать Bun самостоятельно **не нужно**. |
+| **[Node](https://nodejs.org) ≥ 18** | `opr` работает на рантайме Bun, но рантайм автоматически поставляется в комплекте при `npm install` — устанавливать Bun самостоятельно **не нужно**. |
 | **[OpenAI Codex](https://openai.com/codex)** (CLI, App или SDK) | Клиент, перед которым работает OpenProvider. OpenProvider записывает данные в `$CODEX_HOME/config.toml` (по умолчанию `~/.codex/config.toml`). |
 | Аккаунт провайдера или API-ключ | Anthropic, xAI, Kimi, Ollama Cloud, OpenRouter, OpenAI-совместимая конечная точка или ваш вход в ChatGPT. |
 
@@ -41,7 +41,7 @@ sudo npm install -g --allow-scripts=bun @bitkyc08/OpenProvider
 Убедитесь, что оба псевдонима команды доступны в `PATH`:
 
 ```bash
-ocx --version
+opr --version
 OpenProvider --version
 ```
 
@@ -54,7 +54,7 @@ ChatGPT, OpenAI по API-ключу, OpenRouter и эксперименталь�
 
 ```bash
 npm install -g @bitkyc08/OpenProvider@preview
-ocx update --tag preview
+opr update --tag preview
 ```
 
 ## Запуск из исходного кода
@@ -82,17 +82,17 @@ bun run dev:gui     # запускает dev-сервер панели упра�
 | Путь | Назначение |
 | --- | --- |
 | `$OpenProvider_HOME/config.json` | Ваши провайдеры, провайдер по умолчанию, порт и параметры. |
-| `$OpenProvider_HOME/ocx.pid` | PID запущенного прокси (защита от повторного запуска). |
+| `$OpenProvider_HOME/opr.pid` | PID запущенного прокси (защита от повторного запуска). |
 | `$OpenProvider_HOME/runtime-port.json` | Текущие PID, имя хоста и порт, включая автоматически выбранный запасной порт. |
-| `$OpenProvider_HOME/auth.json` | Сохранённые учётные данные OAuth (после `ocx login`). |
+| `$OpenProvider_HOME/auth.json` | Сохранённые учётные данные OAuth (после `opr login`). |
 | `$OpenProvider_HOME/catalog-backup*.json` | Резервные копии каталога моделей Codex, создаваемые перед тем, как OpenProvider его изменит. |
 | `$CODEX_HOME/config.toml` | На loopback-адресе OpenProvider добавляет корневой `openai_base_url`, отмеченный собственным маркером; при привязке не к loopback используются `model_provider = "OpenProvider"` и `[model_providers.OpenProvider]`, чтобы Codex мог отправлять заголовок API-аутентификации. |
 | `$CODEX_HOME/OpenProvider.config.toml` | Резервный/справочный профиль, записываемый рядом с основной конфигурацией Codex. |
 | `$CODEX_HOME/OpenProvider-catalog.json` | Синхронизированный каталог нативных и маршрутизируемых моделей, используемый Codex. |
 
 :::note
-OpenProvider никогда не удаляет вашу конфигурацию Codex. Каждое внедрение обратимо — `ocx stop`,
-`ocx restore` или `ocx eject` убирают ровно те строки, которые добавил OpenProvider, и восстанавливают
+OpenProvider никогда не удаляет вашу конфигурацию Codex. Каждое внедрение обратимо — `opr stop`,
+`opr restore` или `opr eject` убирают ровно те строки, которые добавил OpenProvider, и восстанавливают
 нативный Codex.
 :::
 

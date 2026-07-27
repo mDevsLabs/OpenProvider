@@ -1347,7 +1347,7 @@ describe("kiro adapter — parseStream", () => {
       await createKiroAdapter(provider).buildRequest(parsedWith([{ role: "user", content: "secret prompt body" }], [bashTool]));
       expect(error).toHaveBeenCalledTimes(1);
       const line = String(error.mock.calls[0]?.[0] ?? "");
-      expect(line).toContain("[ocx:kiro:request]");
+      expect(line).toContain("[opr:kiro:request]");
       expect(line).toContain("\"region\":\"us-east-1\"");
       expect(line).toContain("\"hasProfileArn\":true");
       expect(line).not.toContain("secret prompt body");

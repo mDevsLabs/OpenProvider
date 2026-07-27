@@ -49,7 +49,7 @@
   `gui/src/components/QuotaBars.tsx`, styles `gui/src/styles.css:370-395`.
 
 ## Data model (backward-compatible)
-`~/.opencodex/auth.json` value per provider becomes:
+`~/.openprovider/auth.json` value per provider becomes:
 ```json
 {
   "anthropic": {

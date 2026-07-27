@@ -4,7 +4,7 @@ Date: 2026-06-24
 
 Goal objective:
 
-Run repeated autonomous PABCD verification loops for opencodex Codex multi-account auth from devlog phase 00 through 150: audit implementation against documented intent, use current external research where relevant, execute tests/build/browser/API/runtime probes, fix any discovered regressions, document results in devlog, and leave the running proxy verified on the latest code without exposing personal account data.
+Run repeated autonomous PABCD verification loops for openprovider Codex multi-account auth from devlog phase 00 through 150: audit implementation against documented intent, use current external research where relevant, execute tests/build/browser/API/runtime probes, fix any discovered regressions, document results in devlog, and leave the running proxy verified on the latest code without exposing personal account data.
 
 ## Classification
 

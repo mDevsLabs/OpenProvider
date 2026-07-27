@@ -97,7 +97,7 @@ function successfulPicks(config: OcxConfig, count: number): string[] {
 async function withTempHome<T>(run: (dir: string) => Promise<T> | T): Promise<T> {
   const previousHome = process.env.OPENCODEX_HOME;
   const previousClaudeConfigDir = process.env.CLAUDE_CONFIG_DIR;
-  const dir = mkdtempSync(join(tmpdir(), "ocx-combos-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-combos-"));
   process.env.OPENCODEX_HOME = dir;
   process.env.CLAUDE_CONFIG_DIR = join(dir, "claude");
   try {

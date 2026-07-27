@@ -1,6 +1,6 @@
 # _chase: upstream 따라잡기 노트
 
-opencodex 프록시 레이어가 따라잡는 두 upstream의 추적 노트. 코드를 통째로
+openprovider 프록시 레이어가 따라잡는 두 upstream의 추적 노트. 코드를 통째로
 vendoring하지 않는다. 실제로 따라잡을 표면은 좁다: API 변환(translator/wire)과
 모델명/카탈로그 컨텍스트 두 갈래뿐이라, 무거운 클론 대신 노트 + on-demand 대조로 간다.
 
@@ -8,7 +8,7 @@ vendoring하지 않는다. 실제로 따라잡을 표면은 좁다: API 변환(t
 
 | slug | repo | 역할 | 로컬 |
 |---|---|---|---|
-| `gjc` (jawcode) | `lidge-jun/jawcode` (`packages/ai/src/providers/*.ts`) | opencodex 어댑터의 직접 포팅 출처 (1차 SOT) | `/Users/jun/Developer/new/700_projects/jawcode` 에 이미 존재 |
+| `gjc` (jawcode) | `lidge-jun/jawcode` (`packages/ai/src/providers/*.ts`) | openprovider 어댑터의 직접 포팅 출처 (1차 SOT) | `/Users/jun/Developer/new/700_projects/jawcode` 에 이미 존재 |
 | `cca` | `router-for-me/CLIProxyAPI` (Go) | wire/auth/quirks 외부 교차검증 SOT (2차) | 없음. 필요 시 `_cca/`로 shallow clone |
 
 주의: jawcode는 gajae-code(에이전트)가 아니다. 프록시 프로바이더 레이어는
@@ -35,7 +35,7 @@ devlog/_chase/
 ## form vs action (jawcode struct_har ↔ chase와 동형)
 
 jawcode는 `struct_har/`(형태 스냅샷, 자동생성)와 `struct_har/chase/`(행동, 수동)를 나눈다.
-opencodex는 이미 `structure/`(patched SoT)와 `src/`(코드 정본)가 form 역할을 하므로,
+openprovider는 이미 `structure/`(patched SoT)와 `src/`(코드 정본)가 form 역할을 하므로,
 chase는 **행동 레이어만** 둔다.
 
 | form (스냅샷) | action (행동) |
@@ -53,7 +53,7 @@ force-add(`git add -f`)해서 추적하고, 클론 디렉터리(`_gjc/`, `_cca/`
 
 1. discover: Tier 1 hosted `web_search`로 해당 영역의 upstream 최신 커밋/파일을 찾는다.
 2. prove: 후보 URL(또는 raw 파일)을 열어 실제 wire/모델 목록을 확인한다. 스니펫만으로 확정하지 않는다.
-3. diff: opencodex 해당 지점(아래 표)과 동작을 대조하고, 차이를 해당 phase devlog(`_plan/`·`_fin/`)에 file:line 근거로 기록한다.
+3. diff: openprovider 해당 지점(아래 표)과 동작을 대조하고, 차이를 해당 phase devlog(`_plan/`·`_fin/`)에 file:line 근거로 기록한다.
 
 GitHub raw로 바로 여는 예:
 
@@ -82,9 +82,9 @@ git -C /Users/jun/Developer/new/700_projects/jawcode fetch origin && \
   git -C /Users/jun/Developer/new/700_projects/jawcode log -1 --oneline
 ```
 
-## opencodex 대조 표면 (따라잡을 지점)
+## openprovider 대조 표면 (따라잡을 지점)
 
-| 표면 | opencodex | gjc(jawcode) | cca(CLIProxyAPI) |
+| 표면 | openprovider | gjc(jawcode) | cca(CLIProxyAPI) |
 |---|---|---|---|
 | API 변환 (Google/Antigravity) | `src/adapters/google.ts`, `google-antigravity-wire.ts`, `google-antigravity-replay.ts` | `packages/ai/src/providers/*.ts` | `internal/translator/antigravity/**`, `internal/runtime/executor/antigravity_executor.go` |
 | API 변환 (Kiro) | `src/adapters/kiro*.ts` | `packages/ai/src/providers/amazon-bedrock.ts` 등 | (없음) |

@@ -22,7 +22,7 @@ function migratableConfig(): OcxConfig {
 
 test("moves a Beijing entry holding an international endpoint", () => {
   const config = migratableConfig();
-  // Beijing catalog fields, as `ocx provider add` would have persisted them.
+  // Beijing catalog fields, as `opr provider add` would have persisted them.
   Object.assign(config.providers["alibaba-token-plan"]!, {
     models: ["qwen3.8-max-preview", "qwen3.7-max"],
     defaultModel: "qwen3.8-max-preview",
@@ -52,7 +52,7 @@ test("the migrated config survives a reload", () => {
   const projection = projectAlibabaRegionMigration(config);
   expect(projection.changed).toBe(true);
 
-  const home = mkdtempSync(join(tmpdir(), "ocx-alibaba-"));
+  const home = mkdtempSync(join(tmpdir(), "opr-alibaba-"));
   const prev = process.env.OPENCODEX_HOME;
   process.env.OPENCODEX_HOME = home;
   try {

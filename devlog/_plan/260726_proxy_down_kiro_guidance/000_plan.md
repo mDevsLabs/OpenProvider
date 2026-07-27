@@ -5,10 +5,10 @@
 - Loop archetype: spec-satisfaction repair (single work-phase, C2).
 - Trigger: user report — Codex app shows `stream disconnected before completion:
   error sending request for url (http://127.0.0.1:10100/v1/responses)` and users do
-  not realize the ocx proxy is simply off; separately, Kiro connection requires the
+  not realize the opr proxy is simply off; separately, Kiro connection requires the
   Kiro CLI installed but no surface says so.
-- Goal (user-visible outcome): when the proxy is down, every ocx-owned surface tells
-  the user to restart it with `ocx start` or `ocx service`; Kiro login surfaces state
+- Goal (user-visible outcome): when the proxy is down, every opr-owned surface tells
+  the user to restart it with `opr start` or `opr service`; Kiro login surfaces state
   the Kiro CLI prerequisite (install + `kiro-cli login`) before the token fallbacks.
 - Non-goals: rewriting Codex app's own error box (impossible — nothing listens on the
   port when the proxy is down); a dead-man's-switch listener; tray changes; provider
@@ -23,20 +23,20 @@
 ## Ground truth (read during P)
 
 - Proxy-down errors are rendered by the *client* (Codex core reqwest, Claude Code) —
-  ocx cannot intercept them because nothing listens on 127.0.0.1:10100. Achievable:
-  guidance on ocx-owned surfaces + docs matching the exact error text.
-- CLI users are auto-healed by the codex shim (`ocx ensure` on every `codex` launch);
+  opr cannot intercept them because nothing listens on 127.0.0.1:10100. Achievable:
+  guidance on opr-owned surfaces + docs matching the exact error text.
+- CLI users are auto-healed by the codex shim (`opr ensure` on every `codex` launch);
   the Codex desktop app is NOT shim-covered (`shimCoverage: "cli-only"`,
   src/codex/autostart-health.ts:69-71) — app users are exactly who hits the screenshot.
 - Existing surfaces:
-  - `ocx status` prints `❌ Proxy: not running` with no next step (src/cli/index.ts:~596).
-  - `ocx doctor` prints "no running ocx proxy process found" in a sub-section but no
+  - `opr status` prints `❌ Proxy: not running` with no next step (src/cli/index.ts:~596).
+  - `opr doctor` prints "no running opr proxy process found" in a sub-section but no
     actionable hint in the Hints section (src/cli/doctor.ts).
-  - `ocx stop` prints stop results but never warns that client requests will now fail
+  - `opr stop` prints stop results but never warns that client requests will now fail
     (src/cli/index.ts handleStop tail).
   - docs-site has no proxy-connection troubleshooting section;
     `guides/codex-integration.md` has a "Catalog troubleshooting" anchor to sit beside.
-- Kiro: `ocx login kiro` is import-first (src/oauth/kiro.ts loginKiro). Missing-token
+- Kiro: `opr login kiro` is import-first (src/oauth/kiro.ts loginKiro). Missing-token
   guidance says "Run `kiro-cli login` first" but never says kiro-cli must be INSTALLED
   (official install: `curl -fsSL https://cli.kiro.dev/install | bash`,
   https://kiro.dev/docs/cli/installation/ — verified 2026-07-26). Registry preset note
@@ -48,7 +48,7 @@
 ## File change map (IN)
 
 1. `src/cli/index.ts` — status render: when proxy not running, print restart hint
-   (`ocx start` / `ocx service install`); `case "stop"` call site: warn that
+   (`opr start` / `opr service install`); `case "stop"` call site: warn that
    Codex/Claude requests now fail until restart (audit-amended: NOT inside
    handleStop — restart/tray-restart callers re-start immediately).
 2. `src/cli/doctor.ts` — new exported pure helper `proxyDownRestartHint(...)` + wire a
@@ -73,12 +73,12 @@
 
 ## Accept criteria (with activation scenarios)
 
-- AC1: `ocx status` with proxy down prints a line containing `ocx start` and
-  `ocx service`. Activation: run status render with no live proxy (helper level).
-- AC2: `ocx doctor` hints include the restart hint ONLY when no live proxy is found;
+- AC1: `opr status` with proxy down prints a line containing `opr start` and
+  `opr service`. Activation: run status render with no live proxy (helper level).
+- AC2: `opr doctor` hints include the restart hint ONLY when no live proxy is found;
   text names the symptom substring `error sending request for url` and both commands.
   Activation: unit-test `proxyDownRestartHint` for down/up/service-viable cases.
-- AC3: `ocx stop` success path prints the fail-until-restart warning. Activation: code
+- AC3: `opr stop` success path prints the fail-until-restart warning. Activation: code
   path review + existing stop tests stay green (tests/stale-state-purge, grok-lifecycle).
 - AC4: `loginKiro` throw message and onAuth instructions name the install command
   `cli.kiro.dev/install` and `kiro-cli login`. Activation: tests/kiro-oauth.test.ts.

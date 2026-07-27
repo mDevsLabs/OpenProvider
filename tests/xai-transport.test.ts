@@ -50,7 +50,7 @@ describe("xAI auth-mode transport selection", () => {
     expect(request.url).toBe(`${XAI_GROK_CLI_BASE_URL}/chat/completions`);
     expect(request.headers).toMatchObject({
       Authorization: "Bearer oauth-token",
-      "x-grok-client-identifier": "opencodex",
+      "x-grok-client-identifier": "openprovider",
       "x-grok-client-version": XAI_GROK_CLIENT_VERSION,
       "x-xai-token-auth": "xai-grok-cli",
     });
@@ -62,7 +62,7 @@ describe("xAI auth-mode transport selection", () => {
     expect(request.url).toBe(`${XAI_GROK_CLI_BASE_URL}/models`);
     expect(request.headers).toMatchObject({
       Authorization: "Bearer oauth-token",
-      "x-grok-client-identifier": "opencodex",
+      "x-grok-client-identifier": "openprovider",
       "x-grok-client-version": XAI_GROK_CLIENT_VERSION,
       "x-xai-token-auth": "xai-grok-cli",
     });
@@ -92,7 +92,7 @@ describe("xAI auth-mode transport selection", () => {
     expect(resolveProviderTransport("xai", custom).headers).toMatchObject({
       "x-grok-client-version": "0.2.94",
       "x-custom": "kept",
-      "x-grok-client-identifier": "opencodex",
+      "x-grok-client-identifier": "openprovider",
       "x-xai-token-auth": "xai-grok-cli",
     });
   });
@@ -228,7 +228,7 @@ describe("xAI prompt-cache conv-id affinity", () => {
     expect(versionKeys).toEqual(["X-Grok-Client-Version"]);
     expect(resolved.headers?.["X-Grok-Client-Version"]).toBe("0.2.94");
     // Untouched defaults still apply.
-    expect(resolved.headers?.["x-grok-client-identifier"]).toBe("opencodex");
+    expect(resolved.headers?.["x-grok-client-identifier"]).toBe("openprovider");
   });
 });
 
@@ -262,9 +262,9 @@ describe("xAI outbound compatibility headers", () => {
     expect(lower(seen[0])).toEqual({
       authorization: "Bearer oauth-token",
       "content-type": "application/json",
-      "user-agent": `opencodex-grok/${XAI_GROK_CLIENT_VERSION}`,
+      "user-agent": `openprovider-grok/${XAI_GROK_CLIENT_VERSION}`,
       "x-authenticateresponse": "authenticate-response",
-      "x-grok-client-identifier": "opencodex",
+      "x-grok-client-identifier": "openprovider",
       "x-grok-client-version": XAI_GROK_CLIENT_VERSION,
       "x-grok-conv-id": deriveXaiConvId("codex-session-abc"),
       "x-grok-req-id": expect.stringMatching(UUID_V4),
@@ -280,7 +280,7 @@ describe("xAI outbound compatibility headers", () => {
     expect(lower(seen[0])).toEqual({
       authorization: "Bearer xai-api-key",
       "content-type": "application/json",
-      "user-agent": `opencodex-grok/${XAI_GROK_CLIENT_VERSION}`,
+      "user-agent": `openprovider-grok/${XAI_GROK_CLIENT_VERSION}`,
       "x-grok-conv-id": deriveXaiConvId("codex-session-abc"),
       "x-grok-req-id": expect.stringMatching(UUID_V4),
       "x-grok-session-id": deriveXaiConvId("codex-session-abc"),
@@ -304,7 +304,7 @@ describe("xAI outbound compatibility headers", () => {
     expect(seen[1].get("x-grok-conv-id")).toBe(seen[0].get("x-grok-conv-id"));
     expect(seen[1].get("x-grok-session-id")).toBe(seen[0].get("x-grok-session-id"));
     for (const headers of seen) {
-      expect(headers.get("user-agent")).toBe(`opencodex-grok/${XAI_GROK_CLIENT_VERSION}`);
+      expect(headers.get("user-agent")).toBe(`openprovider-grok/${XAI_GROK_CLIENT_VERSION}`);
       for (const name of OMITTED) expect(headers.has(name)).toBe(false);
     }
   });
@@ -342,7 +342,7 @@ describe("xAI outbound compatibility headers", () => {
       await effective.fetch!(request.url, { headers: request.headers });
       expect(seen[0].has("x-grok-conv-id")).toBe(false);
       expect(seen[0].has("x-grok-session-id")).toBe(false);
-      expect(seen[0].get("user-agent")).toBe(`opencodex-grok/${XAI_GROK_CLIENT_VERSION}`);
+      expect(seen[0].get("user-agent")).toBe(`openprovider-grok/${XAI_GROK_CLIENT_VERSION}`);
       expect(seen[0].get("x-grok-req-id")).toMatch(UUID_V4);
       for (const name of OMITTED) expect(seen[0].has(name)).toBe(false);
     }

@@ -11,7 +11,7 @@ Implemented per `10_implementation.md` with O1/O2/O3 as resolved in
   install command via `updateCommand`, removing the duplicated arg logic.
 - `src/star-prompt.ts`: added `hasStarPromptRun()` so the update prompt can
   yield on the user's first run (O1) without duplicating the marker name.
-- `src/update-notify.ts` (new): cache I/O over `~/.opencodex/version.json`
+- `src/update-notify.ts` (new): cache I/O over `~/.openprovider/version.json`
   (`atomicWriteFile`, channel-tagged, stale-channel invalidation), channel-aware
   `isNewer` (latest = maj.min.pat only; preview = -preview.N, plus
   strictly-higher-base stable counts as newer per O3), `shouldConsider` guard
@@ -43,8 +43,8 @@ Implemented per `10_implementation.md` with O1/O2/O3 as resolved in
 - `OCX_SERVICE=1` (service, ensure-spawned child, gui not applicable): silent
   via `interactiveGuardOk`.
 - piped / non-TTY stdin or stdout: silent.
-- `ocx ensure` (parent): never calls the prompt.
-- `ocx gui` spawned start: `stdio:"ignore"` -> non-TTY -> silent.
+- `opr ensure` (parent): never calls the prompt.
+- `opr gui` spawned start: `stdio:"ignore"` -> non-TTY -> silent.
 - source checkout (`detectInstall()==="source"` or version `0.0.0`): silent.
 - first run (no star marker): silent; evaluated from the next start.
 

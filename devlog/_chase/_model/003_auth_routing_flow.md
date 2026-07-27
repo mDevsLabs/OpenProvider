@@ -1,6 +1,6 @@
 # 003 — Auth and routing flow
 
-Provider를 추가할 때 인증, 모델 선택, wire adapter를 한 덩어리로 보면 잘못된 소유자에 코드를 넣기 쉽다. OpenCodex는 세 단계를 분리한다.
+Provider를 추가할 때 인증, 모델 선택, wire adapter를 한 덩어리로 보면 잘못된 소유자에 코드를 넣기 쉽다. OpenProvider는 세 단계를 분리한다.
 
 ## 인증 종류
 

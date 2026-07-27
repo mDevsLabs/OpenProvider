@@ -17,7 +17,7 @@ Socrates(보안) + Noether(견고성) 감사: **P0 없음.** P1 수정 반영:
 - [S-P1] 업스트림 에러 바디 시크릿 스크럽: formatErrorResponse 전에 redactSecretString
 - [N-P1] 429 페일오버 재시도 전 실패 응답 body.cancel() (소켓 누수 방지)
 - [N-P1] web-search 사이드카 스트림 trackStreamLifetime 등록 (drainAndShutdown이 대기/중단 가능)
-- [N-P1] service stop/uninstall + /api/stop이 restoreNativeCodex() 결과를 검사 — 실패 시 성공 위장 대신 ocx restore 안내
+- [N-P1] service stop/uninstall + /api/stop이 restoreNativeCodex() 결과를 검사 — 실패 시 성공 위장 대신 opr restore 안내
 - [S-P2] key-failover 로그에서 사용자 라벨 제거(id만)
 - [N-P2] flushResponseState가 schedule 시점 캡처 경로 사용(OPENCODEX_HOME 스왑 안전)
 

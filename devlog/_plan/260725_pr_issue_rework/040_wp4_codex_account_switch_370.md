@@ -154,11 +154,11 @@
 - 작업 시각 기준 checkout HEAD와 `origin/dev`: `037e8f5e4fa32a82e4149acc509554f157656dad`.
 - 이 Codex worktree는 실제로 detached HEAD이지만 정확히 `origin/dev` tip을 가리킨다. 브랜치 checkout은 하지 않았다.
 - PR: `#370 fix(codex): reset main runtime state after account switch`, base `dev`, head `7432203703e4578a28f2d0dd7860d7ef78e43854`, `reviewDecision=CHANGES_REQUESTED`, 5 files, `+302/-13`.
-- PR patch 전량 확인: `gh pr diff 370 --repo lidge-jun/opencodex` = **464 lines**.
+- PR patch 전량 확인: `gh pr diff 370 --repo lidge-jun/openprovider` = **464 lines**.
 - 필수 direct apply 검사:
 
 ```text
-$ gh pr diff 370 --repo lidge-jun/opencodex | git apply --check -
+$ gh pr diff 370 --repo lidge-jun/openprovider | git apply --check -
 error: patch failed: src/codex/auth-api.ts:26
 error: src/codex/auth-api.ts: patch does not apply
 exit 1
@@ -185,9 +185,9 @@ exit 1
 PR의 464-line patch가 incoming 변경의 원본 권위다. 구현자는 아래 명령으로 그 시점의 patch를 고정하고, head SHA가 위 값과 다르면 즉시 `REBASE_REQUIRED`로 멈춘다.
 
 ```bash
-test "$(gh pr view 370 --repo lidge-jun/opencodex --json headRefOid --jq .headRefOid)" = \
+test "$(gh pr view 370 --repo lidge-jun/openprovider --json headRefOid --jq .headRefOid)" = \
   "7432203703e4578a28f2d0dd7860d7ef78e43854"
-gh pr diff 370 --repo lidge-jun/opencodex > /tmp/pr-370.patch
+gh pr diff 370 --repo lidge-jun/openprovider > /tmp/pr-370.patch
 test "$(wc -l < /tmp/pr-370.patch | tr -d ' ')" = "464"
 git apply --3way /tmp/pr-370.patch
 ```

@@ -6,7 +6,7 @@
 
 Codex RS 분석 결과:
 - Codex RS의 idle timeout은 ANY SSE frame으로 리셋됨 (`timeout(idle_timeout, stream.next())`)
-- opencodex의 heartbeat (`response.heartbeat`)가 2초마다 전송되므로 Codex 자체 idle timeout은 영원히 발동 안 함
+- openprovider의 heartbeat (`response.heartbeat`)가 2초마다 전송되므로 Codex 자체 idle timeout은 영원히 발동 안 함
 - 따라서 proxy의 stall timeout이 **유일한** provider 실패 감지 경로
 - 5분은 너무 긺 — 사용자가 멈춘 provider를 5분간 기다려야 함
 

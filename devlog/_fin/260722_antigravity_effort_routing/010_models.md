@@ -84,7 +84,7 @@ gemini-3-flash-agent     → gemini-3.6-flash-high     (existing)
 - Picker shows `gemini-3.6-flash` once with effort selector [low, medium, high].
 - Saved config with `gemini-3.6-flash-low` still resolves and routes correctly.
 - Saved config with `gemini-3.1-pro-high` still resolves to `gemini-pro-agent`.
-- `ocx models` lists collapsed entries.
+- `opr models` lists collapsed entries.
 
 ## Verification
 

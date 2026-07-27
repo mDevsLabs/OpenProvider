@@ -44,7 +44,7 @@ function efforts(entry: { supported_reasoning_levels?: unknown }): string[] {
 }
 
 function fixtureConfig(content: string): string {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-v2-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-v2-"));
   const path = join(dir, "config.toml");
   writeFileSync(path, content);
   return path;
@@ -314,7 +314,7 @@ describe("management API logical v1/v2 switching", () => {
     const oldCodexHome = process.env.CODEX_HOME;
     const oldOcxHome = process.env.OPENCODEX_HOME;
     process.env.CODEX_HOME = dirname(path);
-    process.env.OPENCODEX_HOME = mkdtempSync(join(tmpdir(), "ocx-api-config-"));
+    process.env.OPENCODEX_HOME = mkdtempSync(join(tmpdir(), "opr-api-config-"));
     const config = { providers: [] } as never;
     const toggle = (enabled: boolean) => {
       const content = readFileSync(path, "utf8");
@@ -414,14 +414,14 @@ describe("cli surface", () => {
     const execFileSync = () => "codex-cli 0.145.0";
     expect(codexFeaturesInvocation("enable", "darwin", {
       env: { PATH: "" },
-      configDir: mkdtempSync(join(tmpdir(), "ocx-v2-inv-posix-")),
+      configDir: mkdtempSync(join(tmpdir(), "opr-v2-inv-posix-")),
       existsSync: () => false,
       execFileSync,
     })).toEqual({ file: "codex", args: ["features", "enable", "multi_agent_v2"], options: {} });
     // Explicit CODEX_CLI_PATH pointing at a .cmd (npm-only Windows Codex install).
     const inv = codexFeaturesInvocation("disable", "win32", {
       env: { CODEX_CLI_PATH: "C:\\npm\\codex.cmd", ComSpec: "C:\\WINDOWS\\system32\\cmd.exe", PATH: "" },
-      configDir: mkdtempSync(join(tmpdir(), "ocx-v2-inv-cmd-")),
+      configDir: mkdtempSync(join(tmpdir(), "opr-v2-inv-cmd-")),
       existsSync: () => true,
       execFileSync,
       exists: () => { throw new Error("explicit path must not probe PATH"); },
@@ -432,7 +432,7 @@ describe("cli surface", () => {
     // Bare `codex` resolving to codex.exe stays a direct spawn.
     const exe = codexFeaturesInvocation("enable", "win32", {
       env: { PATH: "C:\\bin" },
-      configDir: mkdtempSync(join(tmpdir(), "ocx-v2-inv-exe-")),
+      configDir: mkdtempSync(join(tmpdir(), "opr-v2-inv-exe-")),
       existsSync: (p: string) => p === "C:\\bin\\codex.exe",
       execFileSync,
       exists: (p: string) => p === "C:\\bin\\codex.exe",
@@ -445,7 +445,7 @@ describe("cli surface", () => {
     const oldCodexHome = process.env.CODEX_HOME;
     const oldOcxHome = process.env.OPENCODEX_HOME;
     process.env.CODEX_HOME = dirname(path);
-    process.env.OPENCODEX_HOME = mkdtempSync(join(tmpdir(), "ocx-cli-config-"));
+    process.env.OPENCODEX_HOME = mkdtempSync(join(tmpdir(), "opr-cli-config-"));
     const logs: string[] = [];
     const deps = {
       execFile: (_file: string, args: string[]) => {

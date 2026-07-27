@@ -12,8 +12,8 @@ arbitrary incoming `Authorization: Bearer …` to Cursor when no Cursor `apiKey`
 
 ## 1. Easy explanation
 
-A client calling the opencodex proxy may send its own `Authorization` header (e.g. an OpenAI or
-ChatGPT bearer). Today, if the Cursor provider has no configured key, opencodex grabs that incoming
+A client calling the openprovider proxy may send its own `Authorization` header (e.g. an OpenAI or
+ChatGPT bearer). Today, if the Cursor provider has no configured key, openprovider grabs that incoming
 bearer and **sends it upstream to Cursor**. That leaks one vendor's credential to a different vendor.
 The fix: never forward a client bearer to Cursor unless the operator has explicitly opted in
 (`forwardAuthToCursor: true`) and accepts that trust boundary. Otherwise use the configured Cursor
@@ -21,7 +21,7 @@ key, then the test-token env var, then fail with the existing clear "no token" e
 
 ## 2. Pre-write evidence
 
-### Current opencodex — implicit forward
+### Current openprovider — implicit forward
 ```30:40:src/adapters/cursor/live-transport.ts
 export function resolveCursorToken(provider: OcxProviderConfig, headers?: Headers): string {
   const providerKey = provider.apiKey?.trim();

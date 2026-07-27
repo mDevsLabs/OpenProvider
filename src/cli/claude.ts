@@ -1,10 +1,10 @@
 /**
- * `ocx claude [claude args...]` — launch Claude Code wired to the local proxy.
+ * `opr claude [claude args...]` — launch Claude Code wired to the local proxy.
  *
  * Mirrors `ccr code` UX (devlog/260711_claude_inbound/020, 003 E1/E2/E5/G1):
  * ensures the proxy is running, injects the Anthropic env slots, then execs the
  * `claude` CLI with stdio inherited. User-exported env wins except when a stale
- * loopback opencodex base URL points at a different proxy port.
+ * loopback openprovider base URL points at a different proxy port.
  */
 import { spawn } from "node:child_process";
 import { loadConfig } from "../config";
@@ -31,7 +31,7 @@ export type ClaudeEnvDeps = { authDetect?: Omit<Partial<AuthDetectDeps>, "env" |
  * Pure env assembly (unit-tested): never sets ANTHROPIC_API_KEY (setting both
  * token vars triggers Claude Code's auth-conflict warning, 003 E1), and never
  * overrides variables the user already exported, apart from stale loopback
- * ANTHROPIC_BASE_URL values owned by a previous opencodex launch.
+ * ANTHROPIC_BASE_URL values owned by a previous openprovider launch.
  */
 export function buildClaudeEnv(
   config: OcxConfig,
@@ -44,7 +44,7 @@ export function buildClaudeEnv(
   // Step 1 — strip OUR OWN dummy from the inherited environment before anything reads
   // or writes the token slot. setDefault below preserves any non-empty value, so a
   // stale marker left in place would suppress the admission key and then be removed,
-  // leaving the child with no token at all (audit R2-1). It is opencodex state, never
+  // leaving the child with no token at all (audit R2-1). It is openprovider state, never
   // user auth, so dropping it unconditionally is safe.
   if (env.ANTHROPIC_AUTH_TOKEN === PROXY_MARKER) delete env.ANTHROPIC_AUTH_TOKEN;
   const setDefault = (name: string, value: string | undefined) => {
@@ -60,7 +60,7 @@ export function buildClaudeEnv(
       const isLoopback = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
       if (isLoopback && parsed.port !== "" && Number(parsed.port) !== port) {
         const replacement = `http://127.0.0.1:${port}`;
-        console.error(`⚠ Replacing stale opencodex ANTHROPIC_BASE_URL ${existingBaseUrl} with ${replacement}.`);
+        console.error(`⚠ Replacing stale openprovider ANTHROPIC_BASE_URL ${existingBaseUrl} with ${replacement}.`);
         env.ANTHROPIC_BASE_URL = replacement;
       }
     } catch {
@@ -103,13 +103,13 @@ export function buildClaudeEnv(
   // this flag in the spawn env, Claude Code strips provider-managed vars
   // (ANTHROPIC_BASE_URL/AUTH_TOKEN/API_KEY, model slots) from settings-sourced
   // env (managedEnv.ts), so a leftover cc-switch/CCR ~/.claude/settings.json
-  // env block cannot silently hijack proxy routing away from opencodex.
+  // env block cannot silently hijack proxy routing away from openprovider.
   // setDefault: an explicit user export (e.g. =0, isEnvTruthy-false) still wins.
   // Intentional contract change: settings.env model slots are also stripped in
-  // ocx claude runs — use the top-level settings "model" field or opt out.
+  // opr claude runs — use the top-level settings "model" field or opt out.
   // Claude Code 2.1.206+ also treats this as a host-auth assertion. Injecting it
   // without a host token makes a valid claude.ai subscription look logged out,
-  // so the guard is only safe when opencodex actually owns authentication.
+  // so the guard is only safe when openprovider actually owns authentication.
   if (env.ANTHROPIC_AUTH_TOKEN) {
     setDefault("CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST", "1");
   }
@@ -157,7 +157,7 @@ export async function fetchClaudeContextWindows(config: OcxConfig, port: number,
   try {
     const headers = new Headers();
     const token = process.env.OPENCODEX_API_AUTH_TOKEN || config.apiKeys?.[0]?.key;
-    if (token) headers.set("x-opencodex-api-key", token);
+    if (token) headers.set("x-openprovider-api-key", token);
     const res = await fetch(`http://127.0.0.1:${port}/api/claude-code`, {
       headers,
       signal: AbortSignal.timeout(timeoutMs),
@@ -231,7 +231,7 @@ export async function cmdClaude(args: string[]): Promise<number> {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`⚠ Gateway model cache could not be refreshed: ${message}`);
   }
-  // Sync roster agents (devlog 070): subagentModels + self -> ~/.claude/agents/ocx-*.md.
+  // Sync roster agents (devlog 070): subagentModels + self -> ~/.claude/agents/opr-*.md.
   try {
     const written = injectClaudeAgentDefs(config, contextWindows);
     if (written === null) {

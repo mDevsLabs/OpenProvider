@@ -64,7 +64,7 @@ export async function syncModelsToCodex(
     };
   }
 
-  applyProxyEnv(config); // `ocx ensure`/`ocx sync` fetch provider models outside the server process
+  applyProxyEnv(config); // `opr ensure`/`opr sync` fetch provider models outside the server process
   let added = 0;
   let catalogPath: string | null = null;
   let catalogPathForInjection: string | null | undefined;

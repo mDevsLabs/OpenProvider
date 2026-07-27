@@ -6,7 +6,7 @@ is the implementation contract.
 ## Scope
 
 IN: fix the codex bucket swallowing `claude-desktop`; widen the surface union with
-`grok`; update BOTH serializers + `parseUsageSurface`; emit `x-opencodex-grok` from the
+`grok`; update BOTH serializers + `parseUsageSurface`; emit `x-openprovider-grok` from the
 fence and read it in `handleChatCompletions`; add the grok filter tag + icon.
 OUT: retroactive relabel of historical entries; any use of the attribution for auth or
 billing (it is a dashboard tag only).
@@ -83,12 +83,12 @@ constraint, and a whitelist is exactly what silently loses a new surface:
        `model = ${tomlString(model.id)}`,
        `base_url = ${tomlString(baseUrl)}`,
        'api_backend = "chat_completions"',
-       'api_key = "opencodex-loopback"',
+       'api_key = "openprovider-loopback"',
        `name = ${tomlString(model.name ?? `OCX ${model.id}`)}`,
 +      // Best-effort attribution tag for the usage dashboard (upstream Grok sends
 +      // extra_headers verbatim on inference calls; 11-custom-models.md). This is NOT
 +      // a security boundary — any loopback client could send it.
-+      'extra_headers = { "x-opencodex-grok" = "1" }',
++      'extra_headers = { "x-openprovider-grok" = "1" }',
      );
 ```
 
@@ -99,7 +99,7 @@ Near the top of the handler:
 ```ts
 // Best-effort Grok attribution: the managed fence stamps this header on every model it
 // registers. Dashboard bucketing only — never an auth or billing signal.
-if (req.headers.get("x-opencodex-grok") === "1") logCtx.surface = "grok";
+if (req.headers.get("x-openprovider-grok") === "1") logCtx.surface = "grok";
 ```
 
 ### 6. Usage filter tag (`gui/src/pages/Usage.tsx:209-227`)
@@ -136,8 +136,8 @@ if (req.headers.get("x-opencodex-grok") === "1") logCtx.surface = "grok";
 
 `tests/grok-attribution.test.ts` (NEW):
 
-- the emitted fence contains `extra_headers = { "x-opencodex-grok" = "1" }`;
-- a chat/completions request carrying `x-opencodex-grok: 1` is logged with
+- the emitted fence contains `extra_headers = { "x-openprovider-grok" = "1" }`;
+- a chat/completions request carrying `x-openprovider-grok: 1` is logged with
   `surface: "grok"` (drives the header path — activation evidence);
 - a request WITHOUT the header keeps `surface: undefined` (codex bucket).
 

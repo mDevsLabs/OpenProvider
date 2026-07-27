@@ -8,13 +8,13 @@
 
 | # | 제목 | 라벨 | 분류 근거 | 클러스터 |
 |---|------|------|-----------|----------|
-| 216 | Windows(non-EN/Bun): `probeScmRegistration`이 ERROR_SERVICE_DOES_NOT_EXIST(1060) 미탐지 → `ocx service`/`ocx update` abort | — | pt-BR 로케일에서 `sc.exe` 1060을 `unknown`으로 분류, 설치 거부. 명확한 오동작 | W |
+| 216 | Windows(non-EN/Bun): `probeScmRegistration`이 ERROR_SERVICE_DOES_NOT_EXIST(1060) 미탐지 → `opr service`/`opr update` abort | — | pt-BR 로케일에서 `sc.exe` 1060을 `unknown`으로 분류, 설치 거부. 명확한 오동작 | W |
 | 199 | localized Windows `sc.exe` 1060이 WinSW service conflict로 오분류 | — | ko 로케일 + Bun exit 36(=1060&0xff) 미인식. #216과 동일 함수 계열 | W |
 | 212 | built-in cloud preset add 흐름이 fake-IP DNS에서 private-network opt-in을 숨김 | — | `AddProviderModal.tsx`가 `(isCustom \|\| isLocal)`일 때만 opt-in 렌더 → 정상 클라우드 preset이 벤치마크 대역 오탐 시 탈출구 없음 | N |
 | 175 | localhost provider 경고가 `allowPrivateNetwork` 옵션을 안내하지만 대시보드에 미노출 | bug | **dev에서 이미 해결됨**: 커밋 109b7672가 GUI(custom/local 토글, `AddProviderModal.tsx:478-482`), API PATCH(`src/server/management-api.ts:668-671`), CLI(`src/cli/provider.ts:146` `--allow-private-network`)를 모두 노출. 이슈 본문·코멘트의 "부재" 주장은 구버전(2.7.27) 기준. 잔여 패치 대상 아님 — close 후보로 추적만 | N (resolved-in-dev) |
 | 209 | Windows 재부팅 후 Anthropic OAuth 계정 needsReauth + 모델 소실 | — | refresh token이 지속되어야 하는데 재부팅마다 재로그인 필요. 지속성/갱신 경로 버그 | O |
 | 183 | codex-auth 계정 추가 모달에 리다이렉트 URL/코드 수동 붙여넣기 입력창 누락 | — | 백엔드 `onManualCodeInput`은 provider/codex 공통 지원인데 GUI codex-auth 모달만 입력창 누락 — 헤드리스 환경 로그인 불가. 기능 요청 형식이지만 실질은 GUI 갭 버그 | O |
-| 202 | Google Vertex AI 모델이 Models 대시보드·`/v1/models`에 미노출 | bug | `ocx models`는 인식하는데 레지스트리/API 출력에서 누락 — 일관성 버그 | R |
+| 202 | Google Vertex AI 모델이 Models 대시보드·`/v1/models`에 미노출 | bug | `opr models`는 인식하는데 레지스트리/API 출력에서 누락 — 일관성 버그 | R |
 | 179 | Cursor effort 미지원 모델에 대시보드가 effort 강제 → 모델 파손 | — | 안정성 개선 + capability-aware effort. 제목은 개선이지만 "effort 강제로 요청 파손"은 버그 성격 | R |
 | 186 | 대화 첫 502 이후 같은 세션에서 502 빈발 | bug | #194/#195/#205 랜딩 후에도 계정풀 round-robin 5세션 테스트에서 잔존 보고(코멘트 실측) — 재검증 필요 | S |
 | 92 | V2 cross-provider sub-agent가 NEW_TASK 본문을 encrypted_content로 소실 | — | maintainer 코멘트가 "root cause is client-side(Codex CLI)"로 판정, 프록시는 Fernet ciphertext 복호화 불가(`src/server/responses.ts:350-365` ciphertext 보존, `src/responses/parser.ts:192-194` opaque 생략). 007에서 ours/upstream 책임 경계 판정 — 로컬 완화가 증명될 때만 패치 계획(031) 포함 | V (conditional) |

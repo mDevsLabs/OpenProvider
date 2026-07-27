@@ -5,7 +5,7 @@ Author: Wibias. Head: `fix/cyber-policy-error-fidelity`. Size: +669/-63, 10 file
 ## Problem
 
 Native Codex shows a dedicated notice only when `error.code === "cyber_policy"`.
-OpenCodex's error remapping dropped that code — rewriting it to
+OpenProvider's error remapping dropped that code — rewriting it to
 `invalid_request_error` or a 502 `upstream_server_error` — so from the user's side
 the agent simply stopped with no reason given. The author cites a 2026-07-24
 Cursor transcript where the turn ended with a mangled "Unable to reach the model

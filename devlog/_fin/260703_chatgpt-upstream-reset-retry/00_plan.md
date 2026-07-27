@@ -7,7 +7,7 @@
 
 Requests proxied to `https://chatgpt.com/backend-api/codex/responses` intermittently fail with
 Bun-fetch `ECONNRESET` ("The socket connection was closed unexpectedly"). Evidence
-(`~/.opencodex/crash.log` fetch ring): failures correlate with idle gaps of 10s–7min between
+(`~/.openprovider/crash.log` fetch ring): failures correlate with idle gaps of 10s–7min between
 requests — the classic stale keep-alive pattern. chatgpt.com sits behind Cloudflare, which
 closes idle keep-alive connections server-side; Bun's fetch pool reuses the half-closed socket
 and the write fails before any response bytes arrive. The proxy currently performs exactly one

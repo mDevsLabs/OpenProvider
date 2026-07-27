@@ -31,7 +31,7 @@ function zenmuxConfig(): OcxConfig {
     port: 10100,
     defaultProvider: "zenmux",
     providers: {
-      // Bare persisted config, like `ocx init` writes: registry seeds backfill the rest.
+      // Bare persisted config, like `opr init` writes: registry seeds backfill the rest.
       zenmux: { adapter: "openai-chat", baseUrl: "https://zenmux.ai/api/v1", apiKey: "k" },
     },
   };

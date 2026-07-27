@@ -2,7 +2,7 @@
 
 ## Objective
 
-opencodex 저장소의 open PR 24건, open Issue 22건을 전수 분석하여
+openprovider 저장소의 open PR 24건, open Issue 22건을 전수 분석하여
 사용자 판단 없이 즉시 클로즈/머지 가능한 항목을 식별하고,
 전체 우선순위 매트릭스를 devlog + inline visualization으로 산출한다.
 

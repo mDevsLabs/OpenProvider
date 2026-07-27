@@ -7,7 +7,7 @@ routable providerIdentifier) is DISPROVEN. Neither the tool NAME scheme nor the
 providerIdentifier is the fix. Even reproducing the EXACT scheme of the known
 working reference bridge (`Hardcode84/opencode-cursor`: provider `opencode`, name
 `mcp_opencode_<tool>`), advertised through the same `requestContextArgs` channel,
-cursor/gpt-5.6-luna still does NOT see opencodex's client tools as callable and
+cursor/gpt-5.6-luna still does NOT see openprovider's client tools as callable and
 falls back to Cursor's native Shell every time. Terminal outcome: NEEDS_HUMAN.
 No code change landed (the cheap fixes don't work); the real fix is a larger C4
 client-capability question that needs a scoping decision.
@@ -22,7 +22,7 @@ an ISOLATED second proxy (port 10199, separate OPENCODEX_HOME/CODEX_HOME copies)
 so the live session and Cursor account pool were never disturbed. All copied
 tokens/temp dirs were deleted after.
 
-1. BASELINE (live 10100, current scheme: provider `opencodex-responses`, bare name
+1. BASELINE (live 10100, current scheme: provider `openprovider-responses`, bare name
    `run_probe` + `exec_command`, forced-call prompt):
    - Frames: `execServerMessage requestContextArgs` fired (tools advertised), then
      the model emitted `toolCallStarted toolCase:"shellToolCall"` + `shellStreamArgs`
@@ -30,7 +30,7 @@ tokens/temp dirs were deleted after.
    - Model text: "`exec_command` is unavailable; ran equivalent shell command
      successfully ... `run_probe` is not available in this environment."
 
-2. NAME variant (live 10100): tool named `mcp_opencodex-responses_run_probe`
+2. NAME variant (live 10100): tool named `mcp_openprovider-responses_run_probe`
    (pre-prefixed to the Cursor display convention).
    - Model text: "No note-recording tool is available in this session." NOT callable.
    => NAMING is not the gate. (H1 disproven.)
@@ -49,7 +49,7 @@ tokens/temp dirs were deleted after.
 ## What this rules out and what it points to
 
 RULED OUT (with faithful advertised-and-observed evidence): the difference between
-opencodex (fails) and opencode-cursor (works) is NOT the providerIdentifier string
+openprovider (fails) and opencode-cursor (works) is NOT the providerIdentifier string
 and NOT the `mcp_<provider>_<tool>` naming. The synthetic-provider advertisement
 channel itself is fine (requestContextArgs fires and carries the defs).
 
@@ -61,7 +61,7 @@ client WITHOUT the native tool surface, so its model has no native Shell and mus
 use the injected `mcp_opencode_*` tools. Opencodex advertises the full Cursor
 native tool suite (Shell/ReadFile/rg/ApplyPatch/...) AND the injected MCP tools;
 the model consistently binds to native and never surfaces the MCP tools. So the
-fix is likely about HOW opencodex declares client capabilities / which native
+fix is likely about HOW openprovider declares client capabilities / which native
 tools it exposes to Cursor, not about the MCP tool defs at all.
 
 ## Terminal outcome: NEEDS_HUMAN (per goal acceptance)
@@ -70,7 +70,7 @@ The goal explicitly listed "documented NEEDS_HUMAN with live evidence disproving
 B-1" as a valid outcome. That is what happened. The next step is a C4 decision, not
 a mechanical fix:
 
-- OPTION A (recommended next experiment, still C4): test H4 by having opencodex
+- OPTION A (recommended next experiment, still C4): test H4 by having openprovider
   suppress / minimize the Cursor NATIVE tool advertisement for a turn while keeping
   the MCP client-tool defs, and re-run the isolated probe. If the model then calls
   `mcp_*`, the fix is a capability-declaration change (scoped, but it changes core

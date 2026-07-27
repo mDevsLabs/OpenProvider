@@ -13,19 +13,19 @@ sidebar and either add localized copies or intentionally accept Starlight fallba
 `.github/workflows/deploy-docs.yml` publishes the docs to:
 
 ```text
-https://opencodex.me/
+https://openprovider.me/
 ```
 
 The workflow runs on `main` pushes touching `docs-site/**` or the workflow itself, builds
 `docs-site`, uploads the artifact, and deploys with GitHub Pages.
 
 [Decision Log]
-- 목적과 의도: Serve the public documentation from the memorable first-party `opencodex.me` domain.
-- 기존 구현 및 제약 조건: The project Pages site was built for `lidge-jun.github.io/opencodex`, so Astro emitted a `/opencodex` base path that returns 404 under a root custom domain.
+- 목적과 의도: Serve the public documentation from the memorable first-party `openprovider.me` domain.
+- 기존 구현 및 제약 조건: The project Pages site was built for `lidge-jun.github.io/openprovider`, so Astro emitted a `/openprovider` base path that returns 404 under a root custom domain.
 - 검토한 주요 대안: Keep the GitHub project URL as canonical; redirect the custom domain through Cloudflare; configure the custom domain directly on GitHub Pages and build for the domain root.
-- 선택한 방식: Keep GitHub Actions Pages hosting, configure `opencodex.me` as the repository custom domain, publish root-relative assets and routes, and retain the default GitHub URL only as GitHub's automatic redirect.
+- 선택한 방식: Keep GitHub Actions Pages hosting, configure `openprovider.me` as the repository custom domain, publish root-relative assets and routes, and retain the default GitHub URL only as GitHub's automatic redirect.
 - 다른 대안 대신 이 방식을 선택한 이유: Direct Pages hosting preserves the existing deployment and HTTPS lifecycle without adding a second proxy or redirect service.
-- 장점, 단점 및 영향: Public links and canonical metadata become stable and branded. DNS and the Pages custom-domain setting are now deployment dependencies, and old hardcoded `/opencodex` links must not be reintroduced.
+- 장점, 단점 및 영향: Public links and canonical metadata become stable and branded. DNS and the Pages custom-domain setting are now deployment dependencies, and old hardcoded `/openprovider` links must not be reintroduced.
 
 Local validation:
 
@@ -39,10 +39,10 @@ bun run build
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| `.github/workflows/ci.yml` | `pull_request`, `push` to `main`/`dev`/`preview`, or manual dispatch when runtime/package paths change | Cross-platform runtime/package quality gate on Linux, Windows, and macOS. The `test` job (Bun) runs typecheck, `bun test --isolate tests`, the privacy scan, release-helper syntax check, GUI lint/build, and `ocx help`; `npm-global-smoke` (Node only, **no setup-bun**) builds package assets, packs the tarball, installs it globally, and runs `ocx help` to prove the bundled-Bun launcher works without a separate Bun install. |
+| `.github/workflows/ci.yml` | `pull_request`, `push` to `main`/`dev`/`preview`, or manual dispatch when runtime/package paths change | Cross-platform runtime/package quality gate on Linux, Windows, and macOS. The `test` job (Bun) runs typecheck, `bun test --isolate tests`, the privacy scan, release-helper syntax check, GUI lint/build, and `opr help`; `npm-global-smoke` (Node only, **no setup-bun**) builds package assets, packs the tarball, installs it globally, and runs `opr help` to prove the bundled-Bun launcher works without a separate Bun install. |
 | `.github/workflows/release.yml` | Manual dispatch only | npm publish/dry-run workflow. It requires the exact `GITHUB_SHA` to have a successful Cross-platform CI run before publish or dry-run. |
 | `.github/workflows/deploy-docs.yml` | `push` to `main` touching `docs-site/**` or the workflow, or manual dispatch | Build and publish the Astro/Starlight docs site to GitHub Pages. |
-| `.github/workflows/service-lifecycle.yml` | `push` touching `src/service.ts`, `src/cli/index.ts`, or the workflow, or manual dispatch | Linux systemd smoke test: install, verify, `ocx stop` stops the service, uninstall. |
+| `.github/workflows/service-lifecycle.yml` | `push` touching `src/service.ts`, `src/cli/index.ts`, or the workflow, or manual dispatch | Linux systemd smoke test: install, verify, `opr stop` stops the service, uninstall. |
 
 Docs-only changes intentionally route through the docs workflow instead of the runtime CI gate. If a
 docs change also edits runtime/package/release files, run the relevant local runtime checks before
@@ -51,7 +51,7 @@ push and let `ci.yml` provide the Linux/Windows confirmation. Service-related ch
 
 ## Root README
 
-The root READMEs are the concise product entrypoint. They should explain what opencodex does, how to
+The root READMEs are the concise product entrypoint. They should explain what openprovider does, how to
 install/start it, where Codex state is touched, and where the full docs live. Deep implementation
 invariants belong in `structure/`, not the README.
 
@@ -93,13 +93,13 @@ Invariants:
   postinstall, and `"engines": { "node": ">=18" }` (Bun is no longer a user prerequisite).
 - `src/service.ts` and `src/codex/shim.ts` bake `durableBunPath()` (the bundled binary, stable under
   the npm global prefix) into launchd/systemd/Task Scheduler and the Codex autostart shim, so those
-  durable artifacts keep resolving across `ocx update`.
+  durable artifacts keep resolving across `opr update`.
 - Public docs (root READMEs + `docs-site` installation pages, all locales) state Node 18+ as the only
   prerequisite. Do not reintroduce "install Bun first" / "bun must be on PATH" guidance for npm users.
 
 ## Release workflow
 
-Package release is npm-focused. `package.json` exposes `opencodex` and `ocx`, `prepublishOnly` runs
+Package release is npm-focused. `package.json` exposes `openprovider` and `opr`, `prepublishOnly` runs
 typecheck and GUI build, and `scripts/release.ts` now runs local typecheck, `bun test --isolate tests`, and
 `bun run privacy:scan` before the version bump, commit/push, Cross-platform CI wait, and GitHub
 Release workflow dispatch. Docs publishing is separate from npm release publishing.
@@ -156,8 +156,8 @@ and the Node-only global-install smoke path:
 npm install
 npm run build:gui
 npm pack --json > pack.json
-npm install -g ./bitkyc08-opencodex-*.tgz
-ocx help
+npm install -g ./bitkyc08-openprovider-*.tgz
+opr help
 ```
 
 The CI intentionally does not build docs, run coverage, or perform remote Ubuntu/RDP smoke tests.

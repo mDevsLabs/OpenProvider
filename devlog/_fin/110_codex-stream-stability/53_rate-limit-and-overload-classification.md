@@ -4,7 +4,7 @@
 
 Make translated backoff faithful to what the **stable** Codex parser actually does. This
 supersedes the 110 RCA note that "`rate_limit_exceeded` is not recognized" — that was based on
-the stale `/tmp/opencodex-codex-src` snapshot. The stable checkout
+the stale `/tmp/openprovider-codex-src` snapshot. The stable checkout
 (`/Users/jun/Developer/codex/codex-cli/codex-rs/codex-api/src/sse/responses.rs`) recognizes
 `rate_limit_exceeded` and extracts the delay from the **message text**.
 
@@ -40,11 +40,11 @@ Three faithful-backoff items, plus one cleanup:
 /Users/jun/Developer/codex/codex-cli/codex-rs/codex-api/src/sse/responses.rs:844      test fixture: rate_limit_exceeded message "Please try again in 11.054s."
 ```
 
-opencodex classifier:
+openprovider classifier:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/errors.ts:18-37
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts:330-331, 343-344  (F3d optional)
+/Users/jun/Developer/new/700_projects/openprovider/src/errors.ts:18-37
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts:330-331, 343-344  (F3d optional)
 ```
 
 ## Files
@@ -52,7 +52,7 @@ opencodex classifier:
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/errors.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/errors.ts
 ```
 
 F3c — drop the over-broad `"quota exceeded"` so transient 429 buckets stay retryable
@@ -100,7 +100,7 @@ check) — so 401/403 auth is matched first, then overload, then the generic 5xx
 ### MODIFY (optional — F3d)
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
 ```
 
 ```diff

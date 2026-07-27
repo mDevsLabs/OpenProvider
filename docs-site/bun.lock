@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "opencodex-docs",
+      "name": "openprovider-docs",
       "dependencies": {
         "@astrojs/starlight": "^0.41.1",
         "@fontsource-variable/geist": "^5.2.9",

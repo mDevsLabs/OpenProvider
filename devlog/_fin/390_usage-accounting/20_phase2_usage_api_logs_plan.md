@@ -1,6 +1,6 @@
 # Phase 2 — Usage API and Logs Token Column
 
-Phase 1 (commit `d1297d7`) added `src/usage-log.ts` and persisted reported usage to `~/.opencodex/usage.jsonl`. This phase exposes aggregate usage to the GUI and surfaces per-request tokens in the Logs table.
+Phase 1 (commit `d1297d7`) added `src/usage-log.ts` and persisted reported usage to `~/.openprovider/usage.jsonl`. This phase exposes aggregate usage to the GUI and surfaces per-request tokens in the Logs table.
 
 ## Surface
 

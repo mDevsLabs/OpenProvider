@@ -8,7 +8,7 @@
 4. 내장 capability 테이블 native_1m 모델 → 1M.
 5. kelp_forest_sonnet statsig (sonnet-4-6 전용) — 무관.
 6. `CLAUDE_CODE_MAX_CONTEXT_TOKENS` 단독 → **canonical id가 "claude-"로 시작하지 않을 때만** 적용.
-   우리 별칭(claude-ocx-*, claude-opus-4-8-*)은 전부 claude- 시작 → **무시됨. 200k 고정의 직접 원인.**
+   우리 별칭(claude-opr-*, claude-opus-4-8-*)은 전부 claude- 시작 → **무시됨. 200k 고정의 직접 원인.**
 7. 기본 200k.
 
 ## 죽은 경로 (헛수고 방지)

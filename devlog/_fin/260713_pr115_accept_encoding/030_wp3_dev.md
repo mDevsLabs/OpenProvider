@@ -34,5 +34,5 @@ git diff --check
 - `bun run typecheck`, `bun run privacy:scan`, `bun run build:gui`, and `git diff --cached --check` exited zero.
 - Contributor merge: `150873e6`, preserving `75109049` as a parent-line ancestor.
 - Scoped hardening commit: `54462c0f337779cc6055467a9e2f09479bebeb44`.
-- Dev CI: https://github.com/lidge-jun/opencodex/actions/runs/29223561042
+- Dev CI: https://github.com/lidge-jun/openprovider/actions/runs/29223561042
 - All six jobs passed: Bun and npm-global matrices on Windows, macOS, and Ubuntu.

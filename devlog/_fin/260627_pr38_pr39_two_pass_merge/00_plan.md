@@ -5,11 +5,11 @@
 Integrate incoming PRs onto `dev` in two full PABCD work-phases:
 
 1. Phase 1: merge PR #38 (`task/update-docs-gui-deps-and-checkout-v7`) onto local `dev`, preserving the current local commit `c560b54`.
-2. Phase 2: merge PR #39 (`ingw/opencodex-hardening-dev-pr`) onto the updated `dev`, review high-risk runtime/service/auth changes, apply focused fixes when needed, then verify and commit.
+2. Phase 2: merge PR #39 (`ingw/openprovider-hardening-dev-pr`) onto the updated `dev`, review high-risk runtime/service/auth changes, apply focused fixes when needed, then verify and commit.
 
 ## Current State
 
-- Project root: `/Users/jun/Developer/new/700_projects/opencodex`
+- Project root: `/Users/jun/Developer/new/700_projects/openprovider`
 - Current branch: `dev`
 - Local status before plan: `dev...origin/dev [ahead 1]`
 - Local commit to preserve: `c560b54 fix(oauth): classify stale provider config`

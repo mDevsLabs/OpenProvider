@@ -10,8 +10,8 @@
 
 ## Data sources
 
-- `gh pr list --state open/merged/closed --repo lidge-jun/opencodex`
-- `gh issue list --state open/closed --repo lidge-jun/opencodex`
+- `gh pr list --state open/merged/closed --repo lidge-jun/openprovider`
+- `gh issue list --state open/closed --repo lidge-jun/openprovider`
 - AGENTS.md 브랜치 정책, MEMORY.md 최근 작업 이력
 
 ## TESTS

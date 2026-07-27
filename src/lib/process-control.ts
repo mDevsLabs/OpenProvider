@@ -68,7 +68,7 @@ export async function stopProxyGracefully(pid: number, io: GracefulStopIo = {}):
   const headers: Record<string, string> = {};
   // Non-loopback binds require management auth; loopback ignores the extra header.
   const token = env.OPENCODEX_API_AUTH_TOKEN?.trim();
-  if (token) headers["x-opencodex-api-key"] = token;
+  if (token) headers["x-openprovider-api-key"] = token;
   const fetchFn = io.fetchFn ?? fetch;
   try {
     const res = await fetchFn(`http://${gracefulStopHost(runtime.hostname)}:${runtime.port}/api/stop`, {

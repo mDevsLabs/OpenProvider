@@ -4,16 +4,16 @@ import type { OcxRequestOptions, OcxTool } from "../../types";
 import { namespacedToolName, toolChoiceAliases } from "../../types";
 import { McpToolDefinitionSchema, McpToolsSchema, type McpToolDefinition } from "./gen/agent_pb";
 
-export const OCX_RESPONSES_TOOL_PROVIDER = "opencodex-responses";
+export const OCX_RESPONSES_TOOL_PROVIDER = "openprovider-responses";
 export const CODEX_EXEC_COMMAND_TOOL = "exec_command";
 export const CODEX_SHELL_COMMAND_TOOL = "shell_command";
 export const CODEX_APPLY_PATCH_TOOL = "apply_patch";
 export const CURSOR_EXEC_COMMAND_TOOL = CODEX_EXEC_COMMAND_TOOL;
 export const CODEX_SHELL_BRIDGE_TOOL_NAMES = [CODEX_EXEC_COMMAND_TOOL, CODEX_SHELL_COMMAND_TOOL] as const;
 export const CURSOR_SHELL_ALIAS_SYSTEM_NOTE =
-  'Shell commands use the Codex shell bridge tool shown in this turn\'s catalog (`shell_command` or `exec_command`) with JSON arguments like {"cmd":"..."}. The long `mcp_opencodex-responses_*` display name is the same tool. Prefer it over Cursor-native Shell; never say native shell is blocked.';
+  'Shell commands use the Codex shell bridge tool shown in this turn\'s catalog (`shell_command` or `exec_command`) with JSON arguments like {"cmd":"..."}. The long `mcp_openprovider-responses_*` display name is the same tool. Prefer it over Cursor-native Shell; never say native shell is blocked.';
 export const CURSOR_SHELL_ALIAS_USER_HINT =
-  "Use the Codex shell bridge tool listed this turn (`shell_command` or `exec_command`, including the long `mcp_opencodex-responses_*` name). Prefer that bridge over Cursor-native Shell/Read. Never say phrases like \"Native shell access is blocked\" or \"Shell access is blocked\" — silently use the bridge unless that bridge tool itself fails.";
+  "Use the Codex shell bridge tool listed this turn (`shell_command` or `exec_command`, including the long `mcp_openprovider-responses_*` name). Prefer that bridge over Cursor-native Shell/Read. Never say phrases like \"Native shell access is blocked\" or \"Shell access is blocked\" — silently use the bridge unless that bridge tool itself fails.";
 const NEIGHBOR_AGENT_TOOL_NAMES = ["Read", "Grep", "Glob", "Bash", "LS"] as const;
 
 export const CURSOR_GENERIC_TOOL_USE_USER_HINT = [
@@ -149,7 +149,7 @@ export function cursorToolWireName(tool: Pick<OcxTool, "namespace" | "name">): s
 /**
  * Cursor's harness shows MCP tools to the model as `mcp_<providerIdentifier>_<toolName>`; models
  * sometimes call that display name verbatim instead of the advertised short name (live 20:41/21:00
- * sessions: `mcp_opencodex-responses_exec_command` / `mcp_opencodex-responses_shell_command`).
+ * sessions: `mcp_openprovider-responses_exec_command` / `mcp_openprovider-responses_shell_command`).
  * Fold the display prefix back to the advertised wire name, and treat `shell_command` /
  * `exec_command` as the same Codex shell bridge, so alias thrash does not become "tool not found".
  */
@@ -394,7 +394,7 @@ export function buildCursorToolGuidanceSystemNote(
       ? `${shellBridgeLabel} is the Codex Responses shell bridge for this turn, exposed through Cursor's tool protocol; it is not an external MCP server tool. \`shell_command\` and \`exec_command\` are aliases of the same bridge.`
       : undefined,
     hasBareExec
-      ? "Your tool list may display it under a longer `mcp_opencodex-responses_shell_command` / `mcp_opencodex-responses_exec_command` name; those are the SAME tool — call whichever your list shows, and do not comment on the naming difference to the user."
+      ? "Your tool list may display it under a longer `mcp_openprovider-responses_shell_command` / `mcp_openprovider-responses_exec_command` name; those are the SAME tool — call whichever your list shows, and do not comment on the naming difference to the user."
       : undefined,
     hasBareExec
       ? "Never tell the user that shell or read access is blocked, disabled, or denied unless the Codex shell bridge tool itself fails. Prefer the bridge over Cursor-native Shell/Read; do not narrate phrases like \"Native shell access is blocked\" — silently call `shell_command` / `exec_command`."

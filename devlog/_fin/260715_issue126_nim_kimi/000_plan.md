@@ -2,7 +2,7 @@
 
 ## Context
 
-Issue #126 (vebaev, mobile Codex app + remote opencodex proxy, codex-cli 0.144.4):
+Issue #126 (vebaev, mobile Codex app + remote openprovider proxy, codex-cli 0.144.4):
 
 1. `nvidia/moonshotai/kimi-k2.6` → `unexpected status 404 Not Found: Provider error 404, url: http://127.0.0.1:10100/v1/responses`
 2. Other NIM models → `{"error":{"message":"Provider error 400","type":"upstream_error","code":null}}`
@@ -19,7 +19,7 @@ Issue #126 (vebaev, mobile Codex app + remote opencodex proxy, codex-cli 0.144.4
 - NIM `/v1/models` is catalog metadata, not an invocability list; account-scoped 404 "function not found" for listed models is a known pattern:
   - https://forums.developer.nvidia.com/t/404-function-not-found-for-account-when-calling-aisingapore-sea-lion-7b-instruct-via-integrate-api-nvidia-com/361577 (2026-02-24)
   - https://forums.developer.nvidia.com/t/api-url-not-working/359304 (2026-02-02, kimi-k2.5)
-- kimi-k2.5 on NIM returns **HTTP 400 "This model only supports single tool-calls at once!"** when `parallel_tool_calls: true` is sent: https://github.com/openclaw/openclaw/issues/37048 (2026-03-06). opencodex sends `parallel_tool_calls: true` by default whenever tools are present (src/adapters/openai-chat.ts:295 region, decision 260709).
+- kimi-k2.5 on NIM returns **HTTP 400 "This model only supports single tool-calls at once!"** when `parallel_tool_calls: true` is sent: https://github.com/openclaw/openclaw/issues/37048 (2026-03-06). openprovider sends `parallel_tool_calls: true` by default whenever tools are present (src/adapters/openai-chat.ts:295 region, decision 260709).
 - `reasoning_effort` is not portable on NIM (models use `chat_template_kwargs`; only some, e.g. gpt-oss, accept it): https://docs.nvidia.com/nim/large-language-models/1.13.0/release-notes.html + https://pi.dev/packages/pi-nvidia-nim
 - NIM free tier: dynamic throttling below the nominal 40 RPM, hour-long lockouts, kimi-class models extremely slow/queued — explains the "just thinking" hangs (bridge keep-alive heartbeats keep the stream open): https://forums.developer.nvidia.com/t/getting-429-too-many-request-for-nim-cloud-api/335755 (2026-06)
 - NVIDIA docs confirm `moonshotai/kimi-k2-instruct|k2-thinking|k2.5|k2.6` are the documented served IDs on integrate chat/completions, all with tool calling: https://docs.api.nvidia.com/nim/reference/llm-apis
@@ -42,4 +42,4 @@ Issue #126 (vebaev, mobile Codex app + remote opencodex proxy, codex-cli 0.144.4
 
 ## Constraints
 - Dirty tree belongs to parallel agents (gui/*, anthropic image retry, kiro, base.ts, responses.ts, many tests) — do not touch.
-- No release; ocx restart note applies to the user's own instance only.
+- No release; opr restart note applies to the user's own instance only.

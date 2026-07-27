@@ -64,14 +64,14 @@ function cfg(overrides: Partial<OcxConfig> = {}): OcxConfig {
 }
 
 function codexHomeFixture(): string {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-subagent-fallback-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-subagent-fallback-"));
   mkdirSync(join(dir, "agents"), { recursive: true });
   process.env.CODEX_HOME = dir;
   return dir;
 }
 
 beforeEach(() => {
-  testDir = mkdtempSync(join(tmpdir(), "ocx-subagent-fb-"));
+  testDir = mkdtempSync(join(tmpdir(), "opr-subagent-fb-"));
   process.env.OPENCODEX_HOME = testDir;
   process.env.CODEX_HOME = testDir;
   installPoolCredential("pool-a");

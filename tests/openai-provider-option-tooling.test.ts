@@ -19,7 +19,7 @@ function writeJson(path: string, value: unknown): void {
 }
 
 function validArtifacts(): { root: string; paths: string[] } {
-  const root = mkdtempSync(join(tmpdir(), "ocx-provider-option-evidence-"));
+  const root = mkdtempSync(join(tmpdir(), "opr-provider-option-evidence-"));
   roots.push(root);
   writeJson(join(root, "030_e2e.json"), {
     schemaVersion: 1,
@@ -219,23 +219,23 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
       CODEX_HOME: "sentinel",
       codex_api_key: "sentinel",
       OPENCODEX_HOME: "sentinel",
-      opencodex_base_url: "sentinel",
+      openprovider_base_url: "sentinel",
       HTTP_PROXY: "sentinel",
       https_proxy: "sentinel",
       ALL_PROXY: "sentinel",
       all_proxy: "sentinel",
     };
-    const env = buildSanitizedRuntimeEnv(source, "/tmp/ocx", "/tmp/codex");
+    const env = buildSanitizedRuntimeEnv(source, "/tmp/opr", "/tmp/codex");
     expect(env.PATH).toBe("/bin");
     expect(env.OPENAI_API_KEY).toBeUndefined();
     expect(env.openai_base_url).toBeUndefined();
     expect(env.codex_api_key).toBeUndefined();
-    expect(env.opencodex_base_url).toBeUndefined();
+    expect(env.openprovider_base_url).toBeUndefined();
     expect(env.HTTP_PROXY).toBeUndefined();
     expect(env.https_proxy).toBeUndefined();
     expect(env.ALL_PROXY).toBeUndefined();
     expect(env.all_proxy).toBeUndefined();
-    expect(env.OPENCODEX_HOME).toBe("/tmp/ocx");
+    expect(env.OPENCODEX_HOME).toBe("/tmp/opr");
     expect(env.CODEX_HOME).toBe("/tmp/codex");
     expect(env.NO_PROXY).toBe("127.0.0.1,localhost,::1");
     expect(env.no_proxy).toBe("127.0.0.1,localhost,::1");
@@ -244,7 +244,7 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
 
   test("keeps the fixture admission token through an installed Unix shim without reading its token file", () => {
     if (process.platform === "win32") return;
-    const root = mkdtempSync(join(tmpdir(), "ocx-runtime-shim-isolation-"));
+    const root = mkdtempSync(join(tmpdir(), "opr-runtime-shim-isolation-"));
     roots.push(root);
     const tokenFile = join(root, "service-token");
     const realCodex = join(root, "codex-real");
@@ -255,7 +255,7 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
     chmodSync(realCodex, 0o700);
     chmodSync(shim, 0o700);
 
-    const env = buildSanitizedRuntimeEnv({ PATH: process.env.PATH }, "/tmp/ocx", "/tmp/codex");
+    const env = buildSanitizedRuntimeEnv({ PATH: process.env.PATH }, "/tmp/opr", "/tmp/codex");
     const result = Bun.spawnSync([shim, "--version"], { env, stdout: "pipe", stderr: "pipe" });
     expect(result.exitCode).toBe(0);
     expect(new TextDecoder().decode(result.stdout).trim()).toBe("fixture-admission");

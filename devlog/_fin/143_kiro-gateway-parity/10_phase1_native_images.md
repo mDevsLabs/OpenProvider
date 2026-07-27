@@ -3,7 +3,7 @@
 ## Problem
 
 CodeWhisperer's userInputMessage accepts an images array (proven by kiro-gateway:
-converters_core.py 641-704 + 1354-1362 + 1520-1562). opencodex's kiro adapter
+converters_core.py 641-704 + 1354-1362 + 1520-1562). openprovider's kiro adapter
 models userInputMessage as { content: string } only, so userContentText
 (kiro.ts 91-94) silently drops every OcxImageContent part. Images vanish.
 
@@ -20,7 +20,7 @@ models userInputMessage as { content: string } only, so userContentText
 - Remote https image URLs are NOT fetchable here -> skip with a text marker,
   matching gateway's "URL-based images not supported" behavior.
 
-## opencodex source shape
+## openprovider source shape
 
 OcxImageContent (types.ts 70-76): { type:"image"; imageUrl: data|https URL; detail? }.
 Carried on user/developer/toolResult messages as OcxContentPart[].

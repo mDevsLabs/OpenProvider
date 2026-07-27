@@ -14,7 +14,7 @@ configs migrate to marker 2 and preserve `config.json.pre-openai-tiers-v2.bak` f
 
 ## Config injection
 
-`ocx init`, `ocx start`, and `ocx sync` call the injector. On the default loopback bind, it keeps
+`opr init`, `opr start`, and `opr sync` call the injector. On the default loopback bind, it keeps
 Codex's built-in `openai` provider id and points that provider at OpenProvider:
 
 ```toml
@@ -96,7 +96,7 @@ one candidate exists, it uses that directory so WSL app-server mode and Windows 
 the same config and auth files. Set `CODEX_HOME` explicitly to override this detection.
 
 On Windows, an Orca shell can set both `CODEX_HOME` and `ORCA_CODEX_HOME` to Orca's bundled runtime
-home while the ChatGPT/Codex app still reads `%USERPROFILE%\\.codex`. `ocx status` and `ocx doctor`
+home while the ChatGPT/Codex app still reads `%USERPROFILE%\\.codex`. `opr status` and `opr doctor`
 warn about this exact mismatch and print redacted target paths. If a background service was installed
 from that Orca shell, uninstall it from the original shell first, then set `CODEX_HOME` to the app
 home, unset `ORCA_CODEX_HOME`, rerun sync/restore, and install the service again.
@@ -118,7 +118,7 @@ builds back to `openai`. Non-loopback dedicated-provider mode still mirrors hist
 ## Model catalog sync
 
 Codex shows models from an on-disk catalog (`$CODEX_HOME/OpenProvider-catalog.json` by default). On
-start and on `ocx sync`, OpenProvider:
+start and on `opr sync`, OpenProvider:
 
 1. **Backs up** the pristine catalog once to `~/.OpenProvider/catalog-backup.json` (so featuring is
    reversible).
@@ -144,18 +144,18 @@ collision order, provider, and native OpenAI marketing names are all left untouc
 Add a display name from the CLI (the proxy syncs the catalog right away when live):
 
 ```bash
-ocx models add deepseek deepseek-v4 --display-name "DeepSeek V4" --context-window 128000
+opr models add deepseek deepseek-v4 --display-name "DeepSeek V4" --context-window 128000
 ```
 
 You can also set or edit it through the management API (`POST /api/custom-models`,
 `PUT /api/custom-models/<id>` with a `displayName` string) and the web dashboard. A `/` is rejected
 because it would collide with the routed-slug separator.
 
-The display name is **display-only and stable across regeneration**. Every `ocx sync` and catalog
+The display name is **display-only and stable across regeneration**. Every `opr sync` and catalog
 refresh re-derives routed entries from `config.json` (including `customModels`), so the configured
 name is reapplied instead of drifting back to the routed slug. A managed service restart also attempts
 this sync shortly after the proxy binds. If that best-effort boot sync fails, for example during an
-offline login, the previously persisted catalog is retained and the next successful `ocx sync`
+offline login, the previously persisted catalog is retained and the next successful `opr sync`
 reapplies the configured name. Genuine upstream native names (e.g. `gpt-5.6-sol` →
 "GPT-5.6-Sol") come from the pinned upstream snapshot and are never overridden by a custom display
 name.
@@ -173,7 +173,7 @@ provider manager, point that provider at `http://127.0.0.1:10100/v1` with Respon
 (`wire_api = "responses"` in Codex TOML), not Chat Completions translation. When proxy API auth is
 enabled, also pass `x-OpenProvider-api-key` from `OpenProvider_API_AUTH_TOKEN`, matching the non-loopback
 provider form above. To let OpenProvider inject routing directly, first switch Codex back to its
-built-in `openai` provider and remove any user-owned root `openai_base_url`, then rerun `ocx start`.
+built-in `openai` provider and remove any user-owned root `openai_base_url`, then rerun `opr start`.
 
 ### Catalog troubleshooting
 
@@ -189,8 +189,8 @@ If a model is missing from Codex, or the catalog order/visibility looks wrong, c
 4. **Cursor `GetUsableModels`** — the Cursor adapter discovers models through its protobuf
    `GetUsableModels` RPC, not `/models`, so a Cursor-side change can alter which ids are visible
    independently of other providers.
-5. **Cache and `ocx sync`** — live catalogs are cached for about five minutes (`modelCacheTtlMs`,
-   default `300000`). Run `ocx sync` to force a fresh fetch and rewrite the catalog immediately.
+5. **Cache and `opr sync`** — live catalogs are cached for about five minutes (`modelCacheTtlMs`,
+   default `300000`). Run `opr sync` to force a fresh fetch and rewrite the catalog immediately.
 
 :::caution[Other local writers]
 Catalog writes (`OpenProvider-catalog.json`, `config.toml`) are atomic **inside** OpenProvider, which only
@@ -198,7 +198,7 @@ prevents half-written files when two OpenProvider-owned writers race. That does 
 local process, file watcher, or sync agent from rewriting catalog visibility or order after OpenProvider
 has written. Codex keeps its separate `models_cache.json` and can refresh it independently, changing
 the visible list without rewriting `OpenProvider-catalog.json`. If models flip unexpectedly while the
-proxy is running, stop or reconfigure the competing writers, then run `ocx sync` — this is an
+proxy is running, stop or reconfigure the competing writers, then run `opr sync` — this is an
 external-writer hazard, not a confirmed OpenProvider defect.
 :::
 
@@ -211,12 +211,12 @@ running: nothing is listening on the configured port, so the client renders that
 connection error itself. Restart the proxy:
 
 ```bash
-ocx start              # foreground
-ocx service install    # persistent: auto-starts on login and respawns on crash
+opr start              # foreground
+opr service install    # persistent: auto-starts on login and respawns on crash
 ```
 
-`ocx status` shows whether the proxy is running and prints the same restart hint when
-it is not; `ocx doctor` reports restart safety (service/shim coverage).
+`opr status` shows whether the proxy is running and prints the same restart hint when
+it is not; `opr doctor` reports restart safety (service/shim coverage).
 
 ## The subagent picker
 
@@ -251,17 +251,17 @@ off by default; it runs only when Token Guardian is enabled, the `chatgpt` refre
 
 ## Restoring native Codex
 
-OpenProvider never traps you. **`ocx stop` is the single command that fully reverts to native Codex** — it
+OpenProvider never traps you. **`opr stop` is the single command that fully reverts to native Codex** — it
 stops the proxy, stops the background service if one is installed, and strips every injected line and
 routed catalog entry so plain `codex` works exactly as if OpenProvider was never there:
 
 ```bash
-ocx stop       # stop the proxy + service, restore native Codex
-ocx restore    # restore without stopping  (alias: ocx eject)
-ocx restore back # point plain Codex at the running proxy again
+opr stop       # stop the proxy + service, restore native Codex
+opr restore    # restore without stopping  (alias: opr eject)
+opr restore back # point plain Codex at the running proxy again
 ```
 
-When OpenProvider runs as a managed [background service](/reference/cli/#ocx-service), it sets
+When OpenProvider runs as a managed [background service](/reference/cli/#opr-service), it sets
 `OCX_SERVICE=1` so a service-driven restart does **not** thrash the Codex config — only an explicit
-`ocx stop` / `ocx service stop` restores native Codex.
+`opr stop` / `opr service stop` restores native Codex.
 

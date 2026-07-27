@@ -3,7 +3,7 @@ title: 설정 레퍼런스
 description: ~/.OpenProvider/config.json의 모든 필드 — 최상위 옵션, 프로바이더, 사이드카.
 ---
 
-OpenProvider는 `~/.OpenProvider/config.json`에서 설정을 읽습니다. `ocx init`과 대시보드가 이 파일을
+OpenProvider는 `~/.OpenProvider/config.json`에서 설정을 읽습니다. `opr init`과 대시보드가 이 파일을
 쓰지만 직접 편집해도 됩니다. 프록시는 시작할 때 다시 읽습니다. 잘렸거나 올바른 JSON이 아닌 등
 파일을 파싱할 수 없으면 `config.json.invalid-<timestamp>`로 백업하고 콘솔에 경고한 뒤 기본값으로
 시작합니다. 파일이 없어도 기본 설정(단일 `openai` forward 프로바이더)을 사용합니다.
@@ -39,7 +39,7 @@ namespaced selected id를 bare id로 바꿉니다.
 | `injectionPrompt?` | `string` | — | 주입되는 v2 안내 본문을 통째로 교체하는 커스텀 텍스트. `{{model}}`, `{{effort}}`, `{{roster}}` 플레이스홀더가 치환되며 발화 조건은 그대로입니다. `PUT /api/injection-model`의 `prompt` 키로도 설정할 수 있습니다. |
 | `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenProvider가 작성하는 multi-agent developer 가이던스만 제어합니다. 미설정/`true`는 v1/v2 가이던스를 유지하고, `false`는 collaboration surface, `subagentModels`, routing, effort cap을 바꾸지 않고 둘 다 억제합니다. `GET/PUT /api/injection-model`은 유효값을 제공하며 PUT은 부분 업데이트입니다. |
 | `disabledModels?` | `string[]` | — | Codex에서 숨길 모델. 라우팅된 `provider/model` id는 카탈로그와 `/v1/models`에서 제외합니다. `gpt-5.4` 같은 일반 네이티브 GPT slug는 카탈로그 항목을 `visibility: "hide"`로 바꾸고 일반 `/v1/models` 목록에서 뺍니다. 대시보드 Models 페이지에서 모델별로 전환할 수 있습니다. |
-| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3단계 multi-agent surface override. `"v1"`은 업스트림 pin보다 우선해 모든 모델을 v1로, `"default"`는 업스트림 model pin(sol/terra=v2, luna=v1)을 따르고, `"v2"`는 모두 v2로 강제합니다. 대시보드 Models 페이지나 `ocx v2 mode`에서 설정합니다. |
+| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3단계 multi-agent surface override. `"v1"`은 업스트림 pin보다 우선해 모든 모델을 v1로, `"default"`는 업스트림 model pin(sol/terra=v2, luna=v1)을 따르고, `"v2"`는 모두 v2로 강제합니다. 대시보드 Models 페이지나 `opr v2 mode`에서 설정합니다. |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | 프로바이더별 Codex 표시 context cap. 알려진 context window를 낮추기만 합니다. |
 | `contextCapValue?` | `number` | `350000` | 대시보드 context-cap control에서 쓸 값. 바꾸면 `providerContextCaps`에서 활성화된 모든 항목을 갱신합니다. |
 | `stallTimeoutSec?` | `number` | `300` | 업스트림 데이터가 오지 않을 때 bridge가 중단하고 `response.incomplete`를 내보내기까지의 초. 최소 1. |
@@ -47,9 +47,9 @@ namespaced selected id를 bare id로 바꿉니다.
 | `shutdownTimeoutMs?` | `number` | `5000` | 진행 중인 turn을 중단하기 전 graceful drain deadline. |
 | `websockets?` | `boolean` | `false` | `supports_websockets`를 알려 Codex가 Responses WebSocket 경로를 쓰게 합니다. 생략하거나 `false`이면 HTTP/SSE를 유지합니다. |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | 비-loopback 바인드에서 관리 API와 data plane 인증에 추가로 허용할 생성형 `ocx_…` 자격 증명. 대시보드가 관리하며 항목 필드는 아래에 설명합니다. |
-| `codexAutoStart?` | `boolean` | `true` | Codex shim이 Codex 실행 전에 `ocx ensure`를 실행하게 합니다. `false`이면 `ocx ensure`가 아무 작업도 하지 않습니다. |
+| `codexAutoStart?` | `boolean` | `true` | Codex shim이 Codex 실행 전에 `opr ensure`를 실행하게 합니다. `false`이면 `opr ensure`가 아무 작업도 하지 않습니다. |
 | `codexShimAutoRestore?` | `boolean` | `true` | 완료된 외부 Codex 업데이트가 이전에 설치한 shim을 교체하면 자동으로 복구합니다. 끄려면 `false`로 설정하거나 프로세스에 `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0`을 설정합니다. |
-| `syncResumeHistory?` | `boolean` | `true` | 되돌릴 수 있는 Codex App 기록 호환 모드. OpenProvider가 원래 Codex thread metadata를 백업하고, 예전 OpenAI interactive row를 `OpenProvider`로 재매핑하며, OpenProvider가 만든 `exec` row를 App에 보이는 source로 잠시 승격합니다. `ocx stop` / `ocx restore`는 백업한 OpenAI row를 복원하고 남은 OpenProvider user thread를 OpenAI로 돌려 네이티브 Codex가 `config.toml`에서 프록시를 제거한 뒤에도 이어서 열 수 있게 합니다. 끄려면 `false`로 설정합니다. |
+| `syncResumeHistory?` | `boolean` | `true` | 되돌릴 수 있는 Codex App 기록 호환 모드. OpenProvider가 원래 Codex thread metadata를 백업하고, 예전 OpenAI interactive row를 `OpenProvider`로 재매핑하며, OpenProvider가 만든 `exec` row를 App에 보이는 source로 잠시 승격합니다. `opr stop` / `opr restore`는 백업한 OpenAI row를 복원하고 남은 OpenProvider user thread를 OpenAI로 돌려 네이티브 Codex가 `config.toml`에서 프록시를 제거한 뒤에도 이어서 열 수 있게 합니다. 끄려면 `false`로 설정합니다. |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | Codex Auth 대시보드에서 관리하는 ChatGPT/Codex pool 계정 metadata. secret은 `codex-accounts.json`에 따로 둡니다. |
 | `activeCodexAccountId?` | `string` | — | 수동으로 선택한 pool 계정. 선택 시 기존 thread affinity를 지우고 다음 요청부터 적용하며, 진행 중인 요청은 기존 계정을 유지합니다. |
 | `autoSwitchThreshold?` | `number` | `80` | 새 세션 자동 전환용 사용량 백분율 threshold. 알려진 5시간, 주간, 30일 quota window 중 가장 높은 점수를 씁니다. `0`이면 quota 자동 전환을 끕니다. |
@@ -62,12 +62,12 @@ namespaced selected id를 bare id로 바꿉니다.
 | `corsAllowOrigins?` | `string[]` | `[]` | CORS에서 추가로 허용할 정확한 origin. loopback origin은 항상 허용합니다. |
 
 `maxConcurrentThreadsPerSession`은 `config.json` 키가 아니라 `PUT /api/v2`에서 쓰는 camel-case
-필드입니다. `ocx v2 threads <n>`은 대응하는 `max_concurrent_threads_per_session` 값을 Codex의
+필드입니다. `opr v2 threads <n>`은 대응하는 `max_concurrent_threads_per_session` 값을 Codex의
 `$CODEX_HOME/config.toml` 안 `[features.multi_agent_v2]`에 저장합니다. 해당 table이 생기도록 v2를
 먼저 켜세요.
 
 백업 지원 이전의 개발 빌드에서 이미 `syncResumeHistory`를 실행했다면
-`ocx recover-history --legacy-openai`로 같은 native-provider 복구를 강제할 수 있습니다.
+`opr recover-history --legacy-openai`로 같은 native-provider 복구를 강제할 수 있습니다.
 
 :::note[Codex 계정 풀]
 pool 계정 추가와 quota 갱신은 대시보드의 **Codex Auth** 페이지에서 처리하세요. 설정에는 secret이
@@ -108,11 +108,11 @@ OpenProvider는 기본적으로 `127.0.0.1`(loopback 전용)에 바인드합니�
 
 ```bash
 export OpenProvider_API_AUTH_TOKEN="your-secret-token"
-ocx start
+opr start
 ```
 
 비-loopback 바인드에서는 이 변수가 없으면 프록시가 시작되지 않습니다. LAN 접근용 백그라운드
-서비스를 설치할 때도 같은 변수를 먼저 export한 뒤 `ocx service install`을 실행해야 launchd,
+서비스를 설치할 때도 같은 변수를 먼저 export한 뒤 `opr service install`을 실행해야 launchd,
 systemd, Task Scheduler에 전달됩니다. 클라이언트는 모든 요청의 `x-OpenProvider-api-key` 헤더에
 token을 넣어야 합니다.
 
@@ -178,7 +178,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 
 ## Cursor 프로바이더 (`adapter: "cursor"`)
 
-Cursor bridge는 실험적입니다. `ocx login cursor`를 실행한 뒤
+Cursor bridge는 실험적입니다. `opr login cursor`를 실행한 뒤
 `~/.OpenProvider/config.json`(Windows: `%USERPROFILE%\.OpenProvider\config.json`)의 `providers` 아래에
 `cursor` 항목을 추가하거나 편집하세요.
 
@@ -205,7 +205,7 @@ Codex 승인 경로 없이 로컬 파일을 읽고, 쓰고, 지우고, 나열하
 
 [웹 대시보드](/ko/guides/web-dashboard/)에서도 설정할 수 있습니다. **Providers →
 Cursor → Edit JSON**에서 `"unsafeAllowNativeLocalExec": true`를 추가해 저장한 뒤 프록시를
-재시작하세요(`ocx restart` 또는 `ocx stop` + `ocx start`).
+재시작하세요(`opr restart` 또는 `opr stop` + `opr start`).
 
 MCP, 화면 녹화, computer-use는 별도의 `mcpServers` / `desktopExecutor` 설정을 쓰며 이 플래그의 영향을
 받지 않습니다.
@@ -372,7 +372,7 @@ fingerprint 방식을 그대로 따릅니다. 저장소의 기존 OAuth 선례 �
 
 :::note[원자적 쓰기]
 모든 설정 및 카탈로그 파일(`config.toml`, `OpenProvider-catalog.json`)은 `atomicWriteFile`(임시 파일 +
-이름 바꾸기)로 원자적으로 기록합니다. `ocx stop`과 프록시 자체 종료 handler처럼 여러 writer가
+이름 바꾸기)로 원자적으로 기록합니다. `opr stop`과 프록시 자체 종료 handler처럼 여러 writer가
 동시에 Codex를 복원하더라도 파일이 반만 기록되는 일을 막습니다.
 :::
 

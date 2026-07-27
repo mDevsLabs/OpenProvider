@@ -15,7 +15,7 @@ OpenProvider заставляет Codex работать через прокси
 
 ## Внедрение конфигурации
 
-`ocx init`, `ocx start` и `ocx sync` вызывают инжектор. При привязке к loopback по умолчанию он
+`opr init`, `opr start` и `opr sync` вызывают инжектор. При привязке к loopback по умолчанию он
 сохраняет встроенный id провайдера Codex `openai` и направляет этого провайдера на OpenProvider:
 
 ```toml
@@ -104,8 +104,8 @@ $CODEX_HOME/models_cache.json
 конфигурации и аутентификации. Чтобы переопределить это обнаружение, задайте `CODEX_HOME` явно.
 
 В Windows оболочка Orca может назначить `CODEX_HOME` и `ORCA_CODEX_HOME` встроенному runtime-home
-Orca, тогда как ChatGPT/Codex App по-прежнему читает `%USERPROFILE%\\.codex`. `ocx status` и
-`ocx doctor` обнаруживают именно это расхождение и показывают целевой home со скрытым именем
+Orca, тогда как ChatGPT/Codex App по-прежнему читает `%USERPROFILE%\\.codex`. `opr status` и
+`opr doctor` обнаруживают именно это расхождение и показывают целевой home со скрытым именем
 пользователя. Если фоновая служба была установлена из оболочки Orca, сначала удалите её в исходной
 оболочке, затем задайте `CODEX_HOME` для App, удалите `ORCA_CODEX_HOME`, повторите sync/restore и
 установите службу заново.
@@ -128,7 +128,7 @@ WebSocket, и прокси с выключенной функцией вернё
 ## Синхронизация каталога моделей
 
 Codex показывает модели из каталога на диске (по умолчанию `$CODEX_HOME/OpenProvider-catalog.json`).
-При запуске и при `ocx sync` OpenProvider:
+При запуске и при `opr sync` OpenProvider:
 
 1. **Создаёт резервную копию** нетронутого каталога — один раз, в
    `~/.OpenProvider/catalog-backup.json` (чтобы выделение избранных было обратимым).
@@ -156,12 +156,12 @@ Codex показывает модели из каталога на диске (�
 Перезапустите прокси:
 
 ```bash
-ocx start              # в foreground
-ocx service install    # постоянно: автозапуск при входе и перезапуск после сбоя
+opr start              # в foreground
+opr service install    # постоянно: автозапуск при входе и перезапуск после сбоя
 ```
 
-`ocx status` показывает, запущен ли прокси, и выводит ту же подсказку о перезапуске,
-когда он остановлен; `ocx doctor` сообщает о надёжности перезапуска (покрытие service/shim).
+`opr status` показывает, запущен ли прокси, и выводит ту же подсказку о перезапуске,
+когда он остановлен; `opr doctor` сообщает о надёжности перезапуска (покрытие service/shim).
 
 ## Селектор подагентов
 
@@ -198,18 +198,18 @@ ocx service install    # постоянно: автозапуск при вхо�
 
 ## Восстановление нативного Codex
 
-OpenProvider никогда не запирает вас. **`ocx stop` — единственная команда, полностью возвращающая
+OpenProvider никогда не запирает вас. **`opr stop` — единственная команда, полностью возвращающая
 нативный Codex**: она останавливает прокси, останавливает фоновый сервис, если он установлен, и
 убирает каждую внедрённую строку и каждую маршрутизируемую запись каталога, так что обычный
 `codex` работает ровно так, как будто OpenProvider никогда не существовал:
 
 ```bash
-ocx stop       # stop the proxy + service, restore native Codex
-ocx restore    # restore without stopping  (alias: ocx eject)
-ocx restore back # point plain Codex at the running proxy again
+opr stop       # stop the proxy + service, restore native Codex
+opr restore    # restore without stopping  (alias: opr eject)
+opr restore back # point plain Codex at the running proxy again
 ```
 
-Когда OpenProvider работает как управляемый [фоновый сервис](/ru/reference/cli/#ocx-service),
+Когда OpenProvider работает как управляемый [фоновый сервис](/ru/reference/cli/#opr-service),
 он устанавливает `OCX_SERVICE=1`, поэтому перезапуск, инициированный сервисом, **не** дёргает
-конфигурацию Codex — нативный Codex восстанавливают только явные `ocx stop` / `ocx service stop`.
+конфигурацию Codex — нативный Codex восстанавливают только явные `opr stop` / `opr service stop`.
 

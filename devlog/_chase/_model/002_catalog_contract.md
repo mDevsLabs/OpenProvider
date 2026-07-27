@@ -1,6 +1,6 @@
 # 002 — Catalog contract
 
-OpenCodex catalog는 한 파일의 정적 목록이 아니다. 네 입력을 합쳐 Codex가 읽는 catalog와 `/v1/models`를 만든다.
+OpenProvider catalog는 한 파일의 정적 목록이 아니다. 네 입력을 합쳐 Codex가 읽는 catalog와 `/v1/models`를 만든다.
 
 ## 입력과 우선순위
 
@@ -42,7 +42,7 @@ bun run generate:jawcode-metadata
 JAWCODE_MODELS_JSON=/abs/path/models.json bun run generate:jawcode-metadata
 ```
 
-생성 파일을 직접 고치지 않는다. source model metadata가 틀렸다면 jawcode generator/descriptor를 먼저 고치고 다시 생성한다. OpenCodex만의 routing/capability 예외라면 registry나 catalog normalization이 소유한다.
+생성 파일을 직접 고치지 않는다. source model metadata가 틀렸다면 jawcode generator/descriptor를 먼저 고치고 다시 생성한다. OpenProvider만의 routing/capability 예외라면 registry나 catalog normalization이 소유한다.
 
 ## 모델 변경 분류
 

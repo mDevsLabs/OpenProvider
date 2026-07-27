@@ -1,13 +1,13 @@
 # Issue #45 — codex-rs consumer-side trace (response + codex-rs investigation)
 
 Follow-up to 00_review.md. The user asked whether the real problem is on the
-`response` / **codex-rs** (Codex client) side, not just opencodex's bridge.
+`response` / **codex-rs** (Codex client) side, not just openprovider's bridge.
 This doc traces the full path through codex-rs `main` (fetched 2026-06-29) and
 records exactly what each event does on the consumer.
 
 ## Short answer
 
-The opencodex root-cause in 00_review.md is **correct AND necessary**, but the
+The openprovider root-cause in 00_review.md is **correct AND necessary**, but the
 codex-rs side has a real, decisive nuance that the original review didn't capture:
 
 - codex-rs does NOT discard raw reasoning `content` — it parses and maps it.
@@ -16,9 +16,9 @@ codex-rs side has a real, decisive nuance that the original review didn't captur
 - So the fix must put routed reasoning into `summary[]` (00_review Approach 1).
   This is confirmed by the codex-rs code, not just inferred.
 
-## End-to-end trace (opencodex → codex-rs)
+## End-to-end trace (openprovider → codex-rs)
 
-### 1. opencodex emits (src/bridge.ts)
+### 1. openprovider emits (src/bridge.ts)
 - `thinking_delta` → `response.reasoning_summary_text.delta` + a final item
   `{ reasoning, summary:[{summary_text}] }`  (bridge.ts:174-195, 276-296)
 - `reasoning_raw_delta` → `response.reasoning_text.delta` (with `content_index:0`)
@@ -30,7 +30,7 @@ codex-rs side has a real, decisive nuance that the original review didn't captur
   (requires `delta` + `summary_index`) — responses.rs:343
 - `"response.reasoning_text.delta"` → `ResponseEvent::ReasoningContentDelta`
   (requires `delta` + `content_index`) — responses.rs:351
-  opencodex DOES send `content_index:0`, so this parses fine. Not the bug.
+  openprovider DOES send `content_index:0`, so this parses fine. Not the bug.
 
 ### 3. codex-rs turn loop — core/src/session/turn.rs
 - `ResponseEvent::ReasoningSummaryDelta` → `EventMsg::ReasoningContentDelta`
@@ -38,7 +38,7 @@ codex-rs side has a real, decisive nuance that the original review didn't captur
 - `ResponseEvent::ReasoningContentDelta` → `EventMsg::ReasoningRawContentDelta`
   (the RAW stream; turn.rs:2326-2345)
 - Both require an `active_item` that is `streaming_to_client`; that active item
-  is established by `OutputItemAdded` (turn.rs:2082). opencodex emits
+  is established by `OutputItemAdded` (turn.rs:2082). openprovider emits
   `response.output_item.added` for both shapes, so the active item exists.
 
 ### 4. Final history item mapping — core/src/event_mapping.rs:167-192
@@ -52,19 +52,19 @@ Reasoning request params are only sent when `model_info.supports_reasoning_summa
 This is keyed on the model catalog, and the "Worked for Xs" timer is driven by
 elapsed time / `reasoning_tokens` usage independent of any summary content.
 
-## Why the trace still points back to opencodex
+## Why the trace still points back to openprovider
 
 Although codex-rs carries `content` (raw_content) all the way to the TurnItem,
 the **expandable, persisted reasoning the reporter expects is the summary
 channel** (`ReasoningSummaryCell` / `new_reasoning_summary_block`,
 tui/src/history_cell/messages.rs:197-506). Native OpenAI models populate
-`summary`; opencodex's `reasoning_raw_delta` path leaves `summary` empty and only
+`summary`; openprovider's `reasoning_raw_delta` path leaves `summary` empty and only
 fills `content`. Result: timer shows, expandable summary is empty — exactly the
 report.
 
-Therefore the **actionable fix is still opencodex-side**: mirror raw reasoning
+Therefore the **actionable fix is still openprovider-side**: mirror raw reasoning
 into `summary[]` (00_review.md Approach 1). codex-rs needs no change — it already
-renders summary-channel reasoning for any model; opencodex just isn't feeding
+renders summary-channel reasoning for any model; openprovider just isn't feeding
 that channel for chat-completions `reasoning_content`.
 
 ## Sub-case B unchanged
@@ -83,5 +83,5 @@ surface; "Worked for Xs" is pure elapsed time. Model limitation, not a bug.
 ## Conclusion
 Not a codex-rs bug. The user's instinct to check the consumer was right, and the
 trace strengthens (not overturns) 00_review.md: codex-rs renders the summary
-channel; opencodex must route chat `reasoning_content` into `summary[]`. The fix
-remains small, opencodex-only, low-risk.
+channel; openprovider must route chat `reasoning_content` into `summary[]`. The fix
+remains small, openprovider-only, low-risk.

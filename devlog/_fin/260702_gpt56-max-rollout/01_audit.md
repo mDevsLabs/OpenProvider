@@ -64,7 +64,7 @@ Evidence:
 Risk: current released/forked Codex checkouts can still reject `max`, while local
 Codex `main`/`origin/main` now parses `"max"` through first-class
 `ReasoningEffort::Max` and still keeps `ReasoningEffort::Custom(String)` for future
-model-defined effort values. opencodex still strips `max` from catalog metadata.
+model-defined effort values. openprovider still strips `max` from catalog metadata.
 
 Mitigation:
 
@@ -108,7 +108,7 @@ Risk: adding Cursor model names without a Cursor adapter creates dead inventory.
 Mitigation:
 
 - Keep Cursor as OUT for this rollout.
-- Handle OpenAI-compatible gateways that opencodex already supports, such as OpenRouter
+- Handle OpenAI-compatible gateways that openprovider already supports, such as OpenRouter
   and LiteLLM-compatible endpoints.
 
 Evidence:
@@ -134,7 +134,7 @@ Evidence:
 
 ### 8. `cache_write_tokens` should be included with GPT-5.6 support
 
-Risk: GPT-5.6 Responses payloads can report cache writes that opencodex currently drops.
+Risk: GPT-5.6 Responses payloads can report cache writes that openprovider currently drops.
 
 Mitigation:
 

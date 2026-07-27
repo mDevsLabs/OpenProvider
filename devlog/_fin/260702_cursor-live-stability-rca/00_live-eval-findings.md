@@ -7,7 +7,7 @@ cross-session contamination), one lane complete (read/write native gap).
 
 ## Request
 
-User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
+User-reported symptoms on `codex exec -m cursor/composer-2.5` through opr:
 
 1. File read/write does not go through Codex-native tool paths (`apply_patch`);
    everything appears to funnel through `exec_command`.
@@ -16,7 +16,7 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 3. Request log shows cursor tokens as per-request increments without cache figures,
    while other providers show cumulative totals plus `cachedInputTokens`.
 
-## Live-eval runs (this session, ocx PID 75582 started 14:51, working tree)
+## Live-eval runs (this session, opr PID 75582 started 14:51, working tree)
 
 ### Run 1 — `tool use 10개해봐` (15:45)
 
@@ -38,7 +38,7 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 
 ### Run 3 — calc.py after catalog sync (15:52)
 
-- Ran `ocx sync` first (see Catalog findings below). Codex CLI's
+- Ran `opr sync` first (see Catalog findings below). Codex CLI's
   "Model metadata for cursor/composer-2.5 not found" warning disappeared.
 - 2 cursor requests (13.0s + 7.5s). calc.py was created/modified CORRECTLY —
   but with ZERO codex-visible tool calls for the writes. Codex rollout
@@ -50,7 +50,7 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 
 ### A. Stale Codex model catalog (confirmed, mitigated live)
 
-- `~/.codex/opencodex-catalog.json` contained only 6 native/template entries and
+- `~/.codex/openprovider-catalog.json` contained only 6 native/template entries and
   NO cursor models (while the running server's `/v1/models` returned 24 incl. 18
   cursor entries). Codex CLI therefore used fallback model metadata, which lacks
   `apply_patch_tool_type` → codex-rs never advertised `apply_patch` for cursor
@@ -58,14 +58,14 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 - Running `bun run src/cli.ts sync` appended 20 models; `cursor/composer-2.5` now
   carries `apply_patch_tool_type: "freeform"`, `context_window: 200000`,
   `supports_parallel_tool_calls: true`.
-- Open question: why the catalog was stale despite `ocx start` calling
+- Open question: why the catalog was stale despite `opr start` calling
   `syncModelsToCodex` (cli.ts:200 swallows errors with `.catch(() => {})`);
   file had been rewritten today 15:25 still without cursor entries.
 
 ### B. Cursor-native local exec channel bypasses Codex (confirmed)
 
 - `src/adapters/cursor/native-exec.ts:61-99` executes Cursor's native exec channel
-  locally in the ocx process: `readArgs`/`writeArgs`/`deleteArgs`/`lsArgs`/
+  locally in the opr process: `readArgs`/`writeArgs`/`deleteArgs`/`lsArgs`/
   `grepArgs` (native-exec-fs), `shellArgs`/`shellStreamArgs`/`writeShellStdinArgs`
   (native-exec-shell), fetch/MCP/computer-use.
 - Run 3's file writes went through this channel: fast (in-stream, no codex round
@@ -100,9 +100,9 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 - Run 4 (sequential 8-step exploration, 15:57+) reproduced the user's hang:
   - codex reported `Reconnecting... 2/5 (stream disconnected before completion:
     Incomplete response returned, reason: upstream_stall_timeout)` — that reason
-    string is ocx's OWN stall watchdog (`src/bridge.ts:149`), which fires after
+    string is opr's OWN stall watchdog (`src/bridge.ts:149`), which fires after
     `stallTimeoutSec` (default 90s) with no upstream activity, then codex retries.
-  - `15:58:33 ocx-mr35l2u6-nv 502 unreported 106079ms` — a cursor upstream
+  - `15:58:33 opr-mr35l2u6-nv 502 unreported 106079ms` — a cursor upstream
     request hung ~106s and got HTTP 502 from Cursor itself, logged with
     usage-unreported/0 (the exact "미보고" row shape the user reported).
 - Watchdog liveness mapping exists: `live-transport.ts` maps swallowed progress
@@ -128,7 +128,7 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 - Run 4 started with "Model metadata not found" — the catalog had ALREADY been
   eroded between 15:52 (run 3 healthy) and 15:56:54.
 - A later write (mtime 15:59:20) left only 4 native models (wildcards gone too).
-  `~/.opencodex/service.log` shows a foreign `ocx start` attempt ("Proxy already
+  `~/.openprovider/service.log` shows a foreign `opr start` attempt ("Proxy already
   running (PID 5766)") — suspected concurrent/config-profile clobber; RCA lane
   dispatched (see 01_catalog-erosion doc when it lands).
 - Run 5 (forced exec_command wording, catalog still eroded): instant HTTP 400
@@ -143,7 +143,7 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 - Contamination RCA lane returned: continuation turns reuse the SAME Cursor
   `conversationId` and send `ResumeAction` (request-builder.ts:84-88,
   protobuf-request.ts:295-315, responses/state.ts:49-78), so Cursor server-side
-  resume state is the top contamination suspect; ocx never sends checkpoints
+  resume state is the top contamination suspect; opr never sends checkpoints
   back; process-global blob map (native-exec.ts:44) serves stale blobs if the
   server references old ids. Recommended capture points: dump encoded run
   request at live-transport.ts:453, log blob fetches, log previous_response_id
@@ -162,7 +162,7 @@ User-reported symptoms on `codex exec -m cursor/composer-2.5` through ocx:
 | 8 | exploration, exec_command forced | _chase | read-only | eroded | OK 39s, 4 sequential round trips |
 
 Verdict: generic READ/exploration wording → model picks Cursor-native read/ls
-ToolCall-frame tools → ocx swallows them (`protobuf-events.ts:48`
+ToolCall-frame tools → opr swallows them (`protobuf-events.ts:48`
 `mcpArgsFromToolCall` requires `mcpToolCall`) → server waits on the client
 forever → watchdog 90s → codex retry → upstream 502 ~100s. Independent of
 workdir, sandbox, and catalog state. Writes survive because they ride the
@@ -173,8 +173,8 @@ periodic writer suspected; RCA lane running.
 
 ## Operational notes
 
-- The running ocx instance carries concurrent live traffic from other consumers
+- The running opr instance carries concurrent live traffic from other consumers
   (kiro/chatgpt/openai rows: cli-jaw instances, codex rescue jobs). Do NOT restart
-  ocx while investigation jobs are in flight.
+  opr while investigation jobs are in flight.
 - Codex CLI `--json` event stream does not surface Cursor-native writes at all —
-  when auditing runs, check the codex rollout AND `~/.opencodex/usage.jsonl`.
+  when auditing runs, check the codex rollout AND `~/.openprovider/usage.jsonl`.

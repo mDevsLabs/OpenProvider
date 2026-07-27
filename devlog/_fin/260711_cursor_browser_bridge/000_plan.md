@@ -8,7 +8,7 @@ opens all native local-exec cases). So this is a DIFFERENT mechanism.
 ## Mechanism map (code read)
 The Browser plugin is not a set of dedicated tools; it is driven through the CLIENT
 MCP tool mcp__node_repl__js (runs browser-client.mjs). For a Cursor-routed model to
-use it, opencodex must let the Cursor model invoke a client Responses/MCP tool
+use it, openprovider must let the Cursor model invoke a client Responses/MCP tool
 (providerIdentifier OCX_RESPONSES_TOOL_PROVIDER) and return its result.
 
 Two possible paths inside src/adapters/cursor:
@@ -36,7 +36,7 @@ mcpArgs OCX_RESPONSES (turn-1-done bridge), or tool-not-advertised.
 proxy-bridge-gap | tool-advertisement-gap | cursor-protocol-limitation | model-behavior.
 
 ## Scope
-IN: src/adapters/cursor/**, tests/**, this devlog, ~/.opencodex config only if a
+IN: src/adapters/cursor/**, tests/**, this devlog, ~/.openprovider config only if a
 provider setting is the fix. OUT: other session's dirty files (gui/**, docs-site/**,
 src/server/management-api.ts, tests/claude-management-api.test.ts, src/claude/**),
 no release, no proxy restart. Keep earlier cursor nativeLocalExec policy intact.

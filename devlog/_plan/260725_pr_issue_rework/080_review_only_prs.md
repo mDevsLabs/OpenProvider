@@ -17,7 +17,7 @@
 공통 명령:
 
 ```bash
-gh pr diff N --repo lidge-jun/opencodex | git apply --check -
+gh pr diff N --repo lidge-jun/openprovider | git apply --check -
 ```
 
 | PR | pinned head | 상태 | apply-check 결과 |
@@ -185,7 +185,7 @@ I appreciate the scope of this feature. The refresh must be truly awaited, setti
 검증 영수증:
 
 - pinned head: `374313200f8fa20c9e00fe5f918c67372a289381` (ready, 46 files, `+1438/-57`)
-- `gh pr diff 426 --repo lidge-jun/opencodex | git apply --check -`: exit 1 — `src/codex/auth-context.ts:24`, `src/codex/routing.ts:66`, `src/server/responses/compact.ts:255`, `src/server/responses/core.ts:120` do not apply to `origin/dev=037e8f5e`
+- `gh pr diff 426 --repo lidge-jun/openprovider | git apply --check -`: exit 1 — `src/codex/auth-context.ts:24`, `src/codex/routing.ts:66`, `src/server/responses/compact.ts:255`, `src/server/responses/core.ts:120` do not apply to `origin/dev=037e8f5e`
 
 게시할 영어 본문:
 
@@ -208,7 +208,7 @@ Because this changes account selection, OAuth-created credential lifecycle, and 
 검증 영수증:
 
 - pinned head: `d25eba5b1f329ac77a2a75cce11ce2cf9a8d65d3` (**draft**, 9 files, `+140/-5`)
-- `gh pr diff 431 --repo lidge-jun/opencodex | git apply --check -`: exit 0, clean against `origin/dev=037e8f5e`
+- `gh pr diff 431 --repo lidge-jun/openprovider | git apply --check -`: exit 0, clean against `origin/dev=037e8f5e`
 
 게시할 영어 본문:
 

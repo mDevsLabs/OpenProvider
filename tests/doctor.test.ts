@@ -21,7 +21,7 @@ import { collectOrcaCodexHomeDiagnostic } from "../src/codex/home";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-doctor-test");
 const TEST_CODEX_HOME = join(TEST_DIR, "codex");
-const TEST_OPENCODEX_HOME = join(TEST_DIR, "opencodex");
+const TEST_OPENCODEX_HOME = join(TEST_DIR, "openprovider");
 let prevOpencodexHome: string | undefined;
 let prevCodexHome: string | undefined;
 let prevHttpsProxy: string | undefined;
@@ -91,8 +91,8 @@ describe("doctor", () => {
     expect(mismatch.warning).toContain("OpenProvider injection will not reach that app");
     expect(mismatch.effectiveCodexHome).toContain("C:\\Users\\[USER]\\");
     expect(mismatch.effectiveCodexHome).not.toContain("alice");
-    expect(mismatch.action).toContain("ocx service uninstall");
-    expect(mismatch.action).toContain("ocx service install");
+    expect(mismatch.action).toContain("opr service uninstall");
+    expect(mismatch.action).toContain("opr service install");
     expect(mismatch.action).toContain("%USERPROFILE%\\.codex");
     expect(mismatch.action).toContain("Remove-Item Env:ORCA_CODEX_HOME");
     expect(mismatch.action).toContain("SilentlyContinue; $env:CODEX_HOME");
@@ -121,7 +121,7 @@ describe("doctor", () => {
     const usersRoot = join(TEST_DIR, "mnt-c", "Users");
     const windowsCodexHome = join(usersRoot, "example", ".codex");
     mkdirSync(windowsCodexHome, { recursive: true });
-    writeFileSync(join(windowsCodexHome, "config.toml"), "model_provider = \"opencodex\"\n");
+    writeFileSync(join(windowsCodexHome, "config.toml"), "model_provider = \"openprovider\"\n");
 
     expect(resolveCodexHomeDir({
       env: { WSL_DISTRO_NAME: "Ubuntu" },
@@ -217,12 +217,12 @@ describe("doctor", () => {
       "drivers /mnt/c drvfs rw,noatime 0 0",
     ].join("\n");
 
-    const c = detectFsType("/mnt/c/Users/test/.opencodex", mounts);
+    const c = detectFsType("/mnt/c/Users/test/.openprovider", mounts);
     expect(c.isDrvfs).toBe(true);
     expect(c.isMntDrive).toBe(true);
     expect(c.fstype).toBe("drvfs");
 
-    const home = detectFsType("/home/test/.opencodex", mounts);
+    const home = detectFsType("/home/test/.openprovider", mounts);
     expect(home.isDrvfs).toBe(false);
     expect(home.isMntDrive).toBe(false);
     expect(home.fstype).toBe("ext4");
@@ -371,7 +371,7 @@ describe("service memory section (#314 WP4)", () => {
       status: "ok",
       data: { ...baseData, heapUsed: 4 * 1024 ** 3, jscHeap: { heapSize: 4 * 1024 ** 3 } },
     });
-    expect(lines.some(l => l.includes("likely an opencodex bug"))).toBe(true);
+    expect(lines.some(l => l.includes("likely an openprovider bug"))).toBe(true);
   });
 
   test("interpretation: rss below threshold → normal line", () => {
@@ -423,15 +423,15 @@ describe("service memory section (#314 WP4)", () => {
     const hint = proxyDownRestartHint({ proxyRunning: false, port: 10100, serviceViable: false });
     expect(hint).toContain("error sending request for url");
     expect(hint).toContain("127.0.0.1:10100");
-    expect(hint).toContain("ocx start");
-    expect(hint).toContain("ocx service install");
+    expect(hint).toContain("opr start");
+    expect(hint).toContain("opr service install");
   });
 
-  test("proxyDownRestartHint prefers 'ocx service start' when a service is installed", () => {
+  test("proxyDownRestartHint prefers 'opr service start' when a service is installed", () => {
     const hint = proxyDownRestartHint({ proxyRunning: false, port: 12000, serviceViable: true });
-    expect(hint).toContain("ocx service start");
+    expect(hint).toContain("opr service start");
     expect(hint).toContain("127.0.0.1:12000");
-    expect(hint).not.toContain("ocx service install");
+    expect(hint).not.toContain("opr service install");
   });
 });
 

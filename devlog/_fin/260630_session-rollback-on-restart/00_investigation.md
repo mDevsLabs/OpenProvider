@@ -1,15 +1,15 @@
-# 260630 — Codex App sessions revert to last `ocx start` snapshot
+# 260630 — Codex App sessions revert to last `opr start` snapshot
 
 Date: 2026-06-30
 
 ## Symptom
 
 After closing and reopening the Codex desktop app, the session/thread list reverted to the state
-at the last `ocx start`. Work done after that point appeared to vanish. The user typically runs
-`ocx start` in a terminal foreground and stops it with `Ctrl-C`, then starts it again later.
+at the last `opr start`. Work done after that point appeared to vanish. The user typically runs
+`opr start` in a terminal foreground and stops it with `Ctrl-C`, then starts it again later.
 
 In the user's own notation, the expected loop was `a a' b' -> b -> b'` (tag flips
-`opencodex<->openai`, content always moves forward), but the observed behavior was
+`openprovider<->openai`, content always moves forward), but the observed behavior was
 `a a' b' -> a -> a'` (the new turns `b'` were lost and the list snapped back).
 
 ## Root cause
@@ -25,7 +25,7 @@ Cross-checked against codex-rs (`~/Developer/codex/121_openai-codex/codex-rs`):
 1. `updateSessionMeta` rewrote each rollout JSONL with `atomicWriteFile` (temp + rename), which
    swaps the inode. The Codex app caches the live session's append handle and only reopens it when
    the handle is gone (`rollout/src/recorder.rs` `RolloutWriterState::ensure_writer_open`). After a
-   rename, the app keeps writing to the orphaned inode; the path holds only opencodex's snapshot, so
+   rename, the app keeps writing to the orphaned inode; the path holds only openprovider's snapshot, so
    the live turns are lost on the next restart.
 2. The proxy also opened the app's live `state_5.sqlite` (WAL) with a second writer connection and
    no `busy_timeout`, racing the app's pool.
@@ -33,7 +33,7 @@ Cross-checked against codex-rs (`~/Developer/codex/121_openai-codex/codex-rs`):
 ## Evidence
 
 - `lsof` showed `codex app-server` holding `state_5.sqlite`; `ps` showed the foreground
-  `bun src/cli.ts start` proxy without `OCX_SERVICE`; `ocx status` confirmed "Service: not installed".
+  `bun src/cli.ts start` proxy without `OCX_SERVICE`; `opr status` confirmed "Service: not installed".
 - codex-rs `state/src/runtime.rs` opens the DB WAL + `synchronous=NORMAL` + `busy_timeout=5s`,
   pooled; the list view reads the DB as the single source (`use_state_db_only`).
 - codex-rs reads a thread's provider through TWO paths: the SQLite replay folds every `session_meta`

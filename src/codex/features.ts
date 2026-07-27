@@ -2,12 +2,12 @@
  * features.ts — codex feature-flag view for $CODEX_HOME/config.toml.
  *
  * Used by the catalog v2-gated-ultra policy (devlog/260709_v2_gated_ultra) and the
- * `ocx v2` toggle surface. The FLAG itself is never written here — toggling goes
+ * `opr v2` toggle surface. The FLAG itself is never written here — toggling goes
  * through the official `codex features enable|disable` CLI (format-preserving).
  * The one write this module owns is the numeric
  * `features.multi_agent_v2.max_concurrent_threads_per_session` scalar
  * (setMaxConcurrentThreads): the codex CLI has no persisted setter for nested
- * feature config (`-c` is per-invocation only), so ocx does a scoped,
+ * feature config (`-c` is per-invocation only), so opr does a scoped,
  * EOL-preserving line edit — same practice as codex/inject.ts.
  *
  * CODEX_HOME is resolved at CALL time (activeCodexConfigPath pattern, mirrors
@@ -118,7 +118,7 @@ export function isMultiAgentV2Enabled(configPath?: string): boolean {
  * TRUE when config.toml still carries `[agents] max_threads` — codex-rs REFUSES to
  * boot with that key while multi_agent_v2 is enabled ("agents.max_threads cannot be
  * set when features.multi_agent_v2 is enabled", core/src/config/mod.rs:1421). The
- * `ocx v2 on` flow warns about it instead of editing config itself.
+ * `opr v2 on` flow warns about it instead of editing config itself.
  */
 export function hasAgentsMaxThreads(configPath?: string): boolean {
   const content = readConfigText(configPath);
@@ -177,7 +177,7 @@ export function setMaxConcurrentThreads(value: number, configPath?: string, migr
   const headerIdx = lines.findIndex(l => headerRe.test(l));
   if (headerIdx === -1) {
     const featuresHeader = lines.findIndex(l => /^\s*\[features\]\s*(?:#.*)?$/.test(l));
-    if (featuresHeader === -1) return { ok: false, error: "multi_agent_v2 feature config not found — enable v2 first (ocx v2 on)" };
+    if (featuresHeader === -1) return { ok: false, error: "multi_agent_v2 feature config not found — enable v2 first (opr v2 on)" };
     let featuresEnd = lines.length;
     for (let i = featuresHeader + 1; i < lines.length; i++) {
       if (/^\s*\[/.test(lines[i])) { featuresEnd = i; break; }
@@ -202,7 +202,7 @@ export function setMaxConcurrentThreads(value: number, configPath?: string, migr
       atomicWriteFile(path, applyEol(lines.join("\n"), eol));
       return { ok: true, changed: true };
     }
-    return { ok: false, error: "multi_agent_v2 feature config not found — enable v2 first (ocx v2 on)" };
+    return { ok: false, error: "multi_agent_v2 feature config not found — enable v2 first (opr v2 on)" };
   }
   let end = lines.length;
   for (let i = headerIdx + 1; i < lines.length; i++) {
@@ -336,7 +336,7 @@ let migrationEditSeq = 0;
 function applyConfigEditsAtomically(path: string, edit: (tempPath: string) => ConfigEditResult): ConfigEditResult {
   const content = readConfigText(path);
   if (content === null) return { ok: false, error: `config.toml not readable at ${path}` };
-  const tempPath = `${path}.ocx-migration.${process.pid}.${++migrationEditSeq}`;
+  const tempPath = `${path}.opr-migration.${process.pid}.${++migrationEditSeq}`;
   try {
     atomicWriteFile(tempPath, content);
     const result = edit(tempPath);

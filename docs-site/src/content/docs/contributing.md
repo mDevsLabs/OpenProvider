@@ -66,7 +66,7 @@ GitHub Actions intentionally stay small:
 - **Cross-platform CI** (`.github/workflows/ci.yml`) runs on pull requests and `main` pushes that
   touch runtime, tests, package, script, TypeScript, or workflow files. Its Bun matrix covers Linux,
   Windows, and macOS with install, typecheck, tests, privacy scan, a release-helper build smoke, GUI
-  build, and `ocx help`. A second three-OS lane proves npm global install works without a separately
+  build, and `opr help`. A second three-OS lane proves npm global install works without a separately
   installed Bun by using the package's bundled runtime.
 - **Release** (`.github/workflows/release.yml`) is manual. It does not act as a second full CI
   pipeline; before dry-run or publish it requires the exact release commit (`GITHUB_SHA`) to already
@@ -115,7 +115,7 @@ All provider pickers and seeds derive from the canonical registry (`src/provider
 },
 ```
 
-`src/providers/derive.ts` feeds that entry into `ocx init`, `ocx provider`, dashboard presets,
+`src/providers/derive.ts` feeds that entry into `opr init`, `opr provider`, dashboard presets,
 API-key login, and OAuth config seeds. `enrichProviderFromCatalog()` copies model metadata and
 capability classifications onto the saved provider config. OAuth protocol implementations still
 live in `src/oauth/`; registry metadata alone is not an OAuth flow.

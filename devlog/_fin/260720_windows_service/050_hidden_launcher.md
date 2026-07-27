@@ -2,7 +2,7 @@
 
 ## 목표
 
-`ocx service install`(기본 backend)이 등록하는 태스크가 콘솔 창 없이 실행되게 한다.
+`opr service install`(기본 backend)이 등록하는 태스크가 콘솔 창 없이 실행되게 한다.
 `InteractiveToken`은 유지(자격증명 불요, passwordless 계정 호환). #165의 직접 수리.
 
 ## 메커니즘 선택
@@ -28,12 +28,12 @@
 
 ## Diff-level 변경 (src/service.ts)
 
-1. **NEW** `windowsLauncherVbsPath(): string` — `join(getConfigDir(), "opencodex-service-launcher.vbs")`.
+1. **NEW** `windowsLauncherVbsPath(): string` — `join(getConfigDir(), "openprovider-service-launcher.vbs")`.
    (windowsServiceScriptPath/windowsTaskXmlPath 옆, :45 부근)
 2. **NEW** `export function buildWindowsLauncherVbs(script = windowsServiceScriptPath()): string` —
    내용:
    ```vbs
-   ' OpenCodex service launcher — runs the batch wrapper with a hidden window.
+   ' OpenProvider service launcher — runs the batch wrapper with a hidden window.
    Set shell = CreateObject("WScript.Shell")
    shell.Run """<script 경로, " -> "" 이스케이프>""", 0, True
    ```

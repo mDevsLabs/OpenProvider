@@ -36,6 +36,6 @@ cycles closed with green tests.
 
 - CI green on dev/main/preview heads (run URLs recorded).
 - npm version + GitHub Release proof captured into goalplan criteria c4/c5.
-- Live proxy note: user's running `ocx` picks up the new version only after
+- Live proxy note: user's running `opr` picks up the new version only after
   reinstall/restart — mention in final report, do not restart it unasked.
 

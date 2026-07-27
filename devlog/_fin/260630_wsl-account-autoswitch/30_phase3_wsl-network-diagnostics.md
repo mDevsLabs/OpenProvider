@@ -13,7 +13,7 @@ No `doctor` verb exists today. The CLI command table is a single `switch
 `login`, `sync`, `service`, `codex-shim`, `update`, ...). The fallthrough at
 src/cli.ts:492-494 prints `Unknown command` and usage.
 
-Decision: add a new top-level `ocx doctor` verb. It is read-only and parallels
+Decision: add a new top-level `opr doctor` verb. It is read-only and parallels
 the existing `status` handler, so it slots in as a sibling `case "doctor"`
 rather than overloading `status` (which is process/port oriented via
 `collectStatus`, imported at src/cli.ts:18).
@@ -58,7 +58,7 @@ WHAM fetch paths swallow the error and return `quota: null`
 ## Reference: exact diagnostic shell commands (from investigation)
 
 These are the manual commands the TS implementation mirrors. They are reference
-only; `ocx doctor` does not shell out.
+only; `opr doctor` does not shell out.
 
 ```sh
 # DNS resolution for the WHAM host
@@ -80,7 +80,7 @@ try {
 
 # State dir filesystem type (drvfs => Windows-mounted)
 findmnt -no FSTYPE,TARGET --target "$HOME/.codex"
-findmnt -no FSTYPE,TARGET --target "$HOME/.opencodex"
+findmnt -no FSTYPE,TARGET --target "$HOME/.openprovider"
 
 # Proxy env actually visible to the WSL process
 env | grep -iE '^(http|https|all|no)_proxy=' || echo 'no *_PROXY set'

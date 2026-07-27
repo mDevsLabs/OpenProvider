@@ -8,7 +8,7 @@ never the live file. Original preserved at `/tmp/grok-config-before-511.toml`.
 ```
 model tables:                 69
 tables WITHOUT context_window: 40
-default:                      "ocx-gpt-5-6-terra"   (an orphan, no context_window)
+default:                      "opr-gpt-5-6-terra"   (an orphan, no context_window)
 ```
 
 ## After one sync
@@ -18,7 +18,7 @@ result:                       { ok: true, changed: true }
 model tables:                  6   (one per catalog model)
 tables WITH context_window:    6   (all of them)
 model tables above the fence:  0
-default:                      "ocx-gpt-5-6-terra"  -> still defined, now WITH context_window = 372000
+default:                      "opr-gpt-5-6-terra"  -> still defined, now WITH context_window = 372000
 ```
 
 ## Counting caveat worth recording
@@ -45,7 +45,7 @@ and `[marketplace]` with its sources are all intact after the sweep.
 ## What this does NOT yet prove
 
 That Grok's TUI reads the corrected file. That requires the user to restart via
-`ocx service` and a visual check — `030` step 2, criterion `c-live`.
+`opr service` and a visual check — `030` step 2, criterion `c-live`.
 
 ## Field state the fixture did not model (found at WP3, fixed)
 
@@ -53,7 +53,7 @@ Inspecting the live file before the restart turned up two things the synthetic f
 never reproduced. Both came from Grok Build re-serializing the config into its own
 format:
 
-**1. The marker comments are GONE.** `rg '>>> opencodex managed block' ~/.grok/config.toml`
+**1. The marker comments are GONE.** `rg '>>> openprovider managed block' ~/.grok/config.toml`
 returns nothing. Grok rewrote the file and dropped our comments. `findManagedRegion`
 then returns `null`, so the whole file is in scope and the ownership predicate is the
 ONLY thing protecting the user's own entries. That is survivable exactly because the

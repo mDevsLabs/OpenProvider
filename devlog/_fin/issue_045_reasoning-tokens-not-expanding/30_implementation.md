@@ -32,4 +32,4 @@ models the same expandable trace as native OpenAI models.
 
 ## Sub-case B (unchanged)
 Models that emit no `reasoning_content` at all still only show the timer — model
-limitation, not an opencodex bug. Documented in 00_review.md.
+limitation, not an openprovider bug. Documented in 00_review.md.

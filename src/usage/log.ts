@@ -463,7 +463,7 @@ function parseUsageLines(lines: string[]): PersistedUsageEntry[] {
 
 /**
  * Read only the newest `limit` usage.jsonl rows without loading the whole append-only
- * file into memory. Used by request-log hydration on `ocx start`.
+ * file into memory. Used by request-log hydration on `opr start`.
  */
 export function readRecentUsageEntries(limit: number): PersistedUsageEntry[] {
   if (!Number.isFinite(limit) || limit <= 0) return [];

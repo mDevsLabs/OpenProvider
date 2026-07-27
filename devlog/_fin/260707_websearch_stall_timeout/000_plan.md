@@ -23,7 +23,7 @@
 
 ## RCA (evidence)
 
-The user-visible kill is opencodex's OWN bridge stall deadline, not codex-rs:
+The user-visible kill is openprovider's OWN bridge stall deadline, not codex-rs:
 
 - `src/bridge.ts:171` — `const stallSec = Math.max(1, options?.stallTimeoutSec ?? 90)`; when no
   REAL adapter event arrives for `stallSec`, bridge emits `response.incomplete`
@@ -66,7 +66,7 @@ budget (audit 011 B1: batched queries + placeholder iterations otherwise chain s
 Default config -> max(90, 200, 200) + 30 = 230s. Finite, so genuine hangs still terminate
 (each awaited unit carries its own AbortSignal.timeout; silence beyond the max unit budget +
 margin is a real hang). Codex-side 300s idle timer keeps being re-armed by 2s heartbeats, so a
-larger opencodex stall deadline is safe.
+larger openprovider stall deadline is safe.
 
 Computation lives in `planWebSearch` (pure, already unit-tested) and returns via
 `SidecarPlan.stallTimeoutSec`; responses.ts and loop.ts just thread it. Diff-level plan:

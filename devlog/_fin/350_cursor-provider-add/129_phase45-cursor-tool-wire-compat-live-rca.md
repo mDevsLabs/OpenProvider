@@ -26,7 +26,7 @@ wire-compatible for this client path. Existing Cursor native MCP advertisement a
 - Do not send Responses client tools in top-level `AgentRunRequest.mcp_tools`.
 - Continue advertising Responses client tools through native exec `requestContextArgs` as
   `RequestContext.tools`.
-- Keep synthetic Responses tools isolated with provider identifier `opencodex-responses`.
+- Keep synthetic Responses tools isolated with provider identifier `openprovider-responses`.
 - Keep synthetic tools fail-closed if Cursor asks for them through native `mcpArgs`.
 
 ## Patch

@@ -68,7 +68,7 @@
   - PATCH to toggle it off
   - Verify GET reflects the change
 - **File:** `tests/cli-provider.test.ts` (NEW if not exists, or add to existing)
-- **Action:** ADD — test: "ocx provider add --allow-private-network sets the flag"
+- **Action:** ADD — test: "opr provider add --allow-private-network sets the flag"
 
 ## Scope boundary
 - IN: The 8 files/actions above

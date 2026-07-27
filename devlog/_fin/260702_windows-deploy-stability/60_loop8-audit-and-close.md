@@ -17,13 +17,13 @@
 
 ## Fixes applied this loop (to make it closeable)
 
-1. **ocx.cmd shell-less restart → EINVAL (Windows, bun/source GUI restart).** `update-job.ts`
-   `restartCommand()` non-npm branch spawned `ocx.cmd` shell-less (`spawn`/`spawnSync` at `:250/267`)
+1. **opr.cmd shell-less restart → EINVAL (Windows, bun/source GUI restart).** `update-job.ts`
+   `restartCommand()` non-npm branch spawned `opr.cmd` shell-less (`spawn`/`spawnSync` at `:250/267`)
    → EINVAL on Node/Bun ≥18.20/20.12 (same CVE-2024-27980 class F1/F7 fixed). Now restarts via
    `process.execPath` + the package launcher (both real `.exe`, no shell). `ocxBin()` removed.
 2. **F9 systemd no-DBUS SSH false negative.** `service.ts` `isSystemd()` hard-failed on
    `systemctl --user show-environment`, which errors in an SSH session without a user D-Bus even
-   when systemd is present → first-time `ocx service install` wrongly refused. Added
+   when systemd is present → first-time `opr service install` wrongly refused. Added
    `userRuntimeDir()` + `ensureUserBusEnv()`: point `XDG_RUNTIME_DIR` at `/run/user/<uid>` when
    unset, fall back to its existence as the systemd-present signal, and ensure the bus env before
    `installSystemd` runs the `--user` commands.

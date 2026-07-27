@@ -2,11 +2,11 @@
 
 - **Date:** 2026-07-02 · **Branch:** cursor-fixes · **Class:** C4-adjacent (user chat-history
   integrity; this loop changes only error-handling/reporting, not tagging semantics)
-- **Driver:** User reports: after `ocx update` + restart, the Codex app shows chat history
+- **Driver:** User reports: after `opr update` + restart, the Codex app shows chat history
   gone except pinned; Windows much worse than macOS.
 - **Evidence base:** first-hand read of src/codex-history-provider.ts (full), call sites
   codex-inject.ts:283/379; Codex xhigh RCA (design map + ranked causes); local state DB
-  inspection (threads.model_provider openai 616 / opencodex 575; no pinned column —
+  inspection (threads.model_provider openai 616 / openprovider 575; no pinned column —
   pinning is app-side, consistent with "pinned survive a list filter").
 
 ## Confirmed failure mechanism (this loop's target)
@@ -15,7 +15,7 @@
 `{rows:0, files:0}` (`codex-history-provider.ts:369-376`) — indistinguishable from
 "nothing to do". On Windows the Codex app holds `state_5.sqlite` (WAL, busy_timeout 5s,
 no retry) far more aggressively, and stop paths there are likelier to be forced. During
-`ocx update` → `stop` → restore silently no-ops → threads stay `model_provider='opencodex'`
+`opr update` → `stop` → restore silently no-ops → threads stay `model_provider='openprovider'`
 → the native app hides them (except app-side pinned). Nothing tells the user; nothing
 retries. The backup manifest (`codex-history-backup-*.json`) is only deleted after a
 SUCCESSFUL restore — its continued existence after stop is a reliable "restore incomplete"
@@ -39,15 +39,15 @@ re-tag design entirely, `session_index.jsonl` reconciliation, cross-process sync
 **MODIFY `src/codex-inject.ts`**
 - `restoreNativeCodex()`: when `history.failed`, append to the returned message:
   `⚠️ Codex resume history could NOT be restored — the Codex app appears to be holding
-  the history DB. Close the Codex app/IDE and run 'ocx stop' again; until then routed
+  the history DB. Close the Codex app/IDE and run 'opr stop' again; until then routed
   threads stay hidden in the native app.`
 - `injectCodexConfig()`: when forward-sync `history.failed`, historyMessage notes the skip
-  (`history sync skipped: state DB locked (close the Codex app and rerun 'ocx start')`).
+  (`history sync skipped: state DB locked (close the Codex app and rerun 'opr start')`).
 
 **MODIFY `src/update.ts` + `bin/ocx.mjs`**
-- After the successful stop gate, scan the ocx config dir for `codex-history-backup-*.json`;
+- After the successful stop gate, scan the opr config dir for `codex-history-backup-*.json`;
   if present, print a non-blocking warning that native history visibility is not restored
-  and how to fix (close Codex app → `ocx stop`). Update proceeds (blocking an update on an
+  and how to fix (close Codex app → `opr stop`). Update proceeds (blocking an update on an
   open IDE would be worse; the warning is actionable).
 
 ## Tests

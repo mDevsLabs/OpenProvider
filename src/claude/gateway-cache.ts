@@ -48,7 +48,7 @@ export function writeGatewayModelCache(baseUrl: string, models: readonly Gateway
 /** Fetch the anthropic-flavor /v1/models from the local proxy and write the cache. */
 export async function refreshGatewayModelCacheFromProxy(port: number, timeoutMs = 3_000, configDir?: string): Promise<string | null> {
   try {
-    // ?ids=cli pins the readable claude-ocx id family deterministically (audit 051
+    // ?ids=cli pins the readable claude-opr id family deterministically (audit 051
     // #5): the cache prewrite must not depend on UA sniffing.
     const res = await fetch(`http://127.0.0.1:${port}/v1/models?limit=1000&ids=cli`, {
       headers: { "anthropic-version": "2023-06-01" },

@@ -1,6 +1,6 @@
 # 042 — wp6 receipt: pre-QA 스모크 (tool-call 왕복, 카탈로그, reasoning)
 
-Date: 2026-07-23 21:5x KST. Server: 수정 체크아웃 :10190 (pid 57004, OPENCODEX_HOME=/tmp/ocx-wp1-home 격리). grok 0.2.101, GROK_HOME=/tmp/grok-home-wp3.
+Date: 2026-07-23 21:5x KST. Server: 수정 체크아웃 :10190 (pid 57004, OPENCODEX_HOME=/tmp/opr-wp1-home 격리). grok 0.2.101, GROK_HOME=/tmp/grok-home-wp3.
 
 ## 1. Tool-call 왕복 — 2-layer 증명 (오딧 합의 형식)
 
@@ -18,7 +18,7 @@ Req2 (`/tmp/wp6-tool-req2.json/.resp`): 같은 `call_id`로 assistant.tool_calls
 기본 샌드박스 ON(GROK_SANDBOX 미설정), cwd=/tmp/wp6-tool-cwd, `--tools run_terminal_cmd` 포지티브 allowlist, `--always-approve` 없음:
 
 ```
-grok -p "Use the run_terminal_cmd tool to run exactly this command: echo OCX_TOOL_OK — then tell me its output." -m ocx-cursor-grok-4-5 --max-turns 4 --tools run_terminal_cmd
+grok -p "Use the run_terminal_cmd tool to run exactly this command: echo OCX_TOOL_OK — then tell me its output." -m opr-cursor-grok-4-5 --max-turns 4 --tools run_terminal_cmd
 exit=0, stdout 말미: OCX_TOOL_OK (코드블록 인용)
 ```
 
@@ -26,7 +26,7 @@ grok가 스트림 파싱→툴 실행→function_call_output 재전송→최종 
 
 ## 2. 카탈로그 listing: **PASS**
 
-`grok models` → `ocx-*` 29줄 노출, `ocx-gpt-5-6-sol` 기본 선택 (`/tmp/wp6-models.out`).
+`grok models` → `opr-*` 29줄 노출, `opr-gpt-5-6-sol` 기본 선택 (`/tmp/wp6-models.out`).
 
 ## 3. Reasoning delta: **PARTIAL — 브리지 PASS / 라이브 업스트림 미발화**
 

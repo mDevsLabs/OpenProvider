@@ -4,7 +4,7 @@
 > Port source: jawcode `packages/ai/src/providers/kiro.ts` (readKiroCliSqlite, refreshKiroDesktopToken,
 > resolveKiroAuth) + `utils/oauth/kiro.ts`. Contract: codex `015/45_ki_codewhisperer_wire_stream_oauth.md` §3.
 
-## opencodex contract (verified from src/oauth)
+## openprovider contract (verified from src/oauth)
 - `OAuthProviderDef = { login(ctrl, opts), refresh(refreshToken, signal), providerConfig, defaultModel }`.
 - `OAuthCredentials = { refresh, access, expires(epoch ms), email?, accountId? }`.
 - import-first precedent: `xai/anthropic` use `{importLocal:"fallback"}`; `kimi` uses a direct import login.
@@ -28,7 +28,7 @@
   - **needs**: `kiro` entry in the provider registry so `deriveOAuthProviderConfig("kiro")`/`deriveOAuthDefaultModel("kiro")`
     resolve. providerConfig: `{ adapter:"kiro", baseUrl:"https://runtime.{region}.kiro.dev", authMode:"oauth" }`
     (registry add is Phase 4 wiring — for Phase 2, mirror chatgpt's inline providerConfig to avoid ordering dep,
-    OR land the registry entry here. **audit: which is cleaner for opencodex?**)
+    OR land the registry entry here. **audit: which is cleaner for openprovider?**)
 
 ### profileArn / region (NOT in OAuthCredentials)
 - `OAuthCredentials` has no profileArn/region. Like jawcode, the **adapter** (Phase 3) resolves profileArn at
@@ -36,7 +36,7 @@
   stores only access/refresh/expires. **audit: confirm this split is acceptable vs needing a cred extension.**
 
 ## Sub-steps (Phase 2 PABCD)
-- A: Backend employee audits THIS plan vs opencodex `src/oauth/{index,types,store,login-cli}.ts` + kimi/xai
+- A: Backend employee audits THIS plan vs openprovider `src/oauth/{index,types,store,login-cli}.ts` + kimi/xai
   precedent + jawcode source. Resolve the two audit questions (inline vs registry providerConfig; profileArn split).
 - B: implement `src/oauth/kiro.ts` + register; tests (`tests/kiro-oauth.test.ts`): SQLite import (temp db),
   manual-paste fallback, refresh mapping, expires skew.

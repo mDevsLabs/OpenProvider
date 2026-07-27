@@ -14,7 +14,7 @@ describe("claude context-window map (devlog 260712 B2)", () => {
     const map = buildClaudeContextWindows([], routed);
     expect(map["cursor/gpt-5.6-luna"]).toBe(1_000_000);
     expect(map[desktop3pAlias("cursor", "gpt-5.6-luna")]).toBe(1_000_000);
-    expect(map["claude-ocx-cursor--gpt-5.6-luna"]).toBe(1_000_000);
+    expect(map["claude-opr-cursor--gpt-5.6-luna"]).toBe(1_000_000);
     expect(map["mock/small-model"]).toBe(128_000);
     expect(map["mock/no-window"]).toBeUndefined();
   });
@@ -24,7 +24,7 @@ describe("claude context-window map (devlog 260712 B2)", () => {
     // Authoritative native overrides: gpt-5.6 natives 372k, gpt-5.4 native 1M.
     expect(map["gpt-5.6-sol"]).toBe(372_000);
     expect(map[desktop3pAlias("native", "gpt-5.6-sol")]).toBe(372_000);
-    expect(map["claude-ocx-native--gpt-5.6-sol"]).toBe(372_000);
+    expect(map["claude-opr-native--gpt-5.6-sol"]).toBe(372_000);
     expect(map["gpt-5.4"]).toBe(1_000_000);
   });
 
@@ -137,8 +137,8 @@ describe("auto-context (devlog 260712 020 + audit 021)", () => {
     const env = effectiveModelEnv({ model: "gpt-5.6-sol" }, windows);
     expect(env.ANTHROPIC_MODEL).toBe("gpt-5.6-sol[1m]");
     // Readable-alias slot value gets the same marking (audit 051 #4).
-    const readable = effectiveModelEnv({ model: "claude-ocx-native--gpt-5.6-sol" }, windows);
-    expect(readable.ANTHROPIC_MODEL).toBe("claude-ocx-native--gpt-5.6-sol[1m]");
+    const readable = effectiveModelEnv({ model: "claude-opr-native--gpt-5.6-sol" }, windows);
+    expect(readable.ANTHROPIC_MODEL).toBe("claude-opr-native--gpt-5.6-sol[1m]");
     // Explicit off: no marking below 1M.
     const off = effectiveModelEnv({ model: "gpt-5.6-sol", autoContext: false }, windows);
     expect(off.ANTHROPIC_MODEL).toBe("gpt-5.6-sol");

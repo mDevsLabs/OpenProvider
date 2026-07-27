@@ -11,7 +11,7 @@ managedEnv.ts`, `managedEnvConstants.ts`, `auth.ts`, `envUtils.ts` + cc-switch
   `ANTHROPIC_BASE_URL`/`ANTHROPIC_AUTH_TOKEN`을 기록한다 (cc-switch docs
   5.1-config-files, issue #1790).
 - Claude Code는 trusted settings.env를 `Object.assign(process.env, ...)`로
-  적용해 **spawn env를 덮어쓴다** (managedEnv.ts:136-161). 즉 `ocx claude`가
+  적용해 **spawn env를 덮어쓴다** (managedEnv.ts:136-161). 즉 `opr claude`가
   주입한 `ANTHROPIC_BASE_URL=127.0.0.1:PORT`는 잔재 설정에 조용히 납치된다.
 - 방어: spawn env에 `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1`이 truthy면
   settings-sourced env에서 provider-managed 변수(BASE_URL/AUTH_TOKEN/API_KEY/
@@ -26,7 +26,7 @@ managedEnv.ts`, `managedEnvConstants.ts`, `auth.ts`, `envUtils.ts` + cc-switch
   Desktop/CCD까지 닿고, 플래그는 settings.env의 모델 슬롯도 strip하므로 CCD
   사용자 설정을 조용히 무효화한다. `src/server/system-env.ts`는 이 phase에서
   변경하지 않는다. (TDZ 블로커 R1 #1은 이 철회로 소멸.)
-- **`ocx claude` 한정 적용** (R1 #3 부분 accept): `ocx claude`는 opencodex가
+- **`opr claude` 한정 적용** (R1 #3 부분 accept): `opr claude`는 openprovider가
   라우팅을 소유하는 명시적 진입점이므로 플래그 기본 ON이 계약에 맞다.
   settings.env에 의도적 `ANTHROPIC_MODEL`을 둔 사용자는 (a) top-level `model`
   설정(strip 무관)으로 이전하거나 (b) `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=0`
@@ -56,7 +56,7 @@ apiKeyHelper류 설정 필드 방어, Claude Desktop 3P 경로, 구버전 클코
 // cc-switch/CCR ~/.claude/settings.json env block cannot hijack proxy routing.
 // setDefault: an explicit user export (e.g. =0, isEnvTruthy-false) still wins.
 // Intentional contract change: settings.env model slots are also stripped in
-// ocx claude runs — use the top-level settings "model" field or opt out.
+// opr claude runs — use the top-level settings "model" field or opt out.
 setDefault("CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST", "1");
 ```
 
@@ -90,7 +90,7 @@ buildClaudeEnv 매트릭스 (활성 시나리오, R1 #3 대조군):
 1. 기본 호출 → 플래그 === "1".
 2. base에 `CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST: "0"` pre-export → "0" 보존
    (user-wins opt-out).
-3. opencodex model 설정 있음/없음 × 플래그 기본 ON — 모델 슬롯 주입 자체는
+3. openprovider model 설정 있음/없음 × 플래그 기본 ON — 모델 슬롯 주입 자체는
    플래그와 독립임을 단언(효과는 클코 내부이므로 여기선 spawn env 계약만).
 
 ## Accept criteria

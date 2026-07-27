@@ -1,6 +1,6 @@
 # 260715 PR merge batch — research notes
 
-Session: 019f638e-885f-7151-a19e-adb92823cb2e (codexclaw HOTL loop, goalplan `land-open-prs-128-129-130-132-onto-opencodex-dev`)
+Session: 019f638e-885f-7151-a19e-adb92823cb2e (codexclaw HOTL loop, goalplan `land-open-prs-128-129-130-132-onto-openprovider-dev`)
 Date: 2026-07-15
 
 ## Objective

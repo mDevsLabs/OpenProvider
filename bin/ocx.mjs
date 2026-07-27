@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * opencodex npm bin launcher.
+ * openprovider npm bin launcher.
  *
  * The package source is TypeScript that runs on the Bun runtime. To let
  * `npm install -g @mdevs/openprovider` work without a separately-installed Bun,
@@ -60,7 +60,7 @@ function expandUserPath(raw) {
 
 function configDir() {
   const raw = process.env.OPENCODEX_HOME?.trim();
-  return resolve(raw ? expandUserPath(raw) : join(homedir(), ".opencodex"));
+  return resolve(raw ? expandUserPath(raw) : join(homedir(), ".openprovider"));
 }
 
 function shouldRepairCodexShim() {
@@ -87,7 +87,7 @@ function repairCodexShimIfNeeded() {
     windowsHide: true,
   });
   if (res.status !== 0) {
-    console.warn(`opencodex: Codex shim repair failed (${res.status ?? "unknown exit"}). Try: ocx codex-shim install`);
+    console.warn(`openprovider: Codex shim repair failed (${res.status ?? "unknown exit"}). Try: opr codex-shim install`);
   }
 }
 
@@ -127,13 +127,13 @@ function runNpmSelfUpdate() {
   });
   const latest = latestResult.status === 0 ? latestResult.stdout.trim() : "";
 
-  console.log(`opencodex v${current} (installed via npm, tag ${tag})`);
+  console.log(`openprovider v${current} (installed via npm, tag ${tag})`);
   if (latest && latest === current) {
     console.log(`Already on the latest ${tag} version (v${latest}).`);
     process.exit(0);
   }
 
-  // Remember whether a background service manages the proxy BEFORE stopping — `ocx stop`
+  // Remember whether a background service manages the proxy BEFORE stopping — `opr stop`
   // unloads it permanently, so a successful update must reinstall it afterwards.
   const serviceStatePath = join(configDir(), "service-state.json");
   const serviceWasInstalled = existsSync(serviceStatePath);
@@ -180,10 +180,10 @@ function runNpmSelfUpdate() {
     } catch { /* keep default */ }
   }
 
-  // Never replace package files under a live proxy — stop it first (full `ocx stop`
+  // Never replace package files under a live proxy — stop it first (full `opr stop`
   // semantics: graceful drain, service stop, native Codex restore). Gate on the service
   // and the runtime-port record too: a service-managed or orphaned proxy can be live
-  // while ocx.pid is stale/missing.
+  // while opr.pid is stale/missing.
   const launcher = fileURLToPath(import.meta.url);
   if (trayBeforeUpdate.stopBeforeReplacement) {
     console.log("⏹  Handing off the Windows tray before updating...");
@@ -196,27 +196,27 @@ function runNpmSelfUpdate() {
         start: () => runTrayLifecycle(launcher, "start"),
       });
     } catch {
-      console.error("opencodex: could not stop the Windows tray; aborting before package replacement.");
+      console.error("openprovider: could not stop the Windows tray; aborting before package replacement.");
       process.exit(1);
     }
   }
   const hasRuntimeState =
-    existsSync(join(configDir(), "ocx.pid")) || existsSync(join(configDir(), "runtime-port.json"));
+    existsSync(join(configDir(), "opr.pid")) || existsSync(join(configDir(), "runtime-port.json"));
   if (serviceWasInstalled || hasRuntimeState) {
     console.log("⏹  Stopping the running proxy before updating...");
     const stopRes = spawnSync(process.execPath, [launcher, "stop"], { stdio: "inherit", windowsHide: true });
     const stillHasRuntimeState =
-      existsSync(join(configDir(), "ocx.pid")) || existsSync(join(configDir(), "runtime-port.json"));
+      existsSync(join(configDir(), "opr.pid")) || existsSync(join(configDir(), "runtime-port.json"));
     if (stopRes.status !== 0 || stillHasRuntimeState) {
       if (trayBeforeUpdate.restoreOnFailure) runTrayLifecycle(launcher, "start");
-      console.error("opencodex: could not stop the running proxy; aborting the update. Run 'ocx stop' and retry.");
+      console.error("openprovider: could not stop the running proxy; aborting the update. Run 'opr stop' and retry.");
       process.exit(1);
     }
     if (historyRestoreIncomplete()) {
       console.warn(
-        "opencodex: WARNING — Codex resume history was NOT restored (history DB locked; Codex app/IDE open?).\n" +
+        "openprovider: WARNING — Codex resume history was NOT restored (history DB locked; Codex app/IDE open?).\n" +
         "  Routed threads stay hidden in the native Codex app until restored.\n" +
-        "  After the update: close the Codex app, then run 'ocx stop' once to restore.",
+        "  After the update: close the Codex app, then run 'opr stop' once to restore.",
       );
     }
   }
@@ -237,7 +237,7 @@ function runNpmSelfUpdate() {
         windowsHide: true,
       });
       if (tray.status !== 0) {
-        console.warn("opencodex: Windows tray refresh failed. Run: ocx tray install");
+        console.warn("openprovider: Windows tray refresh failed. Run: opr tray install");
         if (trayBeforeUpdate.restoreOnFailure) runTrayLifecycle(launcher, "start");
       }
     }
@@ -255,8 +255,8 @@ function runNpmSelfUpdate() {
           // user's (non-admin) token, so the service reinstall can fail with access
           // denied. Fall back to a direct detached proxy start so the update never
           // leaves the user without a running proxy.
-          console.warn("opencodex: service refresh failed — starting the proxy directly instead.");
-          console.warn("  Run 'ocx service install' as administrator to refresh the background service.");
+          console.warn("openprovider: service refresh failed — starting the proxy directly instead.");
+          console.warn("  Run 'opr service install' as administrator to refresh the background service.");
           const env = { ...process.env };
           delete env.OCX_SERVICE;
           const child = spawn(process.execPath, [launcher, "start", "--port", String(bakePort)], {
@@ -273,7 +273,7 @@ function runNpmSelfUpdate() {
         else process.env.OCX_BAKE_PORT = prevBake;
       }
     } else {
-      console.log("Restart the proxy:  ocx start");
+      console.log("Restart the proxy:  opr start");
     }
     process.exit(0);
   }
@@ -306,7 +306,7 @@ function findBunBinary(bunDir) {
 
 function fail(msg) {
   console.error(
-    `opencodex: ${msg}\n` +
+    `openprovider: ${msg}\n` +
       "The bundled Bun runtime could not be prepared. This usually means the\n" +
       "install skipped lifecycle scripts (e.g. npm blocked bun's postinstall\n" +
       "under allowScripts) or optional dependencies. Reinstall with:\n" +
@@ -339,14 +339,14 @@ function resolveBun() {
   return bin;
 }
 
-// `ocx update --help` prints usage and exits WITHOUT side effects. The npm launcher
+// `opr update --help` prints usage and exits WITHOUT side effects. The npm launcher
 // intercepts `update` before the Bun CLI starts, so the help short-circuit must live
 // here too — otherwise --help runs the real self-update, stops the proxy, and drops
 // in-flight routed streams (issue #168).
 const updateHelpRequested = process.argv[2] === "update" &&
   process.argv.slice(3).some(a => a === "--help" || a === "-h" || a === "help");
 if (updateHelpRequested) {
-  console.log("Usage: ocx update [--tag latest|preview]\n\nUpdate opencodex. Preview installs stay on the preview tag unless overridden.");
+  console.log("Usage: opr update [--tag latest|preview]\n\nUpdate openprovider. Preview installs stay on the preview tag unless overridden.");
   process.exit(0);
 }
 
@@ -383,7 +383,7 @@ const clearHandlers = () => {
 
 child.on("error", err => {
   clearHandlers();
-  console.error(`opencodex: failed to launch Bun runtime: ${err.message}`);
+  console.error(`openprovider: failed to launch Bun runtime: ${err.message}`);
   process.exit(1);
 });
 

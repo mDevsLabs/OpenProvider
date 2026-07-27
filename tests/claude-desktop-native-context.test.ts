@@ -14,7 +14,7 @@ import type { OcxConfig } from "../src/types";
  */
 
 function tempHome(): string {
-  return mkdtempSync(join(tmpdir(), "ocx-desktop-ctx-"));
+  return mkdtempSync(join(tmpdir(), "opr-desktop-ctx-"));
 }
 
 const config = {

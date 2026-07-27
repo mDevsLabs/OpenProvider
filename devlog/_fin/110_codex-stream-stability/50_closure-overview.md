@@ -28,7 +28,7 @@ routed reliability" verdict still stands).
 ## Citation basis (IMPORTANT — read before implementing)
 
 The 110 RCA (`10_root-cause-analysis.md`) cited an **ephemeral** Codex snapshot at
-`/tmp/opencodex-codex-src/...`. These closure docs re-base every Codex-parser citation to the
+`/tmp/openprovider-codex-src/...`. These closure docs re-base every Codex-parser citation to the
 **stable local checkout** the user actually runs:
 
 ```text

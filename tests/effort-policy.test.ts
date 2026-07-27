@@ -252,9 +252,9 @@ describe("supportedLadderFor (real routeModel routes)", () => {
   });
 
   test("custom key-mode providers cannot capture a bare native-looking OpenAI id", () => {
-    tempCodexHome = mkdtempSync(join(tmpdir(), "ocx-effort-catalog-"));
+    tempCodexHome = mkdtempSync(join(tmpdir(), "opr-effort-catalog-"));
     process.env.CODEX_HOME = tempCodexHome;
-    writeFileSync(join(tempCodexHome, "opencodex-catalog.json"), JSON.stringify({
+    writeFileSync(join(tempCodexHome, "openprovider-catalog.json"), JSON.stringify({
       models: [{ slug: "gpt-5.4", display_name: "gpt-5.4", supported_reasoning_levels: [
         { effort: "low", description: "low" }, { effort: "medium", description: "medium" },
       ] }],
@@ -275,9 +275,9 @@ describe("supportedLadderFor (real routeModel routes)", () => {
   });
 
   test("native forward-mode passthrough reads the injected catalog ladder", () => {
-    tempCodexHome = mkdtempSync(join(tmpdir(), "ocx-effort-catalog-"));
+    tempCodexHome = mkdtempSync(join(tmpdir(), "opr-effort-catalog-"));
     process.env.CODEX_HOME = tempCodexHome;
-    writeFileSync(join(tempCodexHome, "opencodex-catalog.json"), JSON.stringify({
+    writeFileSync(join(tempCodexHome, "openprovider-catalog.json"), JSON.stringify({
       models: [{ slug: "gpt-5.4", display_name: "gpt-5.4", supported_reasoning_levels: [
         { effort: "low", description: "low" }, { effort: "medium", description: "medium" },
         { effort: "high", description: "high" }, { effort: "xhigh", description: "xhigh" },
@@ -419,7 +419,7 @@ describe("cap composition with downstream clamps", () => {
 
 describe("/api/effort-caps", () => {
   function isolatedHome(): void {
-    tempHome = mkdtempSync(join(tmpdir(), "ocx-effort-caps-"));
+    tempHome = mkdtempSync(join(tmpdir(), "opr-effort-caps-"));
     process.env.OPENCODEX_HOME = tempHome;
   }
 

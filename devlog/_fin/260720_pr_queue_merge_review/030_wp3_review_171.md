@@ -45,14 +45,14 @@ classic/workspace 양쪽에서의 CTA 노출 조건.
 
 ```
 git fetch origin pull/171/head
-git worktree add /tmp/ocx-pr171 FETCH_HEAD --detach
-cd /tmp/ocx-pr171
+git worktree add /tmp/opr-pr171 FETCH_HEAD --detach
+cd /tmp/opr-pr171
 bun install
 bun test tests/oauth-reauth-bind.test.ts tests/provider-workspace-auth.test.ts \
   tests/codex-auth-api.test.ts tests/codex-auth-collision.test.ts
 cd gui && bun x tsc --noEmit && bun run lint
-cd /Users/jun/developer/new/700_projects/opencodex
-git worktree remove --force /tmp/ocx-pr171
+cd /Users/jun/developer/new/700_projects/openprovider
+git worktree remove --force /tmp/opr-pr171
 ```
 
 ## C-ACTIVATION-GROUNDING-01 시나리오

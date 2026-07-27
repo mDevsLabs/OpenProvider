@@ -230,7 +230,7 @@ export function responsesSseToAnthropicSse(
           // Synthetic signature: Claude Code accepts it (003 E6); inbound drops replays anyway.
           emit("content_block_delta", {
             type: "content_block_delta", index: open.index,
-            delta: { type: "signature_delta", signature: `ocx${Date.now()}` },
+            delta: { type: "signature_delta", signature: `opr${Date.now()}` },
           });
         }
         emit("content_block_stop", { type: "content_block_stop", index: open.index });
@@ -261,7 +261,7 @@ export function responsesSseToAnthropicSse(
       };
       // upstreamDerived: transient upstream statuses become overloaded_error so the
       // Anthropic-SDK client retries with backoff; proxy-internal exceptions stay
-      // api_error — a deterministic ocx bug must not be masked as retryable
+      // api_error — a deterministic opr bug must not be masked as retryable
       // (devlog/_plan/260716_claudecode_hardening/020). On win32 mid-stream socket
       // resets reach the reader catch (no failed-tail relay) and stay api_error —
       // same as today, deliberate residual.
@@ -516,7 +516,7 @@ export function responsesJsonToAnthropicMessage(json: unknown, model: string): R
           }
         }
         if (parts.length > 0) {
-          content.push({ type: "thinking", thinking: parts.join("\n\n"), signature: `ocx${Date.now()}` });
+          content.push({ type: "thinking", thinking: parts.join("\n\n"), signature: `opr${Date.now()}` });
         }
         break;
       }

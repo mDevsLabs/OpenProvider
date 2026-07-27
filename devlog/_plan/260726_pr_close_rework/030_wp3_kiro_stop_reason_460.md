@@ -162,7 +162,7 @@ terminal: {
 
 참고로 OpenAI Responses는 context-window 도달도 `max_output_tokens`로 표현하므로
 AWS 문구만으로 이를 "입력 거부"라고 단정할 수는 없다. 이건 규범이 아니라
-**이 저장소의 정책 선택**이다: opencodex는 이미 `kiro-errors.ts`에서 context 고갈을
+**이 저장소의 정책 선택**이다: openprovider는 이미 `kiro-errors.ts`에서 context 고갈을
 비재시도 400 계약으로 구분하고 있으므로 그 선례를 따른다.
 
 PR head `src/adapters/kiro.ts:1005-1103`에서 `END_TURN`만 종료로 취급하고
@@ -551,7 +551,7 @@ tool call, an output-token limit surfaces as incomplete output that can be conti
 context-window exhaustion surfaces as a non-retryable context-length error rather than as
 truncated output. Filtering and guardrail stops surface as filtered incomplete output.
 
-When no native stop reason is present and an ordinary client tool is available, opencodex adds a
+When no native stop reason is present and an ordinary client tool is available, openprovider adds a
 private `codex_kiro_final_answer` tool. If Kiro emits progress without calling it, the adapter makes
 one bounded continuation. Duplicate suppression is deliberately limited to whitespace-normalized
 exact repeats; a reworded status update is retained because suppressing genuine final information

@@ -34,7 +34,7 @@ Used the native CSS `light-dark()` function so every color token is authored **o
   what `light-dark()` obeys — no duplicated dark block, no media-query fork.
 - **FOWT guard** (`gui/index.html`): a <200-byte inline script applies a stored light/dark
   choice before first paint; `system` leaves the attribute off. Mirrored by `App.tsx`.
-- Toggle: sidebar-foot button cycles light → dark → system, persisted to `localStorage["ocx-theme"]`.
+- Toggle: sidebar-foot button cycles light → dark → system, persisted to `localStorage["opr-theme"]`.
 
 ## Files
 

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Expose the existing Cursor adapter scaffold in the user-facing opencodex flow so
+Expose the existing Cursor adapter scaffold in the user-facing openprovider flow so
 `cursor/auto` can be added from the dashboard and become visible to Codex's routed
 model catalog, while preserving the existing safe boundary:
 
@@ -108,7 +108,7 @@ Update wording from "not advertised in dashboard Add Provider" to:
 
 ## Verification Plan
 
-Run without invoking `ocx`, `codex`, `cursor`, or `cursor-agent`:
+Run without invoking `opr`, `codex`, `cursor`, or `cursor-agent`:
 
 1. `bun test tests/provider-registry-parity.test.ts tests/cursor-oauth-shell.test.ts tests/cursor-discovery.test.ts tests/cursor-adapter.test.ts`
 2. `bun run typecheck`
@@ -125,4 +125,4 @@ Run without invoking `ocx`, `codex`, `cursor`, or `cursor-agent`:
 - Cursor OAuth login.
 - Cursor native tool execution.
 - Making Cursor the default provider automatically.
-- Running live `ocx`, `codex`, `cursor`, or `cursor-agent`.
+- Running live `opr`, `codex`, `cursor`, or `cursor-agent`.

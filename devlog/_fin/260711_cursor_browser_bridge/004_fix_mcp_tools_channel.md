@@ -3,7 +3,7 @@
 ## Result
 
 Browser-under-Cursor is fixable. The cause is NOT provider identity, NOT tool
-naming, NOT mcp_instructions - it is that opencodex advertised client tools ONLY
+naming, NOT mcp_instructions - it is that openprovider advertised client tools ONLY
 through native-exec `requestContextArgs` (RequestContext.tools), which Cursor does
 NOT register into the model's callable catalog. Populating the top-level
 `AgentRunRequest.mcp_tools` channel (the `McpTools` wrapper) makes the injected

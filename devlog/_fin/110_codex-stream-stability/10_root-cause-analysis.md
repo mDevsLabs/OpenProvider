@@ -1,8 +1,8 @@
 # 110.10 — Root-Cause Analysis: Codex Stream Errors
 
-All line citations verified against source on the authoring date. opencodex paths are
+All line citations verified against source on the authoring date. openprovider paths are
 relative to the repo root; the Codex parser is the vendored upstream at
-`/tmp/opencodex-codex-src/codex-rs/codex-api/src/sse/responses.rs`.
+`/tmp/openprovider-codex-src/codex-rs/codex-api/src/sse/responses.rs`.
 
 ## 1. The Codex stream-error model (consumer side)
 
@@ -101,7 +101,7 @@ tool-cycle, timeout — frequent in interactive use):
 
 Across a long interactive session this is the most plausible driver of *"엄청 발생"*
 (errors *en masse*): every cancel leaks an upstream stream and emits noisy proxy-side
-errors. On the passthrough path the leak is the same (no `signal`), though opencodex returns
+errors. On the passthrough path the leak is the same (no `signal`), though openprovider returns
 `upstreamResponse.body` directly so there is no custom `cancel` to add there — the fix is the
 `signal`.
 
@@ -113,7 +113,7 @@ Codex aborts with **"idle timeout waiting for SSE"** if no event arrives within
 `idle_timeout` (`responses.rs:446,464-468`). The bridge emits `response.created` immediately
 (`bridge.ts:75`), which covers first-token latency, but it emits **nothing during mid-stream
 stalls** — a slow routed provider, a long upstream reasoning gap, or a slow tool round-trip
-produces silence on the opencodex→Codex hop. There is no periodic keep-alive in
+produces silence on the openprovider→Codex hop. There is no periodic keep-alive in
 `bridgeToResponsesSSE`. Native passthrough inherits the ChatGPT backend's own pacing/keep-
 alives, so this primarily bites routed models — i.e. the exact configuration in which the
 proxy is most often used (e.g. `opencode-go/deepseek-v4-pro`).
@@ -136,7 +136,7 @@ proxy is most often used (e.g. `opencode-go/deepseek-v4-pro`).
   chunk-split upstream frame is dropped silently. This does not throw on the Codex side
   (it ignores unparseable frames, `responses.rs:476-478`), but it can truncate content and,
   combined with RC1, end the stream without a terminal event.
-- **Malformed proxy output:** if opencodex ever emits a malformed Responses frame, Codex
+- **Malformed proxy output:** if openprovider ever emits a malformed Responses frame, Codex
   surfaces it as `ApiError::Stream` (`responses.rs:454`). Not currently observed, but the
   reason to keep `sseEvent` (`bridge.ts:8-9`) strictly well-formed.
 
@@ -144,7 +144,7 @@ proxy is most often used (e.g. `opencode-go/deepseek-v4-pro`).
 
 **Severity: Medium. Path: native `gpt-*`. Mitigated by phase 100.5; verify.**
 
-On passthrough, opencodex relays `upstreamResponse.body` with `sanitizePassthroughHeaders`
+On passthrough, openprovider relays `upstreamResponse.body` with `sanitizePassthroughHeaders`
 (`server.ts:153-155`). Bun's `fetch` auto-decompresses the body but leaves the upstream
 `content-encoding: gzip` and a stale `content-length`. If those are relayed, the Codex
 client double-decodes / truncates → a malformed frame → `ApiError::Stream`

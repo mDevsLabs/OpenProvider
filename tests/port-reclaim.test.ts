@@ -69,7 +69,7 @@ describe("parseTcpQuadsForLocalPort / IPv6", () => {
 });
 
 describe("reclaimListenPort", () => {
-  test("does not kill any ocx listener by default (healthy proxy / stale pid files)", async () => {
+  test("does not kill any opr listener by default (healthy proxy / stale pid files)", async () => {
     const killed: number[] = [];
     await expect(reclaimListenPort(10100, "127.0.0.1", {
       timeoutMs: 80,
@@ -109,7 +109,7 @@ describe("reclaimListenPort", () => {
     expect(killed).toEqual([]);
   });
 
-  test("concurrent pinned-start shape: second start never kills the first ocx listener", async () => {
+  test("concurrent pinned-start shape: second start never kills the first opr listener", async () => {
     const killed: number[] = [];
     await expect(reclaimListenPort(10100, "127.0.0.1", {
       timeoutMs: 80,
@@ -129,7 +129,7 @@ describe("reclaimListenPort", () => {
     expect(killed).toEqual([]);
   });
 
-  test("kills only the allowlisted ocx pid after revalidation", async () => {
+  test("kills only the allowlisted opr pid after revalidation", async () => {
     const killed: number[] = [];
     const verified: number[] = [];
     await expect(reclaimListenPort(10100, "127.0.0.1", {
@@ -155,7 +155,7 @@ describe("reclaimListenPort", () => {
     expect(verified.filter(pid => pid === 100).length).toBeGreaterThanOrEqual(2);
   });
 
-  test("unknown old PID: update-style reclaim kills no ocx listener", async () => {
+  test("unknown old PID: update-style reclaim kills no opr listener", async () => {
     const killed: number[] = [];
     await expect(reclaimListenPort(10100, "127.0.0.1", {
       timeoutMs: 80,
@@ -176,7 +176,7 @@ describe("reclaimListenPort", () => {
     expect(killed).toEqual([]);
   });
 
-  test("does not kill foreign (non-ocx) listeners and does not drop their TCP rows", async () => {
+  test("does not kill foreign (non-opr) listeners and does not drop their TCP rows", async () => {
     const killed: number[] = [];
     const dropped: number[] = [];
     await expect(reclaimListenPort(10100, "127.0.0.1", {
@@ -381,7 +381,7 @@ describe("reclaimListenPort", () => {
     expect(dropped).toEqual([]);
   });
 
-  test("does not drop TCP rows while allowlisted ocx survives kill", async () => {
+  test("does not drop TCP rows while allowlisted opr survives kill", async () => {
     const killed: number[] = [];
     const dropped: number[] = [];
     await expect(reclaimListenPort(10100, "127.0.0.1", {
@@ -408,7 +408,7 @@ describe("reclaimListenPort", () => {
     expect(dropped).toEqual([]);
   });
 
-  test("drops TCP rows only after allowlisted ocx is confirmed dead", async () => {
+  test("drops TCP rows only after allowlisted opr is confirmed dead", async () => {
     let alive = true;
     let available = false;
     const dropped: number[] = [];

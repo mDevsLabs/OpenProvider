@@ -2,14 +2,14 @@
 
 ## The decision
 
-opencodex sits mid-chain: `Codex CLI → opencodex → upstream provider`. WS parity can be
+openprovider sits mid-chain: `Codex CLI → openprovider → upstream provider`. WS parity can be
 implemented at one or both hops. Two strategies, not mutually exclusive:
 
-- **Option A — Codex-facing WS bridge (MVP).** Implement the WS *server* hop (Codex ↔ ocx).
-  Upstream stays HTTP/SSE for every provider. ocx accepts the WS upgrade, parses
+- **Option A — Codex-facing WS bridge (MVP).** Implement the WS *server* hop (Codex ↔ opr).
+  Upstream stays HTTP/SSE for every provider. opr accepts the WS upgrade, parses
   `response.create`, runs the **existing** `handleResponses` pipeline, and emits the bridge's
   Responses events as WS **Text** frames instead of SSE.
-- **Option B — Native upstream WS (true parity).** For native `gpt-*` only, ocx also speaks WS
+- **Option B — Native upstream WS (true parity).** For native `gpt-*` only, opr also speaks WS
   *upstream* to the ChatGPT backend (a Bun WS **client** re-implementing Codex's
   `ResponsesWebsocketClient`), so the native path is end-to-end WS.
 
@@ -41,7 +41,7 @@ implemented at one or both hops. Two strategies, not mutually exclusive:
 
 | Dimension | A — Codex-facing WS bridge | B — Native upstream WS |
 |-----------|----------------------------|------------------------|
-| Hop implemented | Codex ↔ ocx (server) | + ocx ↔ ChatGPT backend (client) |
+| Hop implemented | Codex ↔ opr (server) | + opr ↔ ChatGPT backend (client) |
 | Covers routed models | yes (first hop only) | no (native only) |
 | Reuses existing pipeline | fully | partially |
 | New surface | Bun WS server + WS emitter | + Bun WS client, upstream handshake |
@@ -51,7 +51,7 @@ implemented at one or both hops. Two strategies, not mutually exclusive:
 
 ## Integration point (feasibility)
 
-opencodex runs on `Bun.serve({ fetch })` (`/Users/jun/Developer/new/700_projects/opencodex/src/server.ts:508-510`),
+openprovider runs on `Bun.serve({ fetch })` (`/Users/jun/Developer/new/700_projects/openprovider/src/server.ts:508-510`),
 routing `POST /v1/responses` at `:547`. Bun's native WS support plugs in here without a new
 dependency:
 
@@ -93,7 +93,7 @@ paths — advertise intentionally when ready, and never let native leak it early
 110.20 concluded WS does not improve routed **reliability or performance** — still true: A's
 upstream read is the same SSE, so first-token latency/throughput are unchanged, and A adds a
 protocol surface rather than removing an error class. 120 is justified on a **different axis**:
-native transport **parity** and satisfying Codex's WS capability so `ocx` is a drop-in for the
+native transport **parity** and satisfying Codex's WS capability so `opr` is a drop-in for the
 native OpenAI provider. Action: add a one-line cross-link at the top of
 `110/20_transport-evaluation.md` pointing here; do **not** delete its conclusion.
 

@@ -25,7 +25,7 @@ contextWindows만 읽음).
 
 `claudeCode.authMode === "proxy"`가 구동하는 것:
 
-- `src/cli/claude.ts:58` — `ocx claude` 실행 시 `ANTHROPIC_AUTH_TOKEN=opencodex-proxy` 주입
+- `src/cli/claude.ts:58` — `opr claude` 실행 시 `ANTHROPIC_AUTH_TOKEN=openprovider-proxy` 주입
 - `src/server/system-env.ts:34,241-245` — launchctl 시스템 env 주입 (systemEnv=true)
 - `gui/src/pages/ClaudeCode.tsx:53` — 수동 env 안내 블록
 
@@ -34,7 +34,7 @@ contextWindows만 읽음).
 systemEnv=true 상태에서 proxy가 이미 launchctl에 주입된 뒤 Subscription으로
 되돌리면: 재주입 경로(`system-env.ts:241-245`)는 proxy 모드일 때만 토큰을
 세팅하고, 이미 주입된 `ANTHROPIC_AUTH_TOKEN`을 제거하는 로직이 없다 →
-`opencodex-proxy` 더미 토큰이 잔류해 Claude 구독 로그인/커넥터를 계속 무력화.
+`openprovider-proxy` 더미 토큰이 잔류해 Claude 구독 로그인/커넥터를 계속 무력화.
 또한 live-apply(`applySystemEnvToggle`)는 `body.systemEnv !== undefined`일 때만
 실행(`management-api.ts:1177-1183`)되므로 authMode 단독 PUT은 반영이 지연된다.
 → 수리 범위에 포함 (010 참조).

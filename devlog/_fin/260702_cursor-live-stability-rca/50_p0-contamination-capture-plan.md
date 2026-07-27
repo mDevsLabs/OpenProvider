@@ -6,11 +6,11 @@ WP2's debug-frames work).
 
 ## Evidence
 
-- Run 2 final continuation turn (15:47, ocx-mr356d7f-jh) returned an unrelated
+- Run 2 final continuation turn (15:47, opr-mr356d7f-jh) returned an unrelated
   conversation's narrative wrapping this session's real tool results.
 - RCA lane (static): continuation reuses the same Cursor `conversationId` and
   sends `ResumeAction` (`request-builder.ts:84-88`, `protobuf-request.ts:295-315`,
-  `responses/state.ts:49-78`); ocx never sends checkpoints back; outgoing
+  `responses/state.ts:49-78`); opr never sends checkpoints back; outgoing
   summary/archive fields are empty (`protobuf-request.ts:318-332`).
 - Ranked suspects: (1) Cursor server-side resume state keyed by conversationId
   merging foreign state; (2) process-global blob map (`native-exec.ts:44`)
@@ -25,7 +25,7 @@ WP2's debug-frames work).
   `native-exec-tools.ts` with failure replies unless desktopExecutor is
   configured). Prompt-side conditioning goes to WP2b.
 - Cursor Notes as a cross-session content channel: `RequestContext.
-  conversationNotesListing`/`sharedNotesListing` (S2). ocx does not populate
+  conversationNotesListing`/`sharedNotesListing` (S2). opr does not populate
   them, but capture must log any notes-related content in server frames and
   outgoing context replies.
 

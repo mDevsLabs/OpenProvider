@@ -1,5 +1,5 @@
 /**
- * `ocx v2 status|on|off` — toggle/report the codex `multi_agent_v2` feature that
+ * `opr v2 status|on|off` — toggle/report the codex `multi_agent_v2` feature that
  * controls the multi-agent surface (v1 vs v2 collab mode).
  *
  * Contract:
@@ -126,7 +126,7 @@ export async function cmdV2(args: string[], deps: V2CliDeps = {}, findPort?: () 
       const sync = deps.sync ?? (await import("../codex/sync")).syncModelsToCodex;
       await sync(findPort ? await findPort() : undefined);
     } catch (err) {
-      log.error(`catalog resync failed: ${err instanceof Error ? err.message : String(err)} — run 'ocx sync' manually.`);
+      log.error(`catalog resync failed: ${err instanceof Error ? err.message : String(err)} — run 'opr sync' manually.`);
       return 1;
     }
     log.log(multiAgentModeLine(modeArg));
@@ -155,7 +155,7 @@ export async function cmdV2(args: string[], deps: V2CliDeps = {}, findPort?: () 
     const sync = deps.sync ?? (await import("../codex/sync")).syncModelsToCodex;
     await sync(findPort ? await findPort() : undefined);
   } catch (err) {
-    log.error(`catalog resync failed (flag IS flipped): ${err instanceof Error ? err.message : String(err)} — run 'ocx sync' manually.`);
+    log.error(`catalog resync failed (flag IS flipped): ${err instanceof Error ? err.message : String(err)} — run 'opr sync' manually.`);
     return 1;
   }
   log.log(v2StatusLine(want));

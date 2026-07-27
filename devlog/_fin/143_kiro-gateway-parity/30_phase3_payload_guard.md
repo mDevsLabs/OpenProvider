@@ -2,7 +2,7 @@
 
 ## Problem
 Gateway (payload_guards.py) trims oldest history pairs to fit a byte cap and
-repairs orphaned tool results. opencodex kiro builds the full history with no
+repairs orphaned tool results. openprovider kiro builds the full history with no
 size guard; very long sessions can exceed Kiro's request limit and hard-fail.
 
 ## Plan (finalized in this phase's P)

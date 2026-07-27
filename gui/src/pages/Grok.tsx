@@ -23,7 +23,7 @@ interface GrokStatus {
 }
 
 /** Same collapse store the Desktop page uses; Grok has only two groups, both open. */
-const GROUP_COLLAPSE = makeCollapseStore("ocx.grok.collapsedGroups.v1");
+const GROUP_COLLAPSE = makeCollapseStore("opr.grok.collapsedGroups.v1");
 
 const GROUPS = [
   { id: "native", tkey: "grok.groupNative" as TKey },
@@ -46,7 +46,7 @@ function formatContext(value: number | undefined, t: TFn): string {
  *
  * The page writes ONLY the selection (config.json, via /api/grok/selection) and asks the
  * proxy to re-run the guarded sync (/api/grok/apply). The fence itself is written only
- * by injectGrokConfig — the same path `ocx start`/`ensure`/`restart` use. Aliases shown
+ * by injectGrokConfig — the same path `opr start`/`ensure`/`restart` use. Aliases shown
  * here come from readGrokStatus (what the writer actually wrote), never computed.
  */
 export default function Grok({ apiBase }: { apiBase: string }) {
@@ -210,31 +210,31 @@ export default function Grok({ apiBase }: { apiBase: string }) {
       )}
 
       {status && status.candidates.length > 0 && (
-        <div className="ocx-group-stack">
+        <div className="opr-group-stack">
           {GROUPS.map(group => {
             const view = grokGroupView(status.candidates, aliasById, excluded, group.id);
             if (view.total === 0) return null;
             const isCollapsed = collapsed.has(group.id);
             return (
-              <section key={group.id} className={`ocx-group${isCollapsed ? " collapsed" : ""}`} aria-labelledby={`grok-group-${group.id}`}>
-                <header className={`ocx-group-head${isCollapsed ? "" : " open"}`}>
-                  <h3 id={`grok-group-${group.id}`} className="ocx-group-heading">
+              <section key={group.id} className={`opr-group${isCollapsed ? " collapsed" : ""}`} aria-labelledby={`grok-group-${group.id}`}>
+                <header className={`opr-group-head${isCollapsed ? "" : " open"}`}>
+                  <h3 id={`grok-group-${group.id}`} className="opr-group-heading">
                     <button
                       type="button"
-                      className="ocx-group-toggle"
+                      className="opr-group-toggle"
                       aria-expanded={!isCollapsed}
                       aria-controls={`grok-group-body-${group.id}`}
                       onClick={() => toggleGroup(group.id)}
                     >
                       <IconChevron
-                        className="ocx-chevron"
+                        className="opr-chevron"
                         width={14}
                         height={14}
                         aria-hidden="true"
                         style={{ transform: isCollapsed ? "none" : "rotate(90deg)" }}
                       />
-                      <span className="ocx-group-name">{t(group.tkey)}</span>
-                      <span className="ocx-group-count">
+                      <span className="opr-group-name">{t(group.tkey)}</span>
+                      <span className="opr-group-count">
                         {t("grok.enabledCount", { on: view.enabled, total: view.total })}
                       </span>
                     </button>

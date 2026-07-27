@@ -3,7 +3,7 @@
 ## Objective
 
 Codex 앱이 내부적으로 보내는 gpt-5.4-mini 헬퍼 호출(제목 생성, 커밋 메시지 등)을
-opencodex 프록시에서 가로채 사용자 지정 모델로 리라이트. effort는 low로 고정.
+openprovider 프록시에서 가로채 사용자 지정 모델로 리라이트. effort는 low로 고정.
 옵트인 방식(기본 비활성)으로 경고 표시.
 
 ## Context
@@ -11,7 +11,7 @@ opencodex 프록시에서 가로채 사용자 지정 모델로 리라이트. eff
 - GitHub issues: #26288, #28741, #28821, #24208
 - Codex 앱은 title generation, commit message에 gpt-5.4-mini (reasoningEffort=low) 하드코딩
 - codex-rs에 설정 포인트 없음 — Electron 앱 클라이언트에서 직접 호출
-- opencodex 프록시를 경유하는 것이 확인됨 (로그에 gpt-5.4-mini-2026-03-17 표시)
+- openprovider 프록시를 경유하는 것이 확인됨 (로그에 gpt-5.4-mini-2026-03-17 표시)
 
 ## Scope
 

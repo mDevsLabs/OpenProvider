@@ -44,7 +44,7 @@ WP2(#429)를 보안 경계로 재분류한 것은 모델 생성 인자가 **shel
 - GUI에 `reasoningSplitModels` 소비자가 없고, 전체 config PUT은 405로 막혀 있으며
   provider PATCH는 언급되지 않은 필드를 보존한다.
 
-다만 `login-cli.ts` 제외에는 실제 대가가 있다: `ocx login minimax`가 저장하는 config에
+다만 `login-cli.ts` 제외에는 실제 대가가 있다: `opr login minimax`가 저장하는 config에
 이 필드가 빠진다. 런타임은 안전하지만 **저장 형태의 완결성은 떨어진다.**
 이웃 필드와의 일관성을 생각하면 포함하는 편이 낫다는 판단도 가능하다.
 이번 통합은 최소 범위 원칙에 따라 제외하되, 이것이 무해해서가 아니라

@@ -7,9 +7,9 @@ window can make every model (even gpt models) disconnect". 댓글에서 이미 �
 
 ## 1. 증상과 재현 경로
 
-1. Windows에서 `ocx service install` 실행.
-2. Task Scheduler 태스크 `opencodex-proxy`가 로그온 트리거로
-   `~/.opencodex/opencodex-service.cmd`를 실행 → **cmd 콘솔 창이 화면에 보임**.
+1. Windows에서 `opr service install` 실행.
+2. Task Scheduler 태스크 `openprovider-proxy`가 로그온 트리거로
+   `~/.openprovider/openprovider-service.cmd`를 실행 → **cmd 콘솔 창이 화면에 보임**.
 3. 사용자가 그 창을 X로 닫음 (대표 재현 경로; 세션 logoff, 작업 관리자 종료도
    같은 계열의 강제 종료).
 4. Windows가 해당 콘솔에 연결된 모든 프로세스에 `CTRL_CLOSE_EVENT`를 보내고,
@@ -44,16 +44,16 @@ PID 추적, 프록시 health 엔드포인트, 창 닫기 후 PT1M 경과 시 재
 - `<Hidden>`(src/service.ts:365, 현재 `false`)은 Task Scheduler **UI 목록**에서
   태스크를 숨기는 설정일 뿐, 콘솔 창과 무관하다.
   출처: https://learn.microsoft.com/en-us/windows/win32/taskschd/tasksettings-hidden
-- `windowsHide: true`(src/service.ts:251 `runFile`)는 opencodex가 `schtasks.exe`를
+- `windowsHide: true`(src/service.ts:251 `runFile`)는 openprovider가 `schtasks.exe`를
   **관리 호출**할 때만 적용된다. 등록된 태스크가 나중에 실행하는 창에는 영향 없음.
 - 래퍼 스크립트의 "The wrapper runs in its own hidden console" 주석
   (src/service.ts:298)은 실제 동작과 모순된다 — InteractiveToken에서는 hidden이
   아니다.
 - LogonType 참고: https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-logontype-simpletype
 
-## 3. `ocx stop`과의 대비 (왜 stop은 문제없나)
+## 3. `opr stop`과의 대비 (왜 stop은 문제없나)
 
-`ocx stop`(src/cli/index.ts:267 이후 `handleStop`)은:
+`opr stop`(src/cli/index.ts:267 이후 `handleStop`)은:
 
 1. `stopServiceIfInstalled()` — 서비스 매니저를 먼저 멈춰 respawn 차단
 2. `stopProxy(pid)` — management-API drain 우선의 graceful 종료

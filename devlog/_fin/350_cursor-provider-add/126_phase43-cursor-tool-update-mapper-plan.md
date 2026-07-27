@@ -5,7 +5,7 @@
 
 ## Part 1 — Easy explanation
 
-Once Cursor starts emitting tool calls, opencodex must pass those calls back to Codex in
+Once Cursor starts emitting tool calls, openprovider must pass those calls back to Codex in
 Responses API format. Today the protobuf mapper drops all Cursor tool-call updates. This
 phase translates those protobuf messages into the adapter events that `bridge.ts` already
 knows how to render as Responses tool calls.

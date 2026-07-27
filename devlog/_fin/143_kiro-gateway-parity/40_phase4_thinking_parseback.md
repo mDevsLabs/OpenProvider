@@ -1,7 +1,7 @@
 # Phase 40 — Response-side thinking block parse-back
 
 ## Problem
-opencodex injects request-side thinking tags (kiro.ts 196-209) but does not
+openprovider injects request-side thinking tags (kiro.ts 196-209) but does not
 parse <thinking>/<think>/<reasoning> blocks OUT of the response stream. Gateway
 (thinking_parser.py) runs an FSM that detects a leading thinking block and emits
 it as reasoning_content separate from visible text.
@@ -9,7 +9,7 @@ it as reasoning_content separate from visible text.
 ## Plan (finalized in this phase's P)
 - Add a streaming FSM in the kiro parse path: detect a thinking block ONLY at the
   start of the response; buffer until close tag; emit AdapterEvent reasoning
-  deltas (matching how other opencodex adapters surface reasoning), then switch
+  deltas (matching how other openprovider adapters surface reasoning), then switch
   to normal text_delta for the remainder.
 - Handle tag split across SSE chunks (FSM buffers partial tags).
 - Once closed, no further thinking detection (later literal tags pass through).

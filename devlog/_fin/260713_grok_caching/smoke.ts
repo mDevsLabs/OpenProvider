@@ -1,6 +1,6 @@
 /**
  * Live xAI OAuth prompt-cache smoke (audit-mandated gate, 260713).
- * Starts the dev server on a spare port (shared real ~/.opencodex home so the
+ * Starts the dev server on a spare port (shared real ~/.openprovider home so the
  * production instance and this smoke never fork the rotating refresh token),
  * sends the same conversation twice with a fixed prompt_cache_key, and prints
  * the usage of both turns. PASS = second turn reports cached input tokens > 0.

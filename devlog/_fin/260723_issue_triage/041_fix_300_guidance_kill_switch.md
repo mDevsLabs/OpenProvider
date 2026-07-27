@@ -278,7 +278,7 @@ export async function multiAgentGuidanceText(
       : undefined;
 
     if (isInjectionDebugEnabled() && effective.excluded.length > 0) {
-      injectionDebugLog(`[opencodex] multi-agent guidance excluded: ${effective.excluded
+      injectionDebugLog(`[openprovider] multi-agent guidance excluded: ${effective.excluded
         .map(item => `${item.configured}:${item.reason}`)
         .join(", ")}`);
     }
@@ -409,8 +409,8 @@ After:
 
 ```ts
 "dash.injectionHint": "Pick a routed model to inject into the delegation prompt. The agent will be told to use it for sub-tasks.",
-"dash.multiAgentGuidance": "OpenCodex multi-agent guidance",
-"dash.multiAgentGuidanceHint": "Adds OpenCodex-authored delegation instructions. Turning this off keeps the v1/v2 surface, sub-agent roster, routing, and effort caps unchanged.",
+"dash.multiAgentGuidance": "OpenProvider multi-agent guidance",
+"dash.multiAgentGuidanceHint": "Adds OpenProvider-authored delegation instructions. Turning this off keeps the v1/v2 surface, sub-agent roster, routing, and effort caps unchanged.",
 ```
 
 `gui/src/i18n/de.ts:71` before:
@@ -423,8 +423,8 @@ After:
 
 ```ts
 "dash.injectionHint": "Wähle ein geroutetes Modell für den Delegations-Prompt. Der Agent wird angewiesen, es für Teilaufgaben zu nutzen.",
-"dash.multiAgentGuidance": "OpenCodex-Multi-Agent-Anleitung",
-"dash.multiAgentGuidanceHint": "Fügt von OpenCodex erstellte Delegationshinweise hinzu. Beim Ausschalten bleiben v1/v2-Oberfläche, Sub-Agent-Liste, Routing und Aufwandsgrenzen unverändert.",
+"dash.multiAgentGuidance": "OpenProvider-Multi-Agent-Anleitung",
+"dash.multiAgentGuidanceHint": "Fügt von OpenProvider erstellte Delegationshinweise hinzu. Beim Ausschalten bleiben v1/v2-Oberfläche, Sub-Agent-Liste, Routing und Aufwandsgrenzen unverändert.",
 ```
 
 `gui/src/i18n/ko.ts:75` before:
@@ -437,8 +437,8 @@ After:
 
 ```ts
 "dash.injectionHint": "위임 프롬프트에 주입할 라우팅 모델을 선택합니다. 에이전트가 서브태스크에 이 모델을 사용하도록 안내됩니다.",
-"dash.multiAgentGuidance": "OpenCodex 멀티 에이전트 가이던스",
-"dash.multiAgentGuidanceHint": "OpenCodex가 작성한 위임 안내를 추가합니다. 꺼도 v1/v2 표면, 서브에이전트 로스터, 라우팅, effort 상한은 바뀌지 않습니다.",
+"dash.multiAgentGuidance": "OpenProvider 멀티 에이전트 가이던스",
+"dash.multiAgentGuidanceHint": "OpenProvider가 작성한 위임 안내를 추가합니다. 꺼도 v1/v2 표면, 서브에이전트 로스터, 라우팅, effort 상한은 바뀌지 않습니다.",
 ```
 
 `gui/src/i18n/zh.ts:75` before:
@@ -451,8 +451,8 @@ After:
 
 ```ts
 "dash.injectionHint": "选择要注入委托提示的路由模型。代理将被告知在子任务中使用它。",
-"dash.multiAgentGuidance": "OpenCodex 多代理指引",
-"dash.multiAgentGuidanceHint": "添加由 OpenCodex 编写的委派指令。关闭后仍保留 v1/v2 界面、子代理清单、路由和 effort 上限。",
+"dash.multiAgentGuidance": "OpenProvider 多代理指引",
+"dash.multiAgentGuidanceHint": "添加由 OpenProvider 编写的委派指令。关闭后仍保留 v1/v2 界面、子代理清单、路由和 effort 上限。",
 ```
 
 `gui/src/i18n/ru.ts:80` before:
@@ -465,8 +465,8 @@ After:
 
 ```ts
 "dash.injectionHint": "Выберите маршрутизируемую модель для внедрения в промпт делегирования. Агенту будет указано использовать её для подзадач.",
-"dash.multiAgentGuidance": "Мультиагентное руководство OpenCodex",
-"dash.multiAgentGuidanceHint": "Добавляет инструкции делегирования от OpenCodex. Отключение не меняет поверхность v1/v2, список подагентов, маршрутизацию и пределы effort.",
+"dash.multiAgentGuidance": "Мультиагентное руководство OpenProvider",
+"dash.multiAgentGuidanceHint": "Добавляет инструкции делегирования от OpenProvider. Отключение не меняет поверхность v1/v2, список подагентов, маршрутизацию и пределы effort.",
 ```
 
 `gui/src/i18n/ja.ts:80` before:
@@ -479,8 +479,8 @@ After:
 
 ```ts
 "dash.injectionHint": "委任プロンプトに注入するルーティングモデルを選択します。エージェントはサブタスクにそれを使うよう指示されます。",
-"dash.multiAgentGuidance": "OpenCodex マルチエージェントガイダンス",
-"dash.multiAgentGuidanceHint": "OpenCodex が作成する委任指示を追加します。オフにしても v1/v2 サーフェス、サブエージェントロスター、ルーティング、effort 上限は変わりません。",
+"dash.multiAgentGuidance": "OpenProvider マルチエージェントガイダンス",
+"dash.multiAgentGuidanceHint": "OpenProvider が作成する委任指示を追加します。オフにしても v1/v2 サーフェス、サブエージェントロスター、ルーティング、effort 上限は変わりません。",
 ```
 
 ## 7. i18n fallback decision
@@ -799,7 +799,7 @@ After:
 
 ```md
 | `injectionPrompt?` | `string` | — | Custom override for the injected v2 guidance body. Replaces the built-in text; `{{model}}`, `{{effort}}`, and `{{roster}}` placeholders are substituted. Firing gates are unchanged. Settable via `PUT /api/injection-model` (`prompt` key). |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | Controls only OpenCodex-authored multi-agent developer guidance. Unset/`true` preserves v1/v2 guidance; `false` suppresses both without changing the collaboration surface, `subagentModels`, routing, or effort caps. `GET/PUT /api/injection-model` exposes the effective value; PUT is a partial update. |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | Controls only OpenProvider-authored multi-agent developer guidance. Unset/`true` preserves v1/v2 guidance; `false` suppresses both without changing the collaboration surface, `subagentModels`, routing, or effort caps. `GET/PUT /api/injection-model` exposes the effective value; PUT is a partial update. |
 ```
 
 ### `docs-site/src/content/docs/ja/reference/configuration.md:38`
@@ -814,7 +814,7 @@ After:
 
 ```md
 | `injectionPrompt?` | `string` | — | 注入される v2 案内本文を丸ごと差し替えるカスタムテキスト。`{{model}}`、`{{effort}}`、`{{roster}}` placeholder が置換され、発火条件はそのままです。`PUT /api/injection-model` の `prompt` キーでも設定できます。 |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenCodex が作成する multi-agent developer ガイダンスだけを制御します。未設定/`true` は v1/v2 ガイダンスを維持し、`false` は collaboration surface、`subagentModels`、routing、effort cap を変えずに両方を抑止します。`GET/PUT /api/injection-model` は有効値を返し、PUT は部分更新です。 |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenProvider が作成する multi-agent developer ガイダンスだけを制御します。未設定/`true` は v1/v2 ガイダンスを維持し、`false` は collaboration surface、`subagentModels`、routing、effort cap を変えずに両方を抑止します。`GET/PUT /api/injection-model` は有効値を返し、PUT は部分更新です。 |
 ```
 
 ### `docs-site/src/content/docs/ko/reference/configuration.md:39`
@@ -829,7 +829,7 @@ After:
 
 ```md
 | `injectionPrompt?` | `string` | — | 주입되는 v2 안내 본문을 통째로 교체하는 커스텀 텍스트. `{{model}}`, `{{effort}}`, `{{roster}}` 플레이스홀더가 치환되며 발화 조건은 그대로입니다. `PUT /api/injection-model`의 `prompt` 키로도 설정할 수 있습니다. |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenCodex가 작성하는 multi-agent developer 가이던스만 제어합니다. 미설정/`true`는 v1/v2 가이던스를 유지하고, `false`는 collaboration surface, `subagentModels`, routing, effort cap을 바꾸지 않고 둘 다 억제합니다. `GET/PUT /api/injection-model`은 유효값을 제공하며 PUT은 부분 업데이트입니다. |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenProvider가 작성하는 multi-agent developer 가이던스만 제어합니다. 미설정/`true`는 v1/v2 가이던스를 유지하고, `false`는 collaboration surface, `subagentModels`, routing, effort cap을 바꾸지 않고 둘 다 억제합니다. `GET/PUT /api/injection-model`은 유효값을 제공하며 PUT은 부분 업데이트입니다. |
 ```
 
 ### `docs-site/src/content/docs/ru/reference/configuration.md:43`
@@ -844,7 +844,7 @@ After:
 
 ```md
 | `injectionPrompt?` | `string` | — | Пользовательская замена текста внедряемого v2-руководства. Заменяет встроенный текст; плейсхолдеры `{{model}}`, `{{effort}}` и `{{roster}}` подставляются. Условия срабатывания не меняются. Настраивается через `PUT /api/injection-model` (ключ `prompt`). |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | Управляет только developer-руководством multi-agent, добавляемым OpenCodex. Отсутствующее значение/`true` сохраняет руководство v1/v2; `false` подавляет оба варианта, не меняя поверхность совместной работы, `subagentModels`, маршрутизацию и пределы effort. `GET/PUT /api/injection-model` возвращает эффективное значение; PUT является частичным обновлением. |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | Управляет только developer-руководством multi-agent, добавляемым OpenProvider. Отсутствующее значение/`true` сохраняет руководство v1/v2; `false` подавляет оба варианта, не меняя поверхность совместной работы, `subagentModels`, маршрутизацию и пределы effort. `GET/PUT /api/injection-model` возвращает эффективное значение; PUT является частичным обновлением. |
 ```
 
 ### `docs-site/src/content/docs/zh-cn/reference/configuration.md:37`
@@ -859,7 +859,7 @@ After:
 
 ```md
 | `injectionPrompt?` | `string` | — | 整体替换注入的 v2 指南正文的自定义文本。`{{model}}`、`{{effort}}`、`{{roster}}` 占位符会被替换，触发条件保持不变。也可通过 `PUT /api/injection-model` 的 `prompt` 键设置。 |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | 仅控制由 OpenCodex 添加的 multi-agent developer 指引。未设置/`true` 保持 v1/v2 指引；`false` 会同时禁止两者，但不改变协作界面、`subagentModels`、路由或 effort 上限。`GET/PUT /api/injection-model` 返回有效值，PUT 为部分更新。 |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | 仅控制由 OpenProvider 添加的 multi-agent developer 指引。未设置/`true` 保持 v1/v2 指引；`false` 会同时禁止两者，但不改变协作界面、`subagentModels`、路由或 effort 上限。`GET/PUT /api/injection-model` 返回有效值，PUT 为部分更新。 |
 ```
 
 ## 11. Backward compatibility

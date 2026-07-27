@@ -1,7 +1,7 @@
 # 140.11 — Phase 1b: google-vertex HTTP hardening (retry/timeout + error classification)
 
 > Brings Vertex (the `google` adapter `googleMode:"vertex"` branch) to the **Kiro/Cursor
-> stabilization bar** for the HTTP layer. Copy-paste-ready. SOT = opencodex's own Kiro pattern
+> stabilization bar** for the HTTP layer. Copy-paste-ready. SOT = openprovider's own Kiro pattern
 > (`kiro-retry.ts`, `kiro-errors.ts`); external cross-check = `router-for-me/CLIProxyAPI`
 > (`internal/runtime/executor/gemini_vertex_executor.go`). See `05_reference-repos.md`.
 

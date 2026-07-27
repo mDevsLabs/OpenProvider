@@ -2,7 +2,7 @@
 
 ## Easy Explanation
 
-Phase 1 records what the proxy already knows. If an upstream response reports token usage, opencodex stores it in a local JSONL file. If a request finishes without usage, opencodex records that fact as `unreported` instead of pretending it used zero tokens.
+Phase 1 records what the proxy already knows. If an upstream response reports token usage, openprovider stores it in a local JSONL file. If a request finishes without usage, openprovider records that fact as `unreported` instead of pretending it used zero tokens.
 
 ## Diff-Level Plan
 

@@ -18,14 +18,14 @@ to the app's live files non-destructive. All changes are in `src/codex-history-p
    skip when its `payload.id` != the canonical thread id, mirroring the app ignoring id-mismatched
    lines. Prevents writing a misleading line for forked rollouts.
 4. `patchFirstLineProviderInPlace()` — for a length-preserving provider change (e.g.
-   `opencodex` -> `openai`), rewrite only the `"model_provider":"..."` token inside line 1, padding
+   `openprovider` -> `openai`), rewrite only the `"model_provider":"..."` token inside line 1, padding
    the freed bytes with JSON-insignificant whitespace so the line byte length is identical. Equal
    length means an offset-fixed write with no truncate and no inode swap. This covers the
-   first-line-clone reader path, so a later app git/memory-mode update cannot resurrect `opencodex`.
+   first-line-clone reader path, so a later app git/memory-mode update cannot resurrect `openprovider`.
    The first line is read by growing the probe until the newline (16 MiB hard stop) so large
    `base_instructions` cannot silently disable the patch.
 
-The opencodex direction (`openai` -> `opencodex`, a length-growing change) intentionally stays
+The openprovider direction (`openai` -> `openprovider`, a length-growing change) intentionally stays
 append-only: keeping line 1 as the origin provider is harmless there and the live data-loss bug was
 the revert direction.
 
@@ -36,8 +36,8 @@ the revert direction.
 - New regression tests in `tests/codex-history-provider.test.ts`:
   - appends instead of rewriting line 1, preserving inode and prior bytes;
   - skips append when the latest `session_meta` has a foreign thread id;
-  - rewrites line 1 in place (length-preserving) on opencodex-origin revert, and a later
-    first-line clone no longer resurrects `opencodex`;
+  - rewrites line 1 in place (length-preserving) on openprovider-origin revert, and a later
+    first-line clone no longer resurrects `openprovider`;
   - patches line 1 even when it exceeds the 64 KiB read chunk (large `base_instructions`).
 - Live reproduction (isolated `CODEX_HOME`, app's cached append handle simulated):
   `inode_preserved=true`, `b'`/`b''` survived, DB flipped to `openai`, latest + first-line
@@ -47,12 +47,12 @@ the revert direction.
 
 All native-restore entry points funnel through `restoreNativeCodex` /
 `syncCodexHistoryProvider` / `restoreLegacyOpenaiHistory`, so they inherit the fix:
-`src/cli.ts` signal shutdown + `ocx stop`/`restore`/`recover-history`, `src/server.ts` `/stop`
-endpoint, and `src/service.ts` service stop/uninstall. The inject (opencodex) direction in
+`src/cli.ts` signal shutdown + `opr stop`/`restore`/`recover-history`, `src/server.ts` `/stop`
+endpoint, and `src/service.ts` service stop/uninstall. The inject (openprovider) direction in
 `src/codex-inject.ts` is unchanged in behavior beyond the safer append/DB open.
 
 ## Operational note
 
-Running the proxy as a service (`ocx service install`, `OCX_SERVICE=1`) skips the on-shutdown
+Running the proxy as a service (`opr service install`, `OCX_SERVICE=1`) skips the on-shutdown
 restore entirely, which also avoids the churn for users who never intend to drop back to native
 Codex between restarts.

@@ -2,9 +2,9 @@
 
 ## Needs implementation-time verification
 
-- Does each jawcode quota provider still match opencodex's current OAuth
+- Does each jawcode quota provider still match openprovider's current OAuth
   credential source and provider id?
-- Which `../cli-jaw` SVG/logo assets are safe to copy into opencodex, and under
+- Which `../cli-jaw` SVG/logo assets are safe to copy into openprovider, and under
   what license/attribution?
 - Should provider custom windows use `customWindows` in the shared component, or
   should adapters map everything into `5h` / `weekly` / `monthly` when possible?

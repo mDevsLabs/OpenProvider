@@ -65,13 +65,13 @@ search/sort, unsaved-leave guards, quota bar coloring, usage charts computation.
 
 ## What the CLI already covers (cross-ref `002_cli_command_inventory.md`)
 
-- `ocx status` — proxy/paths/OAuth-login summary (subset of Dashboard).
-- `ocx debug` — full Debug page parity (flags + log streams).
-- `ocx provider list/add/remove/show/set-default` — provider config management.
-- `ocx models` — static model list (no enable/disable, no caps).
-- `ocx login/logout` — first-credential OAuth/key login.
-- `ocx update`, `ocx health`, `ocx doctor`, `ocx service`, `ocx v2`,
-  `ocx claude`, `ocx sync`, `ocx gui`, daemon lifecycle.
+- `opr status` — proxy/paths/OAuth-login summary (subset of Dashboard).
+- `opr debug` — full Debug page parity (flags + log streams).
+- `opr provider list/add/remove/show/set-default` — provider config management.
+- `opr models` — static model list (no enable/disable, no caps).
+- `opr login/logout` — first-credential OAuth/key login.
+- `opr update`, `opr health`, `opr doctor`, `opr service`, `opr v2`,
+  `opr claude`, `opr sync`, `opr gui`, daemon lifecycle.
 
 ## Headline gap (feeds `004_parity_matrix.md`)
 

@@ -24,7 +24,7 @@ const prevHome = process.env.OPENCODEX_HOME;
 let dir: string;
 
 beforeEach(() => {
-  dir = join(tmpdir(), `ocx-update-job-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  dir = join(tmpdir(), `opr-update-job-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   mkdirSync(dir, { recursive: true });
   process.env.OPENCODEX_HOME = dir;
 });

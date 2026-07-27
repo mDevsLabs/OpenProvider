@@ -186,7 +186,7 @@ export async function handleCursorNativeExec(execMsg: ExecServerMessage, deps: C
         case: "error",
         value: create(DiagnosticsErrorSchema, {
           path,
-          error: "Diagnostics are not supported by the opencodex Cursor transport.",
+          error: "Diagnostics are not supported by the openprovider Cursor transport.",
         }),
       },
     }))];

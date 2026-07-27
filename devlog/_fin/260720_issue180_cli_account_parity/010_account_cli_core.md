@@ -1,4 +1,4 @@
-# 010 — Phase 1: `ocx account list|current|use` core (diff-level design)
+# 010 — Phase 1: `opr account list|current|use` core (diff-level design)
 
 Issue #180 minimal scope. Reuses existing management contracts only
 (`003_management_api_contracts.md` → no server change). Conventions from
@@ -14,9 +14,9 @@ live local proxy.
 ## Command surface
 
 ```text
-ocx account list [provider] [--json] [--all]
-ocx account current <provider> [--json]
-ocx account use <provider> <account-or-key-id|main> [--json]
+opr account list [provider] [--json] [--all]
+opr account current <provider> [--json]
+opr account use <provider> <account-or-key-id|main> [--json]
 ```
 
 - `list` (no provider): codex pool (if `openai` configured, pool mode) + every
@@ -142,10 +142,10 @@ export interface AccountDeps {
   `runningProxyUpdateHeaders()` (src/oauth/login-cli.ts:9); base URL from
   `probeHostname(live.hostname)` + `live.port` (mirror src/cli/debug.ts:19-21).
 - `resolveLive(deps)` → deps.baseUrl ?? `findLiveProxy()`; null → stderr
-  `Proxy not reachable. Start it with 'ocx start' or 'ocx ensure'.` return 1.
+  `Proxy not reachable. Start it with 'opr start' or 'opr ensure'.` return 1.
 - `cmdAccount(args, deps = {}): Promise<number>` — subcommand switch; usage
   errors print `ACCOUNT_USAGE` + return 1; NEVER `process.exit` (return-code
-  pattern of `ocx v2`, src/cli/index.ts:524 — Windows-friendly unwind).
+  pattern of `opr v2`, src/cli/index.ts:524 — Windows-friendly unwind).
 
 Data flow per subcommand:
 
@@ -199,7 +199,7 @@ Error propagation rules (audit WP2-R1#1/#2, refined WP2-R2#1):
 
 ```ts
   account: {
-    usage: "ocx account <list|current|use> [provider] [id] [--json] [--all]",
+    usage: "opr account <list|current|use> [provider] [id] [--json] [--all]",
     summary: "List and switch provider accounts and API-key pools (GUI parity).",
     details: [
       "list [provider]     Codex pool, OAuth accounts and API keys (masked).",
@@ -234,7 +234,7 @@ Test matrix (activation scenarios, C-ACTIVATION-GROUNDING-01):
 | 7 | `main` alias mapping | `use openai main` | PUT body `accountId:"__main__"` |
 | 8 | unknown provider | `use nosuch x` | exit 1, stderr names candidates |
 | 9 | unknown account (API 404) | `use anthropic nope` | exit 1, server error text surfaced |
-| 10 | proxy down | baseUrl→127.0.0.1:1 | exit 1 + `ocx start`/`ensure` hint |
+| 10 | proxy down | baseUrl→127.0.0.1:1 | exit 1 + `opr start`/`ensure` hint |
 | 11 | secret hygiene (WP2-R2#2) | key DTO with sentinel in `apiKey` + valid `masked` | output shows `sk-ra****7890`, never the sentinel; `list --json` row has no `apiKey` property |
 | 12 | kiro note | `list kiro` | single-slot replacement note printed |
 | 13 | usage errors | bare `account`, `use` missing id | exit 1 + ACCOUNT_USAGE |
@@ -264,11 +264,11 @@ Test matrix (activation scenarios, C-ACTIVATION-GROUNDING-01):
 ## Accept criteria (C verifies each live)
 
 1. `bun x tsc --noEmit` clean; `bun test tests/cli-account.test.ts` all rows pass (matrix 1-17).
-2. Live proxy: `ocx account list`, `list --json | jq`, `current openai`,
+2. Live proxy: `opr account list`, `list --json | jq`, `current openai`,
    `use openai main` round-trip — then RESTORE the pre-test pin (evidence:
    before/after `current openai` outputs).
 3. Live error exits: `use openai nope` → 1; `use nosuch x` → 1.
-4. `ocx help account` and bare `ocx` usage both show the family.
+4. `opr help account` and bare `opr` usage both show the family.
 5. No raw token/key material in any captured output (grep over live + mock).
 
 ## Pre-implementation P stale-check items

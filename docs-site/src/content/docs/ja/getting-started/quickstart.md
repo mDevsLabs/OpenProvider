@@ -8,10 +8,10 @@ description: 最初のプロバイダーを設定し、3 つのコマンドで O
 ## 1. セットアップウィザードの実行
 
 ```bash
-ocx init
+opr init
 ```
 
-`ocx init` は次の手順を案内します:
+`opr init` は次の手順を案内します:
 
 1. **プロバイダー選択** — 組み込みレジストリのプリセット 50 個から一つを選ぶか、`custom` を選んで
    base URL とアダプターを直接入力します。
@@ -22,7 +22,7 @@ ocx init
    `$CODEX_HOME/config.toml`(デフォルト `~/.codex/config.toml`)のルートに `openai_base_url` を追加し、
    Codex の組み込み `openai` プロバイダーがプロキシを見るようにします。LAN などの外部アドレスにバインドした
    構成では API 認証ヘッダーを含む専用プロバイダーエントリを代わりに使います。
-6. **自動起動 shim をインストールしますか?** — オンにすると `codex` 実行時にまず `ocx ensure` が実行されます。
+6. **自動起動 shim をインストールしますか?** — オンにすると `codex` 実行時にまず `opr ensure` が実行されます。
 
 結果は `$OpenProvider_HOME/config.json`(デフォルト `~/.OpenProvider/config.json`)に保存されます。
 
@@ -36,13 +36,13 @@ Codex に提供し、Cursor はアダプターが提供する別のメタデー�
 ## 2. プロキシの起動
 
 ```bash
-ocx start            # デフォルトポート 10100
-ocx start --port 8080
+opr start            # デフォルトポート 10100
+opr start --port 8080
 ```
 
 起動時に OpenProvider は:
 
-- PID を `~/.OpenProvider/ocx.pid` に記録し(二重起動を拒否)、
+- PID を `~/.OpenProvider/opr.pid` に記録し(二重起動を拒否)、
 - 対応プロバイダーではライブモデルを照会し、ネイティブおよびルーティング項目を **Codex モデル
   カタログに同期**し、
 - `http://localhost:<port>/v1` で待機します。
@@ -53,8 +53,8 @@ ocx start --port 8080
 確認:
 
 ```bash
-ocx status
-ocx gui       # 現在のポートでダッシュボードを開く
+opr status
+opr gui       # 現在のポートでダッシュボードを開く
 ```
 
 ## 3. Codex の使用
@@ -84,7 +84,7 @@ codex -m "openrouter/openai/gpt-5.6-luna" "Summarize this trace"
 ## サブエージェントモデルの選択(任意)
 
 新規構成では `gpt-5.5`、`gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-5.6-luna`、`gpt-5.4-mini` が
-Codex のサブエージェントピッカーにデフォルトで表示されます。`ocx gui` でネイティブモデルとルーティングモデルを
+Codex のサブエージェントピッカーにデフォルトで表示されます。`opr gui` でネイティブモデルとルーティングモデルを
 合わせて最大 5 つまで変更や並び替えができます。推奨サブエージェントモデルと推論負荷も指定でき、
 OpenProvider はこの値を v1 コラボリクエストのガイダンスメッセージに反映します。
 
@@ -93,8 +93,8 @@ OpenProvider はこの値を v1 コラボリクエストのガイダンスメッ
 一部のプロバイダーは実際のアカウントログインをサポートします(OAuth、自動更新):
 
 ```bash
-ocx login xai          # または anthropic, kimi, kiro, google-antigravity, cursor
-ocx logout xai
+opr login xai          # または anthropic, kimi, kiro, google-antigravity, cursor
+opr logout xai
 ```
 
 デフォルトの OpenAI 経路は**キー不要**です — 既存の `codex login` 認証情報をそのまま転送します。
@@ -105,9 +105,9 @@ OpenAI API キーを別に使うには `openai-apikey` プロバイダーを追�
 ## 停止と復元
 
 ```bash
-ocx stop          # プロキシを停止しネイティブ Codex を復元
-ocx restore       # プロキシは残したままネイティブ Codex を復元(エイリアス: ocx eject)
-ocx restore back  # 実行中のプロキシに Codex を再接続
+opr stop          # プロキシを停止しネイティブ Codex を復元
+opr restore       # プロキシは残したままネイティブ Codex を復元(エイリアス: opr eject)
+opr restore back  # 実行中のプロキシに Codex を再接続
 ```
 
 ## 次へ

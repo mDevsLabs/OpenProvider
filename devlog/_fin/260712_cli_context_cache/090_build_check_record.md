@@ -21,7 +21,7 @@
   티어 별칭 서브에이전트 실호출 확인 (012의 폴딩 주의 참조).
 
 ## 사용자 절차
-1. `ocx stop && ocx start` → `ocx claude` 새로 실행 (env는 시작 시 1회)
+1. `opr stop && opr start` → `opr claude` 새로 실행 (env는 시작 시 1회)
 2. GUI Claude 페이지: 서브에이전트 티어 모델 3슬롯 지정 + 저장
 3. CLI /model 픽커에서 `… · 1M` 행 선택 → /context가 1M로 뜨는지
 4. 서브에이전트에서 `model: "opus"` 지정 → 로그에서 티어 슬롯 모델로 라우팅 확인
@@ -38,22 +38,22 @@
   bare id 유일시 등록, 테스트 계약 갱신, `[1m]` 대소문자 무시 통일(inbound/count_tokens 포함).
 - 게이트: `bun x tsc --noEmit` clean / `bun test` 2252 pass 0 fail / `gui build` OK /
   `docs-site build` 55 pages OK.
-- 잔여(HOTL): 라이브 스모크 — `ocx claude` 재시작 후 picker에서 `gpt-5.6-sol · 372k` 변형 선택,
+- 잔여(HOTL): 라이브 스모크 — `opr claude` 재시작 후 picker에서 `gpt-5.6-sol · 372k` 변형 선택,
   /context 1M 표시 + 350k 부근 자동 컴팩션 관측.
 
 ## 030 gateway-cache 사이클 (C1, 라이브 스모크 중 발견)
 
-- 증상: 프록시 재시작 후에도 픽커에 옛 `claude-ocx-*` 행만 표시.
+- 증상: 프록시 재시작 후에도 픽커에 옛 `claude-opr-*` 행만 표시.
 - 원인(바이너리): `q5l()`은 `ANTHROPIC_AUTH_TOKEN`/api key 없으면 fetch 자체를 생략 —
   구독 보존 모드(토큰 미주입)에서는 `~/.claude/cache/gateway-models.json`이 영원히 stale.
   픽커(`mkr()`)는 baseUrl 일치만 검사하고 캐시를 그대로 신뢰.
 - 해결: `src/claude/gateway-cache.ts` — CLI 스키마 그대로(usable-id 필터 포함) 캐시를
-  선기록. `ocx claude` 실행 직전 + systemEnv 주입 시(데몬 자기-fetch, 서버 listen 후) 실행.
+  선기록. `opr claude` 실행 직전 + systemEnv 주입 시(데몬 자기-fetch, 서버 listen 후) 실행.
 - 게이트: tsc clean / bun test 2255 pass. 라이브 캐시 재기록 확인(36 모델, 372k 변형 포함).
 
 ## 정정 (실측 2026-07-12): effort는 id 모양과 무관
 
-2.1.207 실측(디버그 링, `claude -p` 3종 비교): `claude-opus-4-8-ncb` / `claude-ocx-native--gpt-5.6-sol` /
+2.1.207 실측(디버그 링, `claude -p` 3종 비교): `claude-opus-4-8-ncb` / `claude-opr-native--gpt-5.6-sol` /
 bare `gpt-5.6-sol` 모두 `output_config.effort: high` + `thinking: adaptive`가 와이어에 실림 —
 ALWAYS_ENABLE_EFFORT 미설정 상태. devlog 136의 "opus 모양만 effort 탑재" 결론은 현 버전에서 무효
 (effort-2025-11-24 beta가 전 모델 적용으로 보임). opus-4-8 해시 별칭의 CLI 잔여 근거는
@@ -86,23 +86,23 @@ ALWAYS_ENABLE_EFFORT 미설정 상태. devlog 136의 "opus 모양만 effort 탑�
 
 ## 070 로스터 에이전트 주입 사이클 (C 기록)
 
-- 구현: agents-inject.ts (roster<=5 + ocx-self(inherit) → ~/.claude/agents/ocx-*.md,
+- 구현: agents-inject.ts (roster<=5 + opr-self(inherit) → ~/.claude/agents/opr-*.md,
   generated-by 마커 소유권 + lstat 심링크 가드 + tmp/rename 원자 쓰기 + disabled prune),
   cmdClaude/injectSystemEnv 훅(윈도우 맵 재사용), management PUT 즉시 prune, GUI 토글+i18n x4,
   docs x3. Kant 감사(071 FAIL) 3블로커 포함 7건 전건 반영 — 특히 self는 `model: inherit`.
 - 게이트: tsc clean / bun test 2274 pass / gui+docs build.
-- 라이브 E2E: 6개 def 생성 확인, `claude -p`에서 `subagent_type: ocx-gpt-5-6-terra` 파견 →
+- 라이브 E2E: 6개 def 생성 확인, `claude -p`에서 `subagent_type: opr-gpt-5-6-terra` 파견 →
   "pong" 회신 + 로그에 라우팅 확인. 잔여(코스메틱): 서브에이전트 행 하나 resolvedModel 미표기.
-- 운영 노트: launchd 서비스가 외부 `ocx stop`류에 의해 두 차례 bootout → plist 재bootstrap.
+- 운영 노트: launchd 서비스가 외부 `opr stop`류에 의해 두 차례 bootout → plist 재bootstrap.
 
-## 072 ocx-self 3라운드 (C 기록) — inherit 반증 → settings 핀 → ocx-route 지시자
+## 072 opr-self 3라운드 (C 기록) — inherit 반증 → settings 핀 → opr-route 지시자
 
 - R1: description "no model arg" 지시 — 디스패처 오버라이드는 억제됐으나 무-인자 파견이
   fable로 낙하 → frontmatter `inherit`는 2.1.207에서 미지원 (Kant 주장 라이브 반증).
 - R2: settings.json 픽커 기본값 핀 — 정의 본문은 로드되지만 커스텀 게이트웨이 id가
   frontmatter 검증에서 sonnet-5로 낙하 (프록시 로그: requested=claude-sonnet-5, native).
-- R3(확정 해법, 사용자 제안 방향): 본문에 `<!-- ocx-route: <model> -->` 지시자 —
+- R3(확정 해법, 사용자 제안 방향): 본문에 `<!-- opr-route: <model> -->` 지시자 —
   서브에이전트 시스템 프롬프트에 본문이 그대로 실리는 것을 이용, 프록시가 passthrough
-  분기 전에 모델을 덮어씀 (messages+count_tokens). 라이브: ocx-self 파견 전 행이
+  분기 전에 모델을 덮어씀 (messages+count_tokens). 라이브: opr-self 파견 전 행이
   gpt-5.6-sol/openai로 라우팅, sonnet 행 소멸. 테스트 2276 pass.
 - 부수: service.ts 클립보드 오염 복구(붙여넣기 사고), 커밋 분리 기록.

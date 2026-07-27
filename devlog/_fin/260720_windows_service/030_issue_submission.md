@@ -1,11 +1,11 @@
 # 030 — GitHub 이슈 등록 결과
 
-2026-07-20, `gh issue create` (계정 lidge-jun, repo lidge-jun/opencodex).
+2026-07-20, `gh issue create` (계정 lidge-jun, repo lidge-jun/openprovider).
 
 | # | 종류 | 제목 | URL |
 |---|------|------|-----|
-| 165 | Bug (`bug`) | [Bug]: Windows 서비스 설치 시 콘솔 창이 표시되고, 창을 닫으면 프록시가 죽어 모든 모델 연결이 끊김 | https://github.com/lidge-jun/opencodex/issues/165 |
-| 166 | Feature (`enhancement`) | [Feature]: Windows에서 창 없는 백그라운드 서비스 실행 모드 | https://github.com/lidge-jun/opencodex/issues/166 |
+| 165 | Bug (`bug`) | [Bug]: Windows 서비스 설치 시 콘솔 창이 표시되고, 창을 닫으면 프록시가 죽어 모든 모델 연결이 끊김 | https://github.com/lidge-jun/openprovider/issues/165 |
+| 166 | Feature (`enhancement`) | [Feature]: Windows에서 창 없는 백그라운드 서비스 실행 모드 | https://github.com/lidge-jun/openprovider/issues/166 |
 
 - 본문은 각각 010/020 초안의 `---` 이후 전문을 사용 (bug_report.yml / feature_request.yml 템플릿 섹션 준수).
 - #166의 "연관 Bug 이슈" 자리에는 #165 URL을 삽입해 등록.

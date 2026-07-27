@@ -363,7 +363,7 @@ export const PROVIDER_REGISTRY: readonly ProviderRegistryEntry[] = [
     authKind: "oauth",
     featured: false,
     dashboardPreset: true,
-    note: "Experimental Cursor bridge. Live transport and live model discovery are enabled after a standalone PKCE browser login via 'ocx login cursor'; native read/write/delete/shell/fetch execution is disabled by default and request text such as Codex sandbox markers never authorizes it. Set \"nativeLocalExec\": \"on\" on providers.cursor in ~/.opencodex/config.json (dashboard: Providers → Cursor → Edit JSON) only for a trusted local experiment where every data-plane caller is trusted. \"off\" denies all, \"codex-sandbox\" is accepted for backwards compatibility but fails closed, and legacy \"unsafeAllowNativeLocalExec\": true still means explicit operator opt-in.",
+    note: "Experimental Cursor bridge. Live transport and live model discovery are enabled after a standalone PKCE browser login via 'opr login cursor'; native read/write/delete/shell/fetch execution is disabled by default and request text such as Codex sandbox markers never authorizes it. Set \"nativeLocalExec\": \"on\" on providers.cursor in ~/.openprovider/config.json (dashboard: Providers → Cursor → Edit JSON) only for a trusted local experiment where every data-plane caller is trusted. \"off\" denies all, \"codex-sandbox\" is accepted for backwards compatibility but fails closed, and legacy \"unsafeAllowNativeLocalExec\": true still means explicit operator opt-in.",
     models: cursorModelIds(CURSOR_STATIC_MODELS),
     liveModels: true,
     defaultModel: "auto",

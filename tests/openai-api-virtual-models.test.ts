@@ -161,7 +161,7 @@ describe("validateOpenAiVirtualModelDefinition", () => {
 describe("OpenAI API compact transport", () => {
   test("maps every Pro id to base, strips reasoning, buffers failures, caps bodies, and logs exactly once", async () => {
     const originalFetch = globalThis.fetch;
-    const home = mkdtempSync(join(tmpdir(), "ocx-openai-api-compact-"));
+    const home = mkdtempSync(join(tmpdir(), "opr-openai-api-compact-"));
     process.env.OPENCODEX_HOME = home;
     saveConfig({
       port: 0,
@@ -352,7 +352,7 @@ describe("OpenAI API compact transport", () => {
 describe("OpenAI API Pro transport identities", () => {
   test("HTTP JSON, HTTP SSE, and real WebSocket keep base wire/client identity and virtual logs", async () => {
     const originalFetch = globalThis.fetch;
-    const home = mkdtempSync(join(tmpdir(), "ocx-openai-api-pro-"));
+    const home = mkdtempSync(join(tmpdir(), "opr-openai-api-pro-"));
     process.env.OPENCODEX_HOME = home;
     saveConfig({
       port: 0,

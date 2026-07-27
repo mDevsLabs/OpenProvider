@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
 const cliPath = join(repoRoot, "src", "cli", "index.ts");
-const isolatedCodexHome = mkdtempSync(join(tmpdir(), "ocx-prov-codex-home-"));
+const isolatedCodexHome = mkdtempSync(join(tmpdir(), "opr-prov-codex-home-"));
 
 function runCli(args: string[], env: Record<string, string> = {}) {
   return spawnSync(process.execPath, [cliPath, ...args], {
@@ -21,7 +21,7 @@ function runCli(args: string[], env: Record<string, string> = {}) {
 }
 
 function freshConfig(extra?: Record<string, unknown>) {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-prov-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-prov-"));
   const config = {
     port: 10100,
     providers: {
@@ -42,11 +42,11 @@ function readConfig(dir: string) {
   return JSON.parse(readFileSync(join(dir, "config.json"), "utf8"));
 }
 
-describe("ocx provider", () => {
+describe("opr provider", () => {
   test("provider --help prints usage", () => {
     const result = runCli(["provider", "--help"]);
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("Usage: ocx provider");
+    expect(result.stdout).toContain("Usage: opr provider");
     expect(result.stdout).toContain("list");
     expect(result.stdout).toContain("add");
     expect(result.stdout).toContain("remove");
@@ -285,7 +285,7 @@ describe("ocx provider", () => {
   });
 });
 
-describe("ocx provider strict args", () => {
+describe("opr provider strict args", () => {
   test("provider list rejects unknown flags", () => {
     const { dir } = freshConfig();
     try {
@@ -320,7 +320,7 @@ describe("ocx provider strict args", () => {
   });
 });
 
-describe("ocx provider mutating --json", () => {
+describe("opr provider mutating --json", () => {
   test("provider add --json returns structured output", () => {
     const { dir } = freshConfig();
     try {
@@ -377,7 +377,7 @@ describe("ocx provider mutating --json", () => {
   });
 });
 
-describe("ocx provider add --sync", () => {
+describe("opr provider add --sync", () => {
   test("provider add --sync flag is accepted without error", () => {
     const { dir } = freshConfig();
     try {

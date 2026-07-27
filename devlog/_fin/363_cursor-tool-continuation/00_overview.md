@@ -13,7 +13,7 @@ same live stream.
 
 Sources:
 - jawcode/gjc local refs in the adjacent Cursor investigations.
-- Web/local repo research: `https://github.com/lidge-jun/opencodex`,
+- Web/local repo research: `https://github.com/lidge-jun/openprovider`,
   `https://github.com/ephraimduncan/opencode-cursor`,
   `https://github.com/shyndman/danger-pi`.
 - GPT Pro transcript:

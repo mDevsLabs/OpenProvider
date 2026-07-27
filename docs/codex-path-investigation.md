@@ -227,7 +227,7 @@ Default path when `CODEX_HOME` is unset:
 /home/<user>/.codex
 ```
 
-The direct `ocx start` path works if the shell environment matches the shell
+The direct `opr start` path works if the shell environment matches the shell
 that later launches Codex. The service path is different: `systemd --user`
 starts OpenProvider from a unit file, not necessarily from the same interactive
 shell environment.
@@ -377,7 +377,7 @@ for modern Codex.
 
 ### Service managers must preserve relevant environment
 
-If a user runs `CODEX_HOME=/some/path ocx service install`, the service
+If a user runs `CODEX_HOME=/some/path opr service install`, the service
 definition should preserve that value:
 
 - Linux: add `Environment="CODEX_HOME=/some/path"` to the systemd user unit.
@@ -406,7 +406,7 @@ Run these cases before release:
 
 1. Windows default home:
    - unset `CODEX_HOME`
-   - run `ocx sync`
+   - run `opr sync`
    - verify `$USERPROFILE\.codex\OpenProvider.config.toml`
    - verify `$USERPROFILE\.codex\OpenProvider-catalog.json`
    - verify `codex debug models` includes routed models
@@ -414,29 +414,29 @@ Run these cases before release:
 2. Windows custom home:
    - create a temp directory
    - set `CODEX_HOME` to it
-   - run `ocx sync`
+   - run `opr sync`
    - verify no writes go to `$USERPROFILE\.codex` except unrelated existing
      files
 
 3. macOS default home:
    - unset `CODEX_HOME`
-   - run `ocx sync`
+   - run `opr sync`
    - verify `~/.codex/OpenProvider.config.toml`
 
 4. macOS custom home:
    - set `CODEX_HOME` to an existing directory
-   - run `ocx service install`
+   - run `opr service install`
    - inspect `~/Library/LaunchAgents/com.OpenProvider.proxy.plist`
    - verify `CODEX_HOME` appears in `EnvironmentVariables`
 
 5. Linux default home:
    - unset `CODEX_HOME`
-   - run `ocx sync`
+   - run `opr sync`
    - verify `~/.codex/OpenProvider.config.toml`
 
 6. Linux custom home with service:
    - set `CODEX_HOME` to an existing directory
-   - run `ocx service install`
+   - run `opr service install`
    - inspect `~/.config/systemd/user/OpenProvider-proxy.service`
    - verify `Environment="CODEX_HOME=..."`
 

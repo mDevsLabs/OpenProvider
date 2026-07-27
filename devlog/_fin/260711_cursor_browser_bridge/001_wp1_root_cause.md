@@ -6,9 +6,9 @@ NOT a permission problem. Class: tool-advertisement / Cursor-protocol gap
 (architectural). Refined after A-gate review (see Synthesis): the precise class
 is an UNREGISTERED / SYNTHETIC-PROVIDER routing gap. Cursor DOES surface
 dynamically advertised MCP tools - but only ones under a registered, routable
-MCP provider (provider.mcpServers). opencodex advertises Codex client tools
+MCP provider (provider.mcpServers). openprovider advertises Codex client tools
 (mcp__node_repl__js and every other client tool) under the SYNTHETIC provider
-id opencodex-responses (OCX_RESPONSES_TOOL_PROVIDER), which Cursor cannot route
+id openprovider-responses (OCX_RESPONSES_TOOL_PROVIDER), which Cursor cannot route
 to, so it hides/rejects those tools from the model's callable catalog. The
 Browser plugin runs on mcp__node_repl__js, so it is not callable under Cursor
 routing and the browser cannot start. No config flag opens it - the earlier
@@ -27,27 +27,27 @@ exec, a different mechanism.
    difference is the Cursor routing, not the subagent harness.
 3. Direct proxy test: POST /v1/responses to cursor/gpt-5.6-luna advertising a
    plain function tool probe_client_tool (tool_choice required). Debug frames
-   show requestContextArgs fired once (opencodex DID inject the client tool defs
+   show requestContextArgs fired once (openprovider DID inject the client tool defs
    via requestContextResult) and the model used its native shellStreamArgs - yet
    the model replied verbatim: "I don't have access to a probe_client_tool in
    this session." Injection happens; the tool never becomes model-callable.
 
 ## Why (code + prior devlog)
 
-- opencodex advertises client tools to Cursor via RequestContext.tools
+- openprovider advertises client tools to Cursor via RequestContext.tools
   (native-exec.ts:140 requestContextArgs -> [...mcpToolDefs, ...clientToolDefs];
   buildCursorToolDefinitions maps request.tools to OCX_RESPONSES_TOOL_PROVIDER
   MCP defs; live-transport.ts:417). The advertise+return bridge was built in
   devlog _fin/350 phase 42-43.
 - Same channel, different routability: provider.mcpServers tools go into the
   SAME RequestContext.tools response AND are model-callable, whereas the
-  synthetic opencodex-responses provider is not routable, so Cursor drops/hides
+  synthetic openprovider-responses provider is not routable, so Cursor drops/hides
   its tools from the model catalog (A-gate reviewer, native-exec.ts:140,
   mcp-config.ts:35). So it is not "Cursor ignores all injected tools" - it is
   "Cursor only surfaces tools under a routable provider identity."
 - This is documented as a deliberate gap, not a bug:
   devlog/_fin/362_cursor-usage-and-stall/00_overview.md - "the empty MCP listing
-  ... is expected: Codex's harness only has node_repl ...; opencodex's Cursor
+  ... is expected: Codex's harness only has node_repl ...; openprovider's Cursor
   adapter only reads provider.mcpServers" and "importing Codex's own MCP config
   into the Cursor adapter is a separate feature, not a bug, left out."
 - The obvious alternative channel is already a dead end: AgentRunRequest.mcpTools
@@ -70,7 +70,7 @@ No permission toggle exists. A real fix is a C4 protocol-boundary FEATURE, and
 the shipped requestContext advertisement does not make synthetic-provider client
 tools model-callable on Cursor today. Candidate directions, all uncertain/large:
 - (B-1, narrowest hypothesis to test FIRST per A-gate) Make client tools carry a
-  routable provider identity Cursor accepts - e.g. register the opencodex client
+  routable provider identity Cursor accepts - e.g. register the openprovider client
   bridge as a provider.mcpServers-style routable MCP provider so its tools land
   in the model catalog the same way configured MCP tools do. Needs live Cursor
   protocol experimentation to find an accepted provider shape.
@@ -89,7 +89,7 @@ what routable provider identity Cursor accepts for dynamically advertised tools.
 
 - ACCEPTED: reclassified from "universal Cursor protocol gap" to
   "unregistered/synthetic-provider routing gap" - Cursor surfaces routable-provider
-  MCP tools via the same channel; only the synthetic opencodex-responses provider
+  MCP tools via the same channel; only the synthetic openprovider-responses provider
   is dropped. Verdict "not a permission" and NEEDS_HUMAN disposition upheld.
 - Confirmed by reviewer: cursorToolsForActivePrompt does NOT drop a plain function
   tool for a normal prompt (tool-definitions.ts:162), so probe_client_tool did

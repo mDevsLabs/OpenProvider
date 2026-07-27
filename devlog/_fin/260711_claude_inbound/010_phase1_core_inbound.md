@@ -12,7 +12,7 @@ One PABCD cycle; this doc is the P artifact. Depends on: 000 D1/D3/D5, 001 §3-4
    stop_sequence:null, usage:{input_tokens:0, output_tokens:0}}`; final counts
    arrive in `message_delta.usage` which is CUMULATIVE (003 Lane 2).
 3. Thinking blocks: emit `thinking_delta`s, then ONE synthetic `signature_delta`
-   (constant-prefixed, e.g. `"ocx-" + Date.now()`) just before
+   (constant-prefixed, e.g. `"opr-" + Date.now()`) just before
    `content_block_stop` — CCR precedent proves Claude Code accepts synthetic
    signatures (003 E6). Inbound replayed thinking/redacted_thinking still DROPPED.
 4. Error envelope is `{type:"error", error:{type, message}, request_id?}`; ship
@@ -130,7 +130,7 @@ completes a streamed tool-use turn against a routed provider.
 
 ## Out of scope
 
-- `ocx claude` CLI, model discovery/aliases, GUI, docs-site (020/030).
+- `opr claude` CLI, model discovery/aliases, GUI, docs-site (020/030).
 - Thinking-signature round-trip fidelity, Anthropic error-type parity table (040).
 
 ## Test plan (C gate)

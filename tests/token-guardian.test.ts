@@ -32,9 +32,9 @@ beforeEach(() => {
   tmp = join(tmpdir(), `token-guardian-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(tmp, { recursive: true });
   process.env.HOME = tmp;
-  process.env.OPENCODEX_HOME = join(tmp, "ocx");
+  process.env.OPENCODEX_HOME = join(tmp, "opr");
   process.env.CODEX_HOME = join(tmp, "codex");
-  mkdirSync(join(tmp, "ocx"), { recursive: true });
+  mkdirSync(join(tmp, "opr"), { recursive: true });
   mkdirSync(join(tmp, "codex"), { recursive: true });
   __resetGuardianState();
 });
@@ -192,7 +192,7 @@ describe("token guardian", () => {
   });
 
   test("direct mode warms main only and never enumerates the added-account store", async () => {
-    const accountStore = join(tmp, "ocx", "codex-accounts.json");
+    const accountStore = join(tmp, "opr", "codex-accounts.json");
     writeFileSync(accountStore, "invalid-added-store");
     writeFileSync(join(tmp, "codex", "auth.json"), JSON.stringify({
       tokens: { access_token: "main-access", account_id: "main-chatgpt-id" },

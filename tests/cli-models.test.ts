@@ -17,7 +17,7 @@ function runCli(args: string[], env: Record<string, string> = {}) {
 }
 
 function freshConfig(extra?: Record<string, unknown>) {
-  const dir = mkdtempSync(join(tmpdir(), "ocx-models-"));
+  const dir = mkdtempSync(join(tmpdir(), "opr-models-"));
   const config = {
     port: 10100,
     providers: {
@@ -41,7 +41,7 @@ function freshConfig(extra?: Record<string, unknown>) {
   return { dir };
 }
 
-describe("ocx models", () => {
+describe("opr models", () => {
   test("models lists all provider models", () => {
     const { dir } = freshConfig();
     try {
@@ -110,7 +110,7 @@ describe("ocx models", () => {
   test("models --help prints usage", () => {
     const result = runCli(["models", "--help"]);
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("ocx models");
+    expect(result.stdout).toContain("opr models");
   });
 
   test("help models shows models help entry", () => {
@@ -120,9 +120,9 @@ describe("ocx models", () => {
   });
 });
 
-describe("ocx models richer metadata", () => {
+describe("opr models richer metadata", () => {
   test("models --json includes contextWindow and inputModalities", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ocx-models-rich-"));
+    const dir = mkdtempSync(join(tmpdir(), "opr-models-rich-"));
     const config = {
       port: 10100,
       providers: {

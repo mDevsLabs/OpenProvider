@@ -39,12 +39,12 @@ absolute checkpoint가 per-attempt input보다 크다는 것을 단언한다.
 ## 착수 시점 사실
 
 - 기준 시각: 2026-07-25 KST.
-- worktree: `/Users/jun/.codex/worktrees/ebcd/opencodex`.
+- worktree: `/Users/jun/.codex/worktrees/ebcd/openprovider`.
 - 현재 체크아웃은 detached HEAD이며, `HEAD == origin/dev == 037e8f5e4fa32a82e4149acc509554f157656dad`.
 - PR #439 base/head: `dev` ← `e78e84636b799e37ac985e83781190bda6539e0c` (`fix/kiro-context-usage-reporting`).
 - PR 원문 diff 길이: 정확히 742줄.
 - 대상 파일: `src/adapters/kiro.ts`, `src/bridge.ts`, `src/types.ts`, `tests/bridge.test.ts`, `tests/kiro-stream.test.ts`, `tests/request-log.test.ts` — 모두 MODIFY, NEW/DELETE 없음.
-- 실행 명령: `gh pr diff 439 --repo lidge-jun/opencodex | git apply --check -`.
+- 실행 명령: `gh pr diff 439 --repo lidge-jun/openprovider | git apply --check -`.
 - 결과: exit 0, stderr/stdout 없음. 기준 `037e8f5e`에 clean apply된다.
 - 독립 리뷰 판정: `MERGE_OK`.
 - 2026-07-25 조회 당시 PR #447 head는 `0c73bd1f06a4b6a7fa9973043330bcd943869e6b`. 보안 경계 때문에 별도 보류된 Kiro 브라우저 멀티계정 PR이며 `src/adapters/kiro.ts`와 `src/types.ts`를 함께 수정한다.
@@ -129,7 +129,7 @@ absolute checkpoint가 per-attempt input보다 크다는 것을 단언한다.
 
 ### PR snapshot diff — 정확한 before/after
 
-출처: `gh pr diff 439 --repo lidge-jun/opencodex`, head `e78e84636b799e37ac985e83781190bda6539e0c`. 아래가 이 WP의 전체 코드/test 변경이며 별도 delta는 없다.
+출처: `gh pr diff 439 --repo lidge-jun/openprovider`, head `e78e84636b799e37ac985e83781190bda6539e0c`. 아래가 이 WP의 전체 코드/test 변경이며 별도 delta는 없다.
 
 ```diff
 diff --git a/src/adapters/kiro.ts b/src/adapters/kiro.ts
@@ -421,7 +421,7 @@ index 9cb55e06..9e43e891 100644
 +    contextInputEstimate: number;
    }> => {
      if (typeof provider.apiKey !== "string" || provider.apiKey.trim() === "") {
-       throw new Error("kiro token missing — run ocx login kiro");
+       throw new Error("kiro token missing — run opr login kiro");
 @@ -1118,6 +1213,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
      if (profileArn) headers["x-amzn-kiro-profile-arn"] = profileArn;
      const built = buildKiroPayload(parsed, profileArn, forcedCompletionMode);
@@ -836,7 +836,7 @@ index e7f86a39..cf7689fc 100644
 +
  function log(overrides: Partial<RequestLogEntry>): RequestLogEntry {
    return {
-     requestId: "ocx-test",
+     requestId: "opr-test",
 @@ -746,6 +752,36 @@ describe("request log metadata", () => {
      });
    });
@@ -854,7 +854,7 @@ index e7f86a39..cf7689fc 100644
 +    }]), "kiro/claude-opus-5");
 +    const response = responseWithDeferredRequestLog(
 +      new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } }),
-+      "ocx-test-kiro-context-checkpoint",
++      "opr-test-kiro-context-checkpoint",
 +      Date.now(),
 +      { model: "kiro/claude-opus-5", provider: "kiro-p9d8524", usageLogInputTokens: 200 },
 +      entry => entries.push(entry),

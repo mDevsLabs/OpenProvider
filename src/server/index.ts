@@ -283,7 +283,7 @@ export function startServer(port?: number) {
   // first save, which is the case the guard exists for.
   armClaudeCodeBaseline(config);
   // usage.jsonl already persists every request; rehydrate the in-memory Logs ring so
-  // /api/logs (and the GUI) survive `ocx stop` / `ocx start` process restarts.
+  // /api/logs (and the GUI) survive `opr stop` / `opr start` process restarts.
   hydrateRequestLogsFromDisk();
   // #314: warn-only RSS observability (unref'd, idempotent — safe under repeated
   // startServer(0) in tests). Snapshot surfaces via GET /api/system/memory.
@@ -354,7 +354,7 @@ export function startServer(port?: number) {
 
       if (url.pathname === "/healthz" && req.method === "GET") {
         // service/pid/port let CLI liveness reject foreign 200s and verify pid identity.
-        return jsonResponse({ status: "ok", service: "opencodex", version: VERSION, uptime: process.uptime(), pid: process.pid, port: listenPort }, 200, req, config);
+        return jsonResponse({ status: "ok", service: "openprovider", version: VERSION, uptime: process.uptime(), pid: process.pid, port: listenPort }, 200, req, config);
       }
 
       if (url.pathname.startsWith("/api/")) {
@@ -366,7 +366,7 @@ export function startServer(port?: number) {
 
       if (url.pathname === "/v1/models" && req.method === "GET") {
         // Model discovery never forwards Authorization upstream, so the broader admission
-        // set (Authorization / x-api-key / x-opencodex-api-key) is safe here and required by
+        // set (Authorization / x-api-key / x-openprovider-api-key) is safe here and required by
         // remote OpenAI-style bearer clients and Claude gateway discovery (anthropic-version).
         const apiAuthError = requireApiAuth(req, config, "data-plane");
         if (apiAuthError) return withCors(apiAuthError, req, config);
@@ -383,7 +383,7 @@ export function startServer(port?: number) {
         // ModelInfo shape incl. capabilities (effort ladder / thinking) — Desktop 3P can
         // only learn capabilities through discovery, and Claude Code 2.1.207 strips the
         // extra fields (backward-safe). Ids are the claude-opus-4-8-{code} Desktop
-        // aliases; legacy claude-ocx-* ids keep decoding via resolveAlias. Detection:
+        // aliases; legacy claude-opr-* ids keep decoding via resolveAlias. Detection:
         // anthropic-version header (Claude Code sends it) or explicit ?flavor=anthropic.
         // Codex catalog (client_version) and the OpenAI list shape below stay byte-identical.
         const wantsAnthropicList = req.headers.get("anthropic-version") !== null
@@ -401,7 +401,7 @@ export function startServer(port?: number) {
           const { activeDesktop3pAlias } = await import("../claude/desktop-3p");
           // Per-surface id family (devlog 050): explicit ?ids= wins; otherwise the
           // Claude Code CLI discovery UA (`claude-code/<version>`, binary n_()) gets
-          // readable claude-ocx ids and every other client (Desktop 3P) keeps the
+          // readable claude-opr ids and every other client (Desktop 3P) keeps the
           // hashed family its config was written with. Unknown UA -> hashed (safe).
           const idsParam = url.searchParams.get("ids");
           const idStyle = idsParam === "cli"
@@ -553,7 +553,7 @@ export function startServer(port?: number) {
           return drainingResponse(req);
         }
         if (!hasValidApiAuth(req, config)) {
-          return withCors(anthropicErrorResponse(401, "opencodex API key required", "authentication_error"), req, config);
+          return withCors(anthropicErrorResponse(401, "openprovider API key required", "authentication_error"), req, config);
         }
         if (!isAllowedRequestOrigin(req, config)) {
           return withCors(anthropicErrorResponse(403, "cross-origin data-plane request blocked", "permission_error"), req, config);
@@ -568,7 +568,7 @@ export function startServer(port?: number) {
           return drainingResponse(req);
         }
         if (!hasValidApiAuth(req, config)) {
-          return withCors(anthropicErrorResponse(401, "opencodex API key required", "authentication_error"), req, config);
+          return withCors(anthropicErrorResponse(401, "openprovider API key required", "authentication_error"), req, config);
         }
         if (!isAllowedRequestOrigin(req, config)) {
           return withCors(anthropicErrorResponse(403, "cross-origin data-plane request blocked", "permission_error"), req, config);
@@ -853,7 +853,7 @@ export function startServer(port?: number) {
   const actualPort = server.port ?? listenPort;
   setCorsOrigin(actualPort);
 
-  console.log(`🚀 opencodex proxy running on http://localhost:${actualPort}`);
+  console.log(`🚀 openprovider proxy running on http://localhost:${actualPort}`);
   console.log(`   POST /v1/responses → provider translation`);
   console.log(`   POST /v1/chat/completions → OpenAI-compatible clients`);
   console.log(`   GET  /healthz      → health check`);

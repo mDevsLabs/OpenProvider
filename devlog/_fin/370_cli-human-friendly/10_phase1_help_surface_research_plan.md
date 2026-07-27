@@ -2,7 +2,7 @@
 
 ## Objective
 
-Do not implement CLI behavior yet. Produce a detailed, evidence-backed map of every current `ocx` command/help surface, including missing or empty command candidates such as `restart`, `doctor`, `--json`, and `--version`.
+Do not implement CLI behavior yet. Produce a detailed, evidence-backed map of every current `opr` command/help surface, including missing or empty command candidates such as `restart`, `doctor`, `--json`, and `--version`.
 
 The output of this phase is documentation only: a command matrix, gap analysis, and later implementation recommendations.
 
@@ -17,21 +17,21 @@ C2 documentation/research slice:
 
 ## Investigation Targets
 
-### Current `ocx` Help Surface
+### Current `opr` Help Surface
 
 Capture outputs and exit behavior for:
 
 ```bash
-ocx
-ocx help
-ocx --help
-ocx -h
-ocx --version
-ocx -v
-ocx version
-ocx help <command>
-ocx <command> --help
-ocx <command> -h
+opr
+opr help
+opr --help
+opr -h
+opr --version
+opr -v
+opr version
+opr help <command>
+opr <command> --help
+opr <command> -h
 ```
 
 Commands to enumerate:
@@ -74,16 +74,16 @@ Nested service/shim commands:
 
 Investigate whether these should exist, or whether help should explicitly say they do not:
 
-- `ocx restart`
-- `ocx service restart`
-- `ocx doctor`
-- `ocx status --json`
-- `ocx doctor --json`
-- `ocx logs`
-- `ocx service logs`
-- `ocx usage`
-- `ocx help <command>`
-- `ocx commands`
+- `opr restart`
+- `opr service restart`
+- `opr doctor`
+- `opr status --json`
+- `opr doctor --json`
+- `opr logs`
+- `opr service logs`
+- `opr usage`
+- `opr help <command>`
+- `opr commands`
 
 ### Reference CLIs
 
@@ -104,7 +104,7 @@ Known preliminary findings:
 - `cli-jaw --help` has a strong grouped layout and `--version, -v`.
 - `cli-jaw service --help` currently reports unknown option while still printing usage; do not copy that inconsistency.
 - `agbrowse --help` has strong quick-start, stuck/failure, and agent decision loop sections.
-- Observed `agbrowse --version` printed full help; do not copy that for `ocx`.
+- Observed `agbrowse --version` printed full help; do not copy that for `opr`.
 
 ## Planned Files
 

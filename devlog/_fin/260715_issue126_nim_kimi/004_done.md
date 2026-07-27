@@ -8,7 +8,7 @@
 
 ## WP2 (record + reply + push) — DONE
 - A-gate: sol "James" round-1 FAIL (2 wording blockers) → revision → round-2 residuals (2 softenings) folded → final text.
-- Issue #126 reply posted: https://github.com/lidge-jun/opencodex/issues/126#issuecomment-4972552726
+- Issue #126 reply posted: https://github.com/lidge-jun/openprovider/issues/126#issuecomment-4972552726
 - Commit scope: registry.ts, openai-chat.ts, new test, this devlog folder (git add -f; devlog/ is gitignored but committed by convention). Parallel agents' dirty files untouched.
 - Push: origin/dev (4 pre-existing cursor commits ride along — already on local dev before this unit).
 - NO release/tag — release pending, as stated in the issue reply.

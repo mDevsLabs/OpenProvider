@@ -5,13 +5,13 @@
 
 ## 증상
 
-정상 동작 중인 Task Scheduler 서비스를 `ocx status`와 Dashboard Startup Safety가
+정상 동작 중인 Task Scheduler 서비스를 `opr status`와 Dashboard Startup Safety가
 stale / AT RISK로 표시한다. 실제 작업과 프록시는 멀쩡히 돌아간다 (Windows 11, 2.7.39).
 
 ## 근본 원인 (코드 확인 완료)
 
 Windows가 등록된 작업을 export할 때 스키마 기본값에 해당하는 요소를 생략한다.
-OpenCodex는 XML의 유효 의미가 아니라 요소의 문자적 존재를 검사한다.
+OpenProvider는 XML의 유효 의미가 아니라 요소의 문자적 존재를 검사한다.
 
 ### 결함 1 — `windowsTaskRegistrationHealthy()` (`src/service.ts:476`)
 

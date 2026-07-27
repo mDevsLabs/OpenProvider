@@ -10,7 +10,7 @@ exactly one compaction output item, got 0 from 2 output items
 1. `core/src/compact.rs:66` — `should_use_remote_compact_task(provider)` returns
    `provider.supports_remote_compaction()`, which is `name == "OpenAI"` or Azure
    (`model-provider-info/src/lib.rs:394`).
-2. opencodex Design B injects root `openai_base_url = http://localhost:10100/v1`
+2. openprovider Design B injects root `openai_base_url = http://localhost:10100/v1`
    (src/codex-inject.ts), so Codex talks to the proxy through its BUILT-IN
    `OpenAI` provider. Remote compaction therefore looks supported for EVERY
    routed model (anthropic, cursor, google, kiro, opencode-go...).
@@ -21,7 +21,7 @@ exactly one compaction output item, got 0 from 2 output items
    (`collect_compaction_output`, compact_remote_v2.rs:397: `compaction_count != 1`
    -> the fatal error above; "2 output items" = reasoning + message from the
    routed model).
-4. opencodex today: `src/responses/parser.ts` has no branch for
+4. openprovider today: `src/responses/parser.ts` has no branch for
    `compaction_trigger` — the item falls into the loose schema and is silently
    dropped. The routed adapter just answers the conversation normally, emitting
    message/reasoning items, never a `compaction` item -> count 0 -> Codex fatals
@@ -59,4 +59,4 @@ compacted history disappears from the routed model's context.
 
 ## Status: investigation complete, implementation NOT started (user asked for
 ## investigation). All file/line references verified 2026-07-06 against
-## /Users/jun/Developer/codex/121_openai-codex and current opencodex tree.
+## /Users/jun/Developer/codex/121_openai-codex and current openprovider tree.

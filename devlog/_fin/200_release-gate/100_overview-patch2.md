@@ -10,7 +10,7 @@ v2.1.1 감사 결과 NO-GO. 1차 패치(10~60)에서 해결 안 된 잔여 findi
 | F2 | WS JSON fallback이 `incomplete`를 `completed`로 전송 | **High** | `ws-bridge.ts` event type 분기에 `incomplete` 누락 | 120_ |
 | F3 | `/api/stop`, `/api/oauth/logout` localhost CSRF | **Medium** | mutating POST에 Origin 검증 없음 | 130_ |
 | F4 | heartbeat가 실패 감지를 5분까지 지연 | **Medium** | `maxStallTicks=150` 하드코딩, 설정 불가 | 140_ |
-| F5 | `ocx update` 후 Windows shim repair 미호출 | **Medium** | `runUpdate()`에 shim repair 연동 없음 | 150_ |
+| F5 | `opr update` 후 Windows shim repair 미호출 | **Medium** | `runUpdate()`에 shim repair 연동 없음 | 150_ |
 
 ## 수정 파일 요약
 

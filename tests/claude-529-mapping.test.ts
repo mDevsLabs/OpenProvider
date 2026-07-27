@@ -14,8 +14,8 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-claude-529-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-claude-529-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-claude-529-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-claude-529-"));
   process.env.OPENCODEX_HOME = testDir;
 });
 

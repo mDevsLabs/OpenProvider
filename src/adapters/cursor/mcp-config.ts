@@ -1,9 +1,9 @@
 import type { OcxProviderConfig } from "../../types";
 
 /**
- * One MCP server opencodex starts/connects and exposes to the Cursor agent as callable tools.
- * Either `command` (stdio: opencodex spawns the server as a child process) or `url`
- * (streamable-http: opencodex connects to a remote MCP server) must be set.
+ * One MCP server openprovider starts/connects and exposes to the Cursor agent as callable tools.
+ * Either `command` (stdio: openprovider spawns the server as a child process) or `url`
+ * (streamable-http: openprovider connects to a remote MCP server) must be set.
  */
 export interface CursorMcpServerConfig {
   /** stdio: executable to spawn (e.g. "npx", "node", "uvx"). */

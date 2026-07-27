@@ -18,7 +18,7 @@ Make the existing authorized-user/service-account ADC path first-class in CLI an
 
 ## Security boundary
 
-- Reuse `gcloud auth application-default login` and existing ADC files. Do not copy refresh tokens into `~/.opencodex/config.json`.
+- Reuse `gcloud auth application-default login` and existing ADC files. Do not copy refresh tokens into `~/.openprovider/config.json`.
 - Readiness output may show source kind and a normalized path label, but never client secret, refresh token, service-account email unless explicitly approved, access token, or raw OAuth body.
 - Browser-based built-in OAuth is `NOOP` unless P proves ADC cannot meet the user journey and identifies an approved Google OAuth client-registration/redirect ownership model.
 - Existing API-key mode remains supported.

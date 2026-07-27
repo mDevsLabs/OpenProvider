@@ -66,14 +66,14 @@ describe("claude discovery aliases", () => {
 
 describe("claudeCodeAlias — readable-or-hash shared helper (devlog 050 / audit 051 #2)", () => {
   test("readable form when representable; both forms decode to the same route", () => {
-    expect(claudeCodeAlias("gemini", "gemini-3-pro")).toBe("claude-ocx-gemini--gemini-3-pro");
-    expect(claudeCodeNativeAlias("gpt-5.6-sol")).toBe("claude-ocx-native--gpt-5.6-sol");
+    expect(claudeCodeAlias("gemini", "gemini-3-pro")).toBe("claude-opr-gemini--gemini-3-pro");
+    expect(claudeCodeNativeAlias("gpt-5.6-sol")).toBe("claude-opr-native--gpt-5.6-sol");
     expect(resolveInboundModel(claudeCodeAlias("gemini", "gemini-3-pro"), undefined)).toBe("gemini/gemini-3-pro");
     expect(resolveInboundModel(claudeCodeNativeAlias("gpt-5.6-sol"), undefined)).toBe("gpt-5.6-sol");
     // Readable id with the [1m] context marker (picker variant row) decodes too —
     // strip happens before alias resolution, case-insensitively (audit 051 #4).
-    expect(resolveInboundModel("claude-ocx-native--gpt-5.6-sol[1m]", undefined)).toBe("gpt-5.6-sol");
-    expect(resolveInboundModel("claude-ocx-gemini--gemini-3-pro[1M]", undefined)).toBe("gemini/gemini-3-pro");
+    expect(resolveInboundModel("claude-opr-native--gpt-5.6-sol[1m]", undefined)).toBe("gpt-5.6-sol");
+    expect(resolveInboundModel("claude-opr-gemini--gemini-3-pro[1M]", undefined)).toBe("gemini/gemini-3-pro");
   });
 
   test("anthropic canonical ids pass through unchanged (native passthrough preserved)", () => {

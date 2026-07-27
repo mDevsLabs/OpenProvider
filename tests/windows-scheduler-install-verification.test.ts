@@ -17,12 +17,12 @@ describe("windowsSchedulerCsvIncludesTask", () => {
   test("matches quoted Task Scheduler CSV task names", () => {
     const csv = [
       `"TaskName","Next Run Time","Status"`,
-      `"\\opencodex-proxy","N/A","Ready"`,
+      `"\\openprovider-proxy","N/A","Ready"`,
       `"\\Other Task","N/A","Ready"`,
     ].join("\n");
-    expect(windowsSchedulerCsvIncludesTask(csv, "opencodex-proxy")).toBe(true);
+    expect(windowsSchedulerCsvIncludesTask(csv, "openprovider-proxy")).toBe(true);
     expect(windowsSchedulerCsvIncludesTask(csv, "missing-task")).toBe(false);
-    expect(windowsSchedulerCsvIncludesTask(csv, "opencodex")).toBe(false);
+    expect(windowsSchedulerCsvIncludesTask(csv, "openprovider")).toBe(false);
   });
 });
 
@@ -37,11 +37,11 @@ describe("probeWindowsSchedulerTask", () => {
   test("returns present when the specific /tn query includes the task", () => {
     Object.defineProperty(process, "platform", { configurable: true, value: "win32" });
     setQuerySchtasksForTests((args) => {
-      if (args[0] === "/query" && args[1] === "/tn") return "Folder: \\\nTaskName: opencodex-proxy";
+      if (args[0] === "/query" && args[1] === "/tn") return "Folder: \\\nTaskName: openprovider-proxy";
       throw new Error("unexpected query");
     });
-    expect(probeWindowsSchedulerTask("opencodex-proxy")).toEqual({ status: "present" });
-    expect(windowsSchedulerTaskInstalled("opencodex-proxy")).toBe(true);
+    expect(probeWindowsSchedulerTask("openprovider-proxy")).toEqual({ status: "present" });
+    expect(windowsSchedulerTaskInstalled("openprovider-proxy")).toBe(true);
   });
 
   test("falls back to CSV listing when the specific query fails", () => {
@@ -49,11 +49,11 @@ describe("probeWindowsSchedulerTask", () => {
     setQuerySchtasksForTests((args) => {
       if (args.includes("/tn")) throw new Error("Access is denied.");
       if (args.includes("CSV")) {
-        return `"TaskName"\n"\\opencodex-proxy"\n`;
+        return `"TaskName"\n"\\openprovider-proxy"\n`;
       }
       throw new Error("unexpected query");
     });
-    expect(probeWindowsSchedulerTask("opencodex-proxy")).toEqual({ status: "present" });
+    expect(probeWindowsSchedulerTask("openprovider-proxy")).toEqual({ status: "present" });
   });
 
   test("returns absent when specific query fails and CSV succeeds without the task", () => {
@@ -63,8 +63,8 @@ describe("probeWindowsSchedulerTask", () => {
       if (args.includes("CSV")) return `"TaskName"\n"\\other-task"\n`;
       throw new Error("unexpected query");
     });
-    expect(probeWindowsSchedulerTask("opencodex-proxy")).toEqual({ status: "absent" });
-    expect(windowsSchedulerTaskInstalled("opencodex-proxy")).toBe(false);
+    expect(probeWindowsSchedulerTask("openprovider-proxy")).toEqual({ status: "absent" });
+    expect(windowsSchedulerTaskInstalled("openprovider-proxy")).toBe(false);
   });
 
   test("returns unknown with both details when specific query and CSV listing fail", () => {
@@ -74,18 +74,18 @@ describe("probeWindowsSchedulerTask", () => {
       if (args.includes("CSV")) throw new Error("RPC server is unavailable.");
       throw new Error("unexpected query");
     });
-    const probe = probeWindowsSchedulerTask("opencodex-proxy");
+    const probe = probeWindowsSchedulerTask("openprovider-proxy");
     expect(probe.status).toBe("unknown");
     if (probe.status !== "unknown") throw new Error("expected unknown");
     expect(probe.detail).toContain("Access is denied.");
     expect(probe.detail).toContain("RPC server is unavailable.");
-    expect(windowsSchedulerTaskInstalled("opencodex-proxy")).toBe(false);
+    expect(windowsSchedulerTaskInstalled("openprovider-proxy")).toBe(false);
   });
 });
 
 describe("evaluateWindowsSchedulerInstallVerification", () => {
   const wscript = "C:\\Windows\\System32\\wscript.exe";
-  const launcher = "C:\\Users\\Test\\.opencodex\\opencodex-service-launcher.vbs";
+  const launcher = "C:\\Users\\Test\\.openprovider\\openprovider-service-launcher.vbs";
   const healthyXml = buildWindowsTaskXml("ignored.cmd", launcher)
     .replace(/<Command>.*?<\/Command>/, `<Command>${wscript}</Command>`);
 

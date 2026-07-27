@@ -2,7 +2,7 @@
 
 ## Goal
 
-Make Windows service/runtime investigations easier by exposing the exact Bun runtime opencodex will use, and by allowing a deliberate Bun binary override for emergency reproduction or mitigation.
+Make Windows service/runtime investigations easier by exposing the exact Bun runtime openprovider will use, and by allowing a deliberate Bun binary override for emergency reproduction or mitigation.
 
 ## Scope
 
@@ -12,7 +12,7 @@ Make Windows service/runtime investigations easier by exposing the exact Bun run
   - Keep fallback order: valid override -> bundled Bun -> `process.execPath`.
   - Add a small diagnostic helper that returns runtime path/source and version command metadata without spawning during import.
 - MODIFY `src/cli.ts`:
-  - Include Bun path/source in `ocx status` Runtime diagnostics.
+  - Include Bun path/source in `opr status` Runtime diagnostics.
   - Preserve existing status behavior and exit code.
 - MODIFY `src/service.ts`:
   - Ensure the Windows wrapper logs the selected Bun path, and include override source when present if exposed by the helper.

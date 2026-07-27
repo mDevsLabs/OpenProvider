@@ -59,14 +59,14 @@ ChatGPT 透传目录也会加入 GPT-5.6 Sol/Terra/Luna 的裸 slug（`gpt-5.6-s
 登录 CLI 也接受 `chatgpt`：它会获取一份 ChatGPT 凭据，并创建一个 `forward` 模式的提供商条目。
 
 ```bash
-ocx login xai          # xAI Grok
-ocx login anthropic    # Anthropic Claude (Pro/Max)
-ocx login kimi         # Moonshot Kimi
-ocx login kiro         # 导入 kiro-cli 凭据（支持令牌回退）
-ocx login google-antigravity
-ocx login cursor       # 独立的 Cursor PKCE 登录
-ocx login chatgpt      # 独立的 ChatGPT OAuth 登录
-ocx logout <provider>
+opr login xai          # xAI Grok
+opr login anthropic    # Anthropic Claude (Pro/Max)
+opr login kimi         # Moonshot Kimi
+opr login kiro         # 导入 kiro-cli 凭据（支持令牌回退）
+opr login google-antigravity
+opr login cursor       # 独立的 Cursor PKCE 登录
+opr login chatgpt      # 独立的 ChatGPT OAuth 登录
+opr logout <provider>
 ```
 
 | 提供商 | Adapter | 基础 URL | 备注 |
@@ -134,13 +134,13 @@ ChatGPT 转发预设。仪表盘的 **Add provider** 选择器会打开密钥提
 
 ### 从终端切换账号
 
-无需打开仪表盘，即可使用 `ocx account list`、`ocx account current` 和 `ocx account use` 查看或
+无需打开仪表盘，即可使用 `opr account list`、`opr account current` 和 `opr account use` 查看或
 切换同一组 Codex、OAuth 和 API-key pool。完整命令、JSON 输出和新 session 生效规则请参阅
-[CLI 参考](/zh-cn/reference/cli/#ocx-account-subcommand)。
+[CLI 参考](/zh-cn/reference/cli/#opr-account-subcommand)。
 
 ### GPT-5.6 预览路径
 
-GPT-5.6 Sol/Terra/Luna 会预置在提供商的回退列表中，因此即使实时模型目录暂时滞后，`ocx sync`
+GPT-5.6 Sol/Terra/Luna 会预置在提供商的回退列表中，因此即使实时模型目录暂时滞后，`opr sync`
 也能继续显示这些模型。
 
 | Codex 路由 | 预置模型 id | Codex 中显示的上下文 |
@@ -160,13 +160,13 @@ GPT-5.6 Sol/Terra/Luna 会预置在提供商的回退列表中，因此即使实
 （AI Studio、Vertex、Antigravity/Cloud Code Assist 模式）、`azure` / `azure-openai`、`kiro` 和
 `cursor`。原生 Amazon Bedrock 这类无法匹配上述实现的专有 API 暂不直接支持。**GitHub Copilot** 和
 **GitLab Duo** 是多模型 gateway，映射到各自的通用 OpenAI 兼容端点。Copilot 支持通过
-`ocx login github-copilot` 使用 GitHub 设备流 OAuth 登录（非官方桥接 — 使用 VS Code 公开客户端 id
+`opr login github-copilot` 使用 GitHub 设备流 OAuth 登录（非官方桥接 — 使用 VS Code 公开客户端 id
 登录后换取短期 Copilot API 令牌，需要有效的 Copilot 订阅，GitHub 政策收紧时可能失效）；GitLab Duo
 使用 Bearer **订阅令牌**（而非普通 API 密钥）进行认证。
 **Cloudflare AI Gateway** 需要将 account 和 gateway id 填入 URL。
 
 Cursor 作为单独的实验性 adapter 进行跟踪。`adapter: "cursor"` 会作为实验性本地配置出现在
-`ocx init` 和 dashboard Add Provider picker 中，并保存 Cursor 的静态回退模型目录 metadata。配置
+`opr init` 和 dashboard Add Provider picker 中，并保存 Cursor 的静态回退模型目录 metadata。配置
 Cursor access token 后，OpenProvider 会使用 Cursor live HTTP/2 transport。v2.7.1 回退列表包含上下文为
 1M 的 `gpt-5.6-sol` / `terra` / `luna`，以及上下文为 500K 的
 `grok-4.5` / `grok-4.5-fast`；最终显示哪些模型由账号的实时发现结果决定。Cursor 服务器直接发起的
@@ -195,5 +195,5 @@ Ollama Cloud 是托管（而非本地）的 Ollama，在 `https://ollama.com/v1`
 
 ## 任意 OpenAI 兼容端点
 
-如果某个提供商使用 Chat Completions，`openai-chat` adapter 即可处理它——在仪表盘中选择 **Custom**，或在 `ocx init` 中选择 `custom` 并输入基础 URL。每个提供商字段（`headers`、`noReasoningModels`、`noVisionModels`、`models`……）请参见 [配置参考](/zh-cn/reference/configuration/)。
+如果某个提供商使用 Chat Completions，`openai-chat` adapter 即可处理它——在仪表盘中选择 **Custom**，或在 `opr init` 中选择 `custom` 并输入基础 URL。每个提供商字段（`headers`、`noReasoningModels`、`noVisionModels`、`models`……）请参见 [配置参考](/zh-cn/reference/configuration/)。
 

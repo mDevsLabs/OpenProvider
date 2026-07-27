@@ -4,7 +4,7 @@ import { expandUserPath } from "../config";
 import { defaultCodexHome } from "./home";
 import { readRootTomlString } from "./paths";
 
-const OCX_SECTION_MARKER = "# Auto-injected by opencodex";
+const OCX_SECTION_MARKER = "# Auto-injected by openprovider";
 const DIAGNOSTICS_CACHE_TTL_MS = 30_000;
 
 function resolveCodexConfigPath(): string {
@@ -97,7 +97,7 @@ function hasModelProviderTable(sections: Map<string, Record<string, string>>, pr
 
 /** Built-in openai provider still routes through the proxy under Design B (marker-owned openai_base_url). */
 function isProxyCompatibleProvider(provider: string): boolean {
-  return provider === "opencodex" || provider === "openai";
+  return provider === "openprovider" || provider === "openai";
 }
 
 export interface EffectiveProjectModelRouting {
@@ -130,7 +130,7 @@ export function resolveEffectiveProjectModelProvider(content: string): Effective
   return { provider: null, profileName: null, via: null };
 }
 
-/** True when global Codex config routes through the opencodex proxy. */
+/** True when global Codex config routes through the openprovider proxy. */
 export function isGlobalOpencodexRoutingActive(
   codexConfigPath: string = resolveCodexConfigPath(),
   content?: string,
@@ -145,7 +145,7 @@ export function isGlobalOpencodexRoutingActive(
     }
   }
   if (hasInjectedOpenaiBaseUrl(text)) return true;
-  if (readRootTomlString(text, "model_provider") === "opencodex") return true;
+  if (readRootTomlString(text, "model_provider") === "openprovider") return true;
   return false;
 }
 
@@ -329,7 +329,7 @@ export function summarizeProjectCodexIssue(warning: ProjectCodexConfigWarning): 
 function humanizeProviderDetail(detail: string): string {
   if (detail === "opencode_go") return "OpenCode Go";
   if (detail.startsWith("opencode")) return "OpenCode";
-  if (detail === "opencodex") return "OpenProvider";
+  if (detail === "openprovider") return "OpenProvider";
   return detail;
 }
 

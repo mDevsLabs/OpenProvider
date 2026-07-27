@@ -44,7 +44,7 @@ Work class: C4 (release/CI integrity). Archetype: spec-satisfaction repair.
      HTTP 200 within the same bound. Quote `whoami`, split `id -u` declaration
      from assignment, and leave the file clean under actionlint/shellcheck;
    - macOS: poll at most 20x1s for both the launchd label and HTTP 200; after
-     `ocx stop`, require the label absent and the health request to fail;
+     `opr stop`, require the label absent and the health request to fail;
    - Windows: use `Get-ScheduledTask -ErrorAction SilentlyContinue` plus bounded
      `Invoke-WebRequest -TimeoutSec 2`; readiness requires task state `Running`
      and HTTP 200. After stop, the task must still exist but not be `Running`,

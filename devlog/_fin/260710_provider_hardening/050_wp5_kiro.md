@@ -6,7 +6,7 @@ Pre-analysis: Carson (sol explorer, 2026-07-10). Re-verify at WP5's P.
 
 IN this cycle (loud-failure + narrow-retry + dead-code class):
 - K1 kiro.ts:503 — blank/missing token becomes `Bearer ` empty header => throw
-  before I/O ("kiro token missing — run ocx login kiro").
+  before I/O ("kiro token missing — run opr login kiro").
 - K2 kiro-retry.ts catch breadth (:63-68) — retries EVERY thrown exception incl.
   deterministic failures => classify: retry only transient network errors
   (isConnectionResetError + timeout-class); deterministic errors rethrow

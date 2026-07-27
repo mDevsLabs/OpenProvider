@@ -1,15 +1,15 @@
 # GPT Pro review prompt — Cursor Responses API tool-call bridge
 
-Please review this opencodex Cursor provider tool-call plan for gaps before implementation.
+Please review this openprovider Cursor provider tool-call plan for gaps before implementation.
 
 Repository:
-https://github.com/lidge-jun/opencodex/tree/dev
+https://github.com/lidge-jun/openprovider/tree/dev
 
 Current pushed branch/commit at time of prompt:
 `dev` at `62a41aa`
 
 Problem:
-When opencodex routes Codex through the Cursor provider, model tool calls are always zero.
+When openprovider routes Codex through the Cursor provider, model tool calls are always zero.
 In this normal ChatGPT/Codex session tool calls work, so the bug is Cursor-provider-specific.
 
 RCA evidence from local code:

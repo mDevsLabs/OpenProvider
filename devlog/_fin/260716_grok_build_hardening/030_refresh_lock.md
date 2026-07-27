@@ -525,7 +525,7 @@ const oldHome = process.env.HOME, oldOcx = process.env.OPENCODEX_HOME, oldFetch 
 let root: string;
 beforeEach(() => {
   root = join(tmpdir(), `xai-lock-${crypto.randomUUID()}`);
-  process.env.HOME = root; process.env.OPENCODEX_HOME = join(root, "ocx");
+  process.env.HOME = root; process.env.OPENCODEX_HOME = join(root, "opr");
   mkdirSync(process.env.OPENCODEX_HOME, { recursive: true });
 });
 afterEach(() => {
@@ -738,7 +738,7 @@ describe("xAI retry", () => {
 - Crash leftovers are `auth.refresh.<provider>.<accountHash>.lock` and `auth.store.lock`. Stale takeover is allowed only after each lock's TTL and unchanged snapshot validation.
 - Intent TTL must exceed discovery plus three 30-second token attempts and backoffs (120 seconds). Store TTL is 30 seconds because it protects local load-merge-persist only.
 - A newly landed writer bypassing `mutateStore` reintroduces lost updates. Stale-check must reject every direct `persist()` call outside the funnel.
-- Rollback the phase commit, stop opencodex processes, then delete only stale lock files beside `auth.json`; never delete `auth.json`. The old `auth.json.refresh.lock` from the rejected design may also be removed during upgrade cleanup.
+- Rollback the phase commit, stop openprovider processes, then delete only stale lock files beside `auth.json`; never delete `auth.json`. The old `auth.json.refresh.lock` from the rejected design may also be removed during upgrade cleanup.
 
 ## Verification
 

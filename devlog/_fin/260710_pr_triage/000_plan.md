@@ -8,7 +8,7 @@
 - Verifier: `bun test ./tests/` (0 fail) + `bun x tsc --noEmit` (exit 0) per merge; gui typecheck/build for GUI PRs; `git rev-parse` SHA equality for sync.
 - Stop: all criteria met (DONE) / external GitHub failure (BLOCKED) / product decision needed (NEEDS_HUMAN) / ~2h wall-clock (BUDGET_EXHAUSTED).
 - Memory: this unit + `.codexclaw/goalplans/integrate-prs-80-79-77-with-per-pr-pabcd-gpt-5-6/`.
-- Resource bounds: repo-local writes + gh API on lidge-jun/opencodex; no destructive git; reviewer subagents are read-only.
+- Resource bounds: repo-local writes + gh API on lidge-jun/openprovider; no destructive git; reviewer subagents are read-only.
 
 ## Context (evidence)
 - Branch state: origin/dev(47ce6564) ⊆ origin/preview(308787a4) ⊆ origin/main(78cb5950) ⊆ local main(4bb44740, +8 hardening commits unpushed). preview/dev contain nothing not in main — ff sync is safe.

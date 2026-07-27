@@ -35,12 +35,12 @@ supports_search_tool = true
 
 Reason:
 
-- `web_search_tool_type = "text_and_image"` is truthful for opencodex's routed path because hosted
+- `web_search_tool_type = "text_and_image"` is truthful for openprovider's routed path because hosted
   search is executed by the default `gpt-5.4-mini` sidecar, and native Codex marks `gpt-5.4-mini` as
   text+image search capable.
-- Routed upstream models still do not receive OpenAI hosted image-search tools directly. opencodex
+- Routed upstream models still do not receive OpenAI hosted image-search tools directly. openprovider
   intercepts hosted web search, then the sidecar verbalizes image results for text-only routed models.
-- `supports_search_tool = true` is deliberate, not inherited: opencodex already supports Codex's
+- `supports_search_tool = true` is deliberate, not inherited: openprovider already supports Codex's
   deferred `tool_search` surface through parser/bridge relaying.
 
 If future evidence shows routed `tool_search` is unsafe for a provider class, this should become a
@@ -51,7 +51,7 @@ provider/model capability flag, not a copied native template value.
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
 ```
 
 Add:
@@ -68,7 +68,7 @@ Call it from `normalizeRoutedCatalogEntry()` after native-only selector strippin
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/codex-catalog.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/codex-catalog.test.ts
 ```
 
 Extend the native-like template to include `web_search_tool_type = "text_and_image"` and
@@ -83,7 +83,7 @@ Add tests proving:
 ### NEW
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/tests/web-search.test.ts
+/Users/jun/Developer/new/700_projects/openprovider/tests/web-search.test.ts
 ```
 
 Add request-time tests proving:

@@ -17,7 +17,7 @@ const SNAPSHOT_TOTAL_MAX_BYTES = 24 * 1024 * 1024;
 const STALE_TEMP_GRACE_MS = 15 * 60 * 1_000;
 const STALE_TEMP_MAX_ENTRIES = 4_096;
 const STALE_TEMP_MAX_CLEANUPS = 512;
-const RESPONSE_STATE_TEMP_NAME = /^responses-state\.json\.ocx\.(\d+)\.(\d+)\.tmp$/;
+const RESPONSE_STATE_TEMP_NAME = /^responses-state\.json\.opr\.(\d+)\.(\d+)\.tmp$/;
 
 interface StoredResponseState {
   createdAt: number;

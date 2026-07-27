@@ -14,7 +14,7 @@ function needsApiAuth(input: RequestInfo | URL): boolean {
 }
 
 /** Legacy sessionStorage key from pre-memory auth — wiped once on install, never read. */
-const LEGACY_TOKEN_KEY = "opencodex-api-token";
+const LEGACY_TOKEN_KEY = "openprovider-api-token";
 
 /** In-memory only — never write tokens to web storage (XSS can read sessionStorage/localStorage). */
 let memoryToken: string | null = null;

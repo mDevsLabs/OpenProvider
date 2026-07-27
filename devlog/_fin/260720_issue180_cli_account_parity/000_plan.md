@@ -1,7 +1,7 @@
 # Issue #180 — CLI account/key parity with GUI (loop roadmap)
 
-GitHub: https://github.com/lidge-jun/opencodex/issues/180
-Goalplan: `.codexclaw/goalplans/issue-180-https-github-com-lidge-jun-opencodex-i/`
+GitHub: https://github.com/lidge-jun/openprovider/issues/180
+Goalplan: `.codexclaw/goalplans/issue-180-https-github-com-lidge-jun-openprovider-i/`
 Entry mode: HOTL cxc-loop, docs-first (LOOP-DOCS-FIRST-01). This 000-range plus the
 decade docs below are the deliverable of the docs-only work-phase 1; implementation
 starts at work-phase 2, one decade doc per PABCD cycle.
@@ -12,10 +12,10 @@ starts at work-phase 2, one decade doc per PABCD cycle.
   plus the GUI↔CLI parity matrix; each slice is checkable locally (unit tests + live
   local management-API invocations).
 - Trigger: GUI exposes multi-account and API-key pool management (Codex ChatGPT
-  account pool, generic OAuth accounts, apiKeyPool providers) while the `ocx` CLI has
+  account pool, generic OAuth accounts, apiKeyPool providers) while the `opr` CLI has
   no official command surface for it; terminal/SSH users must hand-call the
   management API with curl.
-- Goal: an official, consistent `ocx account` CLI family covering every
+- Goal: an official, consistent `opr account` CLI family covering every
   account/credential capability the GUI has, with masked output, `--json`, correct
   exit codes, runtime-port auto-resolution, and docs — plus a durable parity matrix
   for any remaining GUI↔CLI gaps found by the survey.
@@ -83,7 +83,7 @@ gui (reference only)      CodexAccountPool.tsx, ProviderAuthPanel.tsx, pages/Pro
 | WP | Decade doc | Slice | Depends on |
 |----|-----------|-------|------------|
 | 1 | (this cycle) | Docs-only: survey + roadmap | — |
-| 2 | 010_account_cli_core.md | `ocx account list|current|use` + tests | WP1 |
+| 2 | 010_account_cli_core.md | `opr account list|current|use` + tests | WP1 |
 | 3 | 020_account_cli_extended.md | codex-pool extras (refresh/auto-switch), single-slot OAuth guidance | WP2 |
 | 4 | 030_docs_and_parity_closeout.md | docs-site CLI/providers pages + parity matrix closeout | WP2 |
 
@@ -100,6 +100,6 @@ that the survey uncovers.
 | `002_cli_command_inventory.md` | research | existing CLI surface + conventions (lane 2) |
 | `003_management_api_contracts.md` | research | credential endpoint contracts (lane 3) |
 | `004_parity_matrix.md` | research | GUI↔CLI coverage matrix + gap classification |
-| `010_account_cli_core.md` | phase 1 | diff-level design: `ocx account list|current|use` |
+| `010_account_cli_core.md` | phase 1 | diff-level design: `opr account list|current|use` |
 | `020_account_cli_extended.md` | phase 2 | diff-level design: codex-pool extras + guidance |
 | `030_docs_and_parity_closeout.md` | phase 3 | diff-level design: docs updates + closeout |

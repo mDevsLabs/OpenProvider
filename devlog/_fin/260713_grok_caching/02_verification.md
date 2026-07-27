@@ -25,4 +25,4 @@
 
 ## 부수 관찰
 
-- ~/.opencodex/config.json이 이미 87바이트 정크(port:1, defaultProvider:"none")로 깨져 있었음(260712 15:26Z 계열 .invalid 백업들). dev loadConfig 폴백이 기본 설정으로 복구함 — 프로덕션(10100)은 메모리 스냅샷으로 계속 정상 동작. 사용자 풀 설정 백업은 config.json.bak-260709 (17KB).
+- ~/.openprovider/config.json이 이미 87바이트 정크(port:1, defaultProvider:"none")로 깨져 있었음(260712 15:26Z 계열 .invalid 백업들). dev loadConfig 폴백이 기본 설정으로 복구함 — 프로덕션(10100)은 메모리 스냅샷으로 계속 정상 동작. 사용자 풀 설정 백업은 config.json.bak-260709 (17KB).

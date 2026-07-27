@@ -113,7 +113,7 @@ async function checkProxyHealth(target: ListenTarget): Promise<HealthCheck> {
     }
     const body = await response.json().catch(() => null) as { service?: unknown; status?: unknown; version?: unknown; uptime?: unknown } | null;
     if (!isOpencodexHealthz(body)) {
-      const message = "responded, but not an opencodex proxy";
+      const message = "responded, but not an openprovider proxy";
       return { ok: false, url, message, label: `${url} ${message}` };
     }
     const version = typeof body?.version === "string" ? ` v${body.version}` : "";
@@ -172,7 +172,7 @@ export async function collectStatus(): Promise<CliStatusView> {
     && resolvedRuntime.replacedConfigured.from.command !== resolvedRuntime.runtime.command
   ) {
     warningParts.push(
-      `Preferred Codex runtime is unavailable; using ${displayCodexRuntimePath(resolvedRuntime.runtime.command)} instead. Run ocx doctor for diagnosis and recovery.`,
+      `Preferred Codex runtime is unavailable; using ${displayCodexRuntimePath(resolvedRuntime.runtime.command)} instead. Run opr doctor for diagnosis and recovery.`,
     );
   } else if (
     resolvedRuntime.runtime.source === "fallback"
@@ -182,16 +182,16 @@ export async function collectStatus(): Promise<CliStatusView> {
     const detail = resolvedRuntime.failures[0]?.reason;
     warningParts.push(
       detail
-        ? `No validated Codex runtime found (${detail}); falling back to \`codex\`. Run ocx doctor for diagnosis and recovery.`
-        : "No validated Codex runtime found; falling back to `codex`. Run ocx doctor for diagnosis and recovery.",
+        ? `No validated Codex runtime found (${detail}); falling back to \`codex\`. Run opr doctor for diagnosis and recovery.`
+        : "No validated Codex runtime found; falling back to `codex`. Run opr doctor for diagnosis and recovery.",
     );
   }
   if (resolvedRuntime.newerAvailable) {
-    warningParts.push("OpenProvider is using an older Codex binary. Run ocx doctor for diagnosis and recovery.");
+    warningParts.push("OpenProvider is using an older Codex binary. Run opr doctor for diagnosis and recovery.");
   }
   if (clampActive) {
     warningParts.push(
-      `Catalog clamp removed: ${lastClamp!.removedEfforts.join(", ")}. Run ocx doctor for diagnosis and recovery.`,
+      `Catalog clamp removed: ${lastClamp!.removedEfforts.join(", ")}. Run opr doctor for diagnosis and recovery.`,
     );
   }
   const codexRuntime = {

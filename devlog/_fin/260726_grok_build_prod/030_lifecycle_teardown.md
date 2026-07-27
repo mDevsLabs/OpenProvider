@@ -9,7 +9,7 @@ tags: [grok-build, lifecycle, service, teardown]
 # 030 — 라이프사이클 teardown 정합성 (B2, B6)
 
 > **개정 2026-07-26 (A-게이트 감사 반영).** 초판의 오너십 게이트는 fence를 실제로 지키지 못했고
-> (`killProxy` → SIGTERM → `syncCleanup` 우회), `ocx update`/트레이 재시작 퇴행과 대시보드 409
+> (`killProxy` → SIGTERM → `syncCleanup` 우회), `opr update`/트레이 재시작 퇴행과 대시보드 409
 > 정지 문제를 놓쳤다. 아래는 그 네 가지를 포함한 교정본이다.
 
 대상 파일: `src/service.ts`, `src/cli/index.ts`, `src/server/management-api.ts`,
@@ -20,10 +20,10 @@ tags: [grok-build, lifecycle, service, teardown]
 
 | 경로 | 서비스 매니저 | Grok fence | 문제 |
 |------|--------------|-----------|------|
-| `ocx stop` (정상) | 정지 | strip | 정상 |
-| `ocx stop` (소유권 불일치) | **살아있음** | strip | B2 — 공유 설정만 제거 |
-| `ocx service stop` | 정지 | **남음** | B6 확장 — Codex는 복원하면서 grok은 방치 |
-| `ocx service uninstall` | 제거 | **남음** | B6 확장 — 영구 방치 |
+| `opr stop` (정상) | 정지 | strip | 정상 |
+| `opr stop` (소유권 불일치) | **살아있음** | strip | B2 — 공유 설정만 제거 |
+| `opr service stop` | 정지 | **남음** | B6 확장 — Codex는 복원하면서 grok은 방치 |
+| `opr service uninstall` | 제거 | **남음** | B6 확장 — 영구 방치 |
 | `POST /api/stop` | 정지 시도 | **남음** | B6 + 가드 없는 throw로 500 |
 | 서비스 프록시 크래시/재spawn | — | 남음 | 의도된 배제, 유지 |
 
@@ -100,7 +100,7 @@ try {
 
 `stopFailed = true`는 종료 코드 1을 낳고, 이는 두 곳에 파급된다:
 
-- **`ocx update`** — `src/update/index.ts:223`이 `stop.status !== 0`이면 업데이트를 중단한다.
+- **`opr update`** — `src/update/index.ts:223`이 `stop.status !== 0`이면 업데이트를 중단한다.
   소유권 불일치 사용자는 원래 `CODEX_HOME`을 찾을 때까지 업데이트가 거부된다.
   의도된 안전 동작이지만 막다른 길이 되므로, 중단 메시지에 소유권 원인과 해결 방법
   (원래 홈에서 실행)을 함께 출력한다.
@@ -202,7 +202,7 @@ if (url.pathname === "/api/stop" && req.method === "POST") {
 - 소유권 불일치 시 `revertSystemEnv`는 **여전히 실행된다**(과잉 게이트 방지).
 - 409를 받은 `stopProxyGracefully`가 `killProxy`로 승격하지 **않는다**.
 - `syncCleanup`이 소유권 불일치에서 strip하지 않는다.
-- `!ok` strip 결과가 `ocx stop`을 실패로 만든다.
+- `!ok` strip 결과가 `opr stop`을 실패로 만든다.
 - `service stop`/`uninstall`이 strip을 호출한다.
 - `/api/stop`이 strip을 호출하고, 소유권 불일치에는 409로 응답하며 프록시를 종료하지 않는다.
 - `syncCleanup`의 `OCX_SERVICE` 배제가 그대로 남아 있다.

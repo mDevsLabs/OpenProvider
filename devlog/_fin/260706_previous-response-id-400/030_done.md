@@ -53,4 +53,4 @@
   the miss window but does not eliminate it. Disk persistence was declared out of scope.
 - A miss now degrades to reduced context (tool outputs as user text, reasoning dropped)
   instead of a 400; the model may lose nuance on that one turn. Acceptable trade-off.
-- The RUNNING ocx instance must be restarted to pick these fixes up.
+- The RUNNING opr instance must be restarted to pick these fixes up.

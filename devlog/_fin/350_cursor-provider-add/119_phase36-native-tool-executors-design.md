@@ -6,22 +6,22 @@
 
 ## Easy explanation (non-developer terms)
 
-When a Cursor model wants to use a "tool" while talking to opencodex, Cursor's server
-sends opencodex a request like *"run this MCP tool"*, *"list MCP resources"*, *"control
-the computer"*, or *"record the screen"*. Today opencodex always answers *"no executor is
+When a Cursor model wants to use a "tool" while talking to openprovider, Cursor's server
+sends openprovider a request like *"run this MCP tool"*, *"list MCP resources"*, *"control
+the computer"*, or *"record the screen"*. Today openprovider always answers *"no executor is
 configured"* for all four — so those tools never actually run.
 
 This band makes the realistic, honest subset of that **actually work**:
 
-1. **MCP (the real win).** opencodex will start the MCP servers you list in config
+1. **MCP (the real win).** openprovider will start the MCP servers you list in config
    (the same `command + args` style every MCP host uses), discover their tools, tell
-   Cursor's server *"these tools exist"*, and when Cursor asks to run one, opencodex
+   Cursor's server *"these tools exist"*, and when Cursor asks to run one, openprovider
    runs it against the live MCP server and returns the real result. This is a standard,
    well-defined protocol, so it can be implemented correctly end-to-end.
 
-2. **computer-use / record-screen (honest handling).** opencodex is a **headless proxy**
+2. **computer-use / record-screen (honest handling).** openprovider is a **headless proxy**
    — it has no screen, mouse, or recording surface of its own, so it cannot truthfully
-   "control the computer". Instead of faking it, opencodex will (a) expose an optional
+   "control the computer". Instead of faking it, openprovider will (a) expose an optional
    hook so a *host* process that DOES have a screen can plug in a real executor, and
    (b) by default return a precise, truthful "not supported in this headless proxy"
    result. No fake automation, no silent success.
@@ -32,7 +32,7 @@ strictly more honest/explicit for the rest.
 
 ## Pre-write evidence
 
-### Current opencodex state (the gap)
+### Current openprovider state (the gap)
 
 The deps interface and dispatch already exist and are correct:
 
@@ -83,7 +83,7 @@ This is the missing advertise→execute loop.
   `requestContextResult.tools`; server later calls back `mcpArgs` with `toolName` matching
   an advertised `McpToolDefinition.toolName` (`cursor.ts:352, 977, 2139`).
 
-**Takeaway:** opencodex will go *beyond* jawcode by backing `mcp` with a **real
+**Takeaway:** openprovider will go *beyond* jawcode by backing `mcp` with a **real
 `@modelcontextprotocol/sdk` client** (live MCP servers) instead of a local tool map, and by
 returning **typed honest results** (not empty-acks) for the resource/computer/screen cases.
 
@@ -119,7 +119,7 @@ Each of WP37 and WP38 is its own full P→A→B→C→D cycle.
 Add to `OcxProviderConfig` (cursor adapter only reads them):
 
 ```ts
-/** MCP servers opencodex starts and exposes to the Cursor agent as callable tools. */
+/** MCP servers openprovider starts and exposes to the Cursor agent as callable tools. */
 mcpServers?: Record<string, CursorMcpServerConfig>;
 /** Optional external executor command for computer-use (headless proxy has none by default). */
 computerUseExecutor?: string;   // reserved: spawn-based hook in WP38
@@ -151,7 +151,7 @@ export interface CursorMcpServerConfig {
   (phase 28): MCP tool calls are a native-exec surface and must respect the same
   deny-by-default policy once that lands. WP37 references but does not duplicate that work.
 - Child MCP processes must be lifecycle-managed (lazy connect, dispose on transport close,
-  timeout on connect/call) to avoid leaks — opencodex is a long-lived server.
+  timeout on connect/call) to avoid leaks — openprovider is a long-lived server.
 - No fake computer-use: returning a fabricated success for screen/mouse control would be a
   "false safety claim" (the exact class flagged as High #3 in the GPT-Pro review). WP38
   returns the truth.

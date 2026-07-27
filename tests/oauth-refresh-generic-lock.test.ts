@@ -19,7 +19,7 @@ beforeEach(() => {
   tmp = join(tmpdir(), `oauth-generic-lock-${Date.now()}-${Math.random().toString(16).slice(2)}`);
   mkdirSync(tmp, { recursive: true });
   process.env.HOME = tmp;
-  process.env.OPENCODEX_HOME = join(tmp, "ocx");
+  process.env.OPENCODEX_HOME = join(tmp, "opr");
 });
 
 afterEach(() => {

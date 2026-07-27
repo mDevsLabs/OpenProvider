@@ -32,7 +32,7 @@ diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
 index 8498aa0a..61842c74 100644
 --- a/CONTRIBUTING.md
 +++ b/CONTRIBUTING.md
-@@ -9,3 +9,15 @@ Thanks for helping with opencodex.
+@@ -9,3 +9,15 @@ Thanks for helping with openprovider.
  
  For local development commands, architecture notes, and release workflow details, use the hosted
  contributing guide above instead of duplicating instructions here.
@@ -139,13 +139,13 @@ index 78445619..9dabc7db 100644
      mkdirSync(agentsDir, { recursive: true });
      const victim = join(dir, "victim.md");
      writeFileSync(victim, "precious");
--    symlinkSync(victim, join(agentsDir, "ocx-linked.md"));
+-    symlinkSync(victim, join(agentsDir, "opr-linked.md"));
 +    try {
-+      symlinkSync(victim, join(agentsDir, "ocx-linked.md"));
++      symlinkSync(victim, join(agentsDir, "opr-linked.md"));
 +    } catch (e: unknown) {
 +      if ((e as NodeJS.ErrnoException).code === "EPERM") return; // skip on Windows without elevated symlink rights
 +      throw e;
 +    }
      syncClaudeAgentDefs([], dir); // prune pass
      expect(readFileSync(victim, "utf8")).toBe("precious");
-     expect(readdirSync(agentsDir)).toContain("ocx-linked.md");
+     expect(readdirSync(agentsDir)).toContain("opr-linked.md");

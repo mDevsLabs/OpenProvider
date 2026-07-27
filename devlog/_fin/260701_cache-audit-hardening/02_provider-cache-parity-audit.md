@@ -2,7 +2,7 @@
 
 ## Scope
 
-This audit covers prompt-cache behavior for the provider surfaces currently relevant to opencodex:
+This audit covers prompt-cache behavior for the provider surfaces currently relevant to openprovider:
 
 - Anthropic Messages adapter: `src/adapters/anthropic.ts`
 - OpenAI / ChatGPT Responses passthrough: `src/adapters/openai-responses.ts`
@@ -10,7 +10,7 @@ This audit covers prompt-cache behavior for the provider surfaces currently rele
 - Google Gemini / Vertex / Antigravity: `src/adapters/google.ts`
 - Umans Coding Plan, because it uses the Anthropic Messages adapter with Kimi-family models
 
-It intentionally excludes server-side response caching. Prompt caching is a provider-side prefix reuse feature; opencodex should preserve, expose, and safely activate provider cache controls, not cache model outputs.
+It intentionally excludes server-side response caching. Prompt caching is a provider-side prefix reuse feature; openprovider should preserve, expose, and safely activate provider cache controls, not cache model outputs.
 
 ## External Evidence
 
@@ -30,7 +30,7 @@ Findings:
 - Cache write tokens cost more than regular input; cache read tokens are cheaper.
 - Active Claude models support prompt caching, but minimum cacheable prompt length varies by model.
 
-opencodex status:
+openprovider status:
 
 - Existing code explicitly marks the user system prompt and final tool definition with `cache_control`.
 - Existing code does not add top-level automatic `cache_control`, so message history is not actively cache-targeted.
@@ -55,7 +55,7 @@ Findings:
 - OpenAI recommends monitoring cache hit rates and cached-token proportions.
 - `prompt_cache_retention` can request extended retention on supported models.
 
-opencodex status:
+openprovider status:
 
 - `src/responses/schema.ts` accepts `prompt_cache_key`.
 - `src/responses/parser.ts` maps it to `options.promptCacheKey`.
@@ -77,7 +77,7 @@ Source state:
 - No reliable official Kimi prompt-cache control evidence was found in this pass.
 - OpenAI-compatible chat providers may reject unknown top-level fields.
 
-opencodex status:
+openprovider status:
 
 - `src/adapters/openai-chat.ts` maps upstream `usage.prompt_tokens_details.cached_tokens` into `cachedInputTokens`.
 - The adapter does not forward `prompt_cache_key`.
@@ -99,7 +99,7 @@ Findings:
 - The Interactions API page documents implicit caching only; explicit cached-content resources are a separate generateContent surface.
 - Cache hits are reported through cached content token counts.
 
-opencodex status:
+openprovider status:
 
 - `src/adapters/google.ts` maps `usageMetadata.cachedContentTokenCount` into `cachedInputTokens`.
 - Antigravity wraps the Gemini request in the Cloud Code Assist envelope, preserves reported usage, and exposes cached token hits in `tests/google-antigravity-wire.test.ts`.
@@ -118,7 +118,7 @@ Source state:
 - `src/providers/registry.ts` configures Umans with `adapter: "anthropic"` and `baseUrl: "https://api.code.umans.ai"`.
 - `tests/umans-provider.test.ts` verifies Anthropic message-wire behavior without Anthropic OAuth beta headers.
 
-opencodex status:
+openprovider status:
 
 - Umans inherits Anthropic adapter request construction, including current explicit `cache_control` markers.
 - If top-level automatic caching is added unconditionally to the Anthropic adapter, Umans will receive the same field unless explicitly gated.
@@ -144,7 +144,7 @@ Relevant findings:
 - `/Users/jun/Developer/codex/002_prompt-context/02_ai_prompt.md` and `/Users/jun/Developer/codex/010_memory-pipeline/10_ai_memory.md` describe Aider/Claude-style cache strategies that mark stable examples/system/repo/chat-file regions.
 - Copilot CLI extracted sources under `/Users/jun/Developer/codex/151_copilot_cli/` track `cacheReadTokens` and `cacheWriteTokens` separately in telemetry.
 
-Implications for opencodex:
+Implications for openprovider:
 
 - `OcxUsage.cachedInputTokens` currently merges cache-read and cache-creation tokens for Anthropic. This is sufficient for OpenAI Responses compatibility but less precise than Claude Code/Copilot telemetry.
 - The request log display should eventually distinguish read vs write tokens for providers that expose both.
@@ -152,7 +152,7 @@ Implications for opencodex:
 
 ## Provider Matrix
 
-| Provider surface | Native cache mode | opencodex request support | opencodex usage support | Safe next action |
+| Provider surface | Native cache mode | openprovider request support | openprovider usage support | Safe next action |
 | --- | --- | --- | --- | --- |
 | Anthropic native | Explicit or automatic `cache_control` | Explicit tools/system only | `cache_read + cache_creation` merged | Add top-level automatic 5m caching |
 | OpenAI / ChatGPT Responses | Automatic prefix caching | Raw passthrough preserves fields | `cached_tokens` extraction | Add retention preservation test |
@@ -167,7 +167,7 @@ Implications for opencodex:
 - Top-level `cache_control` is documented for native Anthropic, but Anthropic-compatible gateways may lag.
 - Anthropic cache-read and cache-write tokens are merged in current usage logs, so hit-rate and write-cost analysis are imprecise.
 - Kimi/Moonshot official cache-control support remains unproven; adding generic fields would risk 400s.
-- OpenAI `prompt_cache_retention` is pass-through only; opencodex does not validate model support or privacy implications.
+- OpenAI `prompt_cache_retention` is pass-through only; openprovider does not validate model support or privacy implications.
 
 ## Decision
 

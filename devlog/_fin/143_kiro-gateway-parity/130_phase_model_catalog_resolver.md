@@ -10,7 +10,7 @@ Official source checked on 2026-06-29:
 
 - `https://kiro.dev/docs/models`
 - The page says it was updated 2026-06-19.
-- Missing from the current opencodex Kiro list: Claude Opus 4.5, Claude
+- Missing from the current openprovider Kiro list: Claude Opus 4.5, Claude
   Sonnet 4.0, and MiniMax M2.1.
 - Some Claude rows expose `Max` effort, but Codex catalog entries must remain
   Codex-safe (`low`/`medium`/`high`/`xhigh`) because Codex rejects raw `max`.

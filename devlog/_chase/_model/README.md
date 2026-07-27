@@ -1,6 +1,6 @@
-# chase/_model — OpenCodex 모델·provider 기준점
+# chase/_model — OpenProvider 모델·provider 기준점
 
-이 폴더는 OpenCodex가 실제로 소유하는 모델/provider 구조와 변경 절차를 모아 둔 chase 기준점이다. jawcode의 `struct_har/chase/model/`에서 문서 분리 방식을 가져왔지만, 내용은 OpenCodex의 프록시·라우팅·Codex catalog 소유권에 맞춰 다시 작성했다.
+이 폴더는 OpenProvider가 실제로 소유하는 모델/provider 구조와 변경 절차를 모아 둔 chase 기준점이다. jawcode의 `struct_har/chase/model/`에서 문서 분리 방식을 가져왔지만, 내용은 OpenProvider의 프록시·라우팅·Codex catalog 소유권에 맞춰 다시 작성했다.
 
 현재 OpenAI/xAI 외 provider 구현 로드맵은 [`devlog/_plan/260717_non_openai_provider_chase/000_plan.md`](../../_plan/260717_non_openai_provider_chase/000_plan.md)다. 이 로드맵은 direct Sakana를 첫 work-phase로 두고, 기존 hardening 뒤에 OpenAI-compatible preset, workspace auth, native AWS 순서로 진행한다.
 
@@ -15,7 +15,7 @@
 7. [007_model_id_delta.md](./007_model_id_delta.md) — provider namespace, 정확한 모델 ID, context/output metadata 차이.
 8. [008_logic_delta.md](./008_logic_delta.md) — Cursor, retry, reasoning, auth, metadata bridge의 실제 로직 대조.
 
-## OpenCodex의 주요 소유자
+## OpenProvider의 주요 소유자
 
 | 표면 | 정본 |
 |---|---|
@@ -34,11 +34,11 @@
 - `src/generated/jawcode-model-metadata.ts`는 직접 수정하지 않는다. jawcode `packages/ai/src/models.json`을 입력으로 `bun run generate:jawcode-metadata`를 실행한다.
 - live `/models`가 있는 provider는 live 결과를 모델 ID의 권위 있는 목록으로 취급하고, registry는 fallback과 capability hint를 맡는다.
 - provider 추가와 모델 추가를 구분한다. 기존 adapter로 호출 가능한 새 모델 때문에 새 adapter나 새 auth flow를 만들지 않는다.
-- jawcode native provider와 OpenCodex proxy provider는 별도 결정이다. 이름이 같아도 transport, auth, retry, catalog 소유권은 자동으로 공유되지 않는다.
+- jawcode native provider와 OpenProvider proxy provider는 별도 결정이다. 이름이 같아도 transport, auth, retry, catalog 소유권은 자동으로 공유되지 않는다.
 
 ## 출처와 신선도
 
-초기 구조는 2026-07-17에 로컬 jawcode의 미커밋 `struct_har/chase/model/` 7개 문서를 읽고 만들었다. jawcode 문서는 참고 근거일 뿐 OpenCodex 정본이 아니다. provider 수, 모델 ID, upstream commit은 바뀔 수 있으므로 변경 작업을 시작할 때 이 폴더의 검증 명령을 다시 실행한다.
+초기 구조는 2026-07-17에 로컬 jawcode의 미커밋 `struct_har/chase/model/` 7개 문서를 읽고 만들었다. jawcode 문서는 참고 근거일 뿐 OpenProvider 정본이 아니다. provider 수, 모델 ID, upstream commit은 바뀔 수 있으므로 변경 작업을 시작할 때 이 폴더의 검증 명령을 다시 실행한다.
 
 상태 표기는 다음 네 가지로 통일한다.
 

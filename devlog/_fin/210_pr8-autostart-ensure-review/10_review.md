@@ -1,14 +1,14 @@
 # PR #8 Code Review — Autostart Ensure Fallback
 
-> PR: https://github.com/lidge-jun/opencodex/pull/8
+> PR: https://github.com/lidge-jun/openprovider/pull/8
 > Author: 이완우 (Ingwannu)
 > Reviewed: 2026-06-21
 > Status: Draft / +450 -53 / 19 files
 
 ## 변경 요약
 
-shim 스크립트의 인라인 bash 로직(30줄+)을 `ocx ensure` 단일 명령어로 통합.
-포트 충돌 시 자동 fallback, `codexAutoStart` 대시보드 토글, `ocx uninstall` 일괄 정리 추가.
+shim 스크립트의 인라인 bash 로직(30줄+)을 `opr ensure` 단일 명령어로 통합.
+포트 충돌 시 자동 fallback, `codexAutoStart` 대시보드 토글, `opr uninstall` 일괄 정리 추가.
 
 ## 수정 필요 (Must Fix)
 

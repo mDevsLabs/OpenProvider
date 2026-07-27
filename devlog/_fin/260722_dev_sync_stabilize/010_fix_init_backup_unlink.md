@@ -1,4 +1,4 @@
-# 010 — `ocx init` 백업 무조건 삭제 수정 (sol BLOCKER)
+# 010 — `opr init` 백업 무조건 삭제 수정 (sol BLOCKER)
 
 ## 문제
 
@@ -8,7 +8,7 @@
 init 경로는 이 정책을 우회하고 사용자 의도 롤백 포인트를 조용히 삭제한다(비가역 데이터 손실).
 
 #257의 원래 의도: init이 fresh v2 config를 쓰면 이전 backup은 orphan이 되어 다음
-`ocx start`가 stale-backup collision으로 크래시하므로 제거 — 하지만 "orphan" 판정 없이
+`opr start`가 stale-backup collision으로 크래시하므로 제거 — 하지만 "orphan" 판정 없이
 전부 삭제한 게 결함.
 
 ## 수정 설계 (diff-level)

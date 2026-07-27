@@ -4,9 +4,9 @@ Date: 2026-06-20
 
 ## Goal
 
-Phase 90 proved that opencodex can make Codex CLI/App treat the proxy as a native Codex
+Phase 90 proved that openprovider can make Codex CLI/App treat the proxy as a native Codex
 provider by injecting the right provider config and model catalog. Phase 100 is the next
-parity pass: audit every Codex-native catalog/runtime selector that opencodex currently
+parity pass: audit every Codex-native catalog/runtime selector that openprovider currently
 inherits from a template, then decide which fields should be preserved, rewritten, or stripped
 for routed non-OpenAI models.
 
@@ -20,7 +20,7 @@ The investigation was split lexicographically by decade:
 | File | Topic |
 | --- | --- |
 | `10_search-and-tool-discovery.md` | `supports_search_tool`, `web_search_tool_type`, hosted vs deferred search fallback |
-| `11_search-defaults-and-inherited-state.md` | Native Codex search defaults and current opencodex inherited catalog state |
+| `11_search-defaults-and-inherited-state.md` | Native Codex search defaults and current openprovider inherited catalog state |
 | `12_catalog-normalization-implementation-plan.md` | Phase 100.1 implementation plan for routed catalog selector normalization |
 | `13_catalog-normalization-completion.md` | Phase 100.1 completion evidence and verification record |
 | `20_personality-model-messages.md` | `model_messages`, `supports_personality`, prompt identity/personality support |
@@ -35,7 +35,7 @@ The investigation was split lexicographically by decade:
 
 ## Primary Finding
 
-opencodex intentionally clones a native Codex model template so Codex's strict catalog parser and
+openprovider intentionally clones a native Codex model template so Codex's strict catalog parser and
 App/TUI picker recognize routed model entries. That was necessary for Phase 90, but it means routed
 models can also inherit native-only runtime selectors:
 
@@ -47,7 +47,7 @@ models can also inherit native-only runtime selectors:
 - context-window and token accounting defaults;
 - websocket capability hints.
 
-For routed models, every inherited field should be considered unsafe until opencodex either proves
+For routed models, every inherited field should be considered unsafe until openprovider either proves
 it is provider-neutral or normalizes it deliberately.
 
 ## Recommended Principle
@@ -57,7 +57,7 @@ Use native Codex metadata only as a structural template. For routed entries:
 1. Preserve fields that are purely parser/picker compatibility.
 2. Rewrite fields that mention model identity, provider identity, reasoning semantics, context size,
    tool exposure, or runtime transport.
-3. Strip fields that advertise native OpenAI-only capability unless opencodex implements an
+3. Strip fields that advertise native OpenAI-only capability unless openprovider implements an
    equivalent bridge.
 
 ## Highest Priority Fixes
@@ -85,7 +85,7 @@ Reason: upstream routed providers are HTTP/SSE, so websocket is not end-to-end
 ```
 
 If websocket-native provider support is ever useful, it should be a separate transport project after
-a provider exposes a real websocket endpoint that opencodex can bridge without converting back to
+a provider exposes a real websocket endpoint that openprovider can bridge without converting back to
 HTTP/SSE internally.
 
 ## Follow-up Decision Update
@@ -98,7 +98,7 @@ Now: strip model_messages from routed non-OpenAI entries first.
 ```
 
 Reason: Codex prefers `model_messages.instructions_template` over `base_instructions`. The current
-opencodex catalog rewrite only changes `base_instructions`, so routed models cloned from native
+openprovider catalog rewrite only changes `base_instructions`, so routed models cloned from native
 `gpt-5.5` can still receive the native GPT/Codex template. Stripping is the lowest-risk way to make
 Codex use the already-rewritten `base_instructions` and disables `/personality` only until
 provider-safe templates exist.
@@ -108,7 +108,7 @@ provider-safe templates exist.
 The upstream Codex source inspected for this planning pass was cloned at:
 
 ```text
-/tmp/opencodex-codex-src
+/tmp/openprovider-codex-src
 ```
 
 The inspected commit was:
@@ -117,12 +117,12 @@ The inspected commit was:
 c83618ab2098525d343df2160d98b2449dca6d5d
 ```
 
-The main opencodex implementation surfaces referenced by the plan are:
+The main openprovider implementation surfaces referenced by the plan are:
 
 ```text
-/Users/jun/Developer/new/700_projects/opencodex/src/codex-catalog.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/server.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/bridge.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/responses/parser.ts
-/Users/jun/Developer/new/700_projects/opencodex/src/types.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/codex-catalog.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/server.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/responses/parser.ts
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts
 ```

@@ -81,7 +81,7 @@ fail-closed 경로는 존재하지만 `model_provider`가 설정된 경우에만
 
 **보안 결론:** 비루프백 블록에서 `api_key`를 빼고 `env_key`만 쓰면, 사용자가 변수를 export하지
 않았을 때 grok이 **xAI 세션 토큰을 평문 HTTP LAN 주소로 전송**한다. 현재의
-`api_key = "opencodex-loopback"`은 비어 있지 않은 own-credential이라 사슬을 즉시 끊고 401로 끝난다.
+`api_key = "openprovider-loopback"`은 비어 있지 않은 own-credential이라 사슬을 즉시 끊고 401로 끝난다.
 즉 제안했던 설계는 무해한 401을 자격증명 유출로 바꾸는 **퇴행**이다. 채택하지 않는다.
 
 **결론(B1):** 메인테이너가 요구한 대로 비루프백에서는 **fence 자동 등록을 하지 않는다.**

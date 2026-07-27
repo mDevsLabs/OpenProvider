@@ -23,8 +23,8 @@ const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
-  isolatedCodexHome = installIsolatedCodexHome("ocx-claude-endpoint-");
-  testDir = mkdtempSync(join(tmpdir(), "ocx-claude-endpoint-"));
+  isolatedCodexHome = installIsolatedCodexHome("opr-claude-endpoint-");
+  testDir = mkdtempSync(join(tmpdir(), "opr-claude-endpoint-"));
   process.env.OPENCODEX_HOME = testDir;
   globalThis.fetch = originalFetch;
 });
@@ -585,7 +585,7 @@ test("routed Claude requests give OpenAI sidecars main auth without leaking it t
         && body.tools.some((tool: Record<string, any>) => tool.function?.name === "web_search");
       const frames = choosesWebSearch
         ? [
-            { choices: [{ index: 0, delta: { tool_calls: [{ index: 0, id: "call_search", function: { name: "web_search", arguments: '{"query":"latest opencodex"}' } }] } }] },
+            { choices: [{ index: 0, delta: { tool_calls: [{ index: 0, id: "call_search", function: { name: "web_search", arguments: '{"query":"latest openprovider"}' } }] } }] },
             { choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }] },
           ]
         : [

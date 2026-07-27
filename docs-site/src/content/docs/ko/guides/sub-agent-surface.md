@@ -61,10 +61,10 @@ v2 서피스(`multi_agent_v2`)의 서브에이전트는 **기본적으로** 부�
 ### CLI
 
 ```bash
-ocx v2 mode v1       # 모든 모델을 v1으로 강제
-ocx v2 mode default  # 업스트림 핀 복원
-ocx v2 mode v2       # 모든 모델을 v2로 강제
-ocx v2 status        # 현재 모드 + Codex 기능 플래그 확인
+opr v2 mode v1       # 모든 모델을 v1으로 강제
+opr v2 mode default  # 업스트림 핀 복원
+opr v2 mode v2       # 모든 모델을 v2로 강제
+opr v2 status        # 현재 모드 + Codex 기능 플래그 확인
 ```
 
 ### API

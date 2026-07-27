@@ -5,7 +5,7 @@ Status: P complete (root cause live-confirmed); B dispatch pending.
 
 ## Root cause (confirmed)
 
-Every `bun test ./tests/` run rewrites the REAL `~/.codex/opencodex-catalog.json`
+Every `bun test ./tests/` run rewrites the REAL `~/.codex/openprovider-catalog.json`
 with test fixtures, dropping all real routed entries (cursor/*, xai/*, ...):
 
 - `tests/server-auth.test.ts` (~:576-700) boots the real server with a test
@@ -33,9 +33,9 @@ with test fixtures, dropping all real routed entries (cursor/*, xai/*, ...):
 - The 400 "not supported when using Codex with a ChatGPT account" is NOT a
   local codex-rs catalog check — codex maps any HTTP 400 body through
   `CodexErr::InvalidRequest` verbatim (`codex-api/src/api_bridge.rs:59-78`).
-  The 400 originated upstream of the CLI (ocx or its routed backend);
+  The 400 originated upstream of the CLI (opr or its routed backend);
   acceptance must re-verify the 400 disappears with a healthy catalog and, if
-  not, trace ocx's routing for the eroded-catalog case separately.
+  not, trace opr's routing for the eroded-catalog case separately.
 
 ## Fix (two layers, both required)
 
@@ -68,7 +68,7 @@ with test fixtures, dropping all real routed entries (cursor/*, xai/*, ...):
     gathered providers + preserved on-disk entries for non-gathered providers
     (dedup by slug; fresh wins).
   - Keep the existing all-empty guard as-is.
-- This also covers the real-world multi-profile clobber case (another ocx
+- This also covers the real-world multi-profile clobber case (another opr
   profile/config syncing the shared catalog path).
 
 ### Tests
@@ -80,8 +80,8 @@ with test fixtures, dropping all real routed entries (cursor/*, xai/*, ...):
   CODEX_HOME isolation + a regression test that `readCodexCatalogPath()`
   honors CODEX_HOME).
 - Full suite + tsc; then verify live that `bun test ./tests/` no longer
-  modifies `~/.codex/opencodex-catalog.json` (mtime/content unchanged), and
-  `ocx sync` still adds 18 cursor entries.
+  modifies `~/.codex/openprovider-catalog.json` (mtime/content unchanged), and
+  `opr sync` still adds 18 cursor entries.
 
 ## Acceptance
 
@@ -199,4 +199,4 @@ Verification:
 - Real catalog before/after final full-suite run:
   `stat -f "%Sm"` stayed `Jul  2 20:41:40 2026`;
   `shasum` stayed
-  `7be0d990236deda2c409b608942159cdb4f62a5c  /Users/jun/.codex/opencodex-catalog.json`.
+  `7be0d990236deda2c409b608942159cdb4f62a5c  /Users/jun/.codex/openprovider-catalog.json`.

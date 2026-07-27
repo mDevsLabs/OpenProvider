@@ -29,11 +29,11 @@ Goal: routed 모델의 `response.completed` / chat `usage`에 token-detail 오�
 ## Verifier
 1. `bun run typecheck`
 2. `bun run test` (full)
-3. **런타임 프로비넌스 (reviewer blocker 반영):** 수정된 체크아웃으로 :10100 프록시를 명시적으로 재기동(`ocx stop` → `ocx start`, 사용자 확인 필요 — 이 프록시가 현재 세션을 서빙 중)하고, `/healthz` version+pid+uptime으로 새 프로세스가 수정 코드를 서빙함을 기록한 뒤에만 매트릭스 실행. stale 프로세스 결과는 무효.
-4. live 3-way 매트릭스 재실행 (grok 0.2.101, `GROK_HOME=/tmp/grok-ocx-smoke-260723`): ocx-chat / ocx-native-chat / ocx-resp 모두 **exit 0** + 정답 텍스트.
-5. **endpoint 프로비넌스 (reviewer 제안 6 반영):** grok의 ocx-chat 런이 Responses 디코더를 탄 사실이 있으므로, 매트릭스만으로는 `chatCompletionsUsage()` 실행 증명이 안 됨 — 직접 `curl /v1/chat/completions` (stream+non-stream)로 details 상시 존재를 별도 확인.
+3. **런타임 프로비넌스 (reviewer blocker 반영):** 수정된 체크아웃으로 :10100 프록시를 명시적으로 재기동(`opr stop` → `opr start`, 사용자 확인 필요 — 이 프록시가 현재 세션을 서빙 중)하고, `/healthz` version+pid+uptime으로 새 프로세스가 수정 코드를 서빙함을 기록한 뒤에만 매트릭스 실행. stale 프로세스 결과는 무효.
+4. live 3-way 매트릭스 재실행 (grok 0.2.101, `GROK_HOME=/tmp/grok-opr-smoke-260723`): opr-chat / opr-native-chat / opr-resp 모두 **exit 0** + 정답 텍스트.
+5. **endpoint 프로비넌스 (reviewer 제안 6 반영):** grok의 opr-chat 런이 Responses 디코더를 탄 사실이 있으므로, 매트릭스만으로는 `chatCompletionsUsage()` 실행 증명이 안 됨 — 직접 `curl /v1/chat/completions` (stream+non-stream)로 details 상시 존재를 별도 확인.
 6. 스모크 receipt는 `011_receipt.md`에 **명령·타임스탬프·stdout·stderr·exit code를 한 세트로** 기록 (reviewer 제안 5).
 
 ## Out of scope
-- ocx `/v1/models`에 `api_backend`/`context_window` 필드 추가 (zero-config 카탈로그) — 후속 결정 사항.
+- opr `/v1/models`에 `api_backend`/`context_window` 필드 추가 (zero-config 카탈로그) — 후속 결정 사항.
 - push / release (사용자 승인 필요).

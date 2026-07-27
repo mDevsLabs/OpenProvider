@@ -92,11 +92,11 @@ concurrency semaphore; `stop()` only clears the timer, in-flight refreshes settl
 
 ## Divergence from codex-lb (intentional)
 
-- codex-lb runs multi-replica with DB leader-election (`scheduler_leader`); opencodex is a
+- codex-lb runs multi-replica with DB leader-election (`scheduler_leader`); openprovider is a
   single local daemon (one PID, `writePid` `src/cli.ts`), so no leader election — the single
-  process IS the leader. The cross-process **file lock** already guards against a second `ocx`
+  process IS the leader. The cross-process **file lock** already guards against a second `opr`
   instance double-refreshing.
-- codex-lb keys staleness on a persisted `last_refresh` (8-day use-time / 12h guardian). opencodex
+- codex-lb keys staleness on a persisted `last_refresh` (8-day use-time / 12h guardian). openprovider
   keys on `expiresAt` proximity (`leadSeconds`) to avoid a schema migration in Phase 0/1; a
   `lastRefresh` field is an optional Phase 1 refinement if we want codex-lb's exact "warm the
   chain every N days regardless of expiry" behavior.

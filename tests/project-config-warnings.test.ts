@@ -71,7 +71,7 @@ let previousCodexHome: string | undefined;
 beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
   previousCodexHome = process.env.CODEX_HOME;
-  testDir = join(tmpdir(), `ocx-proj-warn-${Date.now()}`);
+  testDir = join(tmpdir(), `opr-proj-warn-${Date.now()}`);
   mkdirSync(testDir, { recursive: true });
   process.env.OPENCODEX_HOME = testDir;
   // Isolate from the real user config — resolveCodexConfigPath reads CODEX_HOME.
@@ -93,7 +93,7 @@ function writeGlobalRoutingConfig(extra = ""): void {
   const codexHome = process.env.CODEX_HOME!;
   mkdirSync(codexHome, { recursive: true });
   writeFileSync(join(codexHome, "config.toml"), `
-model_provider = "opencodex"
+model_provider = "openprovider"
 ${extra}
 `);
 }
@@ -101,17 +101,17 @@ ${extra}
 describe("isGlobalOpencodexRoutingActive", () => {
   test("detects injected openai_base_url marker", () => {
     const text = `
-# Auto-injected by opencodex
+# Auto-injected by openprovider
 openai_base_url = "http://127.0.0.1:10100/v1"
-model_provider = "opencodex"
+model_provider = "openprovider"
 `;
     expect(isGlobalOpencodexRoutingActive("unused", text)).toBe(true);
   });
 
-  test("does not treat dormant model_providers.opencodex table as active routing", () => {
+  test("does not treat dormant model_providers.openprovider table as active routing", () => {
     const text = `
-[model_providers.opencodex]
-name = "opencodex"
+[model_providers.openprovider]
+name = "openprovider"
 base_url = "http://127.0.0.1:10100/v1"
 `;
     expect(isGlobalOpencodexRoutingActive("unused", text)).toBe(false);

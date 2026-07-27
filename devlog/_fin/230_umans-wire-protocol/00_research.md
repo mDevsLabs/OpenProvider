@@ -3,12 +3,12 @@
 ## Goal
 
 Investigate whether issue #18 can be explained by routing Umans models through the wrong wire
-adapter, and decide whether opencodex needs a custom-provider path for Anthropic Messages-style
+adapter, and decide whether openprovider needs a custom-provider path for Anthropic Messages-style
 providers in addition to the existing OpenAI Chat Completions path.
 
 Issue anchor:
 
-- https://github.com/lidge-jun/opencodex/issues/18
+- https://github.com/lidge-jun/openprovider/issues/18
 
 ## External evidence
 
@@ -74,11 +74,11 @@ Findings:
   direct evidence that Umans emits that exact shape, but it is a useful warning that modern
   OpenAI-compatible coding gateways do not always behave like simple scalar-delta streams.
 
-## opencodex local evidence
+## openprovider local evidence
 
 ### Router
 
-File: `/Users/jun/Developer/new/700_projects/opencodex/src/router.ts`
+File: `/Users/jun/Developer/new/700_projects/openprovider/src/router.ts`
 
 Routing behavior:
 
@@ -96,12 +96,12 @@ Local config check during this investigation:
 ```
 
 So the reporter's `umans` provider is not present in this local machine's
-`~/.opencodex/config.json`; conclusions about its exact adapter must be verified against the
+`~/.openprovider/config.json`; conclusions about its exact adapter must be verified against the
 reporter's config.
 
 ### OpenAI Chat adapter
 
-File: `/Users/jun/Developer/new/700_projects/opencodex/src/adapters/openai-chat.ts`
+File: `/Users/jun/Developer/new/700_projects/openprovider/src/adapters/openai-chat.ts`
 
 Behavior:
 
@@ -118,17 +118,17 @@ Behavior:
 Issue #18 implication:
 
 - If Umans Chat Completions emits cumulative or overlapping content snapshots rather than strict
-  append-only deltas, opencodex will append them and live output can duplicate partial text.
+  append-only deltas, openprovider will append them and live output can duplicate partial text.
 - If Umans emits tool-call arguments as object fragments, cumulative snapshots, or id-less indexed
   chunks, the current parser can lose or corrupt tool-call state. That can explain commentary
   streaming successfully but the turn stalling before Codex receives a file-change/tool event.
-- If a custom `umans` provider lacks Kimi model constraints, opencodex can send unsupported or
+- If a custom `umans` provider lacks Kimi model constraints, openprovider can send unsupported or
   poorly matched params (`temperature`, `top_p`, `reasoning_effort`, `tool_choice`) to
   Kimi-family models.
 
 ### Anthropic Messages adapter
 
-File: `/Users/jun/Developer/new/700_projects/opencodex/src/adapters/anthropic.ts`
+File: `/Users/jun/Developer/new/700_projects/openprovider/src/adapters/anthropic.ts`
 
 Behavior:
 
@@ -136,11 +136,11 @@ Behavior:
 - For API-key providers, uses `x-api-key`.
 - Sets `anthropic-version: 2023-06-01`.
 - Maps Codex reasoning to Anthropic `thinking`.
-- Parses `thinking_delta`, `text_delta`, and `input_json_delta` into opencodex `AdapterEvent`s.
+- Parses `thinking_delta`, `text_delta`, and `input_json_delta` into openprovider `AdapterEvent`s.
 
 Issue #18 implication:
 
-- Since Umans officially implements `/v1/messages`, opencodex can already target the Messages path
+- Since Umans officially implements `/v1/messages`, openprovider can already target the Messages path
   by configuring:
 
 ```json
@@ -165,9 +165,9 @@ Issue #18 implication:
 
 Files:
 
-- `/Users/jun/Developer/new/700_projects/opencodex/gui/src/components/AddProviderModal.tsx`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/providers/derive.ts`
-- `/Users/jun/Developer/new/700_projects/opencodex/src/server.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/gui/src/components/AddProviderModal.tsx`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/providers/derive.ts`
+- `/Users/jun/Developer/new/700_projects/openprovider/src/server.ts`
 
 Current behavior:
 
@@ -201,14 +201,14 @@ Evidence:
 
 Risk:
 
-- If the reporter's `umans` provider uses `openai-chat`, opencodex goes through
+- If the reporter's `umans` provider uses `openai-chat`, openprovider goes through
   `/v1/chat/completions`.
 - That may still be officially supported, but it may be the less stable path for Codex's
   Responses-to-tool-call bridge.
 
 Falsification:
 
-- Capture the reporter's `~/.opencodex/config.json` provider entry with secrets redacted.
+- Capture the reporter's `~/.openprovider/config.json` provider entry with secrets redacted.
 - Run the same prompt with:
   - `adapter: "openai-chat", baseUrl: "https://api.code.umans.ai/v1"`
   - `adapter: "anthropic", baseUrl: "https://api.code.umans.ai"`
@@ -235,7 +235,7 @@ Evidence:
 
 - models.dev marks `umans-kimi-k2.7` and `umans-coder` as `temperature: false` and
   `reasoning_options: []`.
-- Existing Kimi registry entries in opencodex have explicit no-temperature/no-top-p/no-penalty and
+- Existing Kimi registry entries in openprovider have explicit no-temperature/no-top-p/no-penalty and
   auto-tool-choice-only settings.
 - A custom Umans provider will not inherit those Kimi constraints unless catalog enrichment covers
   this provider id or the user config includes them.
@@ -275,8 +275,8 @@ Reasoning:
 Improve the custom provider modal:
 
 - Add an adapter explainer:
-  - `openai-chat`: base URL should end in `/v1`; opencodex calls `/chat/completions`.
-  - `anthropic`: base URL should be provider root or `/v1`; opencodex calls `/v1/messages`.
+  - `openai-chat`: base URL should end in `/v1`; openprovider calls `/chat/completions`.
+  - `anthropic`: base URL should be provider root or `/v1`; openprovider calls `/v1/messages`.
 - Add a preset-like "Umans Messages" row so users do not accidentally keep `openai-chat`.
 - Optionally warn when a base URL contains `api.code.umans.ai` and adapter is still `openai-chat`:
   "Umans also supports Messages; use Anthropic adapter for Codex-style tool stability."
@@ -296,7 +296,7 @@ Add a temporary or gated debug facility:
 
 - Log upstream SSE frames for a selected provider/model with secrets stripped.
 - Include request adapter, URL path, and model params.
-- Use it to prove whether duplication comes from upstream frames, opencodex bridge, or Codex
+- Use it to prove whether duplication comes from upstream frames, openprovider bridge, or Codex
   mobile renderer.
 
 ## Recommendation

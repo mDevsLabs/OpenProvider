@@ -1,8 +1,8 @@
 # Contributing
 
-Thanks for helping with opencodex.
+Thanks for helping with openprovider.
 
-- Start with the canonical guide: [Contributing](https://opencodex.me/contributing/)
+- Start with the canonical guide: [Contributing](https://openprovider.me/contributing/)
 - Public user docs live in [`docs-site/`](./docs-site)
 - Current maintainer invariants live in [`structure/`](./structure)
 - Maintainer roles and merge policy live in [`MAINTAINERS.md`](./MAINTAINERS.md)

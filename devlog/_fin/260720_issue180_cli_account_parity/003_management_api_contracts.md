@@ -11,7 +11,7 @@ Errors are JSON `{ "error": string }` (codex-auth sometimes adds `code`/`reason`
 - Loopback bind (default 127.0.0.1): `isApiAuthRequired` false
   (src/server/auth-cors.ts:114-116) → no token needed; CLI must send a loopback
   Host and no foreign Origin (src/server/auth-cors.ts:55-73).
-- Non-loopback bind: client must send `x-opencodex-api-key` / `Authorization: Bearer`
+- Non-loopback bind: client must send `x-openprovider-api-key` / `Authorization: Bearer`
   / `x-api-key` matching `OPENCODEX_API_AUTH_TOKEN` or a `config.apiKeys` entry
   (src/server/auth-cors.ts:156-163, 125-143). Existing CLI convention:
   `runningProxyUpdateHeaders()` (src/oauth/login-cli.ts:9-14) injects the env token.
@@ -19,7 +19,7 @@ Errors are JSON `{ "error": string }` (codex-auth sometimes adds `code`/`reason`
   pid file (`readAlivePid`, src/config.ts:846-857) → `runtime-port.json`
   (`readRuntimePort`, src/config.ts:750-759) → `/healthz` identity probe
   (`isOpencodexHealthz`, src/server/proxy-liveness.ts:59-65) → `config.port ?? 10100`
-  fallback. Config dir: `OPENCODEX_HOME` or `~/.opencodex` (src/config.ts:268-274).
+  fallback. Config dir: `OPENCODEX_HOME` or `~/.openprovider` (src/config.ts:268-274).
 
 ## Family A — Codex (ChatGPT) account pool
 

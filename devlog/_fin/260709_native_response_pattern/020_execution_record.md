@@ -21,7 +21,7 @@
 ## LOOP-PESSIMIST-01 (not proven / residual)
 - Desktop-app visual grouping is client-side and closed-source; wire parity is proven, the
   visual confirmation needs the USER to restart the Codex app (stale in-memory model info from
-  before the catalog flip) + restart ocx (running proxy predates this unit) + open a fresh
+  before the catalog flip) + restart opr (running proxy predates this unit) + open a fresh
   thread on glm-5.2/grok-4.5.
 - If the user later opts into visible thinking (summary "auto"), raw reasoning becomes visible
   again and will split cells - by design (native semantics).

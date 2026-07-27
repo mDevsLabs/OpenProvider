@@ -32,7 +32,7 @@ Work class: C4 (release surface)
 3. Cross-platform regression: local commits alter Windows executable resolution, shell spawning, Claude path parsing, and Codex home containment. Mitigation: affected regression suites plus full cross-platform CI.
 4. Release race: another maintainer can move `dev` or `main` during validation. Mitigation: fetch and compare exact SHAs before every push/promotion; stop on unexpected movement.
 5. Partial public release: npm, tag, and GitHub Release can diverge. Mitigation: use `scripts/release.ts`, verify all four metadata surfaces, and choose a new version rather than rewriting a consumed one.
-6. Stale live proxy: the running `ocx` process can keep old code. This release is GUI/cross-platform focused; restart is recorded as an operational follow-up only if live local smoke is used.
+6. Stale live proxy: the running `opr` process can keep old code. This release is GUI/cross-platform focused; restart is recorded as an operational follow-up only if live local smoke is used.
 
 ## Necessity gate
 

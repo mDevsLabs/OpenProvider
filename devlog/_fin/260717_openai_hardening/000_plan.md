@@ -31,7 +31,7 @@ originally locked the plan before the docs-only Audit/Build/Check/Done cycles be
   with fresh `capturedEvidence`, the final D closes the FSM to IDLE, and no in-scope
   diff or failed gate remains.
 - **Memory artifact:** this numbered devlog unit plus
-  `.codexclaw/goalplans/opencodex-openai-1-provider-id-openai-codex-dire/goalplan.json`
+  `.codexclaw/goalplans/openprovider-openai-1-provider-id-openai-codex-dire/goalplan.json`
   and its append-only ledger.
 - **Expected terminal outcomes:** `DONE` for verified completion; `NOOP` only if the
   current tree already satisfies every criterion; `BLOCKED`, `UNSAFE`, `NEEDS_HUMAN`,
@@ -54,7 +54,7 @@ Make OpenAI a deliberate three-tier provider family:
 | Provider id | User-facing tier | Credential owner | Account behavior | Upstream |
 |---|---|---|---|---|
 | `openai` | Codex Direct | caller / main Codex login | main account only; never enters rotation | `chatgpt.com/backend-api/codex` |
-| `openai-multi` | Codex Multi-account | OpenCodex Codex-account pool | main account plus added accounts; affinity, quota, cooldown, failover | `chatgpt.com/backend-api/codex` |
+| `openai-multi` | Codex Multi-account | OpenProvider Codex-account pool | main account plus added accounts; affinity, quota, cooldown, failover | `chatgpt.com/backend-api/codex` |
 | `openai-apikey` | OpenAI API | configured OpenAI API key/key pool | no Codex-account routing | `api.openai.com/v1` |
 
 The main Codex account is a normal candidate in the Multi-account pool. It is not an

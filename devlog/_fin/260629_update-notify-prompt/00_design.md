@@ -1,26 +1,26 @@
 # 00 - Interactive Update Notify Prompt Design
 
-Goal: when a newer published version of opencodex exists, surface a one-screen
-update prompt on interactive `ocx start` so users stop silently running stale
+Goal: when a newer published version of openprovider exists, surface a one-screen
+update prompt on interactive `opr start` so users stop silently running stale
 versions. Server/daemon users must never see it. Reference implementation is
-codex-rs (the native Codex CLI), adapted to opencodex's npm/bun distribution
+codex-rs (the native Codex CLI), adapted to openprovider's npm/bun distribution
 and existing `src/update.ts` helpers.
 
 This document is design only. No code is written in this phase.
 
 ## Part 1 - Easy explanation
 
-Today a user can run an old opencodex for weeks without noticing a release.
+Today a user can run an old openprovider for weeks without noticing a release.
 codex-rs solves this with a small startup prompt offering three choices:
 
 1. Update now - run the global install, then exit and ask the user to
-   re-run `ocx start`.
+   re-run `opr start`.
 2. Skip - continue this run, ask again next start.
 3. Skip until next version - remember this exact version and stay quiet until
    a strictly newer one appears.
 
 The hard rule from the user: this only ever appears in an interactive TTY.
-People who run opencodex as a background service or under a process supervisor
+People who run openprovider as a background service or under a process supervisor
 must never be interrupted.
 
 ## Reference: codex-rs logic (what we are copying)
@@ -42,7 +42,7 @@ Files under `~/Developer/codex/121_openai-codex/codex-rs/tui/src/`:
 - `update_action.rs` - maps the detected install method (npm/bun/brew/
   standalone) to the exact upgrade command shown and run.
 
-## Current opencodex shape (what we already have)
+## Current openprovider shape (what we already have)
 
 - `src/update.ts`
   - `detectInstall()` -> `"bun" | "npm" | "source"` by inspecting the module
@@ -70,7 +70,7 @@ Files under `~/Developer/codex/121_openai-codex/codex-rs/tui/src/`:
   - `gui` spawns `start` with the parent env (no `OCX_SERVICE`) but
     `stdio:"ignore"` (cli.ts:416), i.e. not a TTY.
 - `src/config.ts`
-  - `getConfigDir()` resolves `~/.opencodex` (or `OPENCODEX_HOME`), hardened to
+  - `getConfigDir()` resolves `~/.openprovider` (or `OPENCODEX_HOME`), hardened to
     `0700`; already holds pid, runtime-port, accounts, usage, service state.
   - `atomicWriteFile` (config.ts:13) for temp+rename writes.
 - `src/service.ts` - service-spawned `start` also sets `OCX_SERVICE=1`.
@@ -79,7 +79,7 @@ Files under `~/Developer/codex/121_openai-codex/codex-rs/tui/src/`:
 
 A design-review subagent (explorer) walked the code; conclusions adopted:
 
-### Insertion point: `ocx start` only, before `startServer`
+### Insertion point: `opr start` only, before `startServer`
 
 The prompt belongs in `handleStart`, but it must move earlier than the current
 star-prompt call. Because "Update now" runs a global install and then exits,
@@ -87,12 +87,12 @@ the prompt has to fire before `startServer(port)` / `writePid`
 (cli.ts:138-147). Otherwise we would overwrite our own running global binary
 while a daemon holds the port and PID. Order becomes: parse args -> reconcile
 -> (interactive update prompt) -> choose port -> start server. "Update now"
-runs `runUpdate()` then `process.exit`, advising re-run of `ocx start`.
+runs `runUpdate()` then `process.exit`, advising re-run of `opr start`.
 
-`ocx ensure` does NOT show the prompt. The child it spawns already carries
+`opr ensure` does NOT show the prompt. The child it spawns already carries
 `OCX_SERVICE:"1"` and is filtered out, but `ensure` itself is also the
 codex-shim autostart hot path, not a sit-and-watch session. Notifications are
-restricted to foreground `ocx start`, matching codex-rs's "once at TUI start".
+restricted to foreground `opr start`, matching codex-rs's "once at TUI start".
 
 ### Order vs the star prompt
 
@@ -119,7 +119,7 @@ Do not try to make one comparator serve both. `dismissed_version` stays a plain
 string equality against the channel-specific `latest`, so channels cannot
 cross-contaminate.
 
-### Cache file: `~/.opencodex/version.json`
+### Cache file: `~/.openprovider/version.json`
 
 Stored under `getConfigDir()`, written with `atomicWriteFile` (concurrent
 starts are possible). Format mirrors codex-rs plus a channel tag:
@@ -140,7 +140,7 @@ dir, so no extra cleanup is needed.
 leaked handles/timers. Prefer a hidden subcommand (e.g. `__refresh-version`)
 spawned `detached`, `stdio:"ignore"`, `.unref()` - it runs one `npm view`
 (or a `fetch` to the npm registry JSON API
-`https://registry.npmjs.org/@bitkyc08%2Fopencodex`), writes `version.json` via
+`https://registry.npmjs.org/@bitkyc08%2Fopenprovider`), writes `version.json` via
 `atomicWriteFile`, and exits. This run only reads the cache to decide whether
 to prompt; the refreshed value shows up on a later start (same model as
 codex-rs). Crucially, only update `last_checked_at` on success so a failed
@@ -150,7 +150,7 @@ fetch retries next start.
 
 Reuse `runUpdate()` but only because the prompt now fires before the server is
 up. Flow: prompt -> if "Update now", call `runUpdate()` -> `process.exit(0)`
-with "Restart: ocx start". This matches codex-rs deferring the install until
+with "Restart: opr start". This matches codex-rs deferring the install until
 after the UI closes, and sidesteps overwriting a live global binary or a held
 PID/port entirely.
 
@@ -208,14 +208,14 @@ PID/port entirely.
 - New `tests/update-notify.test.ts`: channel-aware `isNewer` (stable vs
   preview), dismiss suppression, source-build skip, non-TTY/`OCX_SERVICE`
   guard, stale-cache trigger, cache tag mismatch invalidation.
-- Manual: confirm no prompt under `OCX_SERVICE=1`, piped stdout, `ocx ensure`,
-  and `gui`-spawned start; confirm prompt under a real interactive `ocx start`
+- Manual: confirm no prompt under `OCX_SERVICE=1`, piped stdout, `opr ensure`,
+  and `gui`-spawned start; confirm prompt under a real interactive `opr start`
   with a stubbed cache.
 
 ## Non-goals
 
 - No auto-update without consent.
-- No prompt outside foreground `ocx start` (explicitly not in `ensure`,
+- No prompt outside foreground `opr start` (explicitly not in `ensure`,
   `gui`, service, or any non-TTY run).
 - No change to the actual upgrade mechanics in `runUpdate()` beyond sharing
   channel/command helpers.
