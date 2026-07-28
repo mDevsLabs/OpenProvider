@@ -1,10 +1,10 @@
 import { create, fromJson, toBinary, type JsonValue } from "@bufbuild/protobuf";
 import { ValueSchema } from "@bufbuild/protobuf/wkt";
-import type { OcxRequestOptions, OcxTool } from "../../types";
+import type { oprRequestOptions, oprTool } from "../../types";
 import { namespacedToolName, toolChoiceAliases } from "../../types";
 import { McpToolDefinitionSchema, McpToolsSchema, type McpToolDefinition } from "./gen/agent_pb";
 
-export const OCX_RESPONSES_TOOL_PROVIDER = "opencodex-responses";
+export const opr_RESPONSES_TOOL_PROVIDER = "opencodex-responses";
 export const CODEX_EXEC_COMMAND_TOOL = "exec_command";
 export const CODEX_SHELL_COMMAND_TOOL = "shell_command";
 export const CODEX_APPLY_PATCH_TOOL = "apply_patch";
@@ -83,7 +83,7 @@ export function resolveShellBridgeAliasKey<T>(
   return undefined;
 }
 
-export function cursorToolChoiceAliases(tool: Pick<OcxTool, "namespace" | "name">): string[] {
+export function cursorToolChoiceAliases(tool: Pick<oprTool, "namespace" | "name">): string[] {
   const aliases = new Set(toolChoiceAliases(tool));
   if (isBareCodexShellBridgeTool(tool)) {
     for (const alias of CODEX_SHELL_BRIDGE_TOOL_NAMES) aliases.add(alias);
@@ -92,7 +92,7 @@ export function cursorToolChoiceAliases(tool: Pick<OcxTool, "namespace" | "name"
 }
 
 function catalogHasBareCodexShellBridge(
-  catalog: readonly Pick<OcxTool, "namespace" | "name">[],
+  catalog: readonly Pick<oprTool, "namespace" | "name">[],
 ): boolean {
   return catalog.some(isBareCodexShellBridgeTool);
 }
@@ -105,9 +105,9 @@ function catalogHasBareCodexShellBridge(
  * Explicit wire names (`mcp__remote__exec_command`) always match the namespaced tool.
  */
 function cursorToolChoiceMatches(
-  tool: Pick<OcxTool, "namespace" | "name">,
+  tool: Pick<oprTool, "namespace" | "name">,
   choiceName: string,
-  catalog: readonly Pick<OcxTool, "namespace" | "name">[],
+  catalog: readonly Pick<oprTool, "namespace" | "name">[],
 ): boolean {
   if (isCodexShellBridgeToolName(choiceName)) {
     if (catalogHasBareCodexShellBridge(catalog)) {
@@ -119,28 +119,28 @@ function cursorToolChoiceMatches(
   return cursorToolChoiceAliases(tool).includes(choiceName);
 }
 
-export function isBareCodexShellBridgeTool(tool: Pick<OcxTool, "namespace" | "name">): boolean {
+export function isBareCodexShellBridgeTool(tool: Pick<oprTool, "namespace" | "name">): boolean {
   return !tool.namespace && isCodexShellBridgeToolName(tool.name);
 }
 
 /** @deprecated Prefer isBareCodexShellBridgeTool; kept for older call sites/tests. */
-function isBareCodexExecCommandTool(tool: Pick<OcxTool, "namespace" | "name">): boolean {
+function isBareCodexExecCommandTool(tool: Pick<oprTool, "namespace" | "name">): boolean {
   return isBareCodexShellBridgeTool(tool);
 }
 
-export function cursorRequestHasShellAlias(tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined): boolean {
+export function cursorRequestHasShellAlias(tools: readonly Pick<oprTool, "namespace" | "name">[] | undefined): boolean {
   return tools?.some(isBareCodexExecCommandTool) ?? false;
 }
 
 export function cursorRequestAdvertisesApplyPatch(
-  tools: readonly Pick<OcxTool, "namespace" | "name" | "freeform">[] | undefined,
-  toolChoice?: OcxRequestOptions["toolChoice"],
+  tools: readonly Pick<oprTool, "namespace" | "name" | "freeform">[] | undefined,
+  toolChoice?: oprRequestOptions["toolChoice"],
 ): boolean {
   const catalog = tools ?? [];
   return catalog.some(tool => !tool.namespace && tool.name === CODEX_APPLY_PATCH_TOOL && tool.freeform === true && cursorToolAllowedByChoice(tool, toolChoice, catalog));
 }
 
-export function cursorToolWireName(tool: Pick<OcxTool, "namespace" | "name">): string {
+export function cursorToolWireName(tool: Pick<oprTool, "namespace" | "name">): string {
   return namespacedToolName(tool.namespace, tool.name);
 }
 
@@ -151,7 +151,7 @@ export function cursorToolWireName(tool: Pick<OcxTool, "namespace" | "name">): s
  * Fold the display prefix back to the advertised wire name, and treat `shell_command` /
  * `exec_command` as the same Codex shell bridge, so alias thrash does not become "tool not found".
  */
-const CURSOR_MCP_DISPLAY_PREFIX = `mcp_${OCX_RESPONSES_TOOL_PROVIDER}_`;
+const CURSOR_MCP_DISPLAY_PREFIX = `mcp_${opr_RESPONSES_TOOL_PROVIDER}_`;
 
 export function normalizeCursorWireName(name: string): string {
   return name.startsWith(CURSOR_MCP_DISPLAY_PREFIX) ? name.slice(CURSOR_MCP_DISPLAY_PREFIX.length) : name;
@@ -164,7 +164,7 @@ export function responsesToolNameFromCursorWire(name: string, cursorToolNameMap?
 }
 
 /** Schema advertised to Cursor for this tool (may use Cursor-preferred field names like `cmd`). */
-export function cursorToolInputSchema(tool: OcxTool): unknown {
+export function cursorToolInputSchema(tool: oprTool): unknown {
   return isBareCodexExecCommandTool(tool) ? CURSOR_EXEC_COMMAND_INPUT_SCHEMA : (tool.parameters ?? {});
 }
 
@@ -173,14 +173,14 @@ export function cursorToolInputSchema(tool: OcxTool): unknown {
  * Must NOT reuse `cursorToolInputSchema` for the shell bridge: advertising `cmd` while also
  * treating `cmd` as canonical prevents the `cmd` → `command` rewrite Codex requires (#399).
  */
-export function cursorToolArgNormalizeSchema(tool: OcxTool): unknown {
+export function cursorToolArgNormalizeSchema(tool: oprTool): unknown {
   if (isBareCodexShellBridgeTool(tool)) {
     return shellBridgeArgNormalizeSchema(tool);
   }
   return tool.parameters ?? {};
 }
 
-function shellBridgeArgNormalizeSchema(tool: OcxTool): unknown {
+function shellBridgeArgNormalizeSchema(tool: oprTool): unknown {
   const parameters = tool.parameters;
   if (!parameters || typeof parameters !== "object") return CODEX_SHELL_BRIDGE_ARG_NORMALIZE_SCHEMA;
   const base = parameters as Record<string, unknown>;
@@ -263,7 +263,7 @@ function activeTextMentionsGenericToolUseHint(text: string): boolean {
 }
 
 export function shouldAppendCursorGenericToolUseHint(
-  tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined,
+  tools: readonly Pick<oprTool, "namespace" | "name">[] | undefined,
   text: string,
 ): boolean {
   const trimmed = text.trim();
@@ -274,7 +274,7 @@ export function shouldAppendCursorGenericToolUseHint(
 }
 
 export function appendCursorGenericToolUseHint(
-  tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined,
+  tools: readonly Pick<oprTool, "namespace" | "name">[] | undefined,
   text: string,
 ): string {
   if (!shouldAppendCursorGenericToolUseHint(tools, text)) return text;
@@ -282,7 +282,7 @@ export function appendCursorGenericToolUseHint(
 }
 
 export function shouldUseNativeExecOnlyForGenericToolUse(
-  tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined,
+  tools: readonly Pick<oprTool, "namespace" | "name">[] | undefined,
   text: string,
 ): boolean {
   const trimmed = text.trim();
@@ -291,10 +291,10 @@ export function shouldUseNativeExecOnlyForGenericToolUse(
     && !/(?:리소스|플러그인|깃허브|github)/i.test(trimmed);
 }
 
-export function cursorToolsForActivePrompt<T extends Pick<OcxTool, "namespace" | "name">>(
+export function cursorToolsForActivePrompt<T extends Pick<oprTool, "namespace" | "name">>(
   tools: readonly T[] | undefined,
   activeText: string,
-  toolChoice?: OcxRequestOptions["toolChoice"],
+  toolChoice?: oprRequestOptions["toolChoice"],
 ): readonly T[] | undefined {
   if (!shouldUseNativeExecOnlyForGenericToolUse(tools, activeText)) return tools;
   const execTools = tools?.filter(isBareCodexExecCommandTool);
@@ -369,14 +369,14 @@ export function cursorShellBridgeArgsValid(
 }
 
 export function cursorToolAllowedByChoice(
-  tool: Pick<OcxTool, "namespace" | "name">,
-  toolChoice: OcxRequestOptions["toolChoice"] | undefined,
-  catalog: readonly Pick<OcxTool, "namespace" | "name">[] = [tool],
+  tool: Pick<oprTool, "namespace" | "name">,
+  toolChoice: oprRequestOptions["toolChoice"] | undefined,
+  catalog: readonly Pick<oprTool, "namespace" | "name">[] = [tool],
 ): boolean {
   if (!toolChoice || toolChoice === "auto" || toolChoice === "required") return true;
   if (toolChoice === "none") return false;
   if ("allowedTools" in toolChoice) {
-    return toolChoice.allowedTools.some(choiceName => cursorToolChoiceMatches(tool, choiceName, catalog));
+    return toolChoice.allowedTools.some((choiceName: string) => cursorToolChoiceMatches(tool, choiceName, catalog));
   }
   return cursorToolChoiceMatches(tool, toolChoice.name, catalog);
 }
@@ -399,8 +399,8 @@ function discoveryToolLabel(wireNames: readonly string[]): string | undefined {
 }
 
 export function buildCursorToolGuidanceSystemNote(
-  tools: readonly Pick<OcxTool, "namespace" | "name" | "freeform">[] | undefined,
-  toolChoice?: OcxRequestOptions["toolChoice"],
+  tools: readonly Pick<oprTool, "namespace" | "name" | "freeform">[] | undefined,
+  toolChoice?: oprRequestOptions["toolChoice"],
 ): string | undefined {
   if (!tools?.length) return undefined;
   const wireNames = [...new Set(
@@ -465,8 +465,8 @@ export function encodeCursorInputSchema(schema: unknown): Uint8Array {
 }
 
 export function buildCursorToolDefinitions(
-  tools: readonly OcxTool[] | undefined,
-  toolChoice?: OcxRequestOptions["toolChoice"],
+  tools: readonly oprTool[] | undefined,
+  toolChoice?: oprRequestOptions["toolChoice"],
 ): McpToolDefinition[] {
   if (!tools?.length) return [];
   return tools.filter(tool => cursorToolAllowedByChoice(tool, toolChoice, tools)).map(tool => {
@@ -474,7 +474,7 @@ export function buildCursorToolDefinitions(
     return create(McpToolDefinitionSchema, {
       name: wireName,
       toolName: wireName,
-      providerIdentifier: OCX_RESPONSES_TOOL_PROVIDER,
+      providerIdentifier: opr_RESPONSES_TOOL_PROVIDER,
       description: tool.description,
       inputSchema: encodeCursorInputSchema(cursorToolInputSchema(tool)),
     });
@@ -483,8 +483,8 @@ export function buildCursorToolDefinitions(
 
 /** Exact byte size of the protobuf field value Cursor receives for client tool registration. */
 export function cursorMcpToolsEncodedSize(
-  tools: readonly OcxTool[] | undefined,
-  toolChoice?: OcxRequestOptions["toolChoice"],
+  tools: readonly oprTool[] | undefined,
+  toolChoice?: oprRequestOptions["toolChoice"],
 ): number {
   const definitions = buildCursorToolDefinitions(tools, toolChoice);
   return toBinary(McpToolsSchema, create(McpToolsSchema, { mcpTools: definitions })).byteLength;
@@ -492,8 +492,8 @@ export function cursorMcpToolsEncodedSize(
 
 /** Exact additive contribution of one repeated McpToolDefinition entry. */
 export function cursorMcpToolEncodedSize(
-  tool: OcxTool,
-  toolChoice?: OcxRequestOptions["toolChoice"],
+  tool: oprTool,
+  toolChoice?: oprRequestOptions["toolChoice"],
 ): number {
   return cursorMcpToolsEncodedSize([tool], toolChoice);
 }

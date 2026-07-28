@@ -12,7 +12,7 @@ import { apiKeyTransportConfigError, hasOwnProvider, isValidProviderName, loadCo
 import { hasHelpFlag } from "./help";
 import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../providers/registry";
 import { providerConfigSeed } from "../providers/derive";
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 import { findLiveProxy } from "../server/proxy-liveness";
 import { syncModelsToCodex } from "../codex/sync";
 
@@ -158,7 +158,7 @@ async function handleAdd(args: string[]): Promise<void> {
     process.exit(1);
   }
 
-  let provConfig: OcxProviderConfig;
+  let provConfig: oprProviderConfig;
   const registryEntry = getProviderRegistryEntry(name);
 
   if (registryEntry) {

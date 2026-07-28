@@ -76,6 +76,7 @@ async function logs(argv: string[], deps: RuntimeApiDeps): Promise<void> {
     if (!follow) return;
     if (seen.size > 5_000) seen = new Set([...seen].slice(-2_500));
     await Bun.sleep(1_000);
+    // eslint-disable-next-line no-constant-condition
   } while (true);
 }
 

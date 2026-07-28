@@ -1,6 +1,6 @@
 {
   "name": "@mdevs/openprovider",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Avec OpenProvider, profitez de Codex ou Claude Code avec vos fournisseurs d'IA personnalisés !",
   "type": "module",
   "main": "./bin/package-main.mjs",

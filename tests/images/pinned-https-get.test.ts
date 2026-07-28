@@ -12,12 +12,12 @@ type LookupCb =
 function installHttpsMock(bodyChunks: Buffer[], statusCode = 200) {
   const requestMock = mock((
     _options: unknown,
-    onResponse?: (res: EventEmitter & { statusCode: number; headers: Record<string, string>; setTimeout: Function; resume: Function }) => void,
+    onResponse?: (res: EventEmitter & { statusCode: number; headers: Record<string, string>; setTimeout: (...args: any[]) => any; resume: (...args: any[]) => any }) => void,
   ) => {
     const req = new EventEmitter() as EventEmitter & {
-      setTimeout: Function;
-      end: Function;
-      destroy: Function;
+      setTimeout: (...args: any[]) => any;
+      end: (...args: any[]) => any;
+      destroy: (...args: any[]) => any;
       destroyed: boolean;
     };
     req.destroyed = false;
@@ -27,8 +27,8 @@ function installHttpsMock(bodyChunks: Buffer[], statusCode = 200) {
       const res = new EventEmitter() as EventEmitter & {
         statusCode: number;
         headers: Record<string, string>;
-        setTimeout: Function;
-        resume: Function;
+        setTimeout: (...args: any[]) => any;
+        resume: (...args: any[]) => any;
       };
       res.statusCode = statusCode;
       res.headers = { "content-type": "image/png" };
@@ -56,17 +56,17 @@ function installHttpsMock(bodyChunks: Buffer[], statusCode = 200) {
 describe("pinnedHttpsGet transport", () => {
   test("lookup honors scalar and { all: true } callback shapes", async () => {
     let capturedLookup: ((hostname: string, opts: unknown, cb?: LookupCb) => void) | undefined;
-    const requestMock = mock((options: { lookup?: typeof capturedLookup }, onResponse?: Function) => {
+    const requestMock = mock((options: { lookup?: typeof capturedLookup }, onResponse?: (...args: any[]) => any) => {
       capturedLookup = options.lookup;
-      const req = new EventEmitter() as EventEmitter & { setTimeout: Function; end: Function; destroy: Function };
+      const req = new EventEmitter() as EventEmitter & { setTimeout: (...args: any[]) => any; end: (...args: any[]) => any; destroy: (...args: any[]) => any };
       req.setTimeout = () => {};
       req.destroy = () => {};
       req.end = () => {
         const res = new EventEmitter() as EventEmitter & {
           statusCode: number;
           headers: Record<string, string>;
-          setTimeout: Function;
-          resume: Function;
+          setTimeout: (...args: any[]) => any;
+          resume: (...args: any[]) => any;
         };
         res.statusCode = 200;
         res.headers = {};
@@ -187,16 +187,16 @@ describe("pinnedHttpsGet transport", () => {
       onResponse?: (res: EventEmitter & {
         statusCode: number;
         headers: Record<string, string>;
-        setTimeout: Function;
-        resume: Function;
-        destroy: Function;
-        on: Function;
+        setTimeout: (...args: any[]) => any;
+        resume: (...args: any[]) => any;
+        destroy: (...args: any[]) => any;
+        on: (...args: any[]) => any;
       }) => void,
     ) => {
       const req = new EventEmitter() as EventEmitter & {
-        setTimeout: Function;
-        end: Function;
-        destroy: Function;
+        setTimeout: (...args: any[]) => any;
+        end: (...args: any[]) => any;
+        destroy: (...args: any[]) => any;
       };
       req.setTimeout = mock(() => {});
       req.destroy = mock(() => { reqDestroyed = true; });
@@ -204,9 +204,9 @@ describe("pinnedHttpsGet transport", () => {
         const res = new EventEmitter() as EventEmitter & {
           statusCode: number;
           headers: Record<string, string>;
-          setTimeout: Function;
-          resume: Function;
-          destroy: Function;
+          setTimeout: (...args: any[]) => any;
+          resume: (...args: any[]) => any;
+          destroy: (...args: any[]) => any;
         };
         res.statusCode = 500;
         res.headers = { "content-type": "text/plain" };
@@ -245,12 +245,12 @@ describe("pinnedHttpsGet transport", () => {
   test("idle timeout fires when no AbortSignal is supplied", async () => {
     const requestMock = mock((
       _options: unknown,
-      _onResponse?: Function,
+      _onResponse?: (...args: any[]) => any,
     ) => {
       const req = new EventEmitter() as EventEmitter & {
         setTimeout: (ms: number, cb: () => void) => void;
-        end: Function;
-        destroy: Function;
+        end: (...args: any[]) => any;
+        destroy: (...args: any[]) => any;
       };
       req.destroy = mock(() => {});
       req.setTimeout = (_ms, cb) => { queueMicrotask(cb); };

@@ -891,6 +891,7 @@ export const de: Record<TKey, string> = {
   "common.close": "Schließen",
   "common.ok": "OK",
   "app.logoAria": "opencodex-Logo",
+  "app.name": "openprovider",
   "app.claudeOn": "Claude AN",
   "app.claudeOff": "Claude AUS",
   "usage.dayMon": "Mo",

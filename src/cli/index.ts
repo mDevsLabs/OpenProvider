@@ -131,7 +131,7 @@ async function chooseListenPort(requestedPort?: number): Promise<number> {
       timeoutMs: 30_000,
       intervalMs: 100,
       scanIntervalMs: 500,
-      killOcxHolders: false,
+      killoprHolders: false,
       dropTcpRows: false,
     });
   }

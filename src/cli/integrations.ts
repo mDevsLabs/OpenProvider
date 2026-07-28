@@ -129,7 +129,10 @@ export async function handleGrokCommand(argv: string[], deps: RuntimeApiDeps = {
       else {
         const state = await runtimeRequest<GrokState>("/api/grok", {}, deps);
         const current = new Set(state.excluded ?? []);
-        for (const model of requested) action === "exclude" ? current.add(model) : current.delete(model);
+        for (const model of requested) {
+          if (action === "exclude") current.add(model);
+          else current.delete(model);
+        }
         excluded = [...current].sort();
       }
     } else throw new CliUsageError(`unknown Grok command ${action}`, GROK_USAGE);

@@ -3,7 +3,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { atomicWriteFile } from "../config";
-import type { OcxClaudeDesktopProfile } from "../types";
+import type { oprClaudeDesktopProfile } from "../types";
 import { claudeDesktopConfigLibraryDir, resolveConfigLibraryDir } from "./desktop-3p-paths";
 import {
   reconcileDesktopProfile,
@@ -151,7 +151,7 @@ function displayModelId(modelId: string): string {
 function collectDesktop3pModels(
   nativeSlugs: string[],
   routedModels: Array<Desktop3pRoutedModel>,
-  profile?: OcxClaudeDesktopProfile,
+  profile?: oprClaudeDesktopProfile,
 ): { models: Desktop3pModelEntry[]; registry: Map<string, string> } {
   const registry = new Map<string, string>();
   const models: Desktop3pModelEntry[] = [];
@@ -252,7 +252,7 @@ function collectDesktop3pModels(
 export function buildDesktop3pRegistry(
   nativeSlugs: string[],
   routedModels: Array<Desktop3pRoutedModel>,
-  profile?: OcxClaudeDesktopProfile,
+  profile?: oprClaudeDesktopProfile,
 ): Map<string, string> {
   const { registry } = collectDesktop3pModels(nativeSlugs, routedModels, profile);
   desktop3pRegistry = registry;
@@ -263,7 +263,7 @@ export function buildDesktop3pRegistry(
 export function generateDesktop3pModels(
   nativeSlugs: string[],
   routedModels: Array<Desktop3pRoutedModel>,
-  profile?: OcxClaudeDesktopProfile,
+  profile?: oprClaudeDesktopProfile,
 ): Desktop3pModelEntry[] {
   const { models, registry } = collectDesktop3pModels(nativeSlugs, routedModels, profile);
   desktop3pRegistry = registry;
@@ -294,7 +294,7 @@ export function generateDesktop3pConfig(
   routedModels: Array<Desktop3pRoutedModel>,
   apiKey = "ocx",
   mode: Desktop3pConfigMode = "static",
-  profile?: OcxClaudeDesktopProfile,
+  profile?: oprClaudeDesktopProfile,
 ): object {
   const base = {
     inferenceProvider: "gateway",
@@ -334,7 +334,7 @@ export function writeDesktop3pConfig(
   routedModels: Array<Desktop3pRoutedModel>,
   apiKey?: string,
   mode: Desktop3pConfigMode = "static",
-  profile?: OcxClaudeDesktopProfile,
+  profile?: oprClaudeDesktopProfile,
 ): { written: boolean; path: string; reason?: string; fingerprint?: string } {
   const libraryPath = resolveDesktop3pConfigLibraryPath();
   const metadataPath = join(libraryPath, "_meta.json");

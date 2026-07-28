@@ -21,6 +21,7 @@ export const en = {
   "common.loading": "Loading…",
   "common.retry": "Retry",
   "app.logoAria": "opencodex logo",
+  "app.name": "openprovider",
   "app.claudeOn": "Claude ON",
   "app.claudeOff": "Claude OFF",
   "theme.label": "Theme",

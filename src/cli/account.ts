@@ -1,7 +1,7 @@
 /** `ocx account` — list and switch provider credentials (issue #180). */
 import { loadConfig } from "../config";
 import { providerCodexAccountMode } from "../providers/registry";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { cmdAddKey, cmdAlias, cmdAutoSwitch, cmdClearCooldown, cmdRefresh, cmdRemove } from "./account-extended";
 import { apiError, apiJson, classifyAccount, fetchRows, proxyUnreachable, resolveBaseUrl, type AccountDeps, type AccountRow, type AccountType, type ApiResult }
   from "./account-api";
@@ -49,7 +49,7 @@ function leftoverArgsError(args: string[]): string | null {
     : `Unexpected argument(s): ${args.join(", ")}`;
 }
 
-function candidateNames(config: OcxConfig): string {
+function candidateNames(config: oprConfig): string {
   const names = new Set<string>(["openai"]);
   for (const n of Object.keys(config.providers ?? {})) names.add(n);
   return [...names].join(", ");

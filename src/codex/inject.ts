@@ -19,7 +19,7 @@ import {
   transformManagedSubagentDefaults,
   type ManagedSubagentDefaults,
 } from "./subagent-defaults";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 
 // Ownership predicates live in `./injected-marker` so `journal.ts` can reach them
 // without importing this module back. Re-exported for existing external callers.
@@ -73,7 +73,7 @@ export interface InjectCodexOptions {
 }
 
 function configuredManagedSubagentDefaults(
-  config: Pick<OcxConfig, "injectionModel" | "injectionEffort" | "syncCodexSubagentDefaults"> | undefined,
+  config: Pick<oprConfig, "injectionModel" | "injectionEffort" | "syncCodexSubagentDefaults"> | undefined,
 ): ManagedSubagentDefaults | null {
   if (!subagentDefaultSyncEffective(config ?? {})) return null;
   return {
@@ -112,7 +112,7 @@ export function providerBaseHost(hostname: string | undefined): string {
   return trimmed.includes(":") ? `[${trimmed}]` : trimmed;
 }
 
-export function shouldInjectApiAuthHeader(config: Pick<OcxConfig, "hostname"> | undefined): boolean {
+export function shouldInjectApiAuthHeader(config: Pick<oprConfig, "hostname"> | undefined): boolean {
   return !isLoopbackHostname(config?.hostname);
 }
 
@@ -190,7 +190,7 @@ export function stripInjectedOpenaiBaseUrl(content: string): string {
   return lines.filter((_, i) => !drop.has(i)).join("\n");
 }
 
-export type CodexRoutingKind = "native" | "opencodex-local" | "custom-local" | "custom-remote" | "unknown";
+export type CodexRoutingKind = "native" | "openprovider-local" | "custom-local" | "custom-remote" | "unknown";
 
 type RoutingEndpointKind = "local" | "remote" | "unknown";
 
@@ -234,7 +234,7 @@ export function classifyCodexRouting(content: string): CodexRoutingKind {
   if (rootBaseUrl) {
     const endpoint = classifyRoutingEndpoint(rootBaseUrl);
     if (endpoint === "unknown") return "unknown";
-    if (hasInjectedOpenaiBaseUrl(content)) return "opencodex-local";
+    if (hasInjectedOpenaiBaseUrl(content)) return "openprovider-local";
     return endpoint === "local" ? "custom-local" : "custom-remote";
   }
   const rootProvider = rootTomlString(content, "model_provider");
@@ -244,7 +244,7 @@ export function classifyCodexRouting(content: string): CodexRoutingKind {
     if (providerBaseUrl) {
       const endpoint = classifyRoutingEndpoint(providerBaseUrl);
       if (endpoint === "unknown") return "unknown";
-      if (rootProvider === "opencodex") return "opencodex-local";
+      if (rootProvider === "opencodex") return "openprovider-local";
       return endpoint === "local" ? "custom-local" : "custom-remote";
     }
     if (rootProvider === "opencodex" || providerTableExists || rootProvider !== "openai") return "unknown";
@@ -478,7 +478,7 @@ export interface CodexInjectResult {
   nativeSubagentDefaultsWarning?: string;
 }
 
-export async function injectCodexConfig(port: number, config?: OcxConfig, options: InjectCodexOptions = {}): Promise<CodexInjectResult> {
+export async function injectCodexConfig(port: number, config?: oprConfig, options: InjectCodexOptions = {}): Promise<CodexInjectResult> {
   if (!existsSync(CODEX_CONFIG_PATH)) {
     return { success: false, message: `Codex config not found at ${CODEX_CONFIG_PATH}. Is Codex installed?` };
   }
@@ -599,7 +599,7 @@ export async function injectCodexConfig(port: number, config?: OcxConfig, option
   // the opposite: a one-time migration of previously re-tagged threads BACK to openai (restore
   // machinery; cheap no-op when there is nothing to migrate).
   const history = config?.syncResumeHistory !== false
-    ? (legacyMode ? syncCodexHistoryProvider("opencodex") : migrateHistoryToOpenai())
+    ? (legacyMode ? syncCodexHistoryProvider("openprovider") : migrateHistoryToOpenai())
     : { rows: 0, files: 0 };
 
   const catalogMessage = catalogPath

@@ -23,7 +23,7 @@ import {
 import { formatCodexProviderForLog } from "../codex/routing";
 import { signalWithTimeout } from "../lib/abort";
 import { sidecarEnter } from "../lib/sidecar-tracker";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { resolveFirstUsableOpenAiSidecar, selectImagesProvider } from "../providers/openai-sidecar";
 import { getProviderRegistryEntry } from "../providers/registry";
 import { readJsonRequestBody } from "./request-decompress";
@@ -86,7 +86,7 @@ function abortableRace<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> 
 
 async function tryCcaImageGeneration(
   body: unknown,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
   signal: AbortSignal,
   endpoint: ImagesEndpoint,
@@ -320,7 +320,7 @@ async function tryCcaImageGeneration(
 
 export async function handleImages(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   endpoint: ImagesEndpoint,
   logCtx: RequestLogContext,
 ): Promise<Response> {

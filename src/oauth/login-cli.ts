@@ -4,7 +4,7 @@ import { loadConfig, saveConfig } from "../config";
 import { findLiveProxy, probeHostname } from "../server/proxy-liveness";
 import { isPublicOAuthProvider, listOAuthProviders, runLogin } from "./index";
 import { KEY_LOGIN_PROVIDERS, isKeyLoginProvider, validateApiKey, type KeyLoginProvider } from "./key-providers";
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 
 export function runningProxyUpdateHeaders(): Headers {
   const headers = new Headers({ "Content-Type": "application/json" });
@@ -75,7 +75,7 @@ async function handleOAuthLogin(name: string): Promise<void> {
   console.log(`\n✅ Logged in to ${name}. Try: ocx sync`);
 }
 
-export function providerConfigFromKeyLoginProvider(def: KeyLoginProvider, key: string, baseUrlOverride?: string): OcxProviderConfig {
+export function providerConfigFromKeyLoginProvider(def: KeyLoginProvider, key: string, baseUrlOverride?: string): oprProviderConfig {
   return {
     adapter: def.adapter,
     baseUrl: baseUrlOverride ?? def.baseUrl,

@@ -21,6 +21,7 @@ export const ja: Record<TKey, string> = {
   "common.loading": "読み込み中…",
   "common.retry": "再試行",
   "app.logoAria": "opencodex ロゴ",
+  "app.name": "openprovider",
   "app.claudeOn": "Claude オン",
   "app.claudeOff": "Claude オフ",
   "theme.label": "テーマ",
