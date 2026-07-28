@@ -245,7 +245,7 @@ Problem:
 
 - Current lock is in-process and keyed by local alias.
 - Duplicate manual aliases can refresh the same grant concurrently.
-- Multiple processes sharing `OPENCODEX_HOME` have independent locks.
+- Multiple processes sharing `OpenProvider_HOME` have independent locks.
 - Refresh completion unconditionally saves over current credential.
 
 Patch direction:
@@ -303,7 +303,7 @@ Improve:
 
 - Replace order-based `chatgpt-1` labels with stable non-PII random pool labels.
 - Sanitize local aliases and upstream error descriptions before durable service logs.
-- Remove or redact `OCX_DEBUG_FRAMES` payload previews.
+- Remove or redact `opr_DEBUG_FRAMES` payload previews.
 - Scrub absolute home paths from devlog before sharing.
 - Add CI checks for token-looking strings, emails, home paths, and bearer values in docs/devlog artifacts.
 
@@ -475,3 +475,4 @@ The feature can move from `main merge: NO-GO` to `CONDITIONAL-GO` only when:
 - Manual import is either disabled or validated against authoritative identity.
 
 The feature can move to `GO` only after P1 routing/refresh/quota lifecycle hardening is complete and documented with fresh evidence.
+

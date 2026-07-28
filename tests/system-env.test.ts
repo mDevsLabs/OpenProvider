@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
 import * as childProcess from "node:child_process";
 import * as fs from "node:fs";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import {
   cleanStaleSystemEnv,
   injectSystemEnv,
@@ -16,7 +16,7 @@ const baseConfig = {
   providers: {},
   defaultProvider: "test",
   claudeCode: { systemEnv: true },
-} satisfies OcxConfig;
+} satisfies oprConfig;
 
 let execSpy: ReturnType<typeof spyOn>;
 let readSpy: ReturnType<typeof spyOn>;
@@ -111,7 +111,7 @@ describe("system environment injection", () => {
   });
 
   test("injectSystemEnv includes the first configured API key", async () => {
-    const config: OcxConfig = {
+    const config: oprConfig = {
       ...baseConfig,
       apiKeys: [{ id: "key-1", name: "Primary", key: "secret-token", createdAt: "2026-07-11T00:00:00.000Z" }],
     };
@@ -121,7 +121,7 @@ describe("system environment injection", () => {
   });
 
   test("injectSystemEnv shell-quotes API keys with special characters", async () => {
-    const config: OcxConfig = {
+    const config: oprConfig = {
       ...baseConfig,
       apiKeys: [{ id: "key-1", name: "Primary", key: "secret token'quoted", createdAt: "2026-07-11T00:00:00.000Z" }],
     };
@@ -157,7 +157,7 @@ describe("system environment injection", () => {
     const subscription = {
       ...baseConfig,
       claudeCode: { systemEnv: true, authMode: "subscription" },
-    } as unknown as OcxConfig;
+    } as unknown as oprConfig;
     expect(await injectSystemEnv(4567, subscription)).toEqual({ injected: true });
     expect(execSpy.mock.calls.map(call => call[0])).toContain("launchctl unsetenv ANTHROPIC_AUTH_TOKEN");
     expect(JSON.parse(trackingFile!).injectedKeys).not.toContain("ANTHROPIC_AUTH_TOKEN");
@@ -224,7 +224,7 @@ describe("systemEnv lever keys (devlog 136 B6)", () => {
   const leverConfig = {
     ...baseConfig,
     claudeCode: { systemEnv: true, maxContextTokens: 1_000_000, alwaysEnableEffort: true },
-  } satisfies OcxConfig;
+  } satisfies oprConfig;
 
   function capturedWrites(): Array<{ path: string; data: string }> {
     const writes: Array<{ path: string; data: string }> = [];
@@ -319,7 +319,7 @@ describe("systemEnv lever keys (devlog 136 B6)", () => {
     const tierConfig = {
       ...baseConfig,
       claudeCode: { systemEnv: true, tierModels: { opus: "cursor/gpt-5.6-luna", sonnet: "mock/small" } },
-    } satisfies OcxConfig;
+    } satisfies oprConfig;
     expect(await injectSystemEnv(4096, tierConfig)).toEqual({ injected: true });
     const setCalls = execSpy.mock.calls.map(call => String(call[0]));
     expect(setCalls.some(c => c.startsWith("launchctl setenv ANTHROPIC_DEFAULT_OPUS_MODEL"))).toBe(true);
@@ -332,3 +332,4 @@ describe("systemEnv lever keys (devlog 136 B6)", () => {
     expect(shellWrite!.data).toContain('[ -z "${ANTHROPIC_DEFAULT_OPUS_MODEL+x}" ] && export ANTHROPIC_DEFAULT_OPUS_MODEL=');
   });
 });
+

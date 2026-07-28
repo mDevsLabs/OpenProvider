@@ -1,9 +1,11 @@
-export interface OcxParsedRequest {
+import type { KiroOAuthMetadata } from "./oauth/types";
+
+export interface oprParsedRequest {
   modelId: string;
   previousResponseId?: string;
-  context: OcxContext;
+  context: oprContext;
   stream: boolean;
-  options: OcxRequestOptions;
+  options: oprRequestOptions;
   _rawBody?: unknown;
   /** Number of leading raw input items restored from local previous_response_id state. */
   _replayPrefixLen?: number;
@@ -23,14 +25,18 @@ export interface OcxParsedRequest {
    * derived from the parent thread id.
    */
   _cursorIsolateConversation?: boolean;
+  /** Account-scoped, non-secret Kiro request metadata selected with the OAuth access token. */
+  _kiroAuthContext?: Pick<KiroOAuthMetadata, "profileArn" | "apiRegion" | "ssoRegion">;
   /** Provider-private continuation metadata resolved from the Responses previous_response_id chain. */
-  _providerContinuation?: OcxProviderContinuationState;
+  _providerContinuation?: oprProviderContinuationState;
   /**
    * The hosted `{type:"web_search", ...}` tool config, stashed when Codex enables web search. Routed
    * (non-OpenAI) providers can't run it server-side, so the proxy re-exposes it as a function tool and
    * executes searches via the gpt-5.4-mini sidecar (see src/web-search). Absent when not requested.
    */
   _webSearch?: Record<string, unknown>;
+  /** Hosted image_generation tool config stashed for the image bridge sidecar (see src/images). */
+  _imageGeneration?: { toolNames: Set<string>; originalTool?: Record<string, unknown> };
   /**
    * True when Codex requested structured output (`text.format` = json_schema/json_object). The
    * web-search tool_result is then rendered as compact JSON instead of markdown prose, so its
@@ -52,59 +58,59 @@ export interface OcxParsedRequest {
   _contextCompactionBoundary?: boolean;
 }
 
-export interface OcxContext {
+export interface oprContext {
   systemPrompt?: string[];
-  messages: OcxMessage[];
-  tools?: OcxTool[];
+  messages: oprMessage[];
+  tools?: oprTool[];
 }
 
-export type OcxMessage =
-  | OcxUserMessage
-  | OcxAssistantMessage
-  | OcxDeveloperMessage
-  | OcxToolResultMessage;
+export type oprMessage =
+  | oprUserMessage
+  | oprAssistantMessage
+  | oprDeveloperMessage
+  | oprToolResultMessage;
 
-export interface OcxUserMessage {
+export interface oprUserMessage {
   role: "user";
-  content: string | OcxContentPart[];
+  content: string | oprContentPart[];
   timestamp: number;
 }
 
-export interface OcxAssistantMessage {
+export interface oprAssistantMessage {
   role: "assistant";
-  content: OcxAssistantContentPart[];
+  content: oprAssistantContentPart[];
   /** Responses message phase, preserved when replaying translated provider output. */
-  phase?: OcxMessagePhase;
+  phase?: oprMessagePhase;
   model?: string;
   timestamp: number;
 }
 
-export interface OcxDeveloperMessage {
+export interface oprDeveloperMessage {
   role: "developer";
-  content: string | OcxContentPart[];
+  content: string | oprContentPart[];
   timestamp: number;
 }
 
-export interface OcxToolResultMessage {
+export interface oprToolResultMessage {
   role: "toolResult";
   toolCallId: string;
   toolName: string;
   /** MCP namespace from the originating tool call, if any. */
   toolNamespace?: string;
   /** Text, or content parts when a tool (e.g. Codex view_image) returns an image in its output. */
-  content: string | OcxContentPart[];
+  content: string | oprContentPart[];
   /** True when the Responses result contained opaque encrypted output Kiro cannot translate. */
   containsEncryptedContent?: boolean;
   isError: boolean;
   timestamp: number;
 }
 
-export interface OcxTextContent {
+export interface oprTextContent {
   type: "text";
   text: string;
 }
 
-export interface OcxImageContent {
+export interface oprImageContent {
   type: "image";
   /** A `data:` URL (base64) or a remote https URL — passed through from Codex verbatim, NEVER inlined as text. */
   imageUrl: string;
@@ -113,9 +119,9 @@ export interface OcxImageContent {
 }
 
 /** A user/developer message content part: text or an image (vision). */
-export type OcxContentPart = OcxTextContent | OcxImageContent;
+export type oprContentPart = oprTextContent | oprImageContent;
 
-export interface OcxThinkingContent {
+export interface oprThinkingContent {
   type: "thinking";
   thinking: string;
   signature?: string;
@@ -124,7 +130,7 @@ export interface OcxThinkingContent {
   redacted?: string[];
 }
 
-export interface OcxToolCall {
+export interface oprToolCall {
   type: "toolCall";
   id: string;
   name: string;
@@ -135,9 +141,9 @@ export interface OcxToolCall {
   namespace?: string;
 }
 
-export type OcxAssistantContentPart = OcxTextContent | OcxThinkingContent | OcxToolCall;
+export type oprAssistantContentPart = oprTextContent | oprThinkingContent | oprToolCall;
 
-export interface OcxTool {
+export interface oprTool {
   name: string;
   description: string;
   parameters: Record<string, unknown>;
@@ -152,6 +158,8 @@ export interface OcxTool {
   loadedFromToolSearch?: boolean;
   /** Synthetic web_search tool: the model's call is executed by the gpt-5.4-mini sidecar, not relayed to Codex. */
   webSearch?: boolean;
+  /** Synthetic image_gen tool: the model's call is executed by the xAI image bridge sidecar, not relayed to Codex. */
+  imageGeneration?: boolean;
 }
 
 /**
@@ -164,16 +172,16 @@ export function namespacedToolName(namespace: string | undefined, name: string):
   return namespace ? `${namespace}__${name}` : name;
 }
 
-export function toolChoiceAliases(tool: Pick<OcxTool, "namespace" | "name">): string[] {
+export function toolChoiceAliases(tool: Pick<oprTool, "namespace" | "name">): string[] {
   const wireName = namespacedToolName(tool.namespace, tool.name);
   return tool.namespace ? [wireName, `${tool.namespace}.${tool.name}`] : [wireName];
 }
 
-export function toolAllowedByChoice(tool: Pick<OcxTool, "namespace" | "name">, allowedTools: ReadonlySet<string>): boolean {
+export function toolAllowedByChoice(tool: Pick<oprTool, "namespace" | "name">, allowedTools: ReadonlySet<string>): boolean {
   return toolChoiceAliases(tool).some(name => allowedTools.has(name));
 }
 
-export function resolveToolChoiceWireName(tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined, name: string): string {
+export function resolveToolChoiceWireName(tools: readonly Pick<oprTool, "namespace" | "name">[] | undefined, name: string): string {
   const match = tools?.find(tool => toolChoiceAliases(tool).includes(name));
   return match ? namespacedToolName(match.namespace, match.name) : name;
 }
@@ -190,23 +198,23 @@ export function modelInList(list: string[] | undefined, modelId: string): boolea
   return colon > 0 && list.includes(modelId.slice(0, colon));
 }
 
-export type OcxToolChoice =
+export type oprToolChoice =
   | "auto"
   | "none"
   | "required"
   | { name: string }
   | { allowedTools: string[]; mode: "auto" | "required" };
 
-export function isAllowedToolChoice(value: OcxToolChoice | undefined): value is { allowedTools: string[]; mode: "auto" | "required" } {
+export function isAllowedToolChoice(value: oprToolChoice | undefined): value is { allowedTools: string[]; mode: "auto" | "required" } {
   return typeof value === "object" && value !== null && "allowedTools" in value;
 }
 
-export interface OcxRequestOptions {
+export interface oprRequestOptions {
   maxOutputTokens?: number;
   temperature?: number;
   topP?: number;
   stopSequences?: string[];
-  toolChoice?: OcxToolChoice;
+  toolChoice?: oprToolChoice;
   parallelToolCalls?: boolean;
   reasoning?: string;
   hideThinkingSummary?: boolean;
@@ -217,13 +225,13 @@ export interface OcxRequestOptions {
   promptCacheKey?: string;
 }
 
-export type OcxMessagePhase = "commentary" | "final_answer";
+export type oprMessagePhase = "commentary" | "final_answer";
 
 /**
  * Provider-private state that must follow a locally expanded `previous_response_id` chain.
  * Kept out of public Responses output and persisted only in the bounded local continuation cache.
  */
-export interface OcxProviderContinuationState {
+export interface oprProviderContinuationState {
   cursor?: {
     conversationId?: string;
     checkpointUsable?: boolean;
@@ -236,7 +244,7 @@ export interface OcxProviderContinuationState {
 
 export type AdapterEvent =
   | { type: "heartbeat" }
-  | { type: "text_delta"; text: string; phase?: OcxMessagePhase }
+  | { type: "text_delta"; text: string; phase?: oprMessagePhase }
   | { type: "thinking_delta"; thinking: string }
   // Anthropic extended-thinking round-trip: signature_delta for the current thinking block, and
   // opaque redacted_thinking blocks. Both must be replayed verbatim or tool-use turns 400.
@@ -255,29 +263,29 @@ export type AdapterEvent =
   // output_item.added(in_progress) and end → the matching output_item.done(completed|failed) under
   // the SAME output index, so the activity animates instead of flashing completed instantly.
   | { type: "web_search_call_begin"; id: string }
-  | { type: "web_search_call_end"; id: string; queries: string[]; status?: "completed" | "failed"; sources?: OcxUrlCitation[] }
+  | { type: "web_search_call_end"; id: string; queries: string[]; status?: "completed" | "failed"; sources?: oprUrlCitation[] }
   | {
       type: "done";
-      usage?: OcxUsage;
+      usage?: oprUsage;
       stopReason?: string;
       endTurn?: boolean;
-      providerState?: OcxProviderContinuationState;
+      providerState?: oprProviderContinuationState;
     }
   | {
       type: "incomplete";
       reason: string;
       message?: string;
-      usage?: OcxUsage;
+      usage?: oprUsage;
       retryable?: boolean;
       endTurn?: boolean;
-      providerState?: OcxProviderContinuationState;
+      providerState?: oprProviderContinuationState;
     }
   // `usage` carries best-effort partial consumption when a turn dies before a clean done
   // (e.g. cursor upstream 502 mid-stream), so failed requests can log real token counts.
   | {
       type: "error";
       message: string;
-      usage?: OcxUsage;
+      usage?: oprUsage;
       /** Authoritative upstream/proxy status when known; avoids message-based classification. */
       status?: number;
       /** Responses error type and code when the adapter has a structured provider failure. */
@@ -291,7 +299,7 @@ export type AdapterEvent =
  * as a `url_citation` annotation on the following assistant message (the desktop app's Sources chip
  * reads these; the TUI ignores annotations, so this is additive).
  */
-export interface OcxUrlCitation {
+export interface oprUrlCitation {
   url: string;
   title?: string;
 }
@@ -305,7 +313,7 @@ export interface OcxUrlCitation {
  *   the provider reports both; reads mirror `cachedInputTokens`.
  * - `totalTokens` = inputTokens + outputTokens. Never re-add cache detail on top.
  */
-export interface OcxUsage {
+export interface oprUsage {
   inputTokens: number;
   outputTokens: number;
   /**
@@ -326,7 +334,7 @@ export interface OcxUsage {
  * Claude Code inbound settings (devlog/260711_claude_inbound). Consumed by the
  * /v1/messages surface, the `opr claude` launcher, and the GUI Claude page.
  */
-export interface OcxClaudeCodeConfig {
+export interface oprClaudeCodeConfig {
   /** Kill switch for the /v1/messages inbound (GUI "Claude ON" toggle). Default: enabled. */
   enabled?: boolean;
   /**
@@ -437,30 +445,49 @@ export interface OcxClaudeCodeConfig {
   /** Claude-originated vision override. Unset fields inherit the global sidecar settings. */
   visionSidecar?: { backend?: "openai" | "anthropic"; model?: string };
   /** Persisted Claude Desktop four-family routing profile. */
-  desktopProfile?: OcxClaudeDesktopProfile;
+  desktopProfile?: oprClaudeDesktopProfile;
   /** Auto-reconcile Desktop 3P config when provider catalog changes. Default: enabled. */
   desktopAutoApply?: boolean;
 }
 
-export type OcxClaudeDesktopFamily = "opus" | "fable" | "sonnet" | "haiku";
+export type oprClaudeDesktopFamily = "opus" | "fable" | "sonnet" | "haiku";
 
-export interface OcxClaudeDesktopAssignment {
-  family: OcxClaudeDesktopFamily;
+export interface oprClaudeDesktopAssignment {
+  family: oprClaudeDesktopFamily;
   alias: string;
 }
 
-export interface OcxClaudeDesktopProfile {
+export interface oprClaudeDesktopProfile {
   version: 1;
-  assignments: Record<string, OcxClaudeDesktopAssignment>;
-  defaults: Record<OcxClaudeDesktopFamily, string | null>;
+  assignments: Record<string, oprClaudeDesktopAssignment>;
+  defaults: Record<oprClaudeDesktopFamily, string | null>;
   /** SHA-256 fingerprint of the last successfully applied 3P config content. */
   appliedFingerprint?: string;
   /** ISO timestamp of the last successful apply. */
   appliedAt?: string;
 }
 
+/**
+ * Opt-in archived-session auto-cleanup policy (issue #42 Phase 3).
+ * Persisted under `oprConfig.storageCleanupPolicy`. Default `enabled: false`.
+ */
+export interface StorageCleanupPolicy {
+  /** When false/unset, the engine never mutates. Default false. */
+  enabled: boolean;
+  /** Run when archived session bytes exceed this threshold. */
+  trigger: { archivedBytesOver: number };
+  /** Either shrink archives toward a byte floor, or remove the oldest N%. */
+  target: { reduceToBytes?: number } | { removeOldestPercent?: number };
+  schedule: "startup" | "daily" | "weekly" | "manual";
+  /** Default quarantine. Permanent only when explicitly set. */
+  mode: "quarantine" | "permanent";
+  lastRun?: { at: number; freedBytes: number; removed: number };
+  /** Epoch ms when the next scheduled evaluation is due. */
+  nextRun?: number;
+}
+
 /** 사용자가 대시보드에서 직접 추가한 커스텀 모델 정의. */
-export interface OcxCustomModel {
+export interface oprCustomModel {
   /** 고유 ID (crypto.randomUUID()) */
   id: string;
   /** 프로바이더 키 (기존 providers[name]) */
@@ -477,14 +504,14 @@ export interface OcxCustomModel {
   addedAt?: string;
 }
 
-export interface OcxConfig {
+export interface oprConfig {
   port: number;
-  providers: Record<string, OcxProviderConfig>;
+  providers: Record<string, oprProviderConfig>;
   defaultProvider: string;
   /** OpenAI provider-contract migration marker (v2 = single `openai` provider with account mode). */
   openaiProviderTierVersion?: 1 | 2;
   /** Claude Code inbound + launcher settings. */
-  claudeCode?: OcxClaudeCodeConfig;
+  claudeCode?: oprClaudeCodeConfig;
   /**
    * Up to 5 routed model ids ("<provider>/<model>") to feature FIRST in the injected Codex catalog.
    * Codex's spawn_agent only advertises the first 5 routed models, so this picks which 5 appear.
@@ -501,6 +528,11 @@ export interface OcxConfig {
    */
   subagentModelFallbackPollMs?: number;
   injectionModel?: string;
+  /**
+   * Opt in to synchronizing the selected injection model into Codex's native
+   * sub-agent defaults. Only meaningful while `injectionModel` is set.
+   */
+  syncCodexSubagentDefaults?: boolean;
   /**
    * Optional reasoning effort the delegation prompt tells the agent to pass in spawn_agent calls
    * (`reasoning_effort` argument). Only meaningful while `injectionModel` is set; validated against
@@ -568,7 +600,7 @@ export interface OcxConfig {
    */
   disabledModels?: string[];
   /** 사용자가 대시보드에서 직접 추가한 커스텀 모델 목록. */
-  customModels?: OcxCustomModel[];
+  customModels?: oprCustomModel[];
   /**
    * Shadow call intercept: redirect Codex's hard-coded helper calls (title generation,
    * commit messages, skill orchestration) to a user-chosen model. Default intercepted
@@ -613,6 +645,12 @@ export interface OcxConfig {
   shutdownTimeoutMs?: number;
   /** Advertise supports_websockets so Codex opens the WS endpoint. Default false; set true to opt in. */
   websockets?: boolean;
+  /**
+   * Opt-in auto-cleanup policy for archived Codex sessions (issue #42 Phase 3).
+   * Default OFF (`enabled` false / unset). Never enabled implicitly.
+   * See `src/storage/policy.ts`.
+   */
+  storageCleanupPolicy?: StorageCleanupPolicy;
   /** Generated API keys for external access to the proxy's /v1/responses endpoint. */
   apiKeys?: Array<{ id: string; name: string; key: string; createdAt: string }>;
   /** Auto-start/sync the proxy from the Codex shim before launching Codex. Default true. */
@@ -631,47 +669,67 @@ export interface OcxConfig {
   /** Anthropic prompt-cache retention: "short" = 5-min ephemeral (default), "long" = 1-hour extended, "none" = disabled. */
   cacheRetention?: "none" | "short" | "long";
   /** Web-search sidecar: route web_search for non-OpenAI models through a gpt-mini via ChatGPT passthrough. */
-  webSearchSidecar?: OcxWebSearchSidecarConfig;
+  webSearchSidecar?: oprWebSearchSidecarConfig;
   /** Vision sidecar: describe images via a gpt vision model so text-only models can "see" them. */
-  visionSidecar?: OcxVisionSidecarConfig;
+  visionSidecar?: oprVisionSidecarConfig;
   /** /v1/images relay for codex's built-in image_gen tool. */
-  images?: OcxImagesConfig;
+  images?: oprImagesConfig;
   /** /v1/alpha/search relay for codex's built-in web search client. */
-  search?: OcxSearchConfig;
+  search?: oprSearchConfig;
   /** Codex multi-account pool. */
   codexAccounts?: CodexAccount[];
   /** Active pool account id for next session. undefined = main (passthrough as-is). */
   activeCodexAccountId?: string;
   /** Auto-switch threshold (0-100). Default 80. 0 = disabled. */
   autoSwitchThreshold?: number;
+  /** New-session account rotation strategy for the Codex pool. Default quota (today's behaviour). */
+  accountPoolStrategy?: oprAccountPoolRotationStrategy;
+  /** Successful new-session binds retained on one round-robin selection. Default 1; range 1..100. */
+  accountPoolStickyLimit?: number;
   /** Consecutive non-2xx upstream responses before switching future new threads. Default 3. 0 = disabled. */
   upstreamFailoverThreshold?: number;
+  /**
+   * Opt-in Anthropic OAuth account pool (#294). Default OFF.
+   * Failover on 429 + sticky affinity; new sessions may pick lowest known 5h usage.
+   * Experimental — see docs and GUI warning before enabling.
+   */
+  anthropicAccountPool?: {
+    enabled?: boolean;
+    /** Usage % threshold for new-session auto-pick. Default 80. 0 = disabled (affinity/active only). */
+    autoSwitchThreshold?: number;
+    /** New-session rotation strategy. Default quota (today's behaviour). */
+    strategy?: oprAccountPoolRotationStrategy;
+    /** Successful new-session binds retained on one round-robin selection. Default 1; range 1..100. */
+    stickyLimit?: number;
+  };
   /** Virtual `combo/<id>` models spanning concrete provider/model targets (issue #133). */
-  combos?: Record<string, OcxComboConfig>;
-  /** Background proactive token refresh ("Token Guardian"). Off by default; see OcxTokenGuardianConfig. */
-  tokenGuardian?: OcxTokenGuardianConfig;
+  combos?: Record<string, oprComboConfig>;
+  /** Background proactive token refresh ("Token Guardian"). Off by default; see oprTokenGuardianConfig. */
+  tokenGuardian?: oprTokenGuardianConfig;
   /** Additional origins allowed for CORS (e.g. ["https://clisu-oracle.tail19a2d7.ts.net"]). Loopback origins are always allowed. */
   corsAllowOrigins?: string[];
 }
 
-export type OcxComboStrategy = "failover" | "round-robin";
-export type OcxComboDefaultEffort = "low" | "medium" | "high" | "xhigh" | "max" | "ultra";
+export type oprAccountPoolRotationStrategy = "quota" | "round-robin" | "fill-first";
 
-export interface OcxComboTarget {
+export type oprComboStrategy = "failover" | "round-robin";
+export type oprComboDefaultEffort = "low" | "medium" | "high" | "xhigh" | "max" | "ultra";
+
+export interface oprComboTarget {
   provider: string;
   model: string;
   /** Relative SWRR batch weight. Default 1; valid range 1..10000. */
   weight?: number;
 }
 
-export interface OcxComboConfig {
-  targets: OcxComboTarget[];
+export interface oprComboConfig {
+  targets: oprComboTarget[];
   /** Ordered failover (default) or deterministic smooth weighted round-robin. */
-  strategy?: OcxComboStrategy;
+  strategy?: oprComboStrategy;
   /** Successful requests retained on one RR selection batch. Default 1; range 1..100. */
   stickyLimit?: number;
   /** Used when the client omits reasoning.effort. null/omitted leaves the target default unchanged. */
-  defaultEffort?: OcxComboDefaultEffort | null;
+  defaultEffort?: oprComboDefaultEffort | null;
   /**
    * Optional public model name replacing the default `combo/<id>` slug. Bare names
    * without "/" are allowed (e.g. "deepseek-v4-flash") so the combo can answer to a
@@ -688,7 +746,7 @@ export interface OcxComboConfig {
  */
 export type RefreshPolicy = "proactive" | "lazy-only" | "disabled";
 
-export interface OcxTokenGuardianConfig {
+export interface oprTokenGuardianConfig {
   /** Global kill-switch. Default false — the guardian does nothing unless explicitly enabled. */
   enabled?: boolean;
   /** Seconds between refresh sweeps. Default 21600 (6h). Min 60. */
@@ -711,12 +769,22 @@ export interface OcxTokenGuardianConfig {
   codexWarmupModel?: string;
 }
 
-export interface OcxImagesConfig {
-  /** Upstream timeout (ms) for one /v1/images relay. Default 300000 — generation is slow. */
+export interface oprImagesConfig {
+  /** Optional custom API-key provider for /v1/images relays. Built-in OpenAI tiers remain automatic. */
+  provider?: string;
+  /** Upstream timeout (ms) for one image generation/edit call (bridge xAI + /v1/images relay). Default 60000 for the bridge; relay may use a higher default (300000). */
   timeoutMs?: number;
+  /** Master switch for the image bridge. Default false — set true to enable paid xAI Grok Imagine generation. */
+  bridgeEnabled?: boolean;
+  /** xAI image model id. Default "grok-imagine-image-quality" (see DEFAULT_MODEL in images/plan.ts). */
+  bridgeModel?: string;
+  /** Max image-generation loop iterations before forced-final. Default 3; clamped to [0, 10]. */
+  maxRounds?: number;
+  /** Max files retained under artifacts/. Oldest deleted when exceeded. Default 200. */
+  artifactsKeepCount?: number;
 }
 
-export interface OcxSearchConfig {
+export interface oprSearchConfig {
   /**
    * Total upstream deadline (ms) for one /v1/alpha/search relay. Default 200000. The endpoint
    * is non-streaming JSON (headers arrive only when the search completes), so this is a whole-
@@ -725,7 +793,7 @@ export interface OcxSearchConfig {
   timeoutMs?: number;
 }
 
-export interface OcxVisionSidecarConfig {
+export interface oprVisionSidecarConfig {
   /** Master switch. Default: enabled when the selected backend has a usable credential. */
   enabled?: boolean;
   /** Description backend. Unset prefers a usable stored Anthropic OAuth credential, else OpenAI. */
@@ -738,7 +806,7 @@ export interface OcxVisionSidecarConfig {
   timeoutMs?: number;
 }
 
-export interface OcxWebSearchSidecarConfig {
+export interface oprWebSearchSidecarConfig {
   /** Master switch. Default: enabled when a forward (ChatGPT) provider exists and the caller is logged in. */
   enabled?: boolean;
   /**
@@ -781,7 +849,7 @@ export interface ResponsesItemIdRepairConfig {
   repairMissingTerminalIds?: boolean;
 }
 
-export interface OcxProviderConfig {
+export interface oprProviderConfig {
   adapter: string;
   /**
    * Per-model wire override, keyed by the upstream native model id (after namespace
@@ -815,6 +883,12 @@ export interface OcxProviderConfig {
    */
   codexAccountMode?: CodexAccountMode;
   apiKey?: string;
+  /**
+   * Key-auth header style for Anthropic-compatible providers.
+   * Defaults to the native Anthropic `x-api-key`; gateways may require
+   * `Authorization: Bearer <key>` instead.
+   */
+  apiKeyTransport?: "x-api-key" | "bearer";
   /**
    * Multi-key pool (API-key twin of OAuth multiauth). `apiKey` always mirrors the ACTIVE
    * entry so routing stays single-key; managed via /api/providers/keys. A legacy bare
@@ -898,6 +972,11 @@ export interface OcxProviderConfig {
    * Responses backend rejects Codex summary-delivery fields for that model.
    */
   modelSupportsReasoningSummaries?: Record<string, boolean>;
+  /**
+   * Per-model wire value for Responses `stream_options.reasoning_summary_delivery`.
+   * Presence also advertises reasoning-summary support for that routed model.
+   */
+  modelReasoningSummaryDelivery?: Record<string, ReasoningSummaryDelivery>;
   /** Provider-wide mapping from Codex effort labels to upstream `reasoning_effort` values. */
   reasoningEffortMap?: Record<string, string>;
   /** Model-specific mapping from Codex effort labels to upstream `reasoning_effort` values. */
@@ -1006,6 +1085,15 @@ export interface OcxProviderConfig {
   nativeLocalExec?: "off" | "codex-sandbox" | "on";
 }
 
+export const REASONING_SUMMARY_DELIVERY_VALUES = [
+  "sequential",
+  "sequential_cutoff",
+  "concurrent",
+  "concurrent_cutoff",
+] as const;
+
+export type ReasoningSummaryDelivery = typeof REASONING_SUMMARY_DELIVERY_VALUES[number];
+
 /** Trusted runtime ownership for Codex-account credentials. Never persisted per provider. */
 export type CodexAccountMode = "direct" | "pool";
 
@@ -1078,3 +1166,4 @@ export interface CodexAccountCredentialRecord {
   lastCodexValidationStatus?: "ok" | "failed";
   lastCodexValidationError?: string;
 }
+

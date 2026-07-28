@@ -12,7 +12,7 @@ Codex RS 분석 결과:
 
 ## 수정
 
-### MODIFY `src/types.ts` — OcxConfig에 필드 추가
+### MODIFY `src/types.ts` — oprConfig에 필드 추가
 
 ```diff
   hostname?: string;
@@ -59,3 +59,4 @@ test("stall timeout triggers response.incomplete after configured seconds", asyn
 1. `stallTimeoutSec=1` + `heartbeatMs=100` → ~1초 후 `response.incomplete` (unit test)
 2. 기본값 90초가 config 미설정 시 적용 확인
 3. config에 `stallTimeoutSec: 30` 설정 시 30초 timeout 동작 확인
+

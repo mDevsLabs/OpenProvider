@@ -79,7 +79,7 @@ describe("reclaimListenPort", () => {
       isAvailableFn: async () => false,
       listListenPidsFn: () => [4242],
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
       },
@@ -88,19 +88,19 @@ describe("reclaimListenPort", () => {
     expect(killed).toEqual([]);
   });
 
-  test("does not kill when killOcxHolders is true but allowlist is empty", async () => {
+  test("does not kill when killoprHolders is true but allowlist is empty", async () => {
     const killed: number[] = [];
     await expect(reclaimListenPort(10100, "127.0.0.1", {
       timeoutMs: 80,
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: false,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [4242],
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
       },
@@ -116,11 +116,11 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: false,
-      killOcxHolders: false,
+      killoprHolders: false,
       isAvailableFn: async () => false,
       listListenPidsFn: () => [1111],
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
       },
@@ -137,12 +137,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: false,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [100],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [100, 200],
       isAliveFn: () => true,
-      verifyOcxFn: pid => {
+      verifyoprFn: pid => {
         verified.push(pid);
         return pid;
       },
@@ -162,12 +162,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: false,
-      killOcxHolders: false,
+      killoprHolders: false,
       onlyKillPids: [],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [777],
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
       },
@@ -184,12 +184,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: true,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [999],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [555],
       isAliveFn: () => true,
-      verifyOcxFn: () => null,
+      verifyoprFn: () => null,
       killFn: pid => {
         killed.push(pid);
       },
@@ -211,12 +211,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: true,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [100],
       isAvailableFn: async () => false,
       listListenPidsFn: () => ({ ok: false, error: "lsof/netstat unavailable" }),
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
       },
@@ -238,7 +238,7 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: false,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [18268],
       isAvailableFn: async () => {
         ticks += 1;
@@ -246,7 +246,7 @@ describe("reclaimListenPort", () => {
       },
       listListenPidsFn: () => [18268],
       isAliveFn: () => false,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
       },
@@ -283,12 +283,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: false,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [4242],
       isAvailableFn: async () => available,
       listListenPidsFn: () => (available ? [] : [4242]),
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
         available = true;
@@ -307,12 +307,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: false,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [100],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [100],
       isAliveFn: () => true,
-      verifyOcxFn: pid => {
+      verifyoprFn: pid => {
         checks += 1;
         // First pass (scan identity) succeeds; revalidation immediately before kill fails.
         return checks === 1 ? pid : null;
@@ -334,12 +334,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: true,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [100],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [100],
       isAliveFn: () => true,
-      verifyOcxFn: pid => {
+      verifyoprFn: pid => {
         checks += 1;
         return checks === 1 ? pid : null;
       },
@@ -363,12 +363,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: true,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [100],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [100],
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: () => {
         throw new Error("kill failed");
       },
@@ -389,12 +389,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: true,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [100],
       isAvailableFn: async () => false,
       listListenPidsFn: () => [100],
       isAliveFn: () => true,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: pid => {
         killed.push(pid);
       },
@@ -417,12 +417,12 @@ describe("reclaimListenPort", () => {
       intervalMs: 20,
       scanIntervalMs: 20,
       dropTcpRows: true,
-      killOcxHolders: true,
+      killoprHolders: true,
       onlyKillPids: [4242],
       isAvailableFn: async () => available,
       listListenPidsFn: () => (alive ? [4242] : []),
       isAliveFn: () => alive,
-      verifyOcxFn: pid => pid,
+      verifyoprFn: pid => pid,
       killFn: () => {
         alive = false;
       },
@@ -436,3 +436,4 @@ describe("reclaimListenPort", () => {
     expect(dropped).toEqual([10100]);
   });
 });
+

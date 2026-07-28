@@ -203,7 +203,7 @@ Add beside `codexAutoStartEnabled()` at `:727-729`:
 
 ```ts
 export function multiAgentGuidanceEnabled(
-  config: Pick<OcxConfig, "multiAgentGuidanceEnabled">,
+  config: Pick<oprConfig, "multiAgentGuidanceEnabled">,
 ): boolean {
   return config.multiAgentGuidanceEnabled !== false;
 }
@@ -248,7 +248,7 @@ async function resolveEffectiveSubagentRoster(
 }
 
 export async function multiAgentGuidanceText(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   options: MultiAgentGuidanceOptions = {},
   deps: MultiAgentGuidanceDeps = {},
 ): Promise<string | null> {
@@ -568,7 +568,7 @@ test("flag-only PUT preserves model, effort, and prompt in memory and on disk", 
     injectionEffort: "max",
     injectionPrompt: "RULES {{model}} {{roster}}",
   });
-  const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as OcxConfig;
+  const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as oprConfig;
   expect(persisted).toMatchObject({
     multiAgentGuidanceEnabled: false,
     injectionModel: "gpt-5.6-terra",
@@ -890,3 +890,4 @@ Manual smoke: save model/effort/custom prompt, toggle off with the Dashboard, ve
 - CLI shorthand for the guidance switch.
 - README marketing copy for the opt-out; the localized configuration references are the source-of-truth documentation for this setting.
 - A dedicated GUI editor for `injectionPrompt`.
+

@@ -95,5 +95,6 @@ Status: user opinion recorded, clarifying questions pending
   sidecar — the bridge already does this; recorded as no-new-work.
 - C-3 (medium -> OA-1): cross use "anthropic에서 luna가 web서치" requires
   ChatGPT forward auth on a Claude-inbound request. Claude Code sessions do
-  NOT carry ChatGPT OAuth; OCX main-account forward auth must be injected
+  NOT carry ChatGPT OAuth; opr main-account forward auth must be injected
   server-side. Feasible (authContext kind main/pool) but must be stated.
+

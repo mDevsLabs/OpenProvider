@@ -20,10 +20,10 @@ surfaced as serde decode errors ("failed to decode ... response") instead of 404
    - openai-responses providers: verbatim forward to {baseUrl}/responses/compact with
      FORWARD_HEADERS (+ api-key override).
    - routed: internal /v1/responses turn with compaction_trigger appended (reuses the
-     v2 summarizer machinery), decodes the ocx1 envelope, returns v1 replacement
+     v2 summarizer machinery), decodes the opr1 envelope, returns v1 replacement
      history: retained real user messages (20k-token budget, tail-truncated, mirrors
      codex-rs build_compacted_history_with_limit) + "SUMMARY_PREFIX\n<summary>" user
-     message. Plain message items only — no compaction/ocx1 leakage (audit fix 2/3).
+     message. Plain message items only — no compaction/opr1 leakage (audit fix 2/3).
 3. src/responses/compaction.ts: extractCompactUserMessages + buildCompactV1Output.
 4. Tests: v1 helper unit tests (4, incl. budget truncation), /v1 404 guard integration,
    routed compact end-to-end against a mock Anthropic upstream.
@@ -36,3 +36,4 @@ surfaced as serde decode errors ("failed to decode ... response") instead of 404
 bun test ./tests/ → 1550 pass / 0 fail (159 files); bun x tsc --noEmit → exit 0.
 Not live until opr restart (queued with image guard, compaction v2, WS 426 gate,
 glm-5.2 vision sidecar).
+

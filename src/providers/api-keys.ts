@@ -8,7 +8,7 @@
  */
 import { createHash } from "node:crypto";
 import { saveConfigPreservingClaudeCode } from "../config";
-import type { OcxConfig, OcxProviderConfig } from "../types";
+import type { oprConfig, oprProviderConfig } from "../types";
 
 export interface ProviderApiKeyInfo {
   id: string;
@@ -30,31 +30,38 @@ export function maskApiKey(value: string): string {
 }
 
 /** Content-derived id: re-adding the same key upserts instead of duplicating. */
-function keyId(key: string): string {
+export function apiKeyPoolEntryId(key: string): string {
   return createHash("sha256").update(key).digest("hex").slice(0, 8);
 }
 
 /** True for providers whose upstream auth is a configured API key (not oauth/forward). */
-export function isKeyAuthProvider(provider: OcxProviderConfig): boolean {
+export function isKeyAuthProvider(provider: oprProviderConfig): boolean {
   return provider.authMode !== "oauth" && provider.authMode !== "forward";
 }
 
+/** Trim and reject blank / CRLF-bearing secrets. Shared by pool writes and OAuth upsert. */
+export function sanitizeApiKeyValue(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed && !/[\r\n]/.test(trimmed) ? trimmed : undefined;
+}
+
 /** Seed the pool from a legacy bare `apiKey`, and keep `apiKey` mirrored to the active entry. */
-function ensurePool(provider: OcxProviderConfig): NonNullable<OcxProviderConfig["apiKeyPool"]> {
+function ensurePool(provider: oprProviderConfig): NonNullable<oprProviderConfig["apiKeyPool"]> {
   if (!provider.apiKeyPool) provider.apiKeyPool = [];
   if (provider.apiKeyPool.length === 0 && provider.apiKey) {
-    provider.apiKeyPool.push({ id: keyId(provider.apiKey), key: provider.apiKey });
+    provider.apiKeyPool.push({ id: apiKeyPoolEntryId(provider.apiKey), key: provider.apiKey });
   }
   return provider.apiKeyPool;
 }
 
-function activeEntryId(provider: OcxProviderConfig): string | null {
+function activeEntryId(provider: oprProviderConfig): string | null {
   const pool = provider.apiKeyPool ?? [];
   if (pool.length === 0) return null;
   return (pool.find(e => e.key === provider.apiKey) ?? pool[0]!).id;
 }
 
-export function listProviderApiKeys(config: OcxConfig, name: string): { activeId: string | null; keys: ProviderApiKeyInfo[] } {
+export function listProviderApiKeys(config: oprConfig, name: string): { activeId: string | null; keys: ProviderApiKeyInfo[] } {
   const provider = config.providers[name];
   if (!provider || !isKeyAuthProvider(provider)) return { activeId: null, keys: [] };
   const pool = ensurePool(provider);
@@ -72,14 +79,14 @@ export function listProviderApiKeys(config: OcxConfig, name: string): { activeId
 }
 
 /** Add (or upsert) a key and make it ACTIVE. Persists config. */
-export function addProviderApiKey(config: OcxConfig, name: string, key: string, label?: string): { id: string } | { error: string } {
+export function addProviderApiKey(config: oprConfig, name: string, key: string, label?: string): { id: string } | { error: string } {
   const provider = config.providers[name];
   if (!provider || !isKeyAuthProvider(provider)) return { error: "provider does not use API-key auth" };
-  const trimmed = key.trim();
-  if (!trimmed) return { error: "key is required" };
-  if (/[\r\n]/.test(trimmed)) return { error: "key must not include line breaks" };
+  if (typeof key !== "string" || !key.trim()) return { error: "key is required" };
+  const trimmed = sanitizeApiKeyValue(key);
+  if (!trimmed) return { error: "key must not include line breaks" };
   const pool = ensurePool(provider);
-  const id = keyId(trimmed);
+  const id = apiKeyPoolEntryId(trimmed);
   const existing = pool.find(e => e.id === id);
   if (existing) {
     if (label?.trim()) existing.label = label.trim();
@@ -92,7 +99,7 @@ export function addProviderApiKey(config: OcxConfig, name: string, key: string, 
 }
 
 /** Switch the ACTIVE key (mirrors into `provider.apiKey`). Persists config. */
-export function setActiveProviderApiKey(config: OcxConfig, name: string, id: string): boolean {
+export function setActiveProviderApiKey(config: oprConfig, name: string, id: string): boolean {
   const provider = config.providers[name];
   if (!provider || !isKeyAuthProvider(provider)) return false;
   const entry = ensurePool(provider).find(e => e.id === id);
@@ -103,7 +110,7 @@ export function setActiveProviderApiKey(config: OcxConfig, name: string, id: str
 }
 
 /** Rename a key slot without changing its id, secret, or active routing state. */
-export function setProviderApiKeyLabel(config: OcxConfig, name: string, id: string, label: string | undefined): boolean {
+export function setProviderApiKeyLabel(config: oprConfig, name: string, id: string, label: string | undefined): boolean {
   const provider = config.providers[name];
   if (!provider || !isKeyAuthProvider(provider)) return false;
   const entry = ensurePool(provider).find(e => e.id === id);
@@ -115,7 +122,7 @@ export function setProviderApiKeyLabel(config: OcxConfig, name: string, id: stri
 }
 
 /** Remove one key; removing the active one promotes the first remaining. Persists config. */
-export function removeProviderApiKey(config: OcxConfig, name: string, id: string): boolean {
+export function removeProviderApiKey(config: oprConfig, name: string, id: string): boolean {
   const provider = config.providers[name];
   if (!provider || !isKeyAuthProvider(provider)) return false;
   const pool = ensurePool(provider);
@@ -131,3 +138,4 @@ export function removeProviderApiKey(config: OcxConfig, name: string, id: string
   saveConfigPreservingClaudeCode(config);
   return true;
 }
+

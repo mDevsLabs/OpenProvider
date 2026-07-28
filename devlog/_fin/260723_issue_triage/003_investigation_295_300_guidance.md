@@ -291,7 +291,7 @@ const configSchema = z.object({
 
 ```ts
 // src/config.ts:731-753
-export function getDefaultConfig(): OcxConfig {
+export function getDefaultConfig(): oprConfig {
   // Fresh-install default: works out of the box with Codex's ChatGPT OAuth (no API key).
   // gpt-* requests forward the caller's incoming OAuth headers to the ChatGPT backend.
   // Adding extra providers (e.g. opencode-go) and switching defaultProvider is a user/runtime choice.
@@ -405,11 +405,11 @@ The management-API claim is confirmed with one terminology correction. `prompt: 
 
 ## Issue #300: supported configuration flow
 
-There is currently no expressible off state. `OcxConfig` has `injectionPrompt` and `multiAgentMode` but no guidance boolean, the default config seeds `subagentModels` without a switch, and the schema merely passes unknown fields through (**A13**: `src/config.ts:412-419,731-753`; `src/types.ts:400-448`). At the execution boundary, every request calls `multiAgentGuidanceText` without an enable check (**A12**: `src/server/responses.ts:904-908`). Consequently, changing v2 mode changes the collaboration surface, clearing `subagentModels` changes the roster/catalog intent, and clearing `injectionPrompt` restores the built-in body; none means “keep all behavior except proxy-authored guidance.”
+There is currently no expressible off state. `oprConfig` has `injectionPrompt` and `multiAgentMode` but no guidance boolean, the default config seeds `subagentModels` without a switch, and the schema merely passes unknown fields through (**A13**: `src/config.ts:412-419,731-753`; `src/types.ts:400-448`). At the execution boundary, every request calls `multiAgentGuidanceText` without an enable check (**A12**: `src/server/responses.ts:904-908`). Consequently, changing v2 mode changes the collaboration surface, clearing `subagentModels` changes the roster/catalog intent, and clearing `injectionPrompt` restores the built-in body; none means “keep all behavior except proxy-authored guidance.”
 
 A supported `multiAgentGuidanceEnabled` flow should be:
 
-1. **Type + load/default semantics:** add `multiAgentGuidanceEnabled?: boolean` to `OcxConfig`; explicitly add `z.boolean().optional()` to `configSchema` despite `.passthrough()` so malformed values are rejected; expose `true` in `getDefaultConfig` for discoverability; and use `config.multiAgentGuidanceEnabled !== false` at runtime so existing valid configs that omit the new field remain enabled. The need for explicit validation/default compatibility follows from **A13** (`src/config.ts:412-419,731-753`).
+1. **Type + load/default semantics:** add `multiAgentGuidanceEnabled?: boolean` to `oprConfig`; explicitly add `z.boolean().optional()` to `configSchema` despite `.passthrough()` so malformed values are rejected; expose `true` in `getDefaultConfig` for discoverability; and use `config.multiAgentGuidanceEnabled !== false` at runtime so existing valid configs that omit the new field remain enabled. The need for explicit validation/default compatibility follows from **A13** (`src/config.ts:412-419,731-753`).
 2. **Management API:** extend `/api/injection-model` GET/PUT with `multiAgentGuidanceEnabled`, using absent → unchanged and boolean → persist. This endpoint already owns `injectionPrompt`, model, and effort (**A14**: `src/server/management-api.ts:1094-1112`), whereas `/api/settings` currently accepts only `codexAutoStart` (**A14**: `src/server/management-api.ts:232-248`). Keeping the flag on the guidance endpoint avoids coupling “off” to `/api/v2` surface transitions.
 3. **GUI:** add enabled state and a switch to the Dashboard guidance/injection panel, loaded and saved through `/api/injection-model`. The current state/response type contains model, effort, ladders, and available models but omits both prompt and enable state (**A15**: `gui/src/pages/Dashboard.tsx:194-198,262-269`). The existing Models-page v1/default/v2 control should remain a separate collaboration-surface control, not double as the kill switch.
 4. **Injection boundary:** make `multiAgentGuidanceText` return `null` immediately when disabled, before surface-specific v1/v2 behavior; pass a structured options object or a final enabled option from the call site. The current unconditional call is **A12** (`src/server/responses.ts:904-908`). This guarantees false suppresses both v1 Proactive text and v2 model guidance without touching catalog generation, `subagentModels`, effort caps, routing, or `multiAgentMode`.
@@ -444,3 +444,4 @@ Ship one backward-compatible combined change: neutral schema-agnostic default wo
 ## Effort estimate
 
 **Medium: 1–2 engineer days.** The core response change is small, but faithfully deriving the runtime-compatible roster, adding persisted config/API/GUI state and translations, updating focused tests, and running `bun run typecheck`, focused suites, full `bun run test`, `bun run lint:gui`, `bun run build:gui`, and `bun run privacy:scan` make this a cross-surface change rather than a copy-only patch.
+

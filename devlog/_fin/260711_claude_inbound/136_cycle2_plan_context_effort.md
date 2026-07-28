@@ -67,7 +67,7 @@
   "recognized claude id"로 취급될 개연성이 높아 쌍 주입이 필요). GUI/문서에 compaction
   상실 경고 명시. 기본 미설정. 적용 여부는 라이브 스모크로 게이트(사용자 /context 확인).
 - **(감사 #2)** maxContextTokens/alwaysEnableEffort의 전체 왕복 명시: `src/types.ts`
-  OcxClaudeCodeConfig 필드 → management-api GET(/api/claude-code 반환) + PUT(양의 정수 검증,
+  oprClaudeCodeConfig 필드 → management-api GET(/api/claude-code 반환) + PUT(양의 정수 검증,
   0/음수/비수치 400, 빈 값 clear) → `gui/src/pages/ClaudeCode.tsx` state/저장 + i18n 4로케일 →
   회귀 테스트(tests/claude-management-api.test.ts).
 - **(감사 #3 + R2 #1)** systemEnv 경로 하드닝: 신규 키 주입 전 `launchctlGetenv`로 기존 사용자
@@ -94,3 +94,4 @@
 ## 스코프
 - IN: B5, B6 (+ B7은 Pro 확정 후), 테스트, i18n, devlog.
 - OUT: Desktop 앱 바이너리 수정/asar 패치, 미확정 supports1m 의미론에 의존하는 UI 약속.
+

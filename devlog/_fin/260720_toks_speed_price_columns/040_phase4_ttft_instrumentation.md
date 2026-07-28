@@ -634,15 +634,15 @@ bun test --isolate tests/bridge.test.ts tests/request-log.test.ts tests/usage-lo
 테스트 통과 후 실제 local server에 **스트리밍 text 응답 1건**과 **비스트리밍 응답 1건**을 보낸다.
 사용자의 정상 credential/provider를 사용하되 문서나 로그에 secret을 출력하지 않는다.
 
-1. server 시작 전 `$OPENCODEX_HOME`(미설정이면 앱 config dir)의 `usage.jsonl` 경로를 확인한다.
+1. server 시작 전 `$OpenProvider_HOME`(미설정이면 앱 config dir)의 `usage.jsonl` 경로를 확인한다.
 2. streaming 요청 완료 후 마지막 line을 `jq`로 projection한다.
 
 ```sh
-tail -n 1 "$OPENCODEX_HOME/usage.jsonl" \
+tail -n 1 "$OpenProvider_HOME/usage.jsonl" \
   | jq '{requestId,provider,model,durationMs,firstOutputMs,attempts}'
 ```
 
-`OPENCODEX_HOME`이 미설정이면 실제 config dir의 절대 `usage.jsonl` 경로로 대체한다. 기대 증거:
+`OpenProvider_HOME`이 미설정이면 실제 config dir의 절대 `usage.jsonl` 경로로 대체한다. 기대 증거:
 
 - text/reasoning streaming line: `firstOutputMs`가 number, `0 <= firstOutputMs <= durationMs`.
 - combo면 각 output-producing attempt도 `0 <= firstOutputMs <= durationMs`.
@@ -651,7 +651,7 @@ tail -n 1 "$OPENCODEX_HOME/usage.jsonl" \
 비스트리밍 unset 확인:
 
 ```sh
-tail -n 1 "$OPENCODEX_HOME/usage.jsonl" \
+tail -n 1 "$OpenProvider_HOME/usage.jsonl" \
   | jq '{requestId, hasFirstOutputMs: has("firstOutputMs"), firstOutputMs}'
 ```
 
@@ -675,3 +675,4 @@ tail -n 1 "$OPENCODEX_HOME/usage.jsonl" \
 3. compaction/hide-thinking early continue 뒤에서 callback을 호출하면 실제 reasoning first output을
    놓친다. event loop의 early continue 전에 판별한다.
 4. callback 예외가 response stream을 끊어서는 안 된다. 계측 callback boundary는 swallow한다.
+

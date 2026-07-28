@@ -7,7 +7,7 @@ Goal ID: 7b2c754f-54d · Branch: `feat/kiro-on-dev` · Class: C3 (process lifecy
 When you run `opr start` and press Ctrl-C, the proxy is supposed to shut down
 gracefully: stop accepting work, finish/abort in-flight turns, free the port,
 remove its pid/runtime-port files, and restore the Codex config. Today that does
-**not** reliably happen. The `opr` command is a thin Node launcher (`bin/ocx.mjs`)
+**not** reliably happen. The `opr` command is a thin Node launcher (`bin/opr.mjs`)
 that runs the real proxy on the bundled Bun runtime via a **blocking** `spawnSync`.
 `spawnSync` can't run JS signal handlers and does **not** forward signals to the
 Bun child. So when the launcher gets the signal but the Bun child does not (Codex
@@ -28,7 +28,7 @@ port=bound`; `opr.pid` + `runtime-port.json` remained; Codex config NOT restored
 
 ## Part 2 — Diff-level plan
 
-### MODIFY `bin/ocx.mjs` (launcher: forward signals + wait for child)
+### MODIFY `bin/opr.mjs` (launcher: forward signals + wait for child)
 Replace the blocking `spawnSync` tail with async `spawn` + signal forwarding.
 
 Before (tail):
@@ -119,8 +119,8 @@ while a deliberate later press escalates to immediate exit ("gradual kill").
 ### NEW `tests/shutdown-launcher.test.ts` (regression, POSIX-gated)
 Integration test isolated from the real environment:
 - `skipIf(process.platform === "win32")` and skip if `node` is not on PATH.
-- temp dir → set child env `OPENCODEX_HOME` + `CODEX_HOME` to it (no real config touched).
-- pick a free port; `spawn("node", [binOcx, "start", "--port", String(port)], {env})`.
+- temp dir → set child env `@mdevs/openprovider_HOME` + `CODEX_HOME` to it (no real config touched).
+- pick a free port; `spawn("node", [binopr, "start", "--port", String(port)], {env})`.
 - wait for `GET /healthz` 200.
 - send `SIGINT` to the **launcher PID only** (the bug's trigger).
 - assert within ~10s: launcher process exits, AND `/healthz` no longer responds
@@ -134,12 +134,14 @@ unchanged and continues to cover the drain unit.
 - `bun x tsc --noEmit`
 - `bun test tests/shutdown-launcher.test.ts tests/shutdown-drain.test.ts`
 - Full suite `bun test tests` (C-phase)
-- Manual: `node bin/ocx.mjs start &` → `kill -INT <launcher>` → confirm child dies,
+- Manual: `node bin/opr.mjs start &` → `kill -INT <launcher>` → confirm child dies,
   port freed, pid removed, Codex config restored.
 
 ## Risk / blast radius
-- `bin/ocx.mjs` is the published npm entrypoint (every `opr` invocation) → release
+- `bin/opr.mjs` is the published npm entrypoint (every `opr` invocation) → release
   surface; the change keeps the same exit-code/signal-mirroring contract for
   non-`start` commands (they exit normally; handlers simply detach on child exit).
 - Windows has no real POSIX signals; forwarding is best-effort and try/caught.
 - No public API/schema change; no new dependency.
+
+

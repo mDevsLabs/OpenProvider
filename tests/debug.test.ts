@@ -4,17 +4,17 @@ import { debugDroppedFrame, debugProviderDiagnostic } from "../src/lib/debug";
 import { resetDebugSettingsForTests, setDebugSettings } from "../src/lib/debug-settings";
 
 describe("debug frame logging", () => {
-  const previous = process.env.OCX_DEBUG;
+  const previous = process.env.opr_DEBUG;
 
   afterEach(() => {
     resetDebugSettingsForTests();
     resetDebugLogBufferForTests();
-    if (previous === undefined) delete process.env.OCX_DEBUG;
-    else process.env.OCX_DEBUG = previous;
+    if (previous === undefined) delete process.env.opr_DEBUG;
+    else process.env.opr_DEBUG = previous;
   });
 
   test("debugDroppedFrame redacts payload content", () => {
-    process.env.OCX_DEBUG = "1";
+    process.env.opr_DEBUG = "1";
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
       debugDroppedFrame("openai-chat", "secret frame body bearer-token@example.test");
@@ -30,8 +30,8 @@ describe("debug frame logging", () => {
     }
   });
 
-  test("debugProviderDiagnostic emits under OCX_DEBUG with provider prefix and redacts secrets", () => {
-    process.env.OCX_DEBUG = "1";
+  test("debugProviderDiagnostic emits under opr_DEBUG with provider prefix and redacts secrets", () => {
+    process.env.opr_DEBUG = "1";
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
       debugProviderDiagnostic("cursor", "dial", { host: "api2.cursor.sh", authorization: "Bearer secret-cursor-token" });
@@ -46,9 +46,9 @@ describe("debug frame logging", () => {
     }
   });
 
-  test("legacy OCX_DEBUG_FRAMES still enables provider diagnostics", () => {
-    delete process.env.OCX_DEBUG;
-    process.env.OCX_DEBUG_FRAMES = "1";
+  test("legacy opr_DEBUG_FRAMES still enables provider diagnostics", () => {
+    delete process.env.opr_DEBUG;
+    process.env.opr_DEBUG_FRAMES = "1";
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
       debugProviderDiagnostic("cursor", "connected", { connectMs: 12 });
@@ -60,8 +60,8 @@ describe("debug frame logging", () => {
   });
 
   test("debugProviderDiagnostic stays quiet unless explicitly enabled", () => {
-    delete process.env.OCX_DEBUG;
-    delete process.env.OCX_DEBUG_FRAMES;
+    delete process.env.opr_DEBUG;
+    delete process.env.opr_DEBUG_FRAMES;
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
       debugProviderDiagnostic("cursor", "dial", { host: "api2.cursor.sh" });
@@ -72,7 +72,7 @@ describe("debug frame logging", () => {
   });
 
   test("debugProviderDiagnostic emits when enabled via runtime settings API", () => {
-    delete process.env.OCX_DEBUG;
+    delete process.env.opr_DEBUG;
     setDebugSettings({ debug: true });
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
@@ -85,7 +85,7 @@ describe("debug frame logging", () => {
   });
 
   test("debugDroppedFrame stays quiet unless explicitly enabled", () => {
-    delete process.env.OCX_DEBUG;
+    delete process.env.opr_DEBUG;
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
       debugDroppedFrame("openai-chat", "secret frame body");
@@ -96,7 +96,7 @@ describe("debug frame logging", () => {
   });
 
   test("debugProviderDiagnostic redacts structured secrets", () => {
-    process.env.OCX_DEBUG = "1";
+    process.env.opr_DEBUG = "1";
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
       debugProviderDiagnostic("kiro", "request", {
@@ -143,3 +143,4 @@ describe("debug frame logging", () => {
     }
   });
 });
+

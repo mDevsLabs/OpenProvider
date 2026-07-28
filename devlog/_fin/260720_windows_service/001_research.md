@@ -15,7 +15,7 @@ window can make every model (even gpt models) disconnect". 댓글에서 이미 �
 4. Windows가 해당 콘솔에 연결된 모든 프로세스에 `CTRL_CLOSE_EVENT`를 보내고,
    기본 핸들러는 프로세스를 종료한다.
    출처: https://learn.microsoft.com/en-us/windows/console/handlerroutine
-5. 래퍼 배치는 Bun을 **동기 실행**하므로(`"%OCX_BUN%" "%OCX_CLI%" start`,
+5. 래퍼 배치는 Bun을 **동기 실행**하므로(`"%opr_BUN%" "%opr_CLI%" start`,
    src/service.ts:320) 래퍼와 프록시 자식이 같은 콘솔 수명에 묶여 함께 죽는다.
    배치 내부의 5초 재시작 루프(:325 `ping -n 6`)는 배치 자체가 죽으므로 무력.
 6. Codex가 바라보는 localhost 프록시가 사라짐 → 라우팅되는 **모든** 모델(GPT
@@ -79,7 +79,7 @@ S4U 검증 매트릭스 (옵션 A 채택 전 필수):
 - 래퍼가 쓰는 `%USERPROFILE%`/`%APPDATA%` 환경 간접화(src/service.ts:273,303)가
   S4U 세션에서 올바르게 해석되는지
 - token 파일 읽기(src/service.ts:168 계열, ACL hardened 경로) + 로그 쓰기 정상 여부
-- EFS 암호화 홈, UNC/custom `OPENCODEX_HOME`, 기업 인증 프록시 환경
+- EFS 암호화 홈, UNC/custom `OpenProvider_HOME`, 기업 인증 프록시 환경
 
 출처:
 
@@ -97,7 +97,7 @@ S4U 검증 매트릭스 (옵션 A 채택 전 필수):
 - 크래시 루프: 래퍼 배치의 5s 재시작 루프 (:319-327, `timeout` 대신 `ping` 지연)
 - 자산 재작성 내성: `writeServiceAssetWithRetry` (EBUSY/EPERM/EACCES 재시도)
 - 스테일 경로 진단: `bakedServicePathsDiagnostic` (npm prefix/nvm 이동 감지)
-- 서비스 재시작 시 Codex 설정 비복원: `OCX_SERVICE=1` 계약
+- 서비스 재시작 시 Codex 설정 비복원: `opr_SERVICE=1` 계약
 
 빠진 것:
 
@@ -109,3 +109,4 @@ S4U 검증 매트릭스 (옵션 A 채택 전 필수):
 - README.md:65 지원 플랫폼 표 ("Fully supported" 문구에 Windows known limitation 주석)
 - README.md:237 "starts on boot" — 실제는 logon trigger(src/service.ts:345-348)
 - docs/codex-path-investigation.md Windows 서비스 절 (S4U/WinSW 채택 시)
+

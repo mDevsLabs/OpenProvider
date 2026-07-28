@@ -6,13 +6,13 @@ import {
 } from "../src/providers/openrouter-routing";
 import { routeModel } from "../src/router";
 import { providerManagementConfigError, safeConfigDTO } from "../src/server/auth-cors";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprParsedRequest, oprProviderConfig } from "../src/types";
 
-function provider(baseUrl: string, overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
+function provider(baseUrl: string, overrides: Partial<oprProviderConfig> = {}): oprProviderConfig {
   return { adapter: "openai-chat", baseUrl, apiKey: "test-key", ...overrides };
 }
 
-function parsed(modelId: string, stream = false): OcxParsedRequest {
+function parsed(modelId: string, stream = false): oprParsedRequest {
   return {
     modelId,
     stream,
@@ -21,7 +21,7 @@ function parsed(modelId: string, stream = false): OcxParsedRequest {
   };
 }
 
-function body(baseUrl: string, modelId: string, overrides: Partial<OcxProviderConfig> = {}, stream = false): Record<string, unknown> {
+function body(baseUrl: string, modelId: string, overrides: Partial<oprProviderConfig> = {}, stream = false): Record<string, unknown> {
   const request = createOpenAIChatAdapter(provider(baseUrl, overrides)).buildRequest(parsed(modelId, stream));
   return JSON.parse(request.body as string) as Record<string, unknown>;
 }
@@ -55,7 +55,7 @@ describe("OpenRouter configurable provider routing", () => {
 
   test("Codex-visible routed slugs resolve before exact model preferences are applied", () => {
     const nativeModelId = "anthropic/claude-sonnet-5";
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "openrouter",
       providers: {
@@ -136,7 +136,7 @@ describe("OpenRouter provider-routing validation", () => {
     test(`rejects ${label}`, () => {
       const error = openRouterRoutingConfigError(provider(
         "https://openrouter.ai/api/v1",
-        overrides as Partial<OcxProviderConfig>,
+        overrides as Partial<oprProviderConfig>,
       ));
       expect(error).toContain(message);
     });
@@ -186,3 +186,4 @@ describe("OpenRouter provider-routing validation", () => {
     expect(dto.providers.openrouter.modelMaxOutputTokens).toEqual({ "anthropic/claude-sonnet-5": 64_000 });
   });
 });
+

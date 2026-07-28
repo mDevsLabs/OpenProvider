@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 import { resolveGithubCopilotTransport } from "./github-copilot-transport";
 
 export const XAI_GROK_CLI_BASE_URL = "https://cli-chat-proxy.grok.com/v1";
@@ -22,7 +22,7 @@ export const XAI_GROK_COMPATIBILITY = {
 export const XAI_GROK_CLIENT_VERSION = XAI_GROK_COMPATIBILITY.version;
 export const XAI_CONV_ID_HEADER = XAI_GROK_COMPATIBILITY.headers.conversationId;
 
-export type OcxProviderTransport = OcxProviderConfig & {
+export type oprProviderTransport = oprProviderConfig & {
   /** Request executor used only at runtime; never persisted. */
   fetch?: typeof globalThis.fetch;
 };
@@ -89,10 +89,10 @@ export function deriveXaiConvId(promptCacheKey: string): string {
  */
 export function resolveProviderTransport(
   providerName: string,
-  provider: OcxProviderTransport,
+  provider: oprProviderTransport,
   promptCacheKey?: string,
   apiBaseUrl?: string,
-): OcxProviderTransport {
+): oprProviderTransport {
   if (providerName === "github-copilot") {
     return resolveGithubCopilotTransport(provider, apiBaseUrl);
   }
@@ -139,3 +139,4 @@ export function resolveProviderTransport(
     fetch: attemptFetch,
   };
 }
+

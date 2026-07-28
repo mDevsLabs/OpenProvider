@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadConfig, saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 // Full-suite Windows load: startServer + management flows often exceed bun's default
@@ -31,7 +31,7 @@ beforeEach(() => {
     providers: {
       mock: { adapter: "openai-chat", baseUrl: "http://127.0.0.1:1/v1", apiKey: "k", allowPrivateNetwork: true, liveModels: false, models: ["test-model"] },
     },
-  } as OcxConfig);
+  } as oprConfig);
 });
 
 afterEach(() => {
@@ -151,3 +151,4 @@ test("POST /api/grok/apply writes through the guarded writer and is idempotent",
     server.stop(true);
   }
 });
+

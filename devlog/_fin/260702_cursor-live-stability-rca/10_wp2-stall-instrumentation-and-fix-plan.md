@@ -29,7 +29,7 @@ hangs by construction.
 ### Step 1 — env-gated frame diagnostics (code, small)
 
 - MODIFY `src/adapters/cursor/live-transport.ts`: in the server-message handler,
-  when `OCX_DEBUG_FRAMES=1`, call `debugProviderDiagnostic("cursor", ...)`
+  when `opr_DEBUG_FRAMES=1`, call `debugProviderDiagnostic("cursor", ...)`
   (existing helper in `src/debug.ts`) with: frame case, interactionUpdate inner
   case, toolCall union case + callId + tool name when present, and whether the
   frame was mapped/swallowed. Redaction via existing `redactSecrets`.
@@ -41,7 +41,7 @@ hangs by construction.
 ### Step 2 — capture a stall (no shared-server restart)
 
 - Start a second instance from the working tree:
-  `OCX_DEBUG_FRAMES=1 bun run src/cli.ts start --port 10199` with stdout/err to
+  `opr_DEBUG_FRAMES=1 bun run src/cli.ts start --port 10199` with stdout/err to
   a scratch log (instance shares config; do NOT run `opr stop`).
 - Reproduce with the run-4 prompt:
   `codex exec -m cursor/composer-2.5 -c model_providers.openprovider.base_url="http://localhost:10199/v1" ...`
@@ -114,7 +114,7 @@ Fix design:
 ## Implementation pass — 2026-07-02 (Boss direct, after employee lanes stalled)
 
 Live-capture pivot: with full frame diagnostics on the debug instance
-(:10199, isolated OPENCODEX_HOME), the stall repro showed NO `interactionQuery`
+(:10199, isolated @mdevs/openprovider_HOME), the stall repro showed NO `interactionQuery`
 frames. The actual sequence before silence: `toolCallStarted(shellToolCall)` →
 `requestContextArgs` → `setBlobArgs`×3 → `execServerMessage: shellStreamArgs`
 → checkpoint/toolCallDelta → heartbeats forever. opr answered `shellStreamArgs`
@@ -140,7 +140,7 @@ acknowledgement" — followed by an exec `streamClose` control frame
   for the query-blocking stall mode even though the live repro didn't need it;
   (2) `isClientToolFrame` narrowed to `mcpToolCall` frames with our provider
   (native ToolCall frames no longer revoke a pending client-tool finalize);
-  (3) OCX_DEBUG_FRAMES diagnostics: per-frame case dump
+  (3) opr_DEBUG_FRAMES diagnostics: per-frame case dump
   (`describeCursorServerFrame`) and interaction-query reply logging.
 - `src/adapters/cursor/protobuf-events.ts` — exported `mcpArgsFromToolCall`.
 - `tests/cursor-interaction-query.test.ts` (new, 11 tests) — reply case + id
@@ -183,3 +183,5 @@ acknowledgement" — followed by an exec `streamClose` control frame
 - Declaring a reduced tool surface might change Cursor-side planning quality.
 - Debug instance shares ~/.openprovider config/usage files with the main instance
   (append-only usage: acceptable; no config writes planned).
+
+

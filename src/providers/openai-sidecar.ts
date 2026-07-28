@@ -9,17 +9,17 @@ import {
 import { recordCodexUpstreamOutcome, type CodexUpstreamOutcome } from "../codex/routing";
 import { extractAccountId } from "../oauth/chatgpt";
 import { ForwardAdmissionCredentialError, validateForwardAdmissionCredential } from "../server/auth-cors";
-import type { CodexAccountMode, OcxConfig, OcxProviderConfig } from "../types";
+import type { CodexAccountMode, oprConfig, oprProviderConfig } from "../types";
 import {
   isCanonicalOpenAiForwardProvider,
   OPENAI_API_PROVIDER_ID,
   OPENAI_CODEX_PROVIDER_ID,
 } from "./openai-tiers";
-import { providerCodexAccountMode } from "./registry";
+import { getProviderRegistryEntry, providerCodexAccountMode } from "./registry";
 
 export interface OpenAiForwardSidecarCandidate {
   providerName: typeof OPENAI_CODEX_PROVIDER_ID;
-  provider: OcxProviderConfig;
+  provider: oprProviderConfig;
   accountMode: CodexAccountMode;
 }
 
@@ -32,13 +32,14 @@ export interface ResolvedOpenAiForwardSidecar extends OpenAiForwardSidecarCandid
 export interface OpenAiImagesProviderSelection {
   forwardCandidates: OpenAiForwardSidecarCandidate[];
   keyed?: {
-    providerName: typeof OPENAI_API_PROVIDER_ID;
-    provider: OcxProviderConfig;
+    providerName: string;
+    provider: oprProviderConfig;
     apiKey: string;
   };
+  error?: string;
 }
 
-export function listOpenAiForwardSidecarCandidates(config: OcxConfig): OpenAiForwardSidecarCandidate[] {
+export function listOpenAiForwardSidecarCandidates(config: oprConfig): OpenAiForwardSidecarCandidate[] {
   const provider = config.providers[OPENAI_CODEX_PROVIDER_ID];
   if (!provider || provider.disabled === true || !isCanonicalOpenAiForwardProvider(provider)) return [];
   return [{
@@ -68,7 +69,7 @@ function directSidecarHeaders(
 export async function resolveFirstUsableOpenAiSidecar(
   candidates: readonly OpenAiForwardSidecarCandidate[],
   incomingHeaders: Headers,
-  config: OcxConfig,
+  config: oprConfig,
 ): Promise<ResolvedOpenAiForwardSidecar | undefined> {
   let callerBearerMayBeForwarded = true;
   try {
@@ -109,7 +110,7 @@ export async function resolveFirstUsableOpenAiSidecar(
   return undefined;
 }
 
-export function selectOpenAiImagesProvider(config: OcxConfig): OpenAiImagesProviderSelection {
+export function selectOpenAiImagesProvider(config: oprConfig): OpenAiImagesProviderSelection {
   const selection: OpenAiImagesProviderSelection = {
     forwardCandidates: listOpenAiForwardSidecarCandidates(config),
   };
@@ -126,3 +127,47 @@ export function selectOpenAiImagesProvider(config: OcxConfig): OpenAiImagesProvi
   }
   return selection;
 }
+
+/** Resolve an explicit custom Images provider, otherwise preserve the existing OpenAI fallback. */
+export function selectImagesProvider(config: oprConfig): OpenAiImagesProviderSelection {
+  const configuredProvider = config.images?.provider;
+  if (configuredProvider === undefined) return selectOpenAiImagesProvider(config);
+  if (typeof configuredProvider !== "string" || !configuredProvider.trim()) {
+    return { forwardCandidates: [], error: "images.provider must be a nonblank provider name" };
+  }
+  const providerName = configuredProvider.trim();
+
+  if (getProviderRegistryEntry(providerName)) {
+    return {
+      forwardCandidates: [],
+      error: `images.provider "${providerName}" must name a custom provider; omit it to use built-in OpenAI tiers`,
+    };
+  }
+
+  const provider = Object.prototype.hasOwnProperty.call(config.providers, providerName)
+    ? config.providers[providerName]
+    : undefined;
+  if (!provider) {
+    return { forwardCandidates: [], error: `images.provider "${providerName}" is not configured` };
+  }
+  if (provider.disabled === true) {
+    return { forwardCandidates: [], error: `images.provider "${providerName}" is disabled` };
+  }
+  if (provider.adapter !== "openai-responses" || (provider.authMode !== undefined && provider.authMode !== "key")) {
+    return {
+      forwardCandidates: [],
+      error: `images.provider "${providerName}" must be an API-key openai-responses provider`,
+    };
+  }
+
+  const apiKey = resolveEnvValue(provider.apiKey)?.trim();
+  if (!apiKey) {
+    return { forwardCandidates: [], error: `images.provider "${providerName}" has no usable API key` };
+  }
+
+  return {
+    forwardCandidates: [],
+    keyed: { providerName, provider, apiKey },
+  };
+}
+

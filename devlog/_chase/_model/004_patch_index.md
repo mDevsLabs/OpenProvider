@@ -36,7 +36,7 @@
 
 새 필드가 정말 필요한 경우에만 아래 순서를 따른다.
 
-1. `src/types.ts`의 `ProviderRegistryEntry` 또는 `OcxProviderConfig` 계약.
+1. `src/types.ts`의 `ProviderRegistryEntry` 또는 `oprProviderConfig` 계약.
 2. `src/config.ts`의 validation/default/migration.
 3. `providerConfigSeed()`와 `enrichProviderFromRegistry()` 파생 경로.
 4. router/adapter/catalog의 실제 소비자.
@@ -53,7 +53,7 @@
 | Codex App picker 노출 | 해당 없음 | `src/codex/catalog.ts`와 sync/cache |
 | OpenProvider OAuth 계정/키 pool | 해당 없음 | `src/oauth/`, `src/providers/api-keys.ts` |
 
-Provider patch를 가져올 때 `JWC native`, `OCX proxy`, `both`, `docs-only` 중 하나로 먼저 분류한다. jawcode에 provider가 생겼다는 이유만으로 OCX registry를 자동 추가하지 않고, OCX가 route할 수 있다는 이유만으로 jawcode `KnownProvider`를 늘리지 않는다.
+Provider patch를 가져올 때 `JWC native`, `opr proxy`, `both`, `docs-only` 중 하나로 먼저 분류한다. jawcode에 provider가 생겼다는 이유만으로 opr registry를 자동 추가하지 않고, opr가 route할 수 있다는 이유만으로 jawcode `KnownProvider`를 늘리지 않는다.
 
 ## 최소 검증 묶음
 
@@ -65,3 +65,4 @@ git diff --check
 ```
 
 실제 test 파일명은 변경 전 `rg --files tests | rg 'provider|router|catalog|oauth'`로 다시 확인한다.
+

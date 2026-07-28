@@ -42,7 +42,7 @@ Maintain mapper state:
 
 ```ts
 export interface CursorProtobufEventState {
-  usage: OcxUsage;
+  usage: oprUsage;
   openToolCalls: Map<string, { name: string; args: string }>;
 }
 ```
@@ -83,4 +83,5 @@ Add or modify:
   and close exactly once.
 - Some Cursor native tool calls are execution-side only and should not be relayed as
   client Responses tool calls. Keep native exec and client tool call pathways separate.
+
 

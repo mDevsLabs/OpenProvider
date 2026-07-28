@@ -39,7 +39,7 @@ diff --git a/src/adapters/google.ts b/src/adapters/google.ts
 index 55df4c25..db627a17 100644
 --- a/src/adapters/google.ts
 +++ b/src/adapters/google.ts
-@@ -87,6 +87,35 @@ function toolResultImageParts(content: string | OcxContentPart[]): unknown[] {
+@@ -87,6 +87,35 @@ function toolResultImageParts(content: string | oprContentPart[]): unknown[] {
    return parts;
  }
  
@@ -66,25 +66,25 @@ index 55df4c25..db627a17 100644
 + * actually carry (`toolResultImageParts` adds none). Fall back to the placeholder unless the content
 + * has something representable.
 + */
-+function geminiToolResultText(content: string | OcxContentPart[]): string {
++function geminiToolResultText(content: string | oprContentPart[]): string {
 +  if (typeof content === "string") return content || GEMINI_EMPTY_TOOL_OUTPUT_PLACEHOLDER;
 +  const hasContent = content.some(p => p.type === "image" || (typeof p.text === "string" && p.text.length > 0));
 +  return hasContent ? contentPartsToText(content) : GEMINI_EMPTY_TOOL_OUTPUT_PLACEHOLDER;
 +}
 +
- function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?: unknown; contents: unknown[] } {
+ function messagesToGeminiFormat(parsed: oprParsedRequest): { systemInstruction?: unknown; contents: unknown[] } {
    // Neutralize Codex's GPT-5 identity line (Gemini/Antigravity share this path) so a routed model
    // never misreports as GPT-5/OpenAI, and never leaks the proxy identity upstream.
-@@ -105,18 +134,22 @@ function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?:
+@@ -105,18 +134,22 @@ function messagesToGeminiFormat(parsed: oprParsedRequest): { systemInstruction?:
        case "user":
        case "developer": {
          if (typeof msg.content === "string") {
 -          contents.push({ role: "user", parts: [{ text: msg.content }] });
 +          contents.push({ role: "user", parts: [{ text: msg.content || GEMINI_EMPTY_PLACEHOLDER }] });
          } else {
--          const parts = (msg.content as OcxContentPart[]).map(p => {
+-          const parts = (msg.content as oprContentPart[]).map(p => {
 +          const parts: unknown[] = [];
-+          for (const p of msg.content as OcxContentPart[]) {
++          for (const p of msg.content as oprContentPart[]) {
              if (p.type === "image") {
                const data = parseDataUrl(p.imageUrl);
                // Gemini takes base64 via inline_data; a remote URL needs a mime type we don't have, so
@@ -104,20 +104,20 @@ index 55df4c25..db627a17 100644
          }
          break;
        }
-@@ -124,8 +157,10 @@ function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?:
-         const aMsg = msg as OcxAssistantMessage;
+@@ -124,8 +157,10 @@ function messagesToGeminiFormat(parsed: oprParsedRequest): { systemInstruction?:
+         const aMsg = msg as oprAssistantMessage;
          const parts: unknown[] = [];
          for (const p of aMsg.content) {
--          if (p.type === "text") parts.push({ text: (p as OcxTextContent).text });
+-          if (p.type === "text") parts.push({ text: (p as oprTextContent).text });
 -          else if (p.type === "toolCall") {
 +          if (p.type === "text") {
-+            const textPart = geminiTextPart((p as OcxTextContent).text);
++            const textPart = geminiTextPart((p as oprTextContent).text);
 +            if (textPart) parts.push(textPart);
 +          } else if (p.type === "toolCall") {
-             const tc = p as OcxToolCall;
+             const tc = p as oprToolCall;
              // Preserve the thought signature on the function-call part so Antigravity/Gemini-3
              // reasoning continuity survives history-driven (stateless) turns, not just same-process
-@@ -142,6 +177,10 @@ function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?:
+@@ -142,6 +177,10 @@ function messagesToGeminiFormat(parsed: oprParsedRequest): { systemInstruction?:
              parts.push(part);
            }
          }
@@ -128,7 +128,7 @@ index 55df4c25..db627a17 100644
          contents.push({ role: "model", parts });
          break;
        }
-@@ -151,7 +190,7 @@ function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?:
+@@ -151,7 +190,7 @@ function messagesToGeminiFormat(parsed: oprParsedRequest): { systemInstruction?:
          // tool-result screenshots (e.g. Computer Use) ride along as inline_data instead of being
          // flattened to a "[image]" marker the model can't actually see.
          const responseId = geminiToolCallId(msg.toolCallId);
@@ -145,7 +145,7 @@ index 00000000..484084e0
 @@ -0,0 +1,183 @@
 +import { describe, expect, test } from "bun:test";
 +import { createGoogleAdapter } from "../src/adapters/google";
-+import type { OcxParsedRequest } from "../src/types";
++import type { oprParsedRequest } from "../src/types";
 +
 +// Antigravity translates these Gemini `contents` into Anthropic `messages` for Claude models, and
 +// Anthropic rejects empty/absent text and empty content arrays. An empty Gemini text part reaches
@@ -155,11 +155,11 @@ index 00000000..484084e0
 +
 +const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "key" };
 +
-+function parsedWith(messages: unknown[]): OcxParsedRequest {
-+  return { modelId: "gemini-3-pro", stream: false, options: {}, context: { messages } } as unknown as OcxParsedRequest;
++function parsedWith(messages: unknown[]): oprParsedRequest {
++  return { modelId: "gemini-3-pro", stream: false, options: {}, context: { messages } } as unknown as oprParsedRequest;
 +}
 +
-+async function geminiContents(parsed: OcxParsedRequest): Promise<{ role: string; parts: Record<string, unknown>[] }[]> {
++async function geminiContents(parsed: oprParsedRequest): Promise<{ role: string; parts: Record<string, unknown>[] }[]> {
 +  const { body } = await createGoogleAdapter(provider).buildRequest(parsed);
 +  return JSON.parse(body).contents;
 +}
@@ -424,3 +424,4 @@ git diff --name-status 037e8f5e4fa32a82e4149acc509554f157656dad --
 ## 실행 영수증
 
 _(C/D 단계에서 작성)_
+

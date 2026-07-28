@@ -26,7 +26,7 @@ Investigation: cxc map (codex-catalog/registry/reasoning-effort) + gpt-5.5 explo
 - Root cause: tests/cli-provider.test.ts runCli() spawned opr with inherited real
   CODEX_HOME; "provider add deepseek --sync" tests hit the LIVE proxy (config.port
   10100 matches) -> syncModelsToCodex rewrote the real catalog from the isolated
-  OPENCODEX_HOME config (providers: openai+deepseek only) -> catalog wiped down to
+  @mdevs/openprovider_HOME config (providers: openai+deepseek only) -> catalog wiped down to
   8 entries. Same class as the 260706 "test pollution" incident.
 - Fix: tests/cli-provider.test.ts always sets an isolated CODEX_HOME in runCli.
 - Recovery: `opr sync` re-materialized 18 models (kimi/glm/anthropic back; verified
@@ -35,3 +35,4 @@ Investigation: cxc map (codex-catalog/registry/reasoning-effort) + gpt-5.5 explo
 
 ## Verification
 bun test ./tests/ -> 1550 pass / 0 fail; tsc exit 0; live catalog intact post-suite.
+

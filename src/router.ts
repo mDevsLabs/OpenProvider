@@ -1,4 +1,4 @@
-import type { CodexAccountMode, OcxConfig, OcxProviderConfig } from "./types";
+import type { CodexAccountMode, oprConfig, oprProviderConfig } from "./types";
 import { preservesPhysicalComboProvider, tryPickComboModel, type ComboPick } from "./combos";
 import { hasOwnProvider, resolveEnvValue } from "./config";
 import { assertProviderDestinationAllowed } from "./lib/destination-policy";
@@ -10,7 +10,7 @@ import { getStaleCached } from "./codex/model-cache";
 
 export interface RouteResult {
   providerName: string;
-  provider: OcxProviderConfig;
+  provider: oprProviderConfig;
   modelId: string;
   codexAccountMode?: CodexAccountMode;
   combo?: ComboPick;
@@ -37,7 +37,7 @@ const MODEL_PROVIDER_PATTERNS: Array<{ providerNames: string[]; prefixes: string
  * last-known-good live /models cache (may be empty on a cold start; decode then passes
  * unknown ids through unchanged for an honest upstream error).
  */
-export function knownModelIdsForProvider(provName: string, prov: OcxProviderConfig): string[] {
+export function knownModelIdsForProvider(provName: string, prov: oprProviderConfig): string[] {
   const ids = new Set<string>();
   for (const id of prov.models ?? []) ids.add(id);
   const registry = PROVIDER_REGISTRY.find(entry => entry.id === provName);
@@ -185,15 +185,22 @@ function warnIfBaseUrlDiscarded(providerName: string, userBaseUrl: string, effec
   );
 }
 
-function routedProviderConfig(providerName: string, provider: OcxProviderConfig): OcxProviderConfig {
+function usableResolvedApiKey(apiKey: string | undefined): string | undefined {
+  const resolved = resolveEnvValue(apiKey);
+  return typeof resolved === "string" && resolved.trim().length > 0 ? resolved : undefined;
+}
+
+function routedProviderConfig(providerName: string, provider: oprProviderConfig): oprProviderConfig {
   const registryEntry = PROVIDER_REGISTRY.find(entry => entry.id === providerName);
   if (!registryEntry) {
     assertProviderDestinationAllowed(providerName, provider);
-    return { ...provider, apiKey: resolveEnvValue(provider.apiKey) };
+    return { ...provider, apiKey: usableResolvedApiKey(provider.apiKey) };
   }
+  const resolvedApiKey = usableResolvedApiKey(provider.apiKey);
   const explicitKeyOverride = registryEntry.authKind === "oauth"
     && registryEntry.allowKeyAuthOverride === true
-    && provider.authMode === "key";
+    && provider.authMode === "key"
+    && resolvedApiKey !== undefined;
   const canonicalAuthMode = explicitKeyOverride
     ? "key"
     : registryEntry.authKind === "forward" || registryEntry.authKind === "oauth"
@@ -239,7 +246,7 @@ function routedProviderConfig(providerName: string, provider: OcxProviderConfig)
     adapter: registryEntry.adapter,
     baseUrl,
     authMode: canonicalAuthMode,
-    apiKey: resolveEnvValue(provider.apiKey),
+    apiKey: resolvedApiKey,
     // Backfill the Google wire mode + Vertex project/location from the registry when the user
     // config omits them, so a minimal `google-vertex`/`google-antigravity` entry still routes
     // through the correct branch (CCA/Vertex) instead of falling back to AI Studio.
@@ -279,7 +286,7 @@ function routedProviderConfig(providerName: string, provider: OcxProviderConfig)
   };
 }
 
-function activeProviderEntries(config: OcxConfig): [string, OcxProviderConfig][] {
+function activeProviderEntries(config: oprConfig): [string, oprProviderConfig][] {
   return Object.entries(config.providers)
     .filter(([name, provider]) => name !== LEGACY_CHATGPT_PROVIDER_ID && provider.disabled !== true);
 }
@@ -295,7 +302,7 @@ function isBareOpenAiFamilyModel(modelId: string): boolean {
   return !modelId.includes("/") && /^(?:gpt-|o1-|o3-|o4-)/.test(modelId);
 }
 
-function routeResult(providerName: string, provider: OcxProviderConfig, modelId: string): RouteResult {
+function routeResult(providerName: string, provider: oprProviderConfig, modelId: string): RouteResult {
   const codexAccountMode = providerCodexAccountMode(providerName, provider);
   return {
     providerName,
@@ -305,7 +312,7 @@ function routeResult(providerName: string, provider: OcxProviderConfig, modelId:
   };
 }
 
-function routeModelInternal(config: OcxConfig, modelId: string, bypassCombos: boolean): RouteResult {
+function routeModelInternal(config: oprConfig, modelId: string, bypassCombos: boolean): RouteResult {
   if (!bypassCombos && !preservesPhysicalComboProvider(config)) {
     const combo = tryPickComboModel(config, modelId);
     if (combo) {
@@ -376,11 +383,11 @@ function routeModelInternal(config: OcxConfig, modelId: string, bypassCombos: bo
   throw new Error(`No provider configured for model: ${modelId}`);
 }
 
-export function routeModel(config: OcxConfig, modelId: string): RouteResult {
+export function routeModel(config: oprConfig, modelId: string): RouteResult {
   return routeModelInternal(config, modelId, false);
 }
 
-function routeByKnownModelPattern(config: OcxConfig, modelId: string): RouteResult | undefined {
+function routeByKnownModelPattern(config: oprConfig, modelId: string): RouteResult | undefined {
   for (const { providerNames, prefixes } of MODEL_PROVIDER_PATTERNS) {
     if (prefixes.some(prefix => modelId.startsWith(prefix))) {
       const matchingProvider = Object.entries(config.providers).find(
@@ -394,3 +401,4 @@ function routeByKnownModelPattern(config: OcxConfig, modelId: string): RouteResu
   }
   return undefined;
 }
+

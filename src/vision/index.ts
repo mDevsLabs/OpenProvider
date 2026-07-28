@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { OcxConfig, OcxContentPart, OcxMessage, OcxParsedRequest, OcxProviderConfig, OcxTextContent } from "../types";
+import type { oprConfig, oprContentPart, oprMessage, oprParsedRequest, oprProviderConfig, oprTextContent } from "../types";
 import { modelInList } from "../types";
 import { describeImage, type DescribeOutcome, type VisionSettings } from "./describe";
 import { describeImageAnthropic } from "./anthropic-describe";
@@ -96,11 +96,11 @@ function clamp(s: string, max: number): string {
 
 export interface AnthropicVisionProvider {
   providerName: string;
-  provider: OcxProviderConfig;
+  provider: oprProviderConfig;
 }
 
 /** First enabled Anthropic OAuth provider whose active stored account is not marked for reauth. */
-export function findAnthropicVisionProvider(config: OcxConfig): AnthropicVisionProvider | undefined {
+export function findAnthropicVisionProvider(config: oprConfig): AnthropicVisionProvider | undefined {
   for (const [providerName, provider] of Object.entries(config.providers)) {
     if (provider.disabled === true || provider.adapter !== "anthropic" || provider.authMode !== "oauth") continue;
     const accountSet = getAccountSet(providerName);
@@ -123,16 +123,16 @@ function carriesImages(role: string): boolean {
   return role === "user" || role === "developer" || role === "toolResult";
 }
 
-function messagesHaveImage(parsed: OcxParsedRequest): boolean {
+function messagesHaveImage(parsed: oprParsedRequest): boolean {
   return parsed.context.messages.some(m =>
-    carriesImages(m.role) && Array.isArray(m.content) && (m.content as OcxContentPart[]).some(p => p.type === "image"));
+    carriesImages(m.role) && Array.isArray(m.content) && (m.content as oprContentPart[]).some(p => p.type === "image"));
 }
 
 export function shouldResolveOpenAiVisionSidecar(
-  config: OcxConfig,
-  provider: OcxProviderConfig,
+  config: oprConfig,
+  provider: oprProviderConfig,
   modelId: string,
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
 ): boolean {
   if (!modelInList(provider.noVisionModels, modelId) || !messagesHaveImage(parsed)) return false;
   const cfg = config.visionSidecar ?? {};
@@ -155,10 +155,10 @@ export interface VisionPlan {
  * otherwise (the caller strips images before sending to a text-only model).
  */
 export function planVisionSidecar(
-  config: OcxConfig,
-  provider: OcxProviderConfig,
+  config: oprConfig,
+  provider: oprProviderConfig,
   modelId: string,
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   openAiSidecar?: ResolvedOpenAiForwardSidecar,
 ): VisionPlan | undefined {
   if (!modelInList(provider.noVisionModels, modelId)) return undefined;
@@ -195,7 +195,7 @@ interface ImageJob {
 }
 
 /** Render one describe outcome as the replacement text part (clamped to the per-image budget). */
-function renderDescription(out: { text: string; error?: string }): OcxTextContent {
+function renderDescription(out: { text: string; error?: string }): oprTextContent {
   return {
     type: "text",
     text: out.error
@@ -274,7 +274,7 @@ async function executeDescription(
  * multi-image turn doesn't pay the sum of per-image latencies. Failures degrade to a short marker.
  */
 export async function describeImagesInPlace(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   plan: VisionPlan,
   selectedForwardHeaders: Headers,
   abortSignal?: AbortSignal,
@@ -282,13 +282,13 @@ export async function describeImagesInPlace(
 ): Promise<void> {
   // 1. Gather every image part across messages, each with its own message's text as context.
   const jobs: ImageJob[] = [];
-  const targets: { msg: OcxMessage; parts: OcxContentPart[] }[] = [];
+  const targets: { msg: oprMessage; parts: oprContentPart[] }[] = [];
   for (const msg of parsed.context.messages) {
     if (!carriesImages(msg.role) || !Array.isArray(msg.content)) continue;
-    const parts = msg.content as OcxContentPart[];
+    const parts = msg.content as oprContentPart[];
     if (!parts.some(p => p.type === "image")) continue;
     const contextText = parts
-      .filter((p): p is OcxTextContent => p.type === "text")
+      .filter((p): p is oprTextContent => p.type === "text")
       .map(p => p.text)
       .join(" ")
       .slice(0, CONTEXT_MAX_CHARS);
@@ -350,7 +350,7 @@ export async function describeImagesInPlace(
   // 3. Rebuild each message, replacing image parts with their descriptions in order.
   let oi = 0;
   for (const { msg, parts } of targets) {
-    const newParts: OcxContentPart[] = [];
+    const newParts: oprContentPart[] = [];
     for (const p of parts) newParts.push(p.type === "image" ? renderDescription(outcomes[oi++]) : p);
     msg.content = newParts;
   }
@@ -362,16 +362,17 @@ export async function describeImagesInPlace(
  * raw images would 400 or silently confuse it. Replace each image with an explicit marker so the
  * model (and the user, via its reply) knows the image was dropped rather than ignored.
  */
-export function stripImagesInPlace(parsed: OcxParsedRequest): boolean {
+export function stripImagesInPlace(parsed: oprParsedRequest): boolean {
   let stripped = false;
   for (const msg of parsed.context.messages) {
     if (!carriesImages(msg.role) || !Array.isArray(msg.content)) continue;
-    const parts = msg.content as OcxContentPart[];
+    const parts = msg.content as oprContentPart[];
     if (!parts.some(p => p.type === "image")) continue;
     msg.content = parts.map(p => p.type === "image"
-      ? { type: "text", text: "[image omitted: this model is text-only and the vision sidecar is unavailable (no ChatGPT login)]" } as OcxContentPart
+      ? { type: "text", text: "[image omitted: this model is text-only and the vision sidecar is unavailable (no ChatGPT login)]" } as oprContentPart
       : p);
     stripped = true;
   }
   return stripped;
 }
+

@@ -13,7 +13,7 @@
  */
 import { lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { claudeCodeAlias, claudeCodeNativeAlias } from "./alias";
 import { resolveAutoContext, stripOneMillionMarker, withOneMillionMarker } from "./context-windows";
 import { claudeConfigDir } from "./gateway-cache";
@@ -57,7 +57,7 @@ function pickerDefaultModel(configDir: string): string | null {
 /** Roster entry -> alias + display parts. Entries are bare native slugs or "provider/id".
  * Codex-facing encoded ids (`provider/vendor-model`) decode to the native slash id first
  * so the alias joins the raw-native context-window map (context-windows.ts). */
-function entryParts(entry: string, config: OcxConfig): { alias: string; id: string; provider: string } {
+function entryParts(entry: string, config: oprConfig): { alias: string; id: string; provider: string } {
   const slash = entry.indexOf("/");
   if (slash > 0) {
     const provider = entry.slice(0, slash);
@@ -70,7 +70,7 @@ function entryParts(entry: string, config: OcxConfig): { alias: string; id: stri
   return { alias: claudeCodeNativeAlias(entry), id: entry, provider: "native" };
 }
 
-export function buildClaudeAgentDefs(config: OcxConfig, windows: Record<string, number>, configDir = claudeConfigDir()): ClaudeAgentDef[] {
+export function buildClaudeAgentDefs(config: oprConfig, windows: Record<string, number>, configDir = claudeConfigDir()): ClaudeAgentDef[] {
   const auto = resolveAutoContext(config.claudeCode);
   const blockedSkills = effectiveBlockedSkillNames(config.claudeCode);
   const blockedSkillsFor = (model: string): readonly string[] => {
@@ -218,7 +218,7 @@ export function syncClaudeAgentDefs(defs: readonly ClaudeAgentDef[], configDir =
 }
 
 /** Launch-time hook: gate + build + sync in one call (used by opr claude and systemEnv). */
-export function injectClaudeAgentDefs(config: OcxConfig, windows: Record<string, number>, configDir?: string): string[] | null {
+export function injectClaudeAgentDefs(config: oprConfig, windows: Record<string, number>, configDir?: string): string[] | null {
   if (config.claudeCode?.enabled === false || config.claudeCode?.injectAgents === false) {
     // Disabled: prune verified-owned files so stale definitions stop loading
     // in future sessions (audit 071 #3).
@@ -236,3 +236,4 @@ export function injectClaudeAgentDefs(config: OcxConfig, windows: Record<string,
  * indistinguishable from a genuine Sonnet call (issue #252).
  */
 const NO_MODEL_ARG = "NOTE: this agent's real model is pinned by the openprovider proxy — the `model` argument is ignored. Pass model: \"haiku\" as a placeholder (or omit it); routing is unaffected either way.";
+

@@ -17,7 +17,7 @@ import { FREE_PROVIDER_DIRECTORY } from "../src/providers/free-directory";
 import { applyProviderConfigHints } from "../src/codex/catalog";
 import { routeModel } from "../src/router";
 import { resolveAdapter } from "../src/server";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
 function nativeTemplate(): Record<string, unknown> {
   return {
@@ -32,7 +32,7 @@ function nativeTemplate(): Record<string, unknown> {
 const EXPECTED_KEY_PROVIDER_IDS = [
   "anthropic-apikey", "openai-apikey", "umans", "opencode-go", "neuralwatt", "openrouter", "orcarouter", "bizrouter", "groq", "google", "google-vertex", "azure-openai",
   "deepseek", "cerebras", "together", "fireworks", "firepass", "moonshot",
-  "huggingface", "nvidia", "venice", "zai", "nanogpt", "synthetic", "siliconflow", "qwen-cloud", "tencent-coding-plan",
+  "huggingface", "nvidia", "venice", "zai", "zhipu-bigmodel", "nanogpt", "synthetic", "siliconflow", "qwen-cloud", "tencent-coding-plan",
   "qianfan", "alibaba", "alibaba-token-plan", "alibaba-token-plan-intl", "parallel", "zenmux", "litellm", "ollama-cloud", "mistral",
   "minimax", "minimax-cn", "kimi-code", "opencode-zen", "vercel-ai-gateway",
   "opencode-free", "xiaomi", "kilo", "mimo-free", "cloudflare-ai-gateway", "cloudflare-workers-ai", "gitlab-duo",
@@ -119,7 +119,7 @@ describe("provider registry parity", () => {
   });
 
   test("OpenAI API route max-input metadata is trusted and user values only lower it", () => {
-    const makeConfig = (value: number, context = 2_000_000): OcxConfig => ({
+    const makeConfig = (value: number, context = 2_000_000): oprConfig => ({
       port: 10100,
       defaultProvider: "openai-apikey",
       providers: {
@@ -147,7 +147,7 @@ describe("provider registry parity", () => {
         "glm-5.2": 100_000,
         "glm-5.2[1m]": 800_000,
       };
-      const config: OcxConfig = {
+      const config: oprConfig = {
         port: 10100,
         defaultProvider: "zai",
         providers: {
@@ -179,7 +179,7 @@ describe("provider registry parity", () => {
         "glm-5.2": 128_000,
         "glm-5.2[1m]": 128_000,
       };
-      const config: OcxConfig = {
+      const config: oprConfig = {
         port: 10100,
         defaultProvider: "zai",
         providers: {
@@ -317,7 +317,7 @@ describe("provider registry parity", () => {
     expect(providerConfigSeed(zai!).modelSuffixBracketStrip).toBe(true);
     expect(optedInProviders).toEqual(["kimi", "zai", "kimi-code"]);
 
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "zai",
       providers: {
@@ -374,6 +374,13 @@ describe("provider registry parity", () => {
         expect(entry?.[field]).toContain("kimi-for-coding");
       }
       expect(entry?.modelSuffixBracketStrip).toBe(true);
+      expect(entry?.promptCacheKey).toBe(true);
+      // Key-pool 429 rotation rebuilds the provider from the persisted config (not the routed
+      // one), so the flag must survive seeding/enrichment, not just the router's registry backfill.
+      expect(providerConfigSeed(entry!).promptCacheKey).toBe(true);
+      const enriched: oprProviderConfig = { adapter: "openai-chat", baseUrl: entry!.baseUrl };
+      enrichProviderFromCatalog(providerId, enriched);
+      expect(enriched.promptCacheKey).toBe(true);
       expect(entry?.noReasoningModels).not.toContain("k3");
       expect(entry?.noReasoningModels).not.toContain("k3[1m]");
       expect(entry?.modelReasoningEfforts?.k3).toEqual(["low", "high", "max"]);
@@ -450,12 +457,12 @@ describe("provider registry parity", () => {
     expect(providerConfigSeed(nvidia).freeTier).toBe(true);
 
     // Enrich backfills only when the user config leaves freeTier unset.
-    const unset: OcxProviderConfig = { adapter: nvidia.adapter, baseUrl: nvidia.baseUrl };
+    const unset: oprProviderConfig = { adapter: nvidia.adapter, baseUrl: nvidia.baseUrl };
     enrichProviderFromRegistry("nvidia", unset);
     expect(unset.freeTier).toBe(true);
 
     // A user-set explicit false is preserved.
-    const optedOut: OcxProviderConfig = { adapter: nvidia.adapter, baseUrl: nvidia.baseUrl, freeTier: false };
+    const optedOut: oprProviderConfig = { adapter: nvidia.adapter, baseUrl: nvidia.baseUrl, freeTier: false };
     enrichProviderFromRegistry("nvidia", optedOut);
     expect(optedOut.freeTier).toBe(false);
 
@@ -565,7 +572,7 @@ describe("provider registry parity", () => {
     expect(seed.modelReasoningEfforts?.["gpt-5.5"]).toEqual(["low", "medium", "high"]);
     expect(seed.modelReasoningEfforts?.["gpt-5.6-sol"]).toEqual(["low", "medium", "high", "xhigh", "max"]);
 
-    const savedCursor: OcxProviderConfig = { adapter: "cursor", baseUrl: "https://api2.cursor.sh" };
+    const savedCursor: oprProviderConfig = { adapter: "cursor", baseUrl: "https://api2.cursor.sh" };
     enrichProviderFromCatalog("cursor", savedCursor);
     expect(savedCursor).toMatchObject({
       liveModels: true,
@@ -608,7 +615,8 @@ describe("provider registry parity", () => {
     expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.models).toContain("claude-sonnet-4-6");
     expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.models).toContain("claude-opus-4-6-thinking");
     expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.models).toContain("gpt-oss-120b-medium");
-    expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.models).toHaveLength(5);
+    expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.models).toContain("gemini-3.1-flash-image");
+    expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.models).toHaveLength(6);
     // Effort ladders on collapsed base models.
     expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.modelReasoningEfforts?.["gemini-3.6-flash"]).toEqual(["low", "medium", "high"]);
     expect(OAUTH_PROVIDERS["google-antigravity"].providerConfig.modelReasoningEfforts?.["gemini-3.1-pro"]).toEqual(["low", "high"]);
@@ -721,6 +729,7 @@ describe("provider registry parity", () => {
       moonshot: "moonshot",
       minimax: "minimax",
       "minimax-cn": "minimax",
+      "zhipu-bigmodel": "zai",
     });
     expect(resolveJawcodeProvider("gemini")).toBe("google");
     expect(resolveJawcodeProvider("minimax-cn")).toBe("minimax");
@@ -811,8 +820,25 @@ describe("free-provider directory isolation", () => {
     }
   });
 
+  test("an id shared by both lists must resolve to the same endpoint", () => {
+    // The rule above only covers `reference` rows, so a CONNECTABLE directory id could be
+    // re-registered against a different host and stay green — that is exactly what #536 proposed
+    // for `glm` (directory: api.z.ai, proposed registry: open.bigmodel.cn). routedProviderConfig()
+    // canonicalizes a saved provider onto the registry baseUrl, so the user's key would have gone
+    // to the other vendor on the next request. Sharing an id is fine; disagreeing on where it
+    // points is not.
+    const registryById = new Map(PROVIDER_REGISTRY.map(entry => [entry.id, entry]));
+    const shared = FREE_PROVIDER_DIRECTORY.filter(row => registryById.has(row.id));
+    expect(shared.length).toBeGreaterThan(0);
+
+    for (const row of shared) {
+      const registryEntry = registryById.get(row.id)!;
+      expect(`${row.id} -> ${registryEntry.baseUrl}`).toBe(`${row.id} -> ${row.baseUrl}`);
+    }
+  });
+
   test("a custom provider named after a directory entry keeps its own destination", () => {
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "qoder",
       providers: {
@@ -845,3 +871,4 @@ describe("free-provider directory isolation", () => {
     }
   });
 });
+

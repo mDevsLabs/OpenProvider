@@ -11,7 +11,7 @@ The current request log shows one combined cache number. For Anthropic, that num
 Before:
 
 ```ts
-export interface OcxUsage {
+export interface oprUsage {
   inputTokens: number;
   outputTokens: number;
   totalTokens?: number;
@@ -24,7 +24,7 @@ export interface OcxUsage {
 After:
 
 ```ts
-export interface OcxUsage {
+export interface oprUsage {
   inputTokens: number;
   outputTokens: number;
   totalTokens?: number;
@@ -166,4 +166,5 @@ Run:
 bun test tests/adapter-usage.test.ts tests/usage-log.test.ts
 bun x tsc --noEmit
 ```
+
 

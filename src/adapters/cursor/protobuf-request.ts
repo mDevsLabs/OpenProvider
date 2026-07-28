@@ -1,7 +1,7 @@
 import { create, fromBinary, toBinary, toJson } from "@bufbuild/protobuf";
 import { fromJson, type JsonValue } from "@bufbuild/protobuf";
 import { ValueSchema } from "@bufbuild/protobuf/wkt";
-import type { OcxAssistantContentPart, OcxMessage, OcxToolResultMessage } from "../../types";
+import type { oprAssistantContentPart, oprMessage, oprToolResultMessage } from "../../types";
 import { namespacedToolName } from "../../types";
 import type { CursorRunRequest } from "./types";
 import { isCursorExternalWireModel } from "./discovery";
@@ -38,13 +38,12 @@ import {
 } from "./gen/agent_pb";
 import {
   appendCursorGenericToolUseHint,
-  appendCursorShellAliasHint,
   cursorToolsForActivePrompt,
   buildCursorToolGuidanceSystemNote,
   buildCursorToolDefinitions,
   cursorRequestHasShellAlias,
   CURSOR_SHELL_ALIAS_SYSTEM_NOTE,
-  OCX_RESPONSES_TOOL_PROVIDER,
+  opr_RESPONSES_TOOL_PROVIDER,
 } from "./tool-definitions";
 
 const encoder = new TextEncoder();
@@ -154,7 +153,7 @@ function systemPromptBlobs(request: CursorRunRequest): StoredRootBlob[] {
 }
 
 function assistantRootText(
-  message: Extract<OcxMessage, { role: "assistant" }>,
+  message: Extract<oprMessage, { role: "assistant" }>,
   includeThinking: boolean,
 ): string {
   if (typeof message.content === "string") return message.content;
@@ -306,7 +305,7 @@ function rootPromptMessages(request: CursorRunRequest): {
   };
 }
 
-function contentText(message: OcxMessage): string {
+function contentText(message: oprMessage): string {
   if (message.role === "toolResult") return toolResultToText(message);
   if (typeof message.content === "string") return message.content;
   return message.content
@@ -320,14 +319,14 @@ function contentText(message: OcxMessage): string {
     .join("\n");
 }
 
-function contentToText(content: OcxToolResultMessage["content"]): string {
+function contentToText(content: oprToolResultMessage["content"]): string {
   if (typeof content === "string") return content;
   return content
     .map(part => part.type === "text" ? part.text : `[image input unsupported by Cursor adapter phase 3: ${part.detail ?? "auto"}]`)
     .join("\n");
 }
 
-function toolResultToText(message: OcxToolResultMessage): string {
+function toolResultToText(message: oprToolResultMessage): string {
   return [
     "[tool_result]",
     `call_id: ${message.toolCallId}`,
@@ -346,7 +345,7 @@ function argBytes(value: unknown): Uint8Array {
   }
 }
 
-function toolCallStep(part: Extract<OcxAssistantContentPart, { type: "toolCall" }>, result?: OcxToolResultMessage): Uint8Array {
+function toolCallStep(part: Extract<oprAssistantContentPart, { type: "toolCall" }>, result?: oprToolResultMessage): Uint8Array {
   const args: Record<string, Uint8Array> = {};
   for (const [key, value] of Object.entries(part.arguments ?? {})) args[key] = argBytes(value);
   const toolName = namespacedToolName(part.namespace, part.name);
@@ -361,7 +360,7 @@ function toolCallStep(part: Extract<OcxAssistantContentPart, { type: "toolCall" 
               name: toolName,
               toolName,
               toolCallId: part.id,
-              providerIdentifier: OCX_RESPONSES_TOOL_PROVIDER,
+              providerIdentifier: opr_RESPONSES_TOOL_PROVIDER,
               args,
             }),
             ...(result ? { result: toolResultPart(result) } : {}),
@@ -372,7 +371,7 @@ function toolCallStep(part: Extract<OcxAssistantContentPart, { type: "toolCall" 
   })));
 }
 
-function toolResultPart(message: OcxToolResultMessage) {
+function toolResultPart(message: oprToolResultMessage) {
   return create(McpToolResultSchema, {
     result: {
       case: "success",
@@ -386,7 +385,7 @@ function toolResultPart(message: OcxToolResultMessage) {
   });
 }
 
-function assistantStep(part: OcxAssistantContentPart): Uint8Array | undefined {
+function assistantStep(part: oprAssistantContentPart): Uint8Array | undefined {
   if (part.type === "toolCall") return toolCallStep(part);
   if (part.type === "thinking") {
     return storeCursorBlob(toBinary(ConversationStepSchema, create(ConversationStepSchema, {
@@ -405,7 +404,7 @@ function assistantStep(part: OcxAssistantContentPart): Uint8Array | undefined {
   })));
 }
 
-function lastActionIndex(messages: readonly OcxMessage[] | undefined): number {
+function lastActionIndex(messages: readonly oprMessage[] | undefined): number {
   if (!messages) return -1;
   for (let i = messages.length - 1; i >= 0; i--) {
     const role = messages[i]?.role;
@@ -424,7 +423,7 @@ function conversationTurns(request: CursorRunRequest, historyMessageStart = 0): 
   const start = externalModel ? Math.max(0, historyMessageStart) : 0;
   const turns: Uint8Array[] = [];
   let current: { userMessage: Uint8Array; steps: Uint8Array[] } | undefined;
-  const pendingToolCalls = new Map<string, Extract<OcxAssistantContentPart, { type: "toolCall" }>>();
+  const pendingToolCalls = new Map<string, Extract<oprAssistantContentPart, { type: "toolCall" }>>();
   const flush = () => {
     if (!current) return;
     for (const part of pendingToolCalls.values()) current.steps.push(toolCallStep(part));
@@ -560,7 +559,7 @@ export function prepareCursorRunRequest(
   const rawText = activePromptText(request);
   const lastRole = request.messages.at(-1)?.role;
   const text = lastRole === "user" || lastRole === "developer"
-    ? appendCursorShellAliasHint(request.tools, appendCursorGenericToolUseHint(request.tools, rawText))
+    ? appendCursorGenericToolUseHint(request.tools, rawText)
     : rawText;
   // Tool-result-only turns resume the remembered Cursor conversation with results in history.
   const lastRawIsToolResult = request.rawMessages?.at(-1)?.role === "toolResult";
@@ -681,3 +680,4 @@ export function prepareCursorRunRequest(
 export function encodeCursorRunRequest(request: CursorRunRequest): Uint8Array {
   return prepareCursorRunRequest(request).bytes;
 }
+

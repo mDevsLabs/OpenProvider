@@ -7,15 +7,15 @@ import {
   clearCursorThreadContinuityForTests,
   lookupCursorThreadConversation,
 } from "../src/adapters/cursor/thread-continuity";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { AdapterEvent, oprParsedRequest, oprProviderConfig } from "../src/types";
 import type { CursorClientMessage, CursorRunRequest, CursorServerMessage } from "../src/adapters/cursor/types";
 
-const provider: OcxProviderConfig = {
+const provider: oprProviderConfig = {
   adapter: "cursor",
   baseUrl: "https://api2.cursor.sh",
 };
 
-const parsed: OcxParsedRequest = {
+const parsed: oprParsedRequest = {
   modelId: "cursor/auto",
   context: { messages: [] },
   stream: false,
@@ -142,7 +142,7 @@ describe("Cursor adapter live transport", () => {
           writeClient() {},
         }),
       });
-      const body: OcxParsedRequest = {
+      const body: oprParsedRequest = {
         modelId: "cursor/auto",
         context: { messages: [{ role: "user", content: "hi", timestamp: 1 }] },
         stream: false,
@@ -196,7 +196,7 @@ describe("Cursor adapter live transport", () => {
     });
 
     const events: AdapterEvent[] = [];
-    const body: OcxParsedRequest = {
+    const body: oprParsedRequest = {
       modelId: "cursor/gpt-5.6-sol",
       context: {
         messages: [
@@ -255,7 +255,7 @@ describe("Cursor adapter live transport", () => {
     });
 
     const events: AdapterEvent[] = [];
-    const body: OcxParsedRequest = {
+    const body: oprParsedRequest = {
       modelId: "cursor/gpt-5.6-sol",
       context: {
         messages: [
@@ -303,7 +303,7 @@ describe("Cursor adapter live transport", () => {
     });
 
     const events: AdapterEvent[] = [];
-    const body: OcxParsedRequest = {
+    const body: oprParsedRequest = {
       modelId: "cursor/gpt-5.6-sol",
       context: { messages: [{ role: "user", content: "run a command", timestamp: 1 }] },
       stream: false,
@@ -334,7 +334,7 @@ describe("Cursor adapter live transport", () => {
       rekeyContextUsage: (from, to) => rekeyCalls.push([from, to]),
     });
 
-    const body: OcxParsedRequest = {
+    const body: oprParsedRequest = {
       modelId: "cursor/gpt-5.6-sol",
       context: {
         messages: [
@@ -387,7 +387,7 @@ describe("Cursor adapter live transport", () => {
       rekeyContextUsage: (from, to) => rekeyCalls.push([from, to]),
     });
 
-    const body: OcxParsedRequest = {
+    const body: oprParsedRequest = {
       modelId: "cursor/auto",
       context: { messages: [{ role: "user", content: "summarize", timestamp: 1 }] },
       stream: false,
@@ -428,7 +428,7 @@ describe("Cursor adapter live transport", () => {
     });
 
     const threadId = "parent-thread-isolate-remember";
-    const body: OcxParsedRequest = {
+    const body: oprParsedRequest = {
       modelId: "cursor/gpt-5.6-sol",
       context: { messages: [{ role: "user", content: "helper ask", timestamp: 1 }] },
       stream: false,
@@ -465,7 +465,7 @@ describe("Cursor adapter live transport", () => {
     });
 
     const events: AdapterEvent[] = [];
-    const body: OcxParsedRequest = {
+    const body: oprParsedRequest = {
       modelId: "cursor/gpt-5.6-sol",
       context: {
         messages: [
@@ -499,3 +499,4 @@ describe("Cursor adapter live transport", () => {
     expect(events.some(event => event.type === "error")).toBe(true);
   });
 });
+

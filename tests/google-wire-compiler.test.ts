@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createGoogleAdapter } from "../src/adapters/google";
 import { compileGoogleWireBody, repairGoogleInvalidRequestBody } from "../src/adapters/google-wire-compiler";
-import type { OcxParsedRequest } from "../src/types";
+import type { oprParsedRequest } from "../src/types";
 
 describe("Google wire compiler", () => {
   test("enforces the conservative wire contract at the final serialization boundary", () => {
@@ -70,7 +70,7 @@ describe("Google wire compiler", () => {
         messages: [{ role: "user", content: "Use the tool" }],
         tools: [{ name: originalName, description: "Test", parameters: { type: "object" } }],
       },
-    } as OcxParsedRequest);
+    } as oprParsedRequest);
     const body = JSON.parse(request.body);
     const wireName = body.tools[0].functionDeclarations[0].name as string;
 
@@ -129,3 +129,4 @@ describe("Google wire compiler", () => {
     expect(repaired.request.generationConfig).toEqual({ maxOutputTokens: 4096 });
   });
 });
+

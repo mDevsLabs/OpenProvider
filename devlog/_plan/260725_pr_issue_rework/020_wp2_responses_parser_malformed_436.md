@@ -82,14 +82,14 @@ index 3e2245d3..c0fdd52e 100644
    | { type: "input_image"; image_url?: string; file_id?: string; detail?: string }
    | { type: "input_file"; file_id?: string; filename?: string };
  
--function inputContentParts(blocks: unknown[] | string | undefined): string | OcxContentPart[] {
-+function inputContentParts(blocks: unknown): string | OcxContentPart[] {
+-function inputContentParts(blocks: unknown[] | string | undefined): string | oprContentPart[] {
++function inputContentParts(blocks: unknown): string | oprContentPart[] {
    if (typeof blocks === "string") return blocks;
 -  if (!blocks) return [];
 +  // The catch-all can also hand back a non-array `content` (an object, a number), which would
 +  // throw at the loop below before any per-block guard runs.
 +  if (!Array.isArray(blocks)) return [];
-   const parts: OcxContentPart[] = [];
+   const parts: oprContentPart[] = [];
    for (const raw of blocks) {
 +    // A malformed message item fails its strict schema and falls through to inputItemSchema's
 +    // permissive catch-all, so blocks reaching here are NOT guaranteed to match the declared
@@ -118,16 +118,16 @@ index 3e2245d3..c0fdd52e 100644
        parts.push({ type: "text", text: `[file: ${ref}]` });
      }
    }
-@@ -56,14 +63,19 @@ function inputContentParts(blocks: unknown[] | string | undefined): string | Ocx
+@@ -56,14 +63,19 @@ function inputContentParts(blocks: unknown[] | string | undefined): string | opr
  
  type OutputBlock = { type: "output_text"; text: string } | { type: "text"; text: string } | { type: "refusal"; refusal: string };
  
--function outputTextOf(blocks: unknown[] | string | undefined): OcxTextContent[] {
-+function outputTextOf(blocks: unknown): OcxTextContent[] {
+-function outputTextOf(blocks: unknown[] | string | undefined): oprTextContent[] {
++function outputTextOf(blocks: unknown): oprTextContent[] {
    if (typeof blocks === "string") return blocks.length > 0 ? [{ type: "text", text: blocks }] : [];
 -  if (!blocks) return [];
 +  if (!Array.isArray(blocks)) return [];
-   const out: OcxTextContent[] = [];
+   const out: oprTextContent[] = [];
    for (const raw of blocks) {
 +    // Same catch-all caveat as inputContentParts: validate before use.
 +    if (!isObj(raw)) continue;
@@ -142,7 +142,7 @@ index 3e2245d3..c0fdd52e 100644
    }
    return out;
  }
-@@ -311,9 +323,7 @@ export function parseRequest(body: unknown): OcxParsedRequest {
+@@ -311,9 +323,7 @@ export function parseRequest(body: unknown): oprParsedRequest {
            content?: unknown;
          };
  
@@ -153,7 +153,7 @@ index 3e2245d3..c0fdd52e 100644
  
          const hasContent =
            typeof content === "string"
-@@ -338,7 +348,7 @@ export function parseRequest(body: unknown): OcxParsedRequest {
+@@ -338,7 +348,7 @@ export function parseRequest(body: unknown): oprParsedRequest {
          switch (msg.role) {
            case "system": {
              pendingReasoning.length = 0;
@@ -162,7 +162,7 @@ index 3e2245d3..c0fdd52e 100644
              const flat = typeof text === "string" ? text : text.map(p => (p.type === "text" ? p.text : "")).join("");
              if (flat.length > 0) systemPrompt.push(flat);
              break;
-@@ -346,12 +356,12 @@ export function parseRequest(body: unknown): OcxParsedRequest {
+@@ -346,12 +356,12 @@ export function parseRequest(body: unknown): oprParsedRequest {
            case "user":
            case "developer": {
              pendingReasoning.length = 0;
@@ -187,7 +187,7 @@ index 00000000..a403cc37
 +import { parseRequest } from "../src/responses/parser";
 +import { createGoogleAdapter } from "../src/adapters/google";
 +import { createAnthropicAdapter } from "../src/adapters/anthropic";
-+import type { OcxProviderConfig } from "../src/types";
++import type { oprProviderConfig } from "../src/types";
 +
 +// A message item whose content blocks do not match their strict schema fails
 +// `userMessageItemSchema` / `assistantMessageItemSchema` and falls through to
@@ -276,8 +276,8 @@ index 00000000..a403cc37
 +
 +  test("adapters build a request from malformed input instead of throwing", async () => {
 +    const parsed = parseRequest(inputOf("user", [{ type: "input_text" }]));
-+    const google = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "k" } as unknown as OcxProviderConfig;
-+    const anthropic = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x" } as unknown as OcxProviderConfig;
++    const google = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "k" } as unknown as oprProviderConfig;
++    const anthropic = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x" } as unknown as oprProviderConfig;
 +
 +    await expect(createGoogleAdapter(google).buildRequest(parsed)).resolves.toBeDefined();
 +    await expect(createAnthropicAdapter(anthropic).buildRequest(parsed)).resolves.toBeDefined();
@@ -597,8 +597,8 @@ PR의 assistant malformed test 근처에 `[null]` 직접 사례를 추가한다.
 +      { type: "input_image" },
 +      { type: "input_file" },
 +    ]));
-     const google = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "k" } as unknown as OcxProviderConfig;
-     const anthropic = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x" } as unknown as OcxProviderConfig;
+     const google = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "k" } as unknown as oprProviderConfig;
+     const anthropic = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x" } as unknown as oprProviderConfig;
  
 -    await expect(createGoogleAdapter(google).buildRequest(parsed)).resolves.toBeDefined();
 +    const googleRequest = await createGoogleAdapter(google).buildRequest(parsed);
@@ -680,3 +680,4 @@ raw input에 포함해 **Google wire 결과만** 관찰한다. Cursor 검증은 
 ## 실행 영수증
 
 _(C/D 단계에서 작성)_
+

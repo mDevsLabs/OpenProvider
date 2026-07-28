@@ -41,7 +41,7 @@ make every model (even gpt models) disconnect". 댓글 스레드에서 원인 �
    노출 → 창 닫기(대표 재현; logoff/작업관리자 종료도 같은 계열의 강제 종료) →
    Windows가 콘솔의 모든 프로세스에 `CTRL_CLOSE_EVENT` 전달, 기본 핸들러가 프로세스
    종료(MS Learn HandlerRoutine) → 래퍼가 Bun을 동기 실행하므로(src/service.ts:320
-   `"%OCX_BUN%" "%OCX_CLI%" start`) 래퍼+프록시가 같은 콘솔 수명에 묶여 함께 사망
+   `"%opr_BUN%" "%opr_CLI%" start`) 래퍼+프록시가 같은 콘솔 수명에 묶여 함께 사망
    → Codex가 바라보는 localhost 프록시 부재 → 모든 모델 disconnect.
    **needs-verification**: 이 종료가 Task Scheduler에서 실패로 기록되어
    `RestartOnFailure`(PT1M x3)가 발동하는지는 미확인 — 공식 문서는 "task failure 시
@@ -74,7 +74,7 @@ make every model (even gpt models) disconnect". 댓글 스레드에서 원인 �
 5. **현재 코드가 이미 갖춘 것 인벤토리** — `MultipleInstancesPolicy=IgnoreNew`
    (src/service.ts:357, 중복 방지), `RestartOnFailure PT1M x3`(:368),
    래퍼 배치의 5s 재시작 루프(ping 지연, :325), `writeServiceAssetWithRetry`
-   (EBUSY 재시도), `bakedServicePathsDiagnostic`(스테일 경로 진단), `OCX_SERVICE=1`
+   (EBUSY 재시도), `bakedServicePathsDiagnostic`(스테일 경로 진단), `opr_SERVICE=1`
    재주입 계약. 빠진 것: "창이 안 보이고 창 닫기로 죽일 수 없는" 실행 모드 +
    비정상 종료 시 재시작 보장(실측 필요).
 
@@ -136,3 +136,4 @@ logon trigger(src/service.ts:345-348)와 불일치 — Windows 한정 known limi
   README 시맨틱 정정을 020 수용 기준에 포함, "대표 재현은 창 닫기" 표현.
 - INFO 확인: 중복 이슈 없음(#30 graceful drain, #63 WSL은 별개), 2-이슈 분리 적절
   (Bug=증상/재현/영향, Feature=설계 선택/수용 기준 소유).
+

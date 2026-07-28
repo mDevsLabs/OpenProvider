@@ -6,7 +6,7 @@ import { getConfigDir } from "../config";
 import { DEBUG_ENV } from "../lib/debug-settings";
 import type { DebugLogEntry } from "../lib/debug-log-buffer";
 import { redactSecretString, redactSecrets } from "../lib/redact";
-import type { OcxUsage } from "../types";
+import type { oprUsage } from "../types";
 
 export const USAGE_DEBUG_ENV = DEBUG_ENV.usage;
 export { isUsageDebugEnabled } from "../lib/debug-settings";
@@ -25,7 +25,7 @@ export interface UsageDebugRecord {
   upstreamStatus: number;
   bodyKind: UsageDebugBodyKind;
   bodySample: string;
-  extractedUsage: OcxUsage | null;
+  extractedUsage: oprUsage | null;
 }
 
 export function usageDebugPath(): string {
@@ -93,3 +93,4 @@ export function getUsageDebugLogEntries(options?: { after?: number; limit?: numb
     return [];
   }
 }
+

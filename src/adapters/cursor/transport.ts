@@ -1,4 +1,4 @@
-import type { OcxProviderConfig } from "../../types";
+import type { oprProviderConfig } from "../../types";
 import type { CursorClientMessage, CursorRunRequest, CursorServerMessage } from "./types";
 
 export interface CursorTransport {
@@ -14,7 +14,7 @@ export interface CursorTransport {
 }
 
 export interface CursorTransportFactoryInput {
-  provider: OcxProviderConfig;
+  provider: oprProviderConfig;
   headers?: Headers;
   /** Pre-first-frame deadline (dial + first server frame). Defaults to 30s when omitted. */
   firstFrameTimeoutMs?: number;
@@ -53,3 +53,4 @@ export function createDisabledCursorTransport(): CursorTransport {
     close() {},
   };
 }
+

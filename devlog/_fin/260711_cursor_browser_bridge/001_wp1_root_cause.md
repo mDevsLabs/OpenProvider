@@ -8,7 +8,7 @@ is an UNREGISTERED / SYNTHETIC-PROVIDER routing gap. Cursor DOES surface
 dynamically advertised MCP tools - but only ones under a registered, routable
 MCP provider (provider.mcpServers). openprovider advertises Codex client tools
 (mcp__node_repl__js and every other client tool) under the SYNTHETIC provider
-id openprovider-responses (OCX_RESPONSES_TOOL_PROVIDER), which Cursor cannot route
+id openprovider-responses (opr_RESPONSES_TOOL_PROVIDER), which Cursor cannot route
 to, so it hides/rejects those tools from the model's callable catalog. The
 Browser plugin runs on mcp__node_repl__js, so it is not callable under Cursor
 routing and the browser cannot start. No config flag opens it - the earlier
@@ -36,7 +36,7 @@ exec, a different mechanism.
 
 - openprovider advertises client tools to Cursor via RequestContext.tools
   (native-exec.ts:140 requestContextArgs -> [...mcpToolDefs, ...clientToolDefs];
-  buildCursorToolDefinitions maps request.tools to OCX_RESPONSES_TOOL_PROVIDER
+  buildCursorToolDefinitions maps request.tools to opr_RESPONSES_TOOL_PROVIDER
   MCP defs; live-transport.ts:417). The advertise+return bridge was built in
   devlog _fin/350 phase 42-43.
 - Same channel, different routability: provider.mcpServers tools go into the
@@ -95,3 +95,4 @@ what routable provider identity Cursor accepts for dynamically advertised tools.
   tool for a normal prompt (tool-definitions.ts:162), so probe_client_tool did
   populate clientToolDefs - the non-surfacing is Cursor-side routability, not a
   local filter. AgentRunRequest.mcpTools dead-end confirmed (phase45).
+

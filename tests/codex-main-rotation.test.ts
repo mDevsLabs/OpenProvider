@@ -34,7 +34,7 @@ import {
   primeCodexPoolQuotas,
   updateAccountQuota,
 } from "../src/codex/auth-api";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const STORE_DIR = join(import.meta.dir, ".tmp-main-rotation-store");
 const CODEX_DIR = join(import.meta.dir, ".tmp-main-rotation-codex");
@@ -58,7 +58,7 @@ function saveCred(id: string): void {
   });
 }
 
-function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function makeConfig(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     providers: {},
     codexAccounts: [
@@ -69,7 +69,7 @@ function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
     autoSwitchThreshold: 80,
     upstreamFailoverThreshold: 3,
     ...overrides,
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 describe("main account rotation (Option A)", () => {
@@ -477,3 +477,4 @@ describe("main account rotation (Option A)", () => {
     expect(pickLowestUsageCodexAccount(config, undefined, now)).toBe("b");
   });
 });
+

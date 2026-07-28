@@ -253,7 +253,7 @@ keys. Locale parity is a test assertion, not a best-effort translation follow-up
 (`scripts/openai-three-tier-runtime-child.ts` -> `scripts/openai-provider-option-runtime-child.ts`)
 is a CYCLE 2 deliverable owned by this document, so this cycle's exit gate is independently
 reachable; Cycle 3 keeps only the parent smoke/evidence orchestration.
-Use that renamed runtime child with temporary `OPENCODEX_HOME`, `CODEX_HOME`, and `port: 0`.
+Use that renamed runtime child with temporary `OpenProvider_HOME`, `CODEX_HOME`, and `port: 0`.
 The child must emit its selected port/PID and serve fixture management data; it must not discover,
 signal, drain, or bind `127.0.0.1:10100`.
 
@@ -312,3 +312,4 @@ the isolated child is stopped.
   `tests/codex-account-mode-state.test.ts`.
 
 Terminal status: **PASS**.
+

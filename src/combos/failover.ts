@@ -1,5 +1,5 @@
 import { classifyError, isCyberPolicyCode } from "../lib/errors";
-import type { OcxComboTarget } from "../types";
+import type { oprComboTarget } from "../types";
 import { targetKey } from "./types";
 
 interface TargetCooldown {
@@ -14,7 +14,7 @@ const targetCooldowns = new Map<string, TargetCooldown>();
 
 function cooldownMapKey(
   comboId: string,
-  target: Pick<OcxComboTarget, "provider" | "model">,
+  target: Pick<oprComboTarget, "provider" | "model">,
 ): string {
   return `${comboId}\0${targetKey(target)}`;
 }
@@ -39,7 +39,7 @@ export function parseRetryAfterMs(
 
 export function isComboTargetInCooldown(
   comboId: string,
-  target: Pick<OcxComboTarget, "provider" | "model">,
+  target: Pick<oprComboTarget, "provider" | "model">,
   now = Date.now(),
 ): boolean {
   const key = cooldownMapKey(comboId, target);
@@ -54,7 +54,7 @@ export function isComboTargetInCooldown(
 
 export function coolComboTarget(
   comboId: string,
-  target: Pick<OcxComboTarget, "provider" | "model">,
+  target: Pick<oprComboTarget, "provider" | "model">,
   options?: { retryAfter?: string | null; now?: number; cooldownMs?: number },
 ): void {
   const now = options?.now ?? Date.now();
@@ -108,3 +108,4 @@ export function comboFailureDecision(
   }
   return "stop";
 }
+

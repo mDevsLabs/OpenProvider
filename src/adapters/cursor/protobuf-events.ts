@@ -1,10 +1,14 @@
-import type { OcxUsage } from "../../types";
+import type { oprUsage } from "../../types";
 import type { AgentServerMessage, McpArgs, ToolCall } from "./gen/agent_pb";
 import { decodeCursorArgsMap } from "./arg-codec";
 import { normalizeArgKeys } from "./arg-normalize";
 import {
+  cursorShellBridgeArgsValid,
+  cursorShellBridgeDropError,
+  defaultShellBridgeArgNormalizeSchema,
+  isCodexShellBridgeToolName,
   normalizeCursorWireName,
-  OCX_RESPONSES_TOOL_PROVIDER,
+  opr_RESPONSES_TOOL_PROVIDER,
   resolveShellBridgeAliasKey,
   responsesToolNameFromCursorWire,
 } from "./tool-definitions";
@@ -120,7 +124,7 @@ export function createCursorContextUsageTracker(options: { maxEntries?: number; 
 }
 
 export interface CursorProtobufEventState {
-  usage: OcxUsage;
+  usage: oprUsage;
   /**
    * Absolute conversation context size from Cursor's `conversationCheckpointUpdate.usedTokens`
    * (authoritative cumulative context, NOT a per-turn delta). Kept separate from `usage.outputTokens`
@@ -206,7 +210,7 @@ export function reportableContextTokens(state: CursorProtobufEventState): number
   return Math.max(current, carry);
 }
 
-export function usageFromContextTokens(state: CursorProtobufEventState, contextTokens: number): OcxUsage {
+export function usageFromContextTokens(state: CursorProtobufEventState, contextTokens: number): oprUsage {
   return {
     ...state.usage,
     inputTokens: Math.max(0, contextTokens - state.usage.outputTokens),
@@ -218,7 +222,7 @@ export function usageFromContextTokens(state: CursorProtobufEventState, contextT
 export function mcpArgsFromToolCall(toolCall: ToolCall | undefined): McpArgs | undefined {
   if (toolCall?.tool.case !== "mcpToolCall") return undefined;
   const args = toolCall.tool.value.args;
-  return args?.providerIdentifier === OCX_RESPONSES_TOOL_PROVIDER ? args : undefined;
+  return args?.providerIdentifier === opr_RESPONSES_TOOL_PROVIDER ? args : undefined;
 }
 
 function mcpWireNameFromArgs(args: McpArgs | undefined): string | undefined {
@@ -308,7 +312,7 @@ export function mapSyntheticMcpExecToToolEvents(
   fallbackCallId = "cursor_mcp_exec",
   options: { allowEmptyArgs?: boolean; state?: CursorProtobufEventState } = {},
 ): CursorServerMessage[] {
-  if (args.providerIdentifier !== OCX_RESPONSES_TOOL_PROVIDER) return [];
+  if (args.providerIdentifier !== opr_RESPONSES_TOOL_PROVIDER) return [];
   if (options.allowEmptyArgs !== true && !hasMcpArgBytes(args)) return [];
   const cursorWireName = mcpWireNameFromArgs(args);
   if (!cursorWireName) return [{ type: "error", message: "Cursor requested a Responses tool without a tool name" }];
@@ -324,10 +328,18 @@ export function mapSyntheticMcpExecToToolEvents(
     out.push(...commitToolCall(options.state, callId, finalArgs));
     return out;
   }
+  const responsesName = responsesToolNameFromCursorWire(cursorWireName);
+  const normSchema = defaultShellBridgeArgNormalizeSchema(responsesName);
+  const normalizedArgs = JSON.stringify(normalizeArgKeys(decodeCursorArgsMap(args?.args), normSchema));
+  if (!cursorShellBridgeArgsValid(normalizedArgs, responsesName, normSchema)) {
+    if (isCodexShellBridgeToolName(responsesName)) {
+      return [{ type: "error", message: cursorShellBridgeDropError(responsesName) }];
+    }
+  }
   // Stateless fallback (no shared event state): emit a complete, self-contained tool call.
   return [
-    { type: "tool_call_start", id: callId, name: responsesToolNameFromCursorWire(cursorWireName) },
-    { type: "tool_call_delta", arguments: decodeMcpArgs(args) },
+    { type: "tool_call_start", id: callId, name: responsesName },
+    ...(normalizedArgs.length > 2 ? [{ type: "tool_call_delta" as const, arguments: normalizedArgs }] : []),
     { type: "tool_call_end", id: callId },
   ];
 }
@@ -361,9 +373,19 @@ function recordToolCall(state: CursorProtobufEventState, callId: string, cursorW
  * recorded in `openToolCalls`. Because each completion emits a whole non-interleaved unit, the bridge
  * (which tracks a single current tool call) serializes parallel Cursor calls correctly.
  */
+function dropShellBridgeCall(state: CursorProtobufEventState, callId: string, toolName: string): CursorServerMessage[] {
+  state.openToolCalls.delete(callId);
+  state.completedToolCalls.add(callId);
+  return [{ type: "error", message: cursorShellBridgeDropError(toolName) }];
+}
+
 function commitToolCall(state: CursorProtobufEventState, callId: string, finalArgs: string): CursorServerMessage[] {
   const open = state.openToolCalls.get(callId);
   if (!open) return [];
+  const schema = toolSchemaForWireName(state, open.name);
+  if (!cursorShellBridgeArgsValid(finalArgs, open.name, schema)) {
+    if (isCodexShellBridgeToolName(open.name)) return dropShellBridgeCall(state, callId, open.name);
+  }
   const out: CursorServerMessage[] = [{ type: "tool_call_start", id: callId, name: open.name }];
   if (finalArgs.length > 0) out.push({ type: "tool_call_delta", arguments: finalArgs });
   out.push(...endToolCall(state, callId));
@@ -476,7 +498,7 @@ export function mapCursorProtobufServerMessage(
  * then the raw per-turn counters. Shared with the partial-usage path in live-transport
  * so a failed turn reports the same input side as a clean one (#373).
  */
-export function resolvedTurnUsage(state: CursorProtobufEventState): OcxUsage {
+export function resolvedTurnUsage(state: CursorProtobufEventState): oprUsage {
   const contextTokens = reportableContextTokens(state);
   if (contextTokens !== undefined) return usageFromContextTokens(state, contextTokens);
   const estimate = state.estimatedInputTokens;
@@ -512,3 +534,4 @@ export function finalizeTurnEvents(state: CursorProtobufEventState): CursorServe
   // input to 0 in case Cursor reports a checkpoint smaller than the streamed output delta.
   return [{ type: "done", usage: resolvedTurnUsage(state) }];
 }
+

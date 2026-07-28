@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { getVertexAccessToken, __resetVertexTokenCache } from "../src/lib/gcp-adc";
 import { createGoogleAdapter } from "../src/adapters/google";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
 const OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
 let tmp: string;
@@ -15,13 +15,13 @@ let prevEnv: Record<string, string | undefined> = {};
 let oauthCalls = 0;
 let lastBody = "";
 
-function parsed(modelId = "gemini-3-pro"): OcxParsedRequest {
+function parsed(modelId = "gemini-3-pro"): oprParsedRequest {
   return {
     modelId,
     stream: true,
     context: { messages: [{ role: "user", content: "hi" }], systemPrompt: [], tools: [] },
     options: {},
-  } as unknown as OcxParsedRequest;
+  } as unknown as oprParsedRequest;
 }
 
 beforeAll(async () => {
@@ -116,7 +116,7 @@ describe("gcp-adc resolver", () => {
 
 describe("google adapter vertex mode", () => {
   test("vertex + api key -> aiplatform host + x-goog-api-key (no ADC fetch)", async () => {
-    const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", googleMode: "vertex", apiKey: "real-key" } as OcxProviderConfig;
+    const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", googleMode: "vertex", apiKey: "real-key" } as oprProviderConfig;
     const req = await createGoogleAdapter(provider).buildRequest(parsed());
     expect(req.url).toBe("https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-3-pro:streamGenerateContent?alt=sse");
     expect(req.headers["x-goog-api-key"]).toBe("real-key");
@@ -125,7 +125,7 @@ describe("google adapter vertex mode", () => {
 
   test("vertex + ADC -> regional host + Authorization Bearer", async () => {
     setEnv("GOOGLE_APPLICATION_CREDENTIALS", saPath);
-    const provider = { adapter: "google", baseUrl: "https://x", googleMode: "vertex", project: "proj-1", location: "us-central1" } as OcxProviderConfig;
+    const provider = { adapter: "google", baseUrl: "https://x", googleMode: "vertex", project: "proj-1", location: "us-central1" } as oprProviderConfig;
     const req = await createGoogleAdapter(provider).buildRequest(parsed());
     expect(req.url).toBe("https://us-central1-aiplatform.googleapis.com/v1/projects/proj-1/locations/us-central1/publishers/google/models/gemini-3-pro:streamGenerateContent?alt=sse");
     expect(req.headers["Authorization"]).toBe("Bearer vertex-tok");
@@ -133,13 +133,13 @@ describe("google adapter vertex mode", () => {
 
   test("vertex + ADC + location global -> global aiplatform host", async () => {
     setEnv("GOOGLE_APPLICATION_CREDENTIALS", saPath);
-    const provider = { adapter: "google", baseUrl: "https://x", googleMode: "vertex", project: "proj-1", location: "global" } as OcxProviderConfig;
+    const provider = { adapter: "google", baseUrl: "https://x", googleMode: "vertex", project: "proj-1", location: "global" } as oprProviderConfig;
     const req = await createGoogleAdapter(provider).buildRequest(parsed());
     expect(req.url).toBe("https://aiplatform.googleapis.com/v1/projects/proj-1/locations/global/publishers/google/models/gemini-3-pro:streamGenerateContent?alt=sse");
   });
 
   test("ai-studio default mode is unchanged (no regression)", async () => {
-    const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "ai-key" } as OcxProviderConfig;
+    const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "ai-key" } as oprProviderConfig;
     const req = await createGoogleAdapter(provider).buildRequest(parsed());
     expect(req.url).toBe("https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro:streamGenerateContent?alt=sse");
     expect(req.headers["x-goog-api-key"]).toBe("ai-key");
@@ -246,3 +246,4 @@ describe("gcp-adc token-exchange hardening", () => {
     expect(await getVertexAccessToken()).toBe("tok-after-rotation");
   });
 });
+

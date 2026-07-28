@@ -79,7 +79,7 @@ Rationale: request logs should answer "which pool slot was used?" without exposi
 All Codex Auth management mutations must update both:
 
 1. persisted `~/.openprovider/config.json`
-2. in-memory runtime `OcxConfig` used by the running proxy
+2. in-memory runtime `oprConfig` used by the running proxy
 
 Previously fixed paths:
 
@@ -388,3 +388,4 @@ Release should not proceed unless all are true:
 7. Quota rows remain aligned in light and dark mode.
 8. API and docs do not expose raw personal account identifiers or tokens.
 ```
+

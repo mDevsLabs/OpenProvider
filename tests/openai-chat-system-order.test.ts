@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { createOpenAIChatAdapter } from "../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
-const provider: OcxProviderConfig = {
+const provider: oprProviderConfig = {
   adapter: "openai-chat",
   baseUrl: "http://localhost:1234/v1",
   apiKey: "local",
 };
 
-function buildMessages(context: OcxParsedRequest["context"]): Array<Record<string, unknown>> {
+function buildMessages(context: oprParsedRequest["context"]): Array<Record<string, unknown>> {
   const request = createOpenAIChatAdapter(provider).buildRequest({
     modelId: "local-model",
     context,
@@ -101,3 +101,4 @@ describe("openai-chat system message ordering", () => {
     });
   });
 });
+

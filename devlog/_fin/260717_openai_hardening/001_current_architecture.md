@@ -10,8 +10,8 @@
   `openai-apikey` as one API-key provider.
 - `src/providers/derive.ts` clones selected registry fields into config seeds and
   the GUI/CLI projections.
-- `src/types.ts` stores Codex account-pool state globally on `OcxConfig`; an
-  `OcxProviderConfig` has no declaration of whether a forward provider is Direct
+- `src/types.ts` stores Codex account-pool state globally on `oprConfig`; an
+  `oprProviderConfig` has no declaration of whether a forward provider is Direct
   or pool-owned.
 
 ### Routing and authentication
@@ -71,7 +71,7 @@
 4. **OpenAI API GPT-5.6 context metadata is stale.** The registry pins 372,000 while
    current official OpenAI model pages state a 1,050,000 context window.
 5. **Pro mode has no selectable representation.** Upstream Pro is a request mode on
-   a base model, not a separate model id, while the requested OCX UX needs stable
+   a base model, not a separate model id, while the requested opr UX needs stable
    picker ids.
 6. **Generic pattern routing will become ambiguous.** Adding `openai-multi` to the
    known OpenAI names without explicit namespace policy could let a bare `gpt-*`
@@ -114,3 +114,4 @@
   surface for a three-alias requirement.
 - **Rewrite Pro ids in catalog/history:** loses the user's selected identity and
   breaks disable/subagent/history consistency.
+

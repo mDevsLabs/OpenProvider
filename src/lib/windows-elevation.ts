@@ -159,7 +159,7 @@ export function resolveTrustedWindowsSchtasksExe(): string {
 
 /** Stable machine-readable marker for a denied `schtasks /create`. Crosses the CLI→proxy boundary. */
 export const WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER =
-  "OCX_ERROR_CODE=WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED";
+  "opr_ERROR_CODE=WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED";
 
 /**
  * Reserved elevated-scheduler protocol exit codes.
@@ -169,20 +169,20 @@ export const WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER =
  * The elevated script never exits with raw schtasks codes — only these protocol values —
  * so the parent can classify the transaction without a user-controlled result file.
  */
-export const OCX_ELEVATED_SUCCESS = 0;
-export const OCX_ELEVATED_CREATE_FAILED = 10;
-export const OCX_ELEVATED_RUN_FAILED_ROLLED_BACK = 11;
-export const OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED = 12;
-export const OCX_ELEVATED_PROTOCOL_FAILED = 13;
+export const opr_ELEVATED_SUCCESS = 0;
+export const opr_ELEVATED_CREATE_FAILED = 10;
+export const opr_ELEVATED_RUN_FAILED_ROLLED_BACK = 11;
+export const opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED = 12;
+export const opr_ELEVATED_PROTOCOL_FAILED = 13;
 /** Windows ERROR_CANCELLED — reserved for UAC denial; never emitted by the elevated script. */
-export const OCX_ELEVATED_UAC_CANCELLED = 1223;
+export const opr_ELEVATED_UAC_CANCELLED = 1223;
 
-export const OCX_ELEVATED_PROTOCOL_CODES = [
-  OCX_ELEVATED_SUCCESS,
-  OCX_ELEVATED_CREATE_FAILED,
-  OCX_ELEVATED_RUN_FAILED_ROLLED_BACK,
-  OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
-  OCX_ELEVATED_PROTOCOL_FAILED,
+export const opr_ELEVATED_PROTOCOL_CODES = [
+  opr_ELEVATED_SUCCESS,
+  opr_ELEVATED_CREATE_FAILED,
+  opr_ELEVATED_RUN_FAILED_ROLLED_BACK,
+  opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
+  opr_ELEVATED_PROTOCOL_FAILED,
 ] as const;
 
 export type WindowsSchtasksOperation = "create" | "run" | "query" | "delete" | "end" | "other";
@@ -343,10 +343,10 @@ export function buildWindowsElevatedArgumentList(args: string[]): string {
 
 /** Classify an elevated-process exit code into a stable scheduler outcome. */
 export function classifyElevatedSchedulerExitCode(exitCode: number): ElevatedSchedulerOutcome {
-  if (exitCode === OCX_ELEVATED_SUCCESS) return "success";
-  if (exitCode === OCX_ELEVATED_CREATE_FAILED) return "create-failed";
-  if (exitCode === OCX_ELEVATED_RUN_FAILED_ROLLED_BACK) return "run-failed-rolled-back";
-  if (exitCode === OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED) return "run-failed-rollback-failed";
+  if (exitCode === opr_ELEVATED_SUCCESS) return "success";
+  if (exitCode === opr_ELEVATED_CREATE_FAILED) return "create-failed";
+  if (exitCode === opr_ELEVATED_RUN_FAILED_ROLLED_BACK) return "run-failed-rolled-back";
+  if (exitCode === opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED) return "run-failed-rollback-failed";
   // Malformed / unexpected / missing-ExitCode-normalized codes fail closed.
   return "protocol-failed";
 }
@@ -481,7 +481,7 @@ export function startPowerShellCommand(commandScript: string): WindowsElevationE
       if (typeof code === "number") {
         // Only treat UAC-cancellation text as cancelled when the process did not succeed.
         if (
-          code === OCX_ELEVATED_UAC_CANCELLED
+          code === opr_ELEVATED_UAC_CANCELLED
           || (code !== 0 && windowsUacCancelledText(detail))
         ) {
           settle(() => reject(new WindowsElevationError(
@@ -517,10 +517,10 @@ export function runWindowsElevated(file: string, args: string[]): Promise<number
     `$p = Start-Process -FilePath ${psSingleQuote(file)}`,
     argumentList.length > 0 ? ` -ArgumentList ${psSingleQuote(argumentList)}` : "",
     " -Verb RunAs -WindowStyle Hidden -PassThru -Wait;",
-    `if ($null -eq $p) { exit ${OCX_ELEVATED_UAC_CANCELLED} }`,
+    `if ($null -eq $p) { exit ${opr_ELEVATED_UAC_CANCELLED} }`,
     "$null = $p.Handle;",
     // Missing ExitCode is a protocol failure for single-file elevation (not success).
-    `if ($null -eq $p.ExitCode) { exit ${OCX_ELEVATED_PROTOCOL_FAILED} }`,
+    `if ($null -eq $p.ExitCode) { exit ${opr_ELEVATED_PROTOCOL_FAILED} }`,
     "exit $p.ExitCode",
   ].join("");
 
@@ -543,20 +543,20 @@ export function buildElevatedSchtasksCreateAndRunScript(
   const deleteList = buildWindowsElevatedArgumentList(deleteArgs);
   return [
     `$schtasks = ${psSingleQuote(schtasksPath)}`,
-    "function Invoke-OcxSchtasks([string]$ArgList) {",
+    "function Invoke-oprSchtasks([string]$ArgList) {",
     "  $p = Start-Process -FilePath $schtasks -ArgumentList $ArgList -Wait -PassThru -WindowStyle Hidden",
     "  if ($null -eq $p) { return 1 }",
     "  $null = $p.Handle",
     "  if ($null -eq $p.ExitCode) { return 1 }",
     "  return [int]$p.ExitCode",
     "}",
-    `$createCode = Invoke-OcxSchtasks ${psSingleQuote(createList)}`,
-    `if ($createCode -ne 0) { exit ${OCX_ELEVATED_CREATE_FAILED} }`,
-    `$runCode = Invoke-OcxSchtasks ${psSingleQuote(runList)}`,
-    `if ($runCode -eq 0) { exit ${OCX_ELEVATED_SUCCESS} }`,
-    `$deleteCode = Invoke-OcxSchtasks ${psSingleQuote(deleteList)}`,
-    `if ($deleteCode -eq 0) { exit ${OCX_ELEVATED_RUN_FAILED_ROLLED_BACK} }`,
-    `exit ${OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED}`,
+    `$createCode = Invoke-oprSchtasks ${psSingleQuote(createList)}`,
+    `if ($createCode -ne 0) { exit ${opr_ELEVATED_CREATE_FAILED} }`,
+    `$runCode = Invoke-oprSchtasks ${psSingleQuote(runList)}`,
+    `if ($runCode -eq 0) { exit ${opr_ELEVATED_SUCCESS} }`,
+    `$deleteCode = Invoke-oprSchtasks ${psSingleQuote(deleteList)}`,
+    `if ($deleteCode -eq 0) { exit ${opr_ELEVATED_RUN_FAILED_ROLLED_BACK} }`,
+    `exit ${opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED}`,
   ].join("; ");
 }
 
@@ -594,9 +594,9 @@ export function startElevatedSchtasksCreateAndRun(
       inner,
     ]))}`,
     " -Verb RunAs -WindowStyle Hidden -PassThru -Wait;",
-    `if ($null -eq $p) { exit ${OCX_ELEVATED_UAC_CANCELLED} }`,
+    `if ($null -eq $p) { exit ${opr_ELEVATED_UAC_CANCELLED} }`,
     "$null = $p.Handle;",
-    `if ($null -eq $p.ExitCode) { exit ${OCX_ELEVATED_PROTOCOL_FAILED} }`,
+    `if ($null -eq $p.ExitCode) { exit ${opr_ELEVATED_PROTOCOL_FAILED} }`,
     "exit $p.ExitCode",
   ].join("");
 
@@ -625,4 +625,5 @@ export function runElevatedSchtasksCreateAndRun(
 ): Promise<ElevatedSchtasksCreateAndRunResult> {
   return startElevatedSchtasksCreateAndRun(schtasksPath, createArgs, runArgs, deleteArgs).completion;
 }
+
 

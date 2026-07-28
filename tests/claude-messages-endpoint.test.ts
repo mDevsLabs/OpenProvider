@@ -13,7 +13,7 @@ import {
   resolvePassthroughBodyGuard,
   tapAnthropicSseForLog,
 } from "../src/server/claude-messages";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 let testDir = "";
@@ -64,7 +64,7 @@ function mockChatUpstreamCapturing() {
   return { server, captured };
 }
 
-function mockConfig(baseUrl: string, claudeCode?: OcxConfig["claudeCode"]): OcxConfig {
+function mockConfig(baseUrl: string, claudeCode?: oprConfig["claudeCode"]): oprConfig {
   return {
     port: 0,
     defaultProvider: "mock",
@@ -72,7 +72,7 @@ function mockConfig(baseUrl: string, claudeCode?: OcxConfig["claudeCode"]): OcxC
       mock: { adapter: "openai-chat", baseUrl, apiKey: "k", allowPrivateNetwork: true },
     },
     ...(claudeCode ? { claudeCode } : {}),
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 test("POST /v1/messages?beta=true streams an Anthropic-shaped turn end to end", async () => {
@@ -433,7 +433,7 @@ test("A5: non-stream bounded read classifies stall and overflow, passes clean bo
 });
 
 test("A6: body-guard config normalization — 0 disables, negatives fall back, sub-second clamps to 1s", () => {
-  const guardFor = (claudeCode: OcxConfig["claudeCode"]) =>
+  const guardFor = (claudeCode: oprConfig["claudeCode"]) =>
     resolvePassthroughBodyGuard(mockConfig("http://127.0.0.1:1/v1", claudeCode));
   expect(guardFor({ bodyStallSec: 0, bodyMaxBytes: 0 })).toMatchObject({ stallMs: 0, maxBytes: 0 });
   expect(guardFor({ bodyStallSec: -5, bodyMaxBytes: -1 })).toMatchObject({ stallMs: 90_000, maxBytes: 64 * 1024 * 1024 });
@@ -521,7 +521,7 @@ test("native openai-responses route carries prompt_cache_key + synthesized sessi
     providers: {
       native: { adapter: "openai-responses", baseUrl: `${upstream.url.toString().replace(/\/$/, "")}/v1`, authMode: "forward", allowPrivateNetwork: true },
     },
-  } as OcxConfig);
+  } as oprConfig);
   const server = startServer(0);
   try {
     const response = await fetch(new URL("/v1/messages", server.url), {
@@ -620,7 +620,7 @@ test("routed Claude requests give OpenAI sidecars main auth without leaking it t
     },
     webSearchSidecar: { backend: "openai" },
     visionSidecar: { backend: "openai" },
-  } as OcxConfig;
+  } as oprConfig;
   globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
     const requestUrl = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
     const url = new URL(requestUrl);
@@ -845,4 +845,5 @@ test("count_tokens is CJK-aware: Korean body counts more tokens than equal-lengt
     server.stop(true);
   }
 });
+
 

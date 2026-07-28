@@ -31,7 +31,7 @@ Those remain P1 follow-up phases.
 
 ### ADD src/adapters/kiro-tools.ts
 
-- export `convertKiroTools(parsed: OcxParsedRequest): unknown[]`
+- export `convertKiroTools(parsed: oprParsedRequest): unknown[]`
 - recursively sanitize schemas:
   - remove every `additionalProperties` key
   - remove `required` if it is an empty array
@@ -61,3 +61,4 @@ required is preserved.
 ## Commit
 
 fix(kiro): sanitize tool schemas before CodeWhisperer payload
+

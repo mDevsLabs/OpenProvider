@@ -8,7 +8,7 @@
 
 `packages/ai/src/providers/cursor/client-version.ts` owns one `CURSOR_CLIENT_VERSION = "cli-2026.02.13-41ac335"`, used by model discovery and run transport. Its invariant is valuable: one backend integration should not silently drift because only one caller was updated.
 
-### OCX
+### opr
 
 - discovery: `src/adapters/cursor/live-models.ts:20` — `cli-2026.02.13-41ac335`
 - run: `src/adapters/cursor/live-transport.ts:56` — `cli-2026.07.08-0c04a8a`
@@ -26,7 +26,7 @@ The centralization can be imported as an invariant, but choosing the older jawco
 
 `openai-bounded-rate-limits.ts` wraps the OpenAI SDK fetch. A 429 is marked `x-should-retry:false` when Retry-After exceeds 60 seconds or the body matches permanent quota phrases such as `out_of_credits`, `insufficient_quota`, or monthly usage limit.
 
-### OCX
+### opr
 
 - `src/lib/upstream-retry.ts:38` retries selected 500/502/503/504/520/521/522 statuses only.
 - 429 is not a generic transient retry.
@@ -34,18 +34,18 @@ The centralization can be imported as an invariant, but choosing the older jawco
 
 ### Decision
 
-Direct port is `REJECT`; outcome is currently `NOOP`. The jawcode wrapper solves SDK-internal retry behavior that OCX does not use. If OCX later adopts an SDK or begins retrying 429, bring over the **classification tests**, not necessarily the wrapper.
+Direct port is `REJECT`; outcome is currently `NOOP`. The jawcode wrapper solves SDK-internal retry behavior that opr does not use. If opr later adopts an SDK or begins retrying 429, bring over the **classification tests**, not necessarily the wrapper.
 
 ## 3. GPT-5.6 policy
 
-jawcode adds curated Luna/Sol/Terra descriptors and constructs 1.05M OpenAI API rows plus 373K Codex rows, then `applyGpt56ContextWindow` resets both to 373K. OCX now has explicit route contracts: Pool(default)/Direct account modes share one bare `openai` 372K group; `openai-apikey` uses 1.05M context / 922K max input and static Pro virtual ids.
+jawcode adds curated Luna/Sol/Terra descriptors and constructs 1.05M OpenAI API rows plus 373K Codex rows, then `applyGpt56ContextWindow` resets both to 373K. opr now has explicit route contracts: Pool(default)/Direct account modes share one bare `openai` 372K group; `openai-apikey` uses 1.05M context / 922K max input and static Pro virtual ids.
 
 Decision: account-mode/API identity, context, max input, and Pro wire rewrite are `ADAPT` and implemented.
 Cost remains `REJECT` in current scope. See [007](./007_model_id_delta.md).
 
 ## 4. Antigravity retired model
 
-jawcode `model-manager.ts` filters `google-antigravity/gemini-3.1-pro-high` from bundled, cached, and dynamic model lists. OCX still maps it to `gemini-pro-agent` in `src/providers/antigravity-models.ts:21` and tests both picker presence and wire mapping.
+jawcode `model-manager.ts` filters `google-antigravity/gemini-3.1-pro-high` from bundled, cached, and dynamic model lists. opr still maps it to `gemini-pro-agent` in `src/providers/antigravity-models.ts:21` and tests both picker presence and wire mapping.
 
 Two contracts must not be collapsed:
 
@@ -60,7 +60,7 @@ jawcode's local compatibility logic records:
 - `kimi-k2.7-code`: `xhigh -> high`, `max -> high`
 - Kimi reasoning is disabled for forced tool-choice cases.
 
-OCX currently sets an empty effort list and `noReasoningModels` for both `kimi-k2.7-code` and `kimi-k2.7-code-highspeed`, while preserving reasoning content for replay.
+opr currently sets an empty effort list and `noReasoningModels` for both `kimi-k2.7-code` and `kimi-k2.7-code-highspeed`, while preserving reasoning content for replay.
 
 Decision: keep the conservative behavior until live probes establish a matrix. The base model could become `ADAPT`; highspeed remains independent `RESEARCH` because jawcode evidence does not cover it.
 
@@ -68,24 +68,24 @@ Decision: keep the conservative behavior until live probes establish a matrix. T
 
 ### Disabled thinking
 
-OCX `src/adapters/anthropic.ts:629` only sends thinking for a string effort other than `none`. This already matches jawcode's general-path omission, so it is `NOOP`.
+opr `src/adapters/anthropic.ts:629` only sends thinking for a string effort other than `none`. This already matches jawcode's general-path omission, so it is `NOOP`.
 
 `tests/web-search-anthropic.test.ts:196` proves the web-search sidecar intentionally sends `{type:"disabled"}`. This is a separate endpoint contract and is not evidence of a bug in the general adapter.
 
 ### Tool argument and block-index changes
 
-jawcode also sanitizes tool argument JSON and tracks stream block indices. Those are SDK/event-shape-specific. Before adapting them, reproduce malformed JSON or interleaved block loss in OCX's own adapter/parser fixtures. Decision: `RESEARCH`, then architecture-specific `ADAPT` only if reachable.
+jawcode also sanitizes tool argument JSON and tracks stream block indices. Those are SDK/event-shape-specific. Before adapting them, reproduce malformed JSON or interleaved block loss in opr's own adapter/parser fixtures. Decision: `RESEARCH`, then architecture-specific `ADAPT` only if reachable.
 
 ## 7. Google request compatibility
 
-jawcode changes Gemini CLI version headers and sanitizes JSON strings in tool arguments. OCX's Google AI Studio/Vertex/Antigravity ownership does not automatically share the Gemini CLI fingerprint.
+jawcode changes Gemini CLI version headers and sanitizes JSON strings in tool arguments. opr's Google AI Studio/Vertex/Antigravity ownership does not automatically share the Gemini CLI fingerprint.
 
-- Header version: direct port `REJECT` unless OCX sends the same endpoint/header contract.
-- Tool JSON sanitizer: `RESEARCH`; require a failing OCX fixture before adding normalization.
+- Header version: direct port `REJECT` unless opr sends the same endpoint/header contract.
+- Tool JSON sanitizer: `RESEARCH`; require a failing opr fixture before adding normalization.
 
 ## 8. Generated metadata consumption
 
-The generator writes six model fields: provider, id, context window, max tokens, input modalities, reasoning, and optional wire model ID. OCX catalog application at `src/codex/catalog.ts:517` consumes only context window and input modalities. `CatalogModel` has no max-output or wire-ID field, and missing rows are appended only for `opencode-go`.
+The generator writes six model fields: provider, id, context window, max tokens, input modalities, reasoning, and optional wire model ID. opr catalog application at `src/codex/catalog.ts:517` consumes only context window and input modalities. `CatalogModel` has no max-output or wire-ID field, and missing rows are appended only for `opencode-go`.
 
 Consequences:
 
@@ -98,17 +98,17 @@ Decision: generator refresh and consumer expansion are separate tasks. The forme
 
 ## 9. Anthropic organization identity
 
-jawcode chase cites upstream organization-scoped auth behavior, but the inspected local source does not establish that full change. OCX `src/oauth/anthropic.ts:30-67` parses account UUID/email and the credential store uses those identities.
+jawcode chase cites upstream organization-scoped auth behavior, but the inspected local source does not establish that full change. opr `src/oauth/anthropic.ts:30-67` parses account UUID/email and the credential store uses those identities.
 
 Decision: `RESEARCH`. Obtain the actual token response schema and a multi-org collision scenario before changing storage identity. This is `chase-only`, not a confirmed local implementation delta.
 
 ## 10. Safety, invalid prompt, and terminality
 
-Chase items describe invalid-prompt breakers, refusal/safety stops, and fallback boundaries. In OCX, 400 errors are not generic retry candidates and the Responses parser already understands refusals. Therefore a retry circuit-breaker port is `NOOP`; cross-provider safety normalization remains `RESEARCH` only if a concrete terminality bug appears.
+Chase items describe invalid-prompt breakers, refusal/safety stops, and fallback boundaries. In opr, 400 errors are not generic retry candidates and the Responses parser already understands refusals. Therefore a retry circuit-breaker port is `NOOP`; cross-provider safety normalization remains `RESEARCH` only if a concrete terminality bug appears.
 
 ## 11. LiteLLM metadata
 
-OCX live model parsing accepts ID/owner, context length variants, and limited reasoning/vision capabilities. It intentionally drops arbitrary rich metadata.
+opr live model parsing accepts ID/owner, context length variants, and limited reasoning/vision capabilities. It intentionally drops arbitrary rich metadata.
 
 Decision: `ADAPT` consumer-first. Add only a field that a Codex-visible catalog or request adapter consumes, together with precedence and fixture tests. Do not add a lossless passthrough bag merely to mirror OMP.
 
@@ -120,13 +120,13 @@ Decision: standalone direct provider는 `ADAPT`. 기존 `openai-responses` keyed
 
 ## 13. Product-boundary rejects
 
-The following chase ideas belong to jawcode/OMP agent products and are not direct OCX proxy imports:
+The following chase ideas belong to jawcode/OMP agent products and are not direct opr proxy imports:
 
 - floating model selection and model hub UX;
 - custom role models and task-agent resolution;
 - agent prompt caps and dispatch preprocessing;
 
-They are `REJECT` for direct port, not claims that the ideas are intrinsically invalid. A future OCX product requirement must start a separate owner-first design.
+They are `REJECT` for direct port, not claims that the ideas are intrinsically invalid. A future opr product requirement must start a separate owner-first design.
 
 ## 14. Recommended implementation order
 
@@ -137,3 +137,4 @@ They are `REJECT` for direct port, not claims that the ideas are intrinsically i
 5. Add Z.AI and Anthropic changes only from provider-specific fixtures.
 6. Decide consumer-backed generated metadata fields and precedence.
 7. Add registry-compatible providers before workspace/auth/signing providers; use the full map in [`000_plan.md`](../../_plan/260717_non_openai_provider_chase/000_plan.md).
+

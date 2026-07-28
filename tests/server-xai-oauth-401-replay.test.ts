@@ -7,7 +7,7 @@ import { XAI_OAUTH_DISCOVERY_URL } from "../src/oauth/xai";
 import { saveCredential } from "../src/oauth/store";
 import { XAI_GROK_CLI_BASE_URL } from "../src/providers/xai-transport";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const TOKEN_ENDPOINT = "https://auth.x.ai/oauth/token";
@@ -45,7 +45,7 @@ function seedOAuth(): void {
   });
 }
 
-function xaiConfig(authMode: "oauth" | "key" = "oauth"): OcxConfig {
+function xaiConfig(authMode: "oauth" | "key" = "oauth"): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -59,7 +59,7 @@ function xaiConfig(authMode: "oauth" | "key" = "oauth"): OcxConfig {
         models: ["grok-4.5"],
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function successBody(text: string): string {
@@ -241,3 +241,4 @@ describe("xAI OAuth upstream 401 replay", () => {
     }
   });
 });
+

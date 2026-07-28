@@ -92,7 +92,7 @@ describe("install scripts", () => {
   });
 
   test("Node launcher handles npm self-update before starting Bun", async () => {
-    const launcher = await readText("bin/ocx.mjs");
+    const launcher = await readText("bin/opr.mjs");
 
     expect(launcher).toContain('process.argv[2] === "update"');
     expect(launcher).toContain('["install", "-g", `${PKG}@${tag}`]');
@@ -112,4 +112,5 @@ describe("install scripts", () => {
     expect(script).toContain("await watchRun(releaseRun.databaseId)");
   });
 });
+
 

@@ -84,6 +84,10 @@ OpenProvider 会将已路由模型公开为稳定且可逆的别名：
 user-agent 会获得易读的 CLI 形式，其他客户端会获得 Desktop 哈希形式。两种别名族都会永久
 保持可解码——以任一形式保存在 `settings.json` 中的模型都能继续工作。
 
+如果 Claude Desktop 底部的选择器没有切换已运行 3P 对话的模型，请在该对话中使用
+`/model <id>`。OpenProvider 无法读取选择器状态，只会路由每个请求实际携带的模型 ID；可在
+**Logs → requestedModel** 中确认结果。
+
 **别名语法规则：**provider 不得包含 `/` 或 `--`，也不得等于 `native`；model 不得包含
 `/`。易读形式无法表达的路由会回退到哈希别名。模型 ID **可以**包含 `--`（解析时只按第一个
 `--` 拆分）；包含 `--` 的原生 slug 会回退到哈希形式。
@@ -304,7 +308,7 @@ role；`tool_result` 缺少 `tool_use_id`；`tool_use` 缺少 id/name；指定�
 
 ## 调试捕获
 
-`opr debug claude on|off|status|reset`、`OCX_CLAUDE_DEBUG=1` 或
+`opr debug claude on|off|status|reset`、`opr_CLAUDE_DEBUG=1` 或
 `PUT /api/debug {"claude": true}` 控制入站捕获。`GET /api/claude/inbound-debug` 返回
 `{enabled, entries}`（最新条目在前，环形缓冲区大小为 20）。
 
@@ -363,4 +367,5 @@ Claude 模型时自动加载。对于原生透传，这是正常现象；对于�
 
 **子代理派发到错误模型**——名册代理（`opr-*`）使用 `<!-- opr-route: ... -->` 指令，
 而不是 Agent 工具的 `model` 参数。请确保指令与预期路由一致。传入 `"haiku"` 作为模型占位符。
+
 

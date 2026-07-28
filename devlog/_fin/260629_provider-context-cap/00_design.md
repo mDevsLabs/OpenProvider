@@ -141,9 +141,9 @@ Exports:
 
 ```ts
 export const DEFAULT_PROVIDER_CONTEXT_CAP = 350_000;
-export function providerContextCap(config: Pick<OcxConfig, "providerContextCaps">, provider: string): number | undefined;
+export function providerContextCap(config: Pick<oprConfig, "providerContextCaps">, provider: string): number | undefined;
 export function applyProviderContextCap(contextWindow: number | undefined, cap: number | undefined): number | undefined;
-export function setProviderContextCap(config: OcxConfig, provider: string, enabled: boolean): void;
+export function setProviderContextCap(config: oprConfig, provider: string, enabled: boolean): void;
 ```
 
 Rules:
@@ -176,7 +176,7 @@ After:
 Before:
 
 ```ts
-function applyProviderConfigHints(name: string, prov: OcxProviderConfig, model: CatalogModel): CatalogModel {
+function applyProviderConfigHints(name: string, prov: oprProviderConfig, model: CatalogModel): CatalogModel {
   void name;
   const contextCap = configuredContextWindow(prov, model.id);
 ```
@@ -184,7 +184,7 @@ function applyProviderConfigHints(name: string, prov: OcxProviderConfig, model: 
 After:
 
 ```ts
-function applyProviderConfigHints(name: string, prov: OcxProviderConfig, model: CatalogModel, providerContextCap?: number): CatalogModel {
+function applyProviderConfigHints(name: string, prov: oprProviderConfig, model: CatalogModel, providerContextCap?: number): CatalogModel {
   void name;
   const contextCap = configuredContextWindow(prov, model.id);
 ```
@@ -313,3 +313,4 @@ bun test tests/codex-catalog.test.ts tests/server-auth.test.ts
 bun x tsc --noEmit
 cd gui && bun run build
 ```
+

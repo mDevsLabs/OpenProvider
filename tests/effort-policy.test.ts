@@ -13,7 +13,7 @@ import { handleManagementAPI } from "../src/server/management-api";
 import { NoEnabledOpenAiProviderError, routeModel } from "../src/router";
 import { mapReasoningEffort } from "../src/reasoning-effort";
 import { nativeEffortClamp } from "../src/codex/catalog";
-import type { OcxConfig, OcxParsedRequest } from "../src/types";
+import type { oprConfig, oprParsedRequest } from "../src/types";
 
 const savedHome = process.env.OPENPROVIDER_HOME;
 const savedCodexHome = process.env.CODEX_HOME;
@@ -29,11 +29,11 @@ afterEach(() => {
   if (tempCodexHome) { rmSync(tempCodexHome, { recursive: true, force: true }); tempCodexHome = null; }
 });
 
-function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
-  return { port: 10100, providers: {}, defaultProvider: "openai", ...overrides } as OcxConfig;
+function makeConfig(overrides: Partial<oprConfig> = {}): oprConfig {
+  return { port: 10100, providers: {}, defaultProvider: "openai", ...overrides } as oprConfig;
 }
 
-function makeParsed(reasoning?: string): OcxParsedRequest {
+function makeParsed(reasoning?: string): oprParsedRequest {
   return {
     modelId: "gpt-5.6-sol",
     context: { messages: [{ role: "user", content: "hi", timestamp: 1 }] },
@@ -216,7 +216,7 @@ describe("supportedLadderFor (real routeModel routes)", () => {
     // modelReasoningEfforts for grok-4.5 and noReasoningModels for the fast models.
     const config = makeConfig({
       providers: { xai: { adapter: "openai-chat", baseUrl: "https://api.x.ai/v1", authMode: "oauth" } },
-    } as Partial<OcxConfig>);
+    } as Partial<oprConfig>);
     const route = routeModel(config, "xai/grok-4.5");
     expect(supportedLadderFor(route)).toEqual(["low", "medium", "high"]);
     const noReasoning = routeModel(config, "xai/grok-composer-2.5-fast");
@@ -232,7 +232,7 @@ describe("supportedLadderFor (real routeModel routes)", () => {
         },
       },
       defaultProvider: "custom",
-    } as Partial<OcxConfig>);
+    } as Partial<oprConfig>);
     const route = routeModel(config, "my-model");
     expect(route.providerName).toBe("custom");
     expect(supportedLadderFor(route)).toEqual(["low", "medium"]);
@@ -247,7 +247,7 @@ describe("supportedLadderFor (real routeModel routes)", () => {
         },
       },
       defaultProvider: "toggle",
-    } as Partial<OcxConfig>);
+    } as Partial<oprConfig>);
     expect(supportedLadderFor(routeModel(config, "toggle/t-model"))).toBeUndefined();
   });
 
@@ -267,7 +267,7 @@ describe("supportedLadderFor (real routeModel routes)", () => {
         },
       },
       defaultProvider: "selfhosted",
-    } as Partial<OcxConfig>);
+    } as Partial<oprConfig>);
     expect(() => routeModel(config, "gpt-5.4")).toThrow(NoEnabledOpenAiProviderError);
     const namespaced = routeModel(config, "selfhosted/gpt-5.4");
     expect(namespaced.providerName).toBe("selfhosted");
@@ -288,14 +288,14 @@ describe("supportedLadderFor (real routeModel routes)", () => {
         openai: { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" },
       },
       defaultProvider: "openai",
-    } as Partial<OcxConfig>);
+    } as Partial<oprConfig>);
     const route = routeModel(config, "gpt-5.4");
     expect(supportedLadderFor(route)).toEqual(["low", "medium", "high", "xhigh"]);
   });
 });
 
 describe("effortCapAppliesTo (caps are a v2-feature gate)", () => {
-  function parsedWithTools(tools: Array<{ name: string; namespace?: string }>, reasoning?: string): OcxParsedRequest {
+  function parsedWithTools(tools: Array<{ name: string; namespace?: string }>, reasoning?: string): oprParsedRequest {
     return {
       modelId: "gpt-5.6-sol",
       context: {
@@ -423,7 +423,7 @@ describe("/api/effort-caps", () => {
     process.env.OPENPROVIDER_HOME = tempHome;
   }
 
-  async function put(config: OcxConfig, body: unknown): Promise<Response> {
+  async function put(config: oprConfig, body: unknown): Promise<Response> {
     const req = new Request("http://localhost/api/effort-caps", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -467,3 +467,4 @@ describe("/api/effort-caps", () => {
     expect(config.subagentEffortCap).toBe("low");
   });
 });
+

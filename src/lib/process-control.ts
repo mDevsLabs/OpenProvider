@@ -136,7 +136,7 @@ async function waitForStoppedPort(
       intervalMs: 100,
       scanIntervalMs: 500,
       // Only the process we just stopped — never kill a newly started twin proxy.
-      killOcxHolders: !!(stoppedPid && stoppedPid > 0),
+      killoprHolders: !!(stoppedPid && stoppedPid > 0),
       onlyKillPids: stoppedPid && stoppedPid > 0 ? [stoppedPid] : [],
     });
   } catch {
@@ -163,3 +163,4 @@ export function killProxy(pid: number): void {
   }
   if (!waitForExit(pid, 5000)) throw new Error(`process ${pid} did not exit`);
 }
+

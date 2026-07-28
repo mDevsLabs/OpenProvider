@@ -5,8 +5,8 @@ Single-phase implementation — all changes ship together.
 ## Server Core (types.ts + responses.ts)
 
 ### src/types.ts
-- ADD: `OcxShadowCallInterceptConfig` interface after line 381
-- ADD: `shadowCallIntercept?: OcxShadowCallInterceptConfig` to `OcxConfig`
+- ADD: `oprShadowCallInterceptConfig` interface after line 381
+- ADD: `shadowCallIntercept?: oprShadowCallInterceptConfig` to `oprConfig`
 
 ### src/server/responses.ts
 - INSERT between line 462 (logCtx.requestedModel) and line 469 (let route):
@@ -44,3 +44,4 @@ Single-phase implementation — all changes ship together.
 ## Docs
 
 - NEW docs/shadow-call-intercept.md
+

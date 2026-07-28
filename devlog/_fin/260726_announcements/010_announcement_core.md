@@ -37,7 +37,7 @@ same release.
 
 ## MODIFY `src/types.ts`
 
-Add to `OcxConfig`, beside the existing optional feature fields:
+Add to `oprConfig`, beside the existing optional feature fields:
 
 ```ts
 +  /**
@@ -64,24 +64,24 @@ an explicit install marker instead (`031` § D1′), written once by the first
 ```
 
 That marker is independent of the announcement baseline and belongs beside it in
-`OcxConfig`, not inside `announcements`: it describes the installation, while
+`oprConfig`, not inside `announcements`: it describes the installation, while
 `baseline` describes when announcements started being observed.
 
 ## NEW `src/announcements/state.ts`
 
 ```ts
 /** Stamps the baseline exactly once. Returns the config unchanged if one exists. */
-export function ensureAnnouncementBaseline(config: OcxConfig, now: Date, version: string): boolean;
+export function ensureAnnouncementBaseline(config: oprConfig, now: Date, version: string): boolean;
 
 /** Announcements declared after the baseline and not yet dismissed. */
 export function pendingAnnouncements(
-  config: OcxConfig,
+  config: oprConfig,
   catalog: readonly Announcement[] = ANNOUNCEMENTS,
   now?: Date,
 ): Announcement[];
 
 /** Records a dismissal. Unknown ids are ignored rather than stored. */
-export function dismissAnnouncement(config: OcxConfig, id: string): boolean;
+export function dismissAnnouncement(config: oprConfig, id: string): boolean;
 ```
 
 Rules `pendingAnnouncements` must enforce, each mapping to a boundary case in
@@ -145,3 +145,4 @@ fail.
 |---------|----------|
 | `bun test tests/announcements.test.ts` | pass |
 | `bun run typecheck` | exit 0 |
+

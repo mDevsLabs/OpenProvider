@@ -26,7 +26,7 @@ WP1-WP4를 전부 착륙.
   `updateChildStdio()`/`logSpawnOutput()` stdio 파이프만 포트(세 자식 stop/
   installer/service reinstall 전부, `serviceReinstallArgs()` 유지).
 - 이슈 #168: `opr update --help`가 실제 self-update를 실행하던 결함.
-  src/cli/index.ts + bin/ocx.mjs 양 진입로에 help 단축. 실기 검증: 양쪽 모두
+  src/cli/index.ts + bin/opr.mjs 양 진입로에 help 단축. 실기 검증: 양쪽 모두
   usage 출력 + exit 0 + 부작용 없음.
 
 ## 증거
@@ -47,3 +47,4 @@ WP1-WP4를 전부 착륙.
   일괄 relay되므로 대화형 진행 표시가 사라진다(부작용 허용, PR 원저자 설계).
 - WinSW `unknown` 상태에서의 stop/uninstall 시도는 깨진 exe에서 추가 에러를
   낼 수 있으나, 라이브 서비스 방치보다 명시적 실패가 낫다는 판단.
+

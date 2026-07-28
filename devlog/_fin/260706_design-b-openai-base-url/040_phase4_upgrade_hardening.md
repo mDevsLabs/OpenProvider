@@ -32,7 +32,7 @@ warning; threads stay invisible until the user manually reruns start.
 - NEW `migrateHistoryToOpenai(stateDbPath?, backupPath?, opts?)`: patient wrapper
   (default attempts 3, delayMs 750) around the openai restore path; returns
   `CodexHistorySyncResult`.
-- NEW `countPendingOpencodexHistory(stateDbPath?, backupPath?)`: read-only
+- NEW `countPending@mdevs/openproviderHistory(stateDbPath?, backupPath?)`: read-only
   `{ pendingRows, backupEntries, failed? }` — COUNT of threads still tagged
   `openprovider` + backup manifest entry count. Cheap; used by guardian + doctor.
 
@@ -60,10 +60,11 @@ warning; threads stay invisible until the user manually reruns start.
 
 ## Tests
 - `withHistoryRetry` honors attempts (fail 3x, succeed on 4th with attempts 4).
-- `countPendingOpencodexHistory` on the legacy fixture → counts; after migration → 0.
+- `countPending@mdevs/openproviderHistory` on the legacy fixture → counts; after migration → 0.
 - `migrateHistoryToOpenai` clears legacy rows + backup (happy path).
 - Guardian: stops immediately at 0 pending; retries while migrate fails then
   logs+stops on success; respects maxTicks; stop() cancels.
 
 ## Accept
 - Targeted + full `bun test` green, tsc clean.
+

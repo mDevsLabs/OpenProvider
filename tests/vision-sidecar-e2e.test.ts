@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 
@@ -111,7 +111,7 @@ describe("vision sidecar fallback (issue #88, end-to-end)", () => {
       return originalFetch(input, init);
     }) as typeof fetch;
 
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 0, hostname: "127.0.0.1", defaultProvider: "textonly", openaiProviderTierVersion: 2,
       providers: {
         textonly: {
@@ -128,7 +128,7 @@ describe("vision sidecar fallback (issue #88, end-to-end)", () => {
           codexAccountMode: "direct",
         },
       },
-    } as OcxConfig;
+    } as oprConfig;
     saveConfig(config);
     const server = startServer(0);
     try {
@@ -166,7 +166,7 @@ describe("vision sidecar fallback (issue #88, end-to-end)", () => {
     upstream = serveUpstream(b => { upstreamBody = b; });
     sidecar = serveSidecar(() => { sidecarHits += 1; });
 
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 0, hostname: "127.0.0.1", defaultProvider: "seeing", openaiProviderTierVersion: 2,
       providers: {
         seeing: {
@@ -178,7 +178,7 @@ describe("vision sidecar fallback (issue #88, end-to-end)", () => {
         },
         openai: { adapter: "openai-responses", authMode: "forward", baseUrl: "https://chatgpt.com/backend-api/codex" },
       },
-    } as OcxConfig;
+    } as oprConfig;
     saveConfig(config);
     const server = startServer(0);
     try {
@@ -196,3 +196,4 @@ describe("vision sidecar fallback (issue #88, end-to-end)", () => {
     }
   });
 });
+

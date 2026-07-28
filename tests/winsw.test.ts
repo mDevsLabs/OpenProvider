@@ -24,11 +24,11 @@ describe("winsw xml", () => {
     expect(xml.toLowerCase()).not.toContain("localsystem");
   });
 
-  test("carries service env: OCX_SERVICE, token file pointer, and escaped PATH parity", () => {
+  test("carries service env: opr_SERVICE, token file pointer, and escaped PATH parity", () => {
     const xml = buildWinswXml(entry, env);
 
-    expect(xml).toContain('<env name="OCX_SERVICE" value="1"/>');
-    expect(xml).toContain('<env name="OCX_API_TOKEN_FILE"');
+    expect(xml).toContain('<env name="opr_SERVICE" value="1"/>');
+    expect(xml).toContain('<env name="opr_API_TOKEN_FILE"');
     expect(xml).toContain('<env name="PATH" value="C:\\bin;C:\\tools &amp; more"/>');
     // The token VALUE never lands in the XML — only the file pointer.
     expect(xml).not.toContain("OpenProvider_API_AUTH_TOKEN");
@@ -44,8 +44,8 @@ describe("winsw xml", () => {
     expect(xml).toContain('<log mode="roll-by-size">');
     expect(xml).toContain(`<id>${WINSW_SERVICE_ID}</id>`);
   });
-  test("honors OCX_BAKE_PORT when building WinSW arguments", () => {
-    const xml = buildWinswXml(entry, { ...env, OCX_BAKE_PORT: "14444" });
+  test("honors opr_BAKE_PORT when building WinSW arguments", () => {
+    const xml = buildWinswXml(entry, { ...env, opr_BAKE_PORT: "14444" });
     expect(xml).toContain("start --port 14444");
   });
 });
@@ -212,18 +212,19 @@ describe("service reinstall args", () => {
 });
 
 describe("app-side service token loading", () => {
-  test("loads the token from OCX_API_TOKEN_FILE only when the env token is empty", () => {
+  test("loads the token from opr_API_TOKEN_FILE only when the env token is empty", () => {
     const dir = mkdtempSync(join(tmpdir(), "opr-token-"));
     const file = join(dir, "service-api-token");
     writeFileSync(file, "  tok-123  \n");
     try {
-      expect(loadServiceTokenFromFile({ OCX_API_TOKEN_FILE: file })).toBe("tok-123");
-      expect(loadServiceTokenFromFile({ OCX_API_TOKEN_FILE: file, OpenProvider_API_AUTH_TOKEN: "already" })).toBeNull();
+      expect(loadServiceTokenFromFile({ opr_API_TOKEN_FILE: file })).toBe("tok-123");
+      expect(loadServiceTokenFromFile({ opr_API_TOKEN_FILE: file, OpenProvider_API_AUTH_TOKEN: "already" })).toBeNull();
       expect(loadServiceTokenFromFile({})).toBeNull();
-      expect(loadServiceTokenFromFile({ OCX_API_TOKEN_FILE: join(dir, "missing") })).toBeNull();
+      expect(loadServiceTokenFromFile({ opr_API_TOKEN_FILE: join(dir, "missing") })).toBeNull();
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
   });
 });
+
 

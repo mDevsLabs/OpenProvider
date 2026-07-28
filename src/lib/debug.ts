@@ -13,7 +13,7 @@ function emitDebugLine(line: string): void {
 }
 
 // Opt-in provider diagnostics. Streaming adapters stay quiet unless provider debug is on
-// (`opr debug provider on`, GUI Logs toggle, or OCX_DEBUG=1). Tail with `opr debug provider logs -f`.
+// (`opr debug provider on`, GUI Logs toggle, or opr_DEBUG=1). Tail with `opr debug provider logs -f`.
 
 export function debugDroppedFrame(adapter: string, payload: string): void {
   if (!isDebugEnabled()) return;
@@ -29,3 +29,4 @@ export function debugProviderDiagnostic(adapter: string, event: string, details:
     /* diagnostics must never affect request handling */
   }
 }
+

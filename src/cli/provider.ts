@@ -1,5 +1,5 @@
 /**
- * `opr provider` subcommand — non-interactive provider management.
+ * `ocx provider` subcommand — non-interactive provider management.
  *
  * Subcommands:
  *   list          List configured and available registry providers
@@ -8,7 +8,7 @@
  *   show <name>   Show provider config details (secrets masked)
  *   set-default <name>  Change the default provider
  */
-import { hasOwnProvider, isValidProviderName, loadConfig, saveConfig } from "../config";
+import { apiKeyTransportConfigError, hasOwnProvider, isValidProviderName, loadConfig, saveConfig } from "../config";
 import { hasHelpFlag } from "./help";
 import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../providers/registry";
 import { providerConfigSeed } from "../providers/derive";
@@ -75,7 +75,7 @@ function validateAndSave(config: ReturnType<typeof loadConfig>): void {
 
 function handleList(args: string[]): void {
   const wantsJson = consumeFlag(args, "--json");
-  rejectUnknownArgs(args, "Usage: opr provider list [--json]");
+  rejectUnknownArgs(args, "Usage: ocx provider list [--json]");
 
   const config = loadConfig();
   const configured = Object.keys(config.providers);
@@ -116,7 +116,7 @@ function handleList(args: string[]): void {
       const auth = entry.authKind === "forward" ? "chatgpt-login" : entry.authKind;
       console.log(`  ${entry.id.padEnd(24)} ${entry.label}  (${auth})`);
     }
-    console.log(`\nAdd with: opr provider add <name> [--api-key <key>]`);
+    console.log(`\nAdd with: ocx provider add <name> [--api-key <key>]`);
   }
 }
 
@@ -124,7 +124,7 @@ function handleList(args: string[]): void {
 // provider add
 // ---------------------------------------------------------------------------
 
-const ADD_USAGE = "Usage: opr provider add <name> [--adapter <adapter>] [--base-url <url>] [--api-key <key>] [--default-model <model>] [--allow-private-network] [--set-default] [--force] [--json] [--sync]";
+const ADD_USAGE = "Usage: ocx provider add <name> [--adapter <adapter>] [--base-url <url>] [--api-key <key>] [--api-key-transport <x-api-key|bearer>] [--default-model <model>] [--allow-private-network] [--set-default] [--force] [--json] [--sync]";
 
 async function handleAdd(args: string[]): Promise<void> {
   const name = args[0];
@@ -138,13 +138,14 @@ async function handleAdd(args: string[]): Promise<void> {
     process.exit(1);
   }
 
- const restArgs = args.slice(1);
- const force = consumeFlag(restArgs, "--force");
- const setDefault = consumeFlag(restArgs, "--set-default");
- const wantsJson = consumeFlag(restArgs, "--json");
- const wantsSync = consumeFlag(restArgs, "--sync");
+  const restArgs = args.slice(1);
+  const force = consumeFlag(restArgs, "--force");
+  const setDefault = consumeFlag(restArgs, "--set-default");
+  const wantsJson = consumeFlag(restArgs, "--json");
+  const wantsSync = consumeFlag(restArgs, "--sync");
   const allowPrivateNetwork = consumeFlag(restArgs, "--allow-private-network");
- const apiKey = consumeFlagValue(restArgs, "--api-key");
+  const apiKey = consumeFlagValue(restArgs, "--api-key");
+  const apiKeyTransport = consumeFlagValue(restArgs, "--api-key-transport");
   const adapter = consumeFlagValue(restArgs, "--adapter");
   const baseUrl = consumeFlagValue(restArgs, "--base-url");
   const defaultModel = consumeFlagValue(restArgs, "--default-model");
@@ -166,7 +167,7 @@ async function handleAdd(args: string[]): Promise<void> {
       if (registryEntry.authKind === "forward") {
         console.warn(`Warning: provider "${name}" uses ChatGPT login (forward auth); --api-key is ignored.`);
       } else if (registryEntry.authKind === "oauth") {
-        console.warn(`Warning: provider "${name}" uses OAuth auth; --api-key is ignored. Run: opr login ${name}`);
+        console.warn(`Warning: provider "${name}" uses OAuth auth; --api-key is ignored. Run: ocx login ${name}`);
       } else {
         provConfig.apiKey = apiKey;
       }
@@ -177,7 +178,7 @@ async function handleAdd(args: string[]): Promise<void> {
   } else {
     if (!adapter || !baseUrl) {
       console.error(`Provider "${name}" is not in the registry. --adapter and --base-url are required.`);
-      console.error("Usage: opr provider add <name> --adapter <adapter> --base-url <url> [--api-key <key>]");
+      console.error("Usage: ocx provider add <name> --adapter <adapter> --base-url <url> [--api-key <key>]");
       process.exit(1);
     }
     provConfig = {
@@ -188,9 +189,22 @@ async function handleAdd(args: string[]): Promise<void> {
     };
   }
 
- config.providers[name] = provConfig;
+  if (apiKeyTransport !== undefined) {
+    if (apiKeyTransport !== "x-api-key" && apiKeyTransport !== "bearer") {
+      console.error('Error: --api-key-transport must be "x-api-key" or "bearer".');
+      process.exit(1);
+    }
+    const transportError = apiKeyTransportConfigError({ ...provConfig, apiKeyTransport });
+    if (transportError) {
+      console.error(`Error: ${transportError}.`);
+      process.exit(1);
+    }
+    provConfig.apiKeyTransport = apiKeyTransport;
+  }
+
+  config.providers[name] = provConfig;
   if (allowPrivateNetwork) provConfig.allowPrivateNetwork = true;
- if (setDefault) config.defaultProvider = name;
+  if (setDefault) config.defaultProvider = name;
 
   validateAndSave(config);
 
@@ -221,17 +235,17 @@ async function handleAdd(args: string[]): Promise<void> {
   console.log(`✅ Provider "${name}"${registryLabel} added.`);
   if (setDefault) console.log(`   Set as default provider.`);
   if (registryEntry?.authKind === "oauth") {
-    console.log(`   Authenticate with: opr login ${name}`);
+    console.log(`   Authenticate with: ocx login ${name}`);
   }
   if (registryEntry?.authKind === "key" && !apiKey) {
     const envKey = `${name.toUpperCase().replace(/[^A-Z0-9]+/g, "_")}_API_KEY`;
-    console.log(`   Set API key with: opr provider add ${name} --api-key <key> --force`);
+    console.log(`   Set API key with: ocx provider add ${name} --api-key <key> --force`);
     console.log(`   Or set env var: ${envKey}`);
   }
   if (wantsSync) {
     console.log(`   Models synced to Codex.`);
   } else {
-    console.log(`   Apply to Codex: opr sync`);
+    console.log(`   Apply to Codex: ocx sync`);
   }
 }
 
@@ -244,10 +258,10 @@ function handleRemove(args: string[]): void {
   const wantsJson = consumeFlag(restArgs, "--json");
   const name = restArgs[0];
   if (!name || name.startsWith("-")) {
-    console.error("Usage: opr provider remove <name> [--json]");
+    console.error("Usage: ocx provider remove <name> [--json]");
     process.exit(1);
   }
-  rejectUnknownArgs(restArgs.slice(1), "Usage: opr provider remove <name> [--json]");
+  rejectUnknownArgs(restArgs.slice(1), "Usage: ocx provider remove <name> [--json]");
 
   const config = loadConfig();
   if (!hasOwnProvider(config.providers, name)) {
@@ -256,12 +270,21 @@ function handleRemove(args: string[]): void {
   }
 
   if (name === config.defaultProvider) {
-    console.error(`Cannot remove "${name}" — it is the default provider. Change the default first: opr provider set-default <other>`);
+    console.error(`Cannot remove "${name}" — it is the default provider. Change the default first: ocx provider set-default <other>`);
     process.exit(1);
   }
 
   if (Object.keys(config.providers).length <= 1) {
     console.error("Cannot remove the last provider.");
+    process.exit(1);
+  }
+
+  const dependentCombos = Object.entries(config.combos ?? {})
+    .filter(([, combo]) => combo.targets.some(target => target.provider === name))
+    .map(([id]) => id)
+    .sort();
+  if (dependentCombos.length > 0) {
+    console.error(`Cannot remove "${name}" — combo(s) depend on it: ${dependentCombos.join(", ")}`);
     process.exit(1);
   }
 
@@ -292,10 +315,10 @@ function handleShow(args: string[]): void {
   const wantsJson = consumeFlag(restArgs, "--json");
   const name = restArgs[0];
   if (!name || name.startsWith("-")) {
-    console.error("Usage: opr provider show <name> [--json]");
+    console.error("Usage: ocx provider show <name> [--json]");
     process.exit(1);
   }
-  rejectUnknownArgs(restArgs.slice(1), "Usage: opr provider show <name> [--json]");
+  rejectUnknownArgs(restArgs.slice(1), "Usage: ocx provider show <name> [--json]");
 
   const config = loadConfig();
   if (!hasOwnProvider(config.providers, name)) {
@@ -333,14 +356,14 @@ function handleSetDefault(args: string[]): void {
   const wantsJson = consumeFlag(restArgs, "--json");
   const name = restArgs[0];
   if (!name || name.startsWith("-")) {
-    console.error("Usage: opr provider set-default <name> [--json]");
+    console.error("Usage: ocx provider set-default <name> [--json]");
     process.exit(1);
   }
-  rejectUnknownArgs(restArgs.slice(1), "Usage: opr provider set-default <name> [--json]");
+  rejectUnknownArgs(restArgs.slice(1), "Usage: ocx provider set-default <name> [--json]");
 
   const config = loadConfig();
   if (!hasOwnProvider(config.providers, name)) {
-    console.error(`Provider "${name}" is not configured. Add it first: opr provider add ${name}`);
+    console.error(`Provider "${name}" is not configured. Add it first: ocx provider add ${name}`);
     process.exit(1);
   }
 
@@ -369,22 +392,28 @@ function handleSetDefault(args: string[]): void {
 // Router (F2 fix: handle help flags internally, like service/codex-shim)
 // ---------------------------------------------------------------------------
 
-const PROVIDER_USAGE = `Usage: opr provider <subcommand>
+const PROVIDER_USAGE = `Usage: ocx provider <subcommand>
 
 Subcommands:
   list                  List configured and available providers
   add <name>            Add a provider (registry or custom)
+  edit <name>           Edit live provider fields
+  test <name>           Test the provider's upstream model endpoint
   remove <name>         Remove a configured provider
   show <name>           Show provider config details
   set-default <name>    Change the default provider
+  selected <name>       Show or set the provider model allowlist
+  quota                 Show provider quota reports
+  presets               List GUI provider presets
+  account-mode <mode>   Set OpenAI Codex pool/direct mode
 
 Examples:
-  opr provider list
-  opr provider add anthropic --api-key sk-ant-...
-  opr provider add my-ollama --adapter openai-chat --base-url http://localhost:11434/v1
-  opr provider show anthropic --json
-  opr provider set-default anthropic
-  opr provider remove my-ollama`;
+  ocx provider list
+  ocx provider add anthropic --api-key sk-ant-...
+  ocx provider add my-ollama --adapter openai-chat --base-url http://localhost:11434/v1
+  ocx provider show anthropic --json
+  ocx provider set-default anthropic
+  ocx provider remove my-ollama`;
 
 export async function handleProviderCommand(args: string[]): Promise<void> {
   const sub = args[0];
@@ -412,9 +441,16 @@ export async function handleProviderCommand(args: string[]): Promise<void> {
     case "set-default":
       handleSetDefault(subArgs);
       break;
-    default:
+    default: {
+      const { handleProviderRuntimeCommand } = await import("./provider-runtime");
+      const code = await handleProviderRuntimeCommand(sub, subArgs);
+      if (code !== null) {
+        process.exitCode = code;
+        break;
+      }
       console.error(`Unknown provider subcommand: ${sub}`);
       console.error(PROVIDER_USAGE);
       process.exit(1);
+    }
   }
 }

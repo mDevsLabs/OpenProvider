@@ -10,7 +10,7 @@ import {
 } from "../src/codex/auth-api";
 import { saveCodexAccountCredential } from "../src/codex/account-store";
 import { resolveCodexAccountForThread, clearThreadAccountMap } from "../src/codex/routing";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 // Phase 20 (260630_wsl-account-autoswitch): startup/lazy quota priming.
 
@@ -19,7 +19,7 @@ const TEST_CODEX_HOME = join(TEST_DIR, "codex");
 let previousOpenproviderHome: string | undefined;
 let previousCodexHome: string | undefined;
 
-function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function makeConfig(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     providers: {
@@ -33,10 +33,10 @@ function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
     defaultProvider: "openai",
     codexAccounts: [],
     ...overrides,
-  } as OcxConfig;
+  } as oprConfig;
 }
 
-function seedPoolAccount(config: OcxConfig, id: string, plan?: string): void {
+function seedPoolAccount(config: oprConfig, id: string, plan?: string): void {
   config.codexAccounts = [
     ...(config.codexAccounts ?? []),
     { id, email: `${id}@example.test`, plan, isMain: false },
@@ -231,3 +231,4 @@ describe("primeCodexPoolQuotas", () => {
     }
   });
 });
+

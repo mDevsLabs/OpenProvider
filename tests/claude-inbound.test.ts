@@ -369,12 +369,12 @@ describe("bundled-skill elision for routed models (devlog 260712 060)", () => {
 });
 
 describe("opr-route directive (devlog 072)", () => {
-  const { extractOcxRouteDirective } = require("../src/claude/inbound") as typeof import("../src/claude/inbound");
+  const { extractoprRouteDirective } = require("../src/claude/inbound") as typeof import("../src/claude/inbound");
 
   test("extracts from string and block-array system; first directive wins", () => {
-    expect(extractOcxRouteDirective({ system: "intro\n<!-- opr-route: claude-opr-native--gpt-5.6-sol[1m] -->\nrest" }))
+    expect(extractoprRouteDirective({ system: "intro\n<!-- opr-route: claude-opr-native--gpt-5.6-sol[1m] -->\nrest" }))
       .toBe("claude-opr-native--gpt-5.6-sol[1m]");
-    expect(extractOcxRouteDirective({
+    expect(extractoprRouteDirective({
       system: [
         { type: "text", text: "You are a delegated worker" },
         { type: "text", text: "<!-- opr-route: gemini/gemini-3-pro --> and <!-- opr-route: other -->" },
@@ -383,9 +383,10 @@ describe("opr-route directive (devlog 072)", () => {
   });
 
   test("absent or malformed directives return null", () => {
-    expect(extractOcxRouteDirective({ system: "no directive here" })).toBeNull();
-    expect(extractOcxRouteDirective({ system: [{ type: "text", text: "<!-- opr-route: -->" }] })).toBeNull();
-    expect(extractOcxRouteDirective({})).toBeNull();
-    expect(extractOcxRouteDirective(null)).toBeNull();
+    expect(extractoprRouteDirective({ system: "no directive here" })).toBeNull();
+    expect(extractoprRouteDirective({ system: [{ type: "text", text: "<!-- opr-route: -->" }] })).toBeNull();
+    expect(extractoprRouteDirective({})).toBeNull();
+    expect(extractoprRouteDirective(null)).toBeNull();
   });
 });
+

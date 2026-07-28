@@ -113,7 +113,7 @@ export function startupInstallArgv(action: StartupInstallAction): string[] {
 }
 
 export interface CliInstallFailure {
-  /** Machine marker such as OCX_ERROR_CODE=..., when present in any stream. */
+  /** Machine marker such as opr_ERROR_CODE=..., when present in any stream. */
   code: string | null;
   stdout: string;
   stderr: string;
@@ -122,8 +122,8 @@ export interface CliInstallFailure {
   detail: string;
 }
 
-function extractOcxErrorCode(text: string): string | null {
-  const match = text.match(/OCX_ERROR_CODE=[A-Z0-9_]+/);
+function extractoprErrorCode(text: string): string | null {
+  const match = text.match(/opr_ERROR_CODE=[A-Z0-9_]+/);
   return match ? match[0] : null;
 }
 
@@ -136,7 +136,7 @@ export function classifyCliInstallFailure(stdout: string, stderr: string, error:
   const stderrText = stderr.trim();
   const message = error.message.trim();
   const combined = [stderrText, stdoutText, message].filter(Boolean).join("\n");
-  const code = extractOcxErrorCode(combined);
+  const code = extractoprErrorCode(combined);
   let detail = combined || message;
   if (detail.length > INSTALL_DETAIL_LIMIT) {
     const truncated = detail.slice(0, INSTALL_DETAIL_LIMIT);
@@ -166,7 +166,7 @@ function runCliInstall(action: StartupInstallAction): Promise<{ stdout: string; 
     }, (error, stdout, stderr) => {
       if (error) {
         const failure = classifyCliInstallFailure(stdout, stderr, error);
-        reject(Object.assign(new Error(failure.detail), { ocxInstallFailure: failure }));
+        reject(Object.assign(new Error(failure.detail), { oprInstallFailure: failure }));
         return;
       }
       resolve({ stdout, stderr });
@@ -175,12 +175,12 @@ function runCliInstall(action: StartupInstallAction): Promise<{ stdout: string; 
 }
 
 function installFailureCode(error: unknown): string | null {
-  if (error && typeof error === "object" && "ocxInstallFailure" in error) {
-    const failure = (error as { ocxInstallFailure?: CliInstallFailure }).ocxInstallFailure;
+  if (error && typeof error === "object" && "oprInstallFailure" in error) {
+    const failure = (error as { oprInstallFailure?: CliInstallFailure }).oprInstallFailure;
     if (failure?.code) return failure.code;
   }
   const detail = error instanceof Error ? error.message : String(error);
-  return extractOcxErrorCode(detail);
+  return extractoprErrorCode(detail);
 }
 
 function rejectIfBusy(_action: StartupInstallAction): Error | null {
@@ -290,4 +290,5 @@ export function runStartupInstallAction(action: StartupInstallAction): Promise<{
     }
   });
 }
+
 

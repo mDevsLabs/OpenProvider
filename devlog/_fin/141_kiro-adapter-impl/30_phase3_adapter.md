@@ -9,7 +9,7 @@
 ```ts
 interface ProviderAdapter {
   name: string;
-  buildRequest(parsed: OcxParsedRequest, incoming?: IncomingMeta): { url; method; headers; body };  // SYNC on dev
+  buildRequest(parsed: oprParsedRequest, incoming?: IncomingMeta): { url; method; headers; body };  // SYNC on dev
   parseStream(response: Response): AsyncGenerator<AdapterEvent>;
   parseResponse?(response: Response): Promise<AdapterEvent[]>;
 }
@@ -45,11 +45,11 @@ interface ProviderAdapter {
 - **Q3 AdapterEvent shape:** Read `src/types.ts` `AdapterEvent` (L177+) and an existing `parseStream`
   (openai-responses.ts / anthropic.ts) to fix the EXACT event variants kiro must emit for: text delta,
   tool-call (id/name/args-delta), and completion. Map CW stream events → those variants.
-- **Q4 OcxParsedRequest shape:** Read `src/types.ts` `OcxParsedRequest` (L1+) to know the input/messages/tools
+- **Q4 oprParsedRequest shape:** Read `src/types.ts` `oprParsedRequest` (L1+) to know the input/messages/tools
   shape buildRequest receives (Responses-API-derived) and how to build CW history from it.
 
 ## Sub-steps
-- A: Backend audits this plan + answers Q1-Q4 with file:line (real adapter token flow + AdapterEvent + OcxParsedRequest).
+- A: Backend audits this plan + answers Q1-Q4 with file:line (real adapter token flow + AdapterEvent + oprParsedRequest).
 - B: implement `src/adapters/kiro.ts` + `resolveAdapter` case; tests `tests/kiro-adapter.test.ts` (buildRequest body
   shape incl. input=object + toolResult adjacency + headers; parseStream over encodeMessage frames incl. tool-arg
   accumulation with name-repeat). Backend B-verify.
@@ -71,8 +71,8 @@ input=object · toolResult adjacency · stream discriminate stop/input/name (the
   `tool_call_end{}` (close before next start / before done) · `done{usage?}` · `error{message}`.
   Ordering invariant from openai-chat.ts L233/253/282. This is exactly why the stop→input→name discrimination
   matters: emit start once, route name-repeat chunks to delta, close on stop.
-- **Q4 (OcxParsedRequest):** `context = { systemPrompt?: string[]; messages: OcxMessage[]; tools?: OcxTool[] }`.
-  `OcxToolCall.arguments` is **already a parsed object** → pass straight into CW `toolUses[].input` (input=object
+- **Q4 (oprParsedRequest):** `context = { systemPrompt?: string[]; messages: oprMessage[]; tools?: oprTool[] }`.
+  `oprToolCall.arguments` is **already a parsed object** → pass straight into CW `toolUses[].input` (input=object
   fix is native here). toolResult adjacency precedent: anthropic.ts L160-185 (scan j=i+1 while role==='toolResult',
   group onto the following user turn) — replicate for CW.
 - **C1:** rely on Phase-2 oauth token injection; don't re-resolve in adapter.
@@ -84,3 +84,4 @@ input=object · toolResult adjacency · stream discriminate stop/input/name (the
 profileArn/region + conversationState w/ input=object + toolResult adjacency + KiroIDE fingerprint headers +
 stable conversationId; parseStream: decodeEventStream + stop/input/name discrimination → the 6 AdapterEvent
 variants) + `resolveAdapter` `case "kiro"` + `tests/kiro-adapter.test.ts`.
+

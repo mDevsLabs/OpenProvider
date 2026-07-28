@@ -5,11 +5,11 @@ import { describe, expect, test } from "bun:test";
 import { createOpenAIChatAdapter, formatOpenAIChatErrorBody } from "../src/adapters/openai-chat";
 import { applyProviderConfigHints, normalizeRoutedCatalogEntry } from "../src/codex/catalog";
 import { routeModel } from "../src/router";
-import type { OcxConfig, OcxParsedRequest, OcxTool } from "../src/types";
+import type { oprConfig, oprParsedRequest, oprTool } from "../src/types";
 
-const tools: OcxTool[] = [{ name: "shell", description: "run", parameters: { type: "object" } }];
+const tools: oprTool[] = [{ name: "shell", description: "run", parameters: { type: "object" } }];
 
-function nvidiaConfig(): OcxConfig {
+function nvidiaConfig(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "nvidia",
@@ -20,7 +20,7 @@ function nvidiaConfig(): OcxConfig {
   };
 }
 
-function parsedFor(modelId: string, options: Partial<OcxParsedRequest["options"]> = {}): Parameters<ReturnType<typeof createOpenAIChatAdapter>["buildRequest"]>[0] {
+function parsedFor(modelId: string, options: Partial<oprParsedRequest["options"]> = {}): Parameters<ReturnType<typeof createOpenAIChatAdapter>["buildRequest"]>[0] {
   return {
     modelId,
     context: {
@@ -128,3 +128,4 @@ describe("formatOpenAIChatErrorBody (web-search sidecar detail surfacing)", () =
     expect(formatOpenAIChatErrorBody(400, new Headers(), long).length).toBe(400);
   });
 });
+

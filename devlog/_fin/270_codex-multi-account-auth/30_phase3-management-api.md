@@ -43,7 +43,7 @@ import {
   removeCodexAccountCredential,
   listCodexAccountIds,
 } from "./codex-account-store";
-import type { OcxConfig, CodexAccount } from "./types";
+import type { oprConfig, CodexAccount } from "./types";
 
 function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -70,7 +70,7 @@ export function getAccountQuota(accountId: string) {
 export async function handleCodexAuthAPI(
   req: Request,
   url: URL,
-  config: OcxConfig,
+  config: oprConfig,
 ): Promise<Response | null> {
 
   // GET /api/codex-auth/accounts — list all
@@ -227,3 +227,4 @@ feat: add codex-auth management API endpoints
 feat: capture quota from upstream response headers
 feat: auto-switch account at usage threshold
 ```
+

@@ -14,9 +14,10 @@ export function buildSanitizedRuntimeEnv(
     ...env,
     OPENPROVIDER_HOME: openproviderHome,
     CODEX_HOME: codexHome,
-    OCX_SHIM_BYPASS: "1",
+    opr_SHIM_BYPASS: "1",
     OPENPROVIDER_API_AUTH_TOKEN: "fixture-admission",
     NO_PROXY: "127.0.0.1,localhost,::1",
     no_proxy: "127.0.0.1,localhost,::1",
   };
 }
+

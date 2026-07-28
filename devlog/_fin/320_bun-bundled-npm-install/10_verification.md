@@ -32,7 +32,7 @@ This is the objective's headline acceptance test: `npm install -g` works
 without a separately-installed Bun.
 
 ```
-$ npm pack            # → bitkyc08-openprovider-2.5.5-preview.1.tgz (launcher shipped: package/bin/ocx.mjs)
+$ npm pack            # → bitkyc08-openprovider-2.5.5-preview.1.tgz (launcher shipped: package/bin/opr.mjs)
 $ npm install <tarball> into an isolated temp prefix
   → node_modules/bun/bin/bun.exe present, 60M (real binary, not the stub)
 $ env -i PATH="<node-dir>:/usr/bin:/bin"  (NO bun on PATH)  opr help
@@ -61,7 +61,7 @@ but the placeholder is a 450-byte script (not 0 bytes). Fixed by gating on
 - Baked path: `buildUnixCodexShim(...)` output contains the bundled
   `node_modules/bun/bin/bun.exe` path (durableBunPath); `service.test.ts` +
   `codex-shim.test.ts` (12 tests) pass.
-- `node --check bin/ocx.mjs` → OK.
+- `node --check bin/opr.mjs` → OK.
 - No stale `bin: ./src/cli.ts` reference; no remaining "install bun first" /
   "bun must be on PATH" claims in any README or docs-site installation page
   (grep → 0 hits, all locales).
@@ -91,3 +91,4 @@ Requires push/publish → user approval.
 
 Code + autonomous verification COMPLETE (gate steps 1–3). Steps 4–5 are
 push/publish-gated and require explicit user approval.
+

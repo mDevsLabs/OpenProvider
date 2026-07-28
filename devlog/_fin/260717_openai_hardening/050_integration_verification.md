@@ -20,7 +20,7 @@ the focused unit and transport suites. Migration runs in the separately evaluate
 
 ### Canonical three-tier fixture
 
-Before dynamic imports, create fresh temporary `OPENCODEX_HOME`, `CODEX_HOME`, and
+Before dynamic imports, create fresh temporary `OpenProvider_HOME`, `CODEX_HOME`, and
 `CLAUDE_CONFIG_DIR` (audit fold-back: `/api/subagent-models` calls
 `syncClaudeAgentDefsBestEffort`, which writes `opr-*.md` under `CLAUDE_CONFIG_DIR` or
 real `~/.claude`; the temp dir isolates that side effect and is removed in `finally`,
@@ -91,7 +91,7 @@ Pro virtual validation remain owned by the Cycle-030 test files.
 ### `scripts/openai-three-tier-runtime-child.ts`
 
 A test-only child process sanitizes inherited `OPENAI_API_KEY`, `CODEX_API_KEY`,
-`OPENCODEX_HOME`, and `CODEX_HOME`, then installs temporary home values and interception
+`OpenProvider_HOME`, and `CODEX_HOME`, then installs temporary home values and interception
 before dynamic imports. It writes a mode-0600 temporary `auth.json` containing only a
 fake Codex token. After starting `startServer`, it awaits
 `syncModelsToCodex(actualPort, config, null)`, verifies the generated catalog contains
@@ -99,7 +99,7 @@ fake Codex token. After starting `startServer`, it awaits
 port/catalog. Its synthetic upstream emits the COMPLETE Codex-compatible Responses
 lifecycle (audit fold-back — `src/bridge.ts:287`: Codex does not commit message content
 without `.done` events): `response.created`, `response.output_item.added`,
-`response.content_part.added`, `response.output_text.delta` (`OCX_PROBE_OK`),
+`response.content_part.added`, `response.output_text.delta` (`opr_PROBE_OK`),
 `response.output_text.done`, `response.content_part.done`, `response.output_item.done`,
 then `response.completed` with usage. It
 then emits one JSON readiness line containing PID/version/port and shuts down on a
@@ -115,7 +115,7 @@ processes, verifies `/healthz`, distinct PIDs, version, and port, then runs asyn
 codex exec --skip-git-repo-check --ignore-rules \
   -C <temporary-working-directory> \
   --model openai-apikey/gpt-5.6-sol-pro --sandbox read-only --json \
-  "Reply exactly OCX_PROBE_OK"
+  "Reply exactly opr_PROBE_OK"
 ```
 
 The script enforces a timeout and kill, parses the sole temporary rollout, and asserts:
@@ -129,8 +129,8 @@ It records `codex --version` and writes redacted JSON only. It never uses `spawn
 while an in-process server must answer.
 
 One sanitized spawn environment is shared by the runtime children and `codex exec`:
-remove every inherited `OPENAI_*`, `CODEX_*`, and `OPENCODEX_*` variable, then add only
-the temporary homes, fake fixture credentials, `OCX_SHIM_BYPASS=1`, and a non-secret
+remove every inherited `OPENAI_*`, `CODEX_*`, and `OpenProvider_*` variable, then add only
+the temporary homes, fake fixture credentials, `opr_SHIM_BYPASS=1`, and a non-secret
 fixture admission value. Also remove uppercase/lowercase `HTTP_PROXY`, `HTTPS_PROXY`,
 `ALL_PROXY`, and their lowercase forms; set `NO_PROXY` and `no_proxy` to exactly
 `127.0.0.1,localhost,::1`. The Codex spawn uses the fresh temporary directory as both
@@ -152,7 +152,7 @@ the redacted attempted outcomes but exits nonzero. Malformed config is also nonz
 merges a schema-limited `liveKey` object into `050_runtime_smoke.json`: status,
 `liveCalls: 0 | 2`, and, only when authorized, redacted status/request-id/selected-id/
 resolved-id outcomes. The scanner rejects a missing tri-state. Live
-OpenAI calls require both a resolved key and explicit `OCX_ALLOW_LIVE_OPENAI_SMOKE=1`.
+OpenAI calls require both a resolved key and explicit `opr_ALLOW_LIVE_OPENAI_SMOKE=1`.
 Without that opt-in, make zero live calls. If authorized, run one base and one
 representative Pro request only; all three Pro aliases remain mandatory in mock E2E.
 
@@ -223,7 +223,7 @@ subprocess while the exact loopback `NO_PROXY` and temporary cwd do.
 
 ```sh
 # Internal final-gates manifest (not invoked manually one-by-one for the receipt):
-OCX_EVIDENCE_DIR=devlog/_plan/260717_openai_hardening/evidence bun test tests/openai-three-tier-e2e.test.ts
+opr_EVIDENCE_DIR=devlog/_plan/260717_openai_hardening/evidence bun test tests/openai-three-tier-e2e.test.ts
 bun test tests/openai-provider-tiers.test.ts tests/openai-provider-tier-migration.test.ts tests/openai-tier-startup.test.ts tests/provider-registry-parity.test.ts tests/router.test.ts tests/codex-catalog.test.ts tests/codex-auth-context.test.ts tests/codex-routing.test.ts tests/codex-main-rotation.test.ts tests/codex-websocket-registry.test.ts tests/codex-quota-prime.test.ts tests/provider-quota.test.ts tests/server-auth.test.ts tests/server-search.test.ts tests/server-images.test.ts tests/web-search-anthropic.test.ts tests/vision-anthropic.test.ts tests/sidecar-abort.test.ts tests/web-search.test.ts tests/web-search-timeout-plan.test.ts tests/claude-sidecar-override.test.ts tests/e2e-style/phase100-native-parity.test.ts tests/vision-cache.test.ts tests/oauth-public-surface.test.ts tests/chatgpt-oauth.test.ts tests/oauth-login-summary.test.ts
 bun test tests/openai-api-virtual-models.test.ts tests/config.test.ts tests/provider-registry-parity.test.ts tests/umans-provider.test.ts tests/codex-catalog.test.ts tests/request-log.test.ts tests/usage-log.test.ts tests/usage-summary.test.ts tests/provider-payload.test.ts tests/codex-multi-state.test.ts tests/openai-hardening-tooling.test.ts
 bun scripts/openai-three-tier-runtime-smoke.ts --evidence-dir devlog/_plan/260717_openai_hardening/evidence
@@ -248,7 +248,7 @@ not justify opening the real user GUI.
 Artifact ownership is fixed:
 
 - `tests/openai-three-tier-e2e.test.ts` writes `evidence/050_e2e.json` only when
-  `OCX_EVIDENCE_DIR` is set.
+  `opr_EVIDENCE_DIR` is set.
 - `scripts/openai-three-tier-runtime-smoke.ts` writes
   `evidence/050_client_history.json` and `evidence/050_runtime_smoke.json`.
 - `scripts/openai-hardening-final-gates.ts` writes `evidence/050_gate_summary.txt` from exit codes and pass
@@ -359,3 +359,4 @@ without explicit opt-in.
 the status/source-of-truth sweep, and produced `051_audit_wp050_implementation.md` before
 the archive move. The live paid sub-gate remained honestly credential-unavailable; no
 push, release, deployment, port-10100 action, or live spend occurred.
+

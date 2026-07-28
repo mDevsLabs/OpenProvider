@@ -13,9 +13,9 @@
 ## 현재 코드 사실 (탐색 완료, 검증 앵커)
 
 - `src/server/request-log.ts` — `RequestLogEntry`에 `durationMs`(요청 전체 벽시계),
-  `usage?: OcxUsage`, `totalTokens`, `attempts[]`(attempt별 `durationMs`+`usage`) 존재.
+  `usage?: oprUsage`, `totalTokens`, `attempts[]`(attempt별 `durationMs`+`usage`) 존재.
   `addFinalRequestLog()`가 `durationMs: Date.now() - start`로 기록 (라인 458).
-- `src/types.ts:236` — `OcxUsage { inputTokens, outputTokens, totalTokens?, cachedInputTokens?,
+- `src/types.ts:236` — `oprUsage { inputTokens, outputTokens, totalTokens?, cachedInputTokens?,
   cacheReadInputTokens?, cacheCreationInputTokens?, reasoningOutputTokens?, estimated? }`.
 - `src/usage/log.ts` — `PersistedUsageEntry`/`PersistedUsageAttempt`가 `usage.jsonl`에 영속.
   kiro/cursor 어댑터는 `estimated: true` (usage 추정치).
@@ -57,7 +57,7 @@
         + cacheCreation × cacheWrite단가 + outputTokens × output단가` — jawcode/OpenAI/Anthropic
   usage 필드 의미 차이(OpenAI `cachedInputTokens`은 input에 포함, Anthropic
   `cacheReadInputTokens`은 별도) 정리 필요.
-  (감사 blocker #2 fold — HIGH) OpenProvider `OcxUsage.inputTokens`는 캐시 포함 총 prompt 토큰
+  (감사 blocker #2 fold — HIGH) OpenProvider `oprUsage.inputTokens`는 캐시 포함 총 prompt 토큰
   (`src/types.ts:227-244`)인 반면 jawcode 계산(`db.ts:214-228`)은 `tokens.input`에 input 단가를
   그대로 곱하고 cacheRead/cacheWrite를 별도 가산 — `cachedInputTokens`/`cacheReadInputTokens`/
   `cacheCreationInputTokens` → jawcode `input/cacheRead/cacheWrite`로의 정확한 변환 규칙
@@ -172,3 +172,4 @@ Usage/Workspace 구현은 004 조사 결과에 따라 WP5+로 append (LOOP-UNIT-
   등재하되 `source`에 derived 근거를 남기고 GUI 상세에서 표시한다.
 - **WP5+ append 예고**(004): WP5 backend(summary.ts 비용/속도 집계), WP6 Usage 페이지,
   WP7 Dashboard 카드, WP8 Provider Workspace — 004 조사대로 goalplan에 append 예정.
+

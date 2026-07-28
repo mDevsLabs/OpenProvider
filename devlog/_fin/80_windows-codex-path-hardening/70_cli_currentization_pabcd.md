@@ -19,7 +19,7 @@ This is one full PABCD cycle after Windows service/data-plane hotfixes. It is al
 Scope:
 
 - MODIFY `src/cli.ts`
-- MODIFY `bin/ocx.mjs` only if launcher-level `-v` should bypass Bun startup or show launcher diagnostics
+- MODIFY `bin/opr.mjs` only if launcher-level `-v` should bypass Bun startup or show launcher diagnostics
 - MODIFY `src/update.ts` or extract shared package-version helper if needed
 - MODIFY `src/config.ts` only for safe config diagnostics helpers
 - MODIFY `tests/cli-help.test.ts` or ADD `tests/cli-version.test.ts`
@@ -107,7 +107,7 @@ opr status
 Stale provider smoke:
 
 ```bash
-# In a temp OPENCODEX_HOME, create config/auth entries for cursor with authMode oauth.
+# In a temp OpenProvider_HOME, create config/auth entries for cursor with authMode oauth.
 opr status
 # Confirm status warns, exits 0, and prints no token material.
 ```
@@ -118,3 +118,4 @@ opr status
 - `opr status` gives enough information for Windows reports: version, runtime, service/log path, config path, provider/default summary.
 - Stale unsupported OAuth providers are diagnosed with safe cleanup guidance.
 - Tests cover version flags, no-mutation help/version behavior, and stale provider diagnostics.
+

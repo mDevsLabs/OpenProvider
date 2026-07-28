@@ -21,7 +21,7 @@ OpenProvider CLI는 `opr`입니다. 최상위 사용법은 `opr help`(또는 `--
 프록시 서버를 시작합니다(우선 포트 `10100`). 해당 포트를 이미 사용 중이면 OpenProvider가 다른 빈
 포트를 골라 기록합니다. PID와 런타임 포트 상태를 저장하며, 살아 있는 두 번째 인스턴스는 시작하지
 않습니다. 시작할 때 각 프로바이더의 모델을 Codex 카탈로그에 동기화합니다. 관리형 서비스
-(`OCX_SERVICE=1`)로 실행한 경우가 아니면 종료 시 네이티브 Codex를 복원합니다.
+(`opr_SERVICE=1`)로 실행한 경우가 아니면 종료 시 네이티브 Codex를 복원합니다.
 
 ```bash
 opr start
@@ -359,7 +359,7 @@ opr login xai
 
 OpenProvider를 로그인 관리형 백그라운드 서비스(macOS **launchd**, Linux **systemd user unit**,
 Windows **Task Scheduler**)로 실행합니다. 로그인 시 자동으로 시작되고 비정상 종료 시 다시
-시작됩니다. 서비스 실행은 `OCX_SERVICE=1`을 설정하므로 재시작할 때 Codex 설정을 반복해서
+시작됩니다. 서비스 실행은 `opr_SERVICE=1`을 설정하므로 재시작할 때 Codex 설정을 반복해서
 바꾸지 않습니다.
 
 | Subcommand | Action |
@@ -430,8 +430,8 @@ opr debug usage logs [-f|--follow]
 ```
 
 범위를 지정하지 않으면 `opr debug`가 사용법을 출력합니다. 프록시가 멈춰 있을 때는 다음 시작 시
-적용될 환경 변수 기본값도 보여 줍니다. 프로바이더 디버그 기본값은 `OCX_DEBUG=1`이며 기존
-`OCX_DEBUG_FRAMES=1`도 지원합니다. 사용량 디버그 기본값은 `OpenProvider_USAGE_DEBUG=1`입니다.
+적용될 환경 변수 기본값도 보여 줍니다. 프로바이더 디버그 기본값은 `opr_DEBUG=1`이며 기존
+`opr_DEBUG_FRAMES=1`도 지원합니다. 사용량 디버그 기본값은 `OpenProvider_USAGE_DEBUG=1`입니다.
 
 ## 업데이트
 
@@ -473,5 +473,6 @@ opr update --tag preview
 프로세스에서 업데이트 알림 캐시를 갱신합니다.
 `__gui-update-worker <job-id> [latest|preview] [restart]`는 대시보드 업데이트 작업을 실행합니다.
 구현 세부 사항이며 안정적인 사용자 명령이 아닙니다.
+
 
 

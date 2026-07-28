@@ -20,11 +20,11 @@ import {
   getCodexAccountHealthSnapshot,
   recordCodexUpstreamOutcome,
 } from "../src/codex/routing";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { formatOAuthHealthForStatus } from "../src/cli/status-oauth";
 
 const origHome = process.env.HOME;
-const origOcxHome = process.env.OPENPROVIDER_HOME;
+const origoprHome = process.env.OPENPROVIDER_HOME;
 let tmp: string;
 
 beforeEach(() => {
@@ -38,8 +38,8 @@ beforeEach(() => {
 afterEach(() => {
   if (origHome === undefined) delete process.env.HOME;
   else process.env.HOME = origHome;
-  if (origOcxHome === undefined) delete process.env.OPENPROVIDER_HOME;
-  else process.env.OPENPROVIDER_HOME = origOcxHome;
+  if (origoprHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = origoprHome;
   clearCodexUpstreamHealth();
   clearAccountNeedsReauth(MAIN_CODEX_ACCOUNT_ID);
   rmSync(tmp, { recursive: true, force: true });
@@ -228,7 +228,7 @@ describe("collectOAuthHealthEntriesForCli", () => {
 
 describe("getCodexAccountHealthSnapshot", () => {
   test("exposes active cooldown source without changing write policy", () => {
-    const config = { providers: {} } as OcxConfig;
+    const config = { providers: {} } as oprConfig;
     const now = Date.parse("2026-07-23T14:00:00.000Z");
     recordCodexUpstreamOutcome(config, "pool-acct", 429, { retryAfter: "120", now });
 
@@ -239,3 +239,4 @@ describe("getCodexAccountHealthSnapshot", () => {
     expect(getCodexAccountHealthSnapshot("missing", now)).toBeNull();
   });
 });
+

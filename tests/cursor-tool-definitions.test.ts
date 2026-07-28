@@ -13,12 +13,13 @@ import {
   cursorToolInputSchema,
   cursorToolWireName,
   isGenericToolUseCountDemoPrompt,
+  nonEmptyShellBridgeCommandFromArgs,
 } from "../src/adapters/cursor/tool-definitions";
-import type { OcxTool } from "../src/types";
+import type { oprTool } from "../src/types";
 
 describe("Cursor tool definitions", () => {
   test("converts Responses tools to Cursor request context definitions", () => {
-    const tool: OcxTool = {
+    const tool: oprTool = {
       name: "read_file",
       namespace: "mcp__fs",
       description: "Read a file",
@@ -38,7 +39,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("advertises bare exec_command with compact native exec schema", () => {
-    const tool: OcxTool = {
+    const tool: oprTool = {
       name: "exec_command",
       description: "Run a command",
       parameters: {
@@ -63,7 +64,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("advertises bare shell_command with the same compact native exec schema", () => {
-    const tool: OcxTool = {
+    const tool: oprTool = {
       name: "shell_command",
       description: "Run a command",
       parameters: {
@@ -91,7 +92,7 @@ describe("Cursor tool definitions", () => {
     // Live #399 failure: Cursor advertisement requires `cmd`, models send `cmd`, but Codex
     // shell_command validates `command` → "missing field `command`". Normalization must use the
     // Responses-side schema, not the Cursor advertisement schema.
-    const tool: OcxTool = {
+    const tool: oprTool = {
       name: "shell_command",
       description: "Run a command",
       parameters: {
@@ -116,7 +117,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("preserves cmd-only exec_command schemas during Responses normalization", () => {
-    const tool: OcxTool = {
+    const tool: oprTool = {
       name: "exec_command",
       description: "Run a command",
       parameters: {
@@ -143,8 +144,35 @@ describe("Cursor tool definitions", () => {
     });
   });
 
+  test("shell bridge command validation honors the schema-required command key", () => {
+    const execSchema = cursorToolArgNormalizeSchema({
+      name: "exec_command",
+      description: "Run a command",
+      parameters: {
+        type: "object",
+        properties: { cmd: { type: "string" } },
+        required: ["cmd"],
+      },
+    } as oprTool);
+    expect(nonEmptyShellBridgeCommandFromArgs(JSON.stringify({ cmd: "echo hi" }), "exec_command", execSchema)).toBe("echo hi");
+    expect(nonEmptyShellBridgeCommandFromArgs(JSON.stringify({ command: "echo hi" }), "exec_command", execSchema)).toBeUndefined();
+    expect(nonEmptyShellBridgeCommandFromArgs(JSON.stringify({ cmd: "", command: "echo hi" }), "exec_command", execSchema)).toBeUndefined();
+
+    const shellSchema = cursorToolArgNormalizeSchema({
+      name: "shell_command",
+      description: "Run a command",
+      parameters: {
+        type: "object",
+        properties: { command: { type: "string" } },
+        required: ["command"],
+      },
+    } as oprTool);
+    expect(nonEmptyShellBridgeCommandFromArgs(JSON.stringify({ command: "echo hi" }), "shell_command", shellSchema)).toBe("echo hi");
+    expect(nonEmptyShellBridgeCommandFromArgs(JSON.stringify({ cmd: "echo hi" }), "shell_command", shellSchema)).toBeUndefined();
+  });
+
   test("does not alias namespaced exec_command tools", () => {
-    const tool: OcxTool = {
+    const tool: oprTool = {
       name: "exec_command",
       namespace: "mcp__shell",
       description: "Run remote command",
@@ -180,7 +208,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("appends generic tool-use guidance only when bare exec_command is available", () => {
-    const tools: OcxTool[] = [{ name: "exec_command", description: "Run", parameters: {} }];
+    const tools: oprTool[] = [{ name: "exec_command", description: "Run", parameters: {} }];
     const prompt = "Use any 10 tools";
 
     const hinted = appendCursorGenericToolUseHint(tools, prompt);
@@ -207,7 +235,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("filters generic tool-count demos to the Codex native exec surface", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "exec_command", description: "Run", parameters: {} },
       { name: "tool_search", description: "Search tools", parameters: {} },
       { name: "list_mcp_resources", description: "List resources", parameters: {} },
@@ -223,7 +251,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("filters generic tool-count demos when only shell_command is available", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "shell_command", description: "Run", parameters: {} },
       { name: "tool_search", description: "Search tools", parameters: {} },
     ];
@@ -232,7 +260,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("does not erase explicit non-exec tool_choice for generic tool-count prompts", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "exec_command", description: "Run", parameters: {} },
       { name: "read_file", namespace: "mcp__fs", description: "Read", parameters: {} },
     ];
@@ -250,7 +278,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("applies Responses tool_choice to advertised Cursor tool definitions", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "read_file", namespace: "mcp__fs", description: "Read", parameters: {} },
       { name: "write_file", namespace: "mcp__fs", description: "Write", parameters: {} },
     ];
@@ -264,7 +292,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("builds concise Cursor tool guidance from advertised wire names", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "exec_command", description: "Run", parameters: {} },
       { name: "read_file", namespace: "mcp__fs", description: "Read", parameters: {} },
     ];
@@ -297,7 +325,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("adds codex-native edit guidance only when apply_patch is advertised", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "exec_command", description: "Run", parameters: {} },
       { name: "apply_patch", description: "Patch", parameters: {}, freeform: true },
     ];
@@ -315,7 +343,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("does not forbid neighboring-agent names that are actually advertised", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "exec_command", description: "Run", parameters: {} },
       { name: "Glob", description: "Find files", parameters: {} },
     ];
@@ -330,7 +358,7 @@ describe("Cursor tool definitions", () => {
   });
 
   test("omits Cursor tool guidance when no tools are advertised", () => {
-    const tools: OcxTool[] = [
+    const tools: oprTool[] = [
       { name: "read_file", namespace: "mcp__fs", description: "Read", parameters: {} },
       { name: "write_file", namespace: "mcp__fs", description: "Write", parameters: {} },
     ];
@@ -346,3 +374,4 @@ describe("Cursor tool definitions", () => {
     expect(allowedNote).not.toContain("`mcp__fs__read_file`");
   });
 });
+

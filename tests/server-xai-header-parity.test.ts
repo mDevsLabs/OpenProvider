@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { deriveXaiConvId } from "../src/providers/xai-transport";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -33,7 +33,7 @@ afterEach(() => {
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
-function config(connectTimeoutMs = 1_000): OcxConfig {
+function config(connectTimeoutMs = 1_000): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -48,7 +48,7 @@ function config(connectTimeoutMs = 1_000): OcxConfig {
         defaultModel: "grok-test",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function post(serverUrl: string): Promise<Response> {
@@ -124,3 +124,4 @@ describe("xAI headers through /v1/responses", () => {
     }
   });
 });
+

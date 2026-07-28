@@ -7,7 +7,7 @@
  * them here breaks that cycle. `inject.ts` imports them back and re-exports the
  * two public predicates, so external callers see no change.
  */
-export const OCX_SECTION_MARKER = "# Auto-injected by openprovider";
+export const opr_SECTION_MARKER = "# Auto-injected by openprovider";
 
 export function isRootOpenaiBaseUrlLine(line: string): boolean {
   return /^\s*openai_base_url\s*=/.test(line);
@@ -55,7 +55,7 @@ export function hasInjectedOpenaiBaseUrl(content: string): boolean {
   const firstTable = lines.findIndex(l => /^\s*\[/.test(l));
   const rootEnd = firstTable === -1 ? lines.length : firstTable;
   for (let i = 1; i < rootEnd; i++) {
-    if (isRootOpenaiBaseUrlLine(lines[i]!) && lines[i - 1]!.includes(OCX_SECTION_MARKER)) return true;
+    if (isRootOpenaiBaseUrlLine(lines[i]!) && lines[i - 1]!.includes(opr_SECTION_MARKER)) return true;
   }
   return false;
 }
@@ -70,3 +70,6 @@ export function hasInjectedCodexRouting(content: string): boolean {
   return rootTomlString(content, "model_provider") === "openprovider"
     && providerTableString(content, "openprovider", "base_url") !== null;
 }
+
+
+

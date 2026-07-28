@@ -12,7 +12,7 @@ import {
 import { parseCallbackInput } from "../src/oauth/callback-server";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-oauth-manual-code-test");
 let previousOpenproviderHome: string | undefined;
@@ -209,7 +209,7 @@ describe("OAuth manual login code fallback", () => {
       hostname: "127.0.0.1",
       defaultProvider: "xai",
       providers: { xai: { adapter: "openai-chat", baseUrl: "https://api.x.ai/v1", authMode: "oauth" } },
-    } as OcxConfig);
+    } as oprConfig);
     const server = startServer(0);
     try {
       const post = (body: unknown) => fetch(new URL("/api/oauth/login/code", server.url), {
@@ -233,3 +233,4 @@ describe("OAuth manual login code fallback", () => {
     }
   });
 });
+

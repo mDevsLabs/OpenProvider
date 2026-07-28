@@ -70,7 +70,7 @@ the side door, defeating rule 2. Announcement state is a property of the
 installation, not of a browser profile. It also has to be readable by any future
 non-GUI surface (`opr status`), which a browser store cannot serve.
 
-Cost accepted: a config write on dismissal, and a new field in `OcxConfig`. The
+Cost accepted: a config write on dismissal, and a new field in `oprConfig`. The
 theme precedent stays in `localStorage` because it genuinely IS per-device.
 
 ## Design decision 3 — declaration lives in code, not in a release artifact
@@ -134,3 +134,4 @@ open question when we get there.
   persists, and all six locales carry the keys.
 - `c-gates` — `bun run typecheck`, `bun run test`, `gui bun run test`,
   `bun run lint:gui`, `bun run privacy:scan`, zero new failures.
+

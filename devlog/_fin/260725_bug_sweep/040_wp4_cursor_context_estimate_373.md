@@ -52,7 +52,7 @@ cursor?: {
 
 ```ts
 const contextTokens = reportableContextTokens(state);
-const usage: OcxUsage = contextTokens !== undefined
+const usage: oprUsage = contextTokens !== undefined
   ? usageFromContextTokens(state, contextTokens)
   : { ...state.usage };
 ```
@@ -278,7 +278,7 @@ estimator가 본 payload와 실제 전송 payload가 동일함이 타입 수준�
 +  estimatedInputTokens?: number;
  }
 +
-+function resolvedTurnUsage(state: CursorProtobufEventState): OcxUsage {
++function resolvedTurnUsage(state: CursorProtobufEventState): oprUsage {
 +  const contextTokens = reportableContextTokens(state);
 +  if (contextTokens !== undefined) return usageFromContextTokens(state, contextTokens);
 +  const estimate = state.estimatedInputTokens;
@@ -382,3 +382,4 @@ bun run typecheck
 ```
 
 `tests/token-estimate.test.ts`는 공유 estimator를 건드리지 않았음을 증명하는 회귀 가드다.
+

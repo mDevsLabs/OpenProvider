@@ -1,7 +1,7 @@
 # Execution record (2026-07-09)
 
 ## Shipped
-- src/bridge.ts: `hiddenRawReasoningText` + `flushHiddenRawReasoning()` (txt-only ocxr1 envelope
+- src/bridge.ts: `hiddenRawReasoningText` + `flushHiddenRawReasoning()` (txt-only oprr1 envelope
   via direct encodeReasoningEnvelope); hidden guard in `reasoning_raw_delta`; flush wired at all
   8 closeCurrentRawReasoning barriers + stream catch path; non-streaming flushRawReasoning hidden
   branch. Visible mode (summary "auto") unchanged.
@@ -26,3 +26,4 @@
 - If the user later opts into visible thinking (summary "auto"), raw reasoning becomes visible
   again and will split cells - by design (native semantics).
 - Kiro thinking replay unchanged (kiro adapter drops thinking parts on replay regardless).
+

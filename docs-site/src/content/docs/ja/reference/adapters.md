@@ -3,7 +3,7 @@ title: アダプター
 description: 7つのプロバイダーアダプターの対象、リクエスト構成方式、固有の動作。
 ---
 
-**アダプター**は OpenProvider の内部リクエスト/レスポンスモデルとプロバイダーの wire 形式の間を変換します。すべてのアダプターは `ProviderAdapter` インターフェース（`src/adapters/base.ts`）を実装します。
+**アダプター**は opencodex の内部リクエスト/レスポンスモデルとプロバイダーの wire 形式の間を変換します。すべてのアダプターは `ProviderAdapter` インターフェース（`src/adapters/base.ts`）を実装します。
 
 ```ts
 interface ProviderAdapter {
@@ -45,7 +45,7 @@ interface ProviderAdapter {
 ## `anthropic`
 
 **対象:** Anthropic **Messages**（`/v1/messages`）。
-**認証:** `key`（`x-api-key`）または `oauth`（Bearer + `anthropic-beta`、Claude Pro/Max 用）。
+**認証:** `key`（デフォルトは `x-api-key`、または `apiKeyTransport: "bearer"` による `Authorization: Bearer`）または `oauth`（Bearer + `anthropic-beta`、Claude Pro/Max 用）。
 
 - メッセージを Anthropic content block（text、base64 image、`tool_use`、`thinking`）に変換します。
 - **Extended thinking の計算:** Anthropic は `max_tokens > thinking.budget_tokens` を要求します。
@@ -77,16 +77,17 @@ interface ProviderAdapter {
 
 Kiro のアシスタントテキストには、それ自体で end-turn を示す信頼できる区別がありません。ただし終端の
 `metadataEvent` がネイティブの `stopReason` を運ぶことがあります。`END_TURN` または `STOP_SEQUENCE` は
-権威ある終了とみなし、そのテキストを最終回答として送出します。追加のモデル往復は行いません。
+終了した推論であることは示しますが、進捗文にも付く場合があるため、ツール有効ターンではそのテキストだけを最終回答にしません。
+通常テキストは commentary のまま、非公開の完了ツールを一度検証します。
 
-互換パスに入るのは stop reason が**存在しない**場合だけです。明示的な理由はすでに上流で推論を終了させて
+`END_TURN`、`STOP_SEQUENCE`、または stop reason が無い場合は一度だけ完了互換パスに入れます。それ以外の明示的な理由はすでに上流で推論を終了させて
 いるため、もう一度モデルに投げ直すのではなくそのまま報告します。出力トークン上限は継続可能な incomplete、
 コンテキストウィンドウの枯渇は再試行不可の context-length エラー、フィルタリングやガードレールによる停止は
 filtered incomplete になります。実際のツール呼び出しを伴わない `TOOL_USE` は進捗ではなく矛盾として扱います。
 
-stop reason がまったく無い場合のみ、OpenProvider は非公開の `codex_kiro_final_answer` ツールを追加して
-一度だけ継続します。重複抑制は空白を正規化した完全一致に限定します。言い換えられた状態更新は結果そのものを
-変えることがあり（「保留中」から「完了」へ）、その一文を失うほうが、体裁上の繰り返しを表示するより有害です。
+ツール有効ターンでは非公開の `codex_kiro_final_answer` を追加します。再試行は空の assistant/user ターンを
+生成せず、元の user/tool-result を保持し、送信前にロール交互性、空の構造メッセージ、tool use/result の対応を検証します。
+完了ツールの回答は以前の commentary と同じでも `final_answer` として送出します。
 
 ### Reasoning effort
 
@@ -119,4 +120,3 @@ stop reason がまったく無い場合のみ、OpenProvider は非公開の `co
 - `parseDataUrl(url)` — `data:<type>;base64,<data>` URL を `{ mediaType, base64 }` に分け、Anthropic/Google の画像 block に使います。
 - `contentPartsToText(content)` — テキスト専用ツールメッセージのために content part をテキストに
   平坦化します。説明のない画像はトークンを増やす base64 blob の代わりに短い `[image]` marker になります。
-

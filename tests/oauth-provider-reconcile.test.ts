@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { loadConfig } from "../src/config";
 import { reconcileOAuthProviders } from "../src/oauth";
 import { getCredential, saveCredential } from "../src/oauth/store";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const originalHome = process.env.OPENPROVIDER_HOME;
 const homes: string[] = [];
@@ -43,7 +43,7 @@ describe("OAuth provider reconciliation", () => {
           note: "user-owned-note",
         },
       },
-    } satisfies OcxConfig;
+    } satisfies oprConfig;
 
     expect(reconcileOAuthProviders(config)).toBe(true);
     const provider = config.providers["google-antigravity"];
@@ -51,6 +51,7 @@ describe("OAuth provider reconciliation", () => {
     expect(provider.models).toEqual([
       "gemini-3.6-flash",
       "gemini-3.1-pro",
+      "gemini-3.1-flash-image",
       "claude-sonnet-4-6",
       "claude-opus-4-6-thinking",
       "gpt-oss-120b-medium",
@@ -73,3 +74,4 @@ describe("OAuth provider reconciliation", () => {
     expect(reconcileOAuthProviders(config)).toBe(false);
   });
 });
+

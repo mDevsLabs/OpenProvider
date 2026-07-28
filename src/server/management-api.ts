@@ -33,7 +33,6 @@ import { clearThreadAccountMap } from "../codex/routing";
 import { primeCodexPoolQuotas } from "../codex/auth-api";
 import { DEFAULT_PROVIDER_CONTEXT_CAP, globalContextCapValue, providerContextCap, providerContextCaps, setAllProviderContextCaps, setGlobalContextCapValue, setProviderContextCap } from "../providers/context-cap";
 import { resolveCodexHomeDir } from "../codex/home";
-import { scanStorage } from "../storage/scanner";
 import { readUsageEntries } from "../usage/log";
 import { getUsageDebugLogEntries } from "../usage/debug";
 import { parseRange, parseUsageSurface, summarizeUsage } from "../usage/summary";
@@ -48,7 +47,7 @@ import {
   setDebugSettings,
   type DebugFlag,
 } from "../lib/debug-settings";
-import type { OcxClaudeCodeConfig, OcxClaudeDesktopProfile, OcxConfig, OcxCustomModel, OcxProviderConfig } from "../types";
+import type { oprClaudeCodeConfig, oprClaudeDesktopProfile, oprConfig, oprCustomModel, oprProviderConfig } from "../types";
 import type { DesktopProfileModel } from "../claude/desktop-profile";
 import { drainAndShutdown } from "./lifecycle";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "./request-log";
@@ -79,7 +78,7 @@ export const VERSION = (() => {
   }
 })();
 
-export async function handleManagementAPI(req: Request, url: URL, config: OcxConfig, deps: ManagementApiDeps = {}): Promise<Response | null> {
+export async function handleManagementAPI(req: Request, url: URL, config: oprConfig, deps: ManagementApiDeps = {}): Promise<Response | null> {
   if (!isAllowedRequestOrigin(req, config)) {
     return jsonResponse({ error: "cross-origin request blocked" }, 403, req, config);
   }
@@ -150,7 +149,7 @@ export async function handleManagementAPI(req: Request, url: URL, config: OcxCon
     }
     const restore = restoreNativeCodex();
     // Both managed configs come down together on an explicit teardown. The daemon's own
-    // syncCleanup skips this when OCX_SERVICE is set (so a crash/respawn keeps the fence),
+    // syncCleanup skips this when opr_SERVICE is set (so a crash/respawn keeps the fence),
     // which is exactly why an intentional stop has to do it here.
     const { stripGrokConfig } = await import("../grok/inject");
     const grok = stripGrokConfig();
@@ -174,3 +173,4 @@ export async function handleManagementAPI(req: Request, url: URL, config: OcxCon
 
 
 export { buildClaudeDesktopState, fetchAllModels } from "./management/shared";
+

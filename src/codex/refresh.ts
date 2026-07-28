@@ -1,14 +1,17 @@
 import { existsSync, readFileSync } from "node:fs";
 import { invalidateCodexModelsCache, syncCatalogModels } from "./catalog";
+import type { ComboCatalogOmission } from "./catalog/aggregation";
 import { CODEX_MODELS_CACHE_PATH } from "./paths";
 import { atomicWriteFile } from "../config";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 
 export interface CodexCatalogRefreshResult {
   added: number;
   path: string;
   catalogExists: boolean;
+  catalogWritten: boolean;
   cacheSynced: boolean;
+  comboOmissions: ComboCatalogOmission[];
 }
 
 interface RefreshDeps {
@@ -35,12 +38,17 @@ export function syncCodexModelsCacheFromCatalog(catalogPath: string): void {
  * inconsistent with the CLI models-manager cache path.
  */
 export async function refreshCodexModelCatalog(
-  config: OcxConfig,
+  config: oprConfig,
   deps: RefreshDeps = defaultDeps,
 ): Promise<CodexCatalogRefreshResult> {
   const result = await deps.syncCatalogModels(config);
   const catalogExists = deps.existsSync(result.path);
-  if (!catalogExists) return { ...result, catalogExists, cacheSynced: false };
-  deps.invalidateCodexModelsCache();
-  return { ...result, catalogExists, cacheSynced: true };
+  const catalogWritten = result.catalogWritten === true;
+  const comboOmissions = result.comboOmissions ?? [];
+  if (!catalogExists) {
+    return { ...result, catalogExists, catalogWritten: false, cacheSynced: false, comboOmissions };
+  }
+  const cacheSynced = deps.invalidateCodexModelsCache();
+  return { ...result, catalogExists, catalogWritten, cacheSynced, comboOmissions };
 }
+

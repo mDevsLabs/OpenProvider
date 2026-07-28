@@ -21,7 +21,7 @@ desktopExecutor, nativeLocalExec, and many more. Nested secrets in mcpServers[*]
 would be silently erased.
 
 ### High — TypeScript compilation failure (H3)
-OcxProviderConfig cast to Record<string,unknown> causes TS2352. Needs typed helper
+oprProviderConfig cast to Record<string,unknown> causes TS2352. Needs typed helper
 function instead of unsafe cast.
 
 ### Medium issues
@@ -47,3 +47,4 @@ This is too complex for the current overnight review session.
 The PR shows as MERGED on GitHub but the code was reverted from dev. A Sol
 review comment has been posted on the PR explaining the 3 high-severity
 findings. The rebuild will be tracked as a separate devlog unit when undertaken.
+

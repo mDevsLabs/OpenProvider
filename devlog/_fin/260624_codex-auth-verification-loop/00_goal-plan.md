@@ -234,7 +234,7 @@ Potential surfaces:
 
 Planned implementation details:
 
-- Add `upstreamFailoverThreshold?: number` to `OcxConfig`; default to 3, validate as integer `0-20`, and keep it separate from `autoSwitchThreshold` percent validation.
+- Add `upstreamFailoverThreshold?: number` to `oprConfig`; default to 3, validate as integer `0-20`, and keep it separate from `autoSwitchThreshold` percent validation.
 - Extend quota data with optional `monthlyPercent?: number` and `monthlyResetAt?: number`.
 - Parse WHAM `rate_limit.tertiary_window` into monthly quota when present; omit the 30d row when absent.
 - Capture optional tertiary headers only when present, without assuming live WHAM currently sends them.
@@ -313,3 +313,4 @@ The goal is not complete until:
 4. External-source-dependent claims are documented with URLs and evidence status.
 5. Independent audit/review has challenged the final completion claim.
 6. No personal tokens, raw account IDs, or full personal emails are newly exposed.
+

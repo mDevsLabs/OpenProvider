@@ -85,7 +85,7 @@ install.js` finalizes the binary into the main package's `bin/`.
 ### Launcher resolution strategy
 
 ```
-bin/ocx.mjs  (#!/usr/bin/env node)
+bin/opr.mjs  (#!/usr/bin/env node)
   → resolveBundledBun():
       bunDir   = dirname(require.resolve('bun/package.json'))
       bunBin   = join(bunDir, 'bin', 'bun.exe')   // all platforms
@@ -128,4 +128,5 @@ launcher execs bun to run cli.ts). This is critical — see §Ripple effects.
 - Publishing binaries on npm (Sentry): https://sentry.engineering/blog/publishing-binaries-on-npm
 - bun build --compile external-asset caveat (relevant to future Option 2):
   https://github.com/oven-sh/bun/issues/14676
+
 

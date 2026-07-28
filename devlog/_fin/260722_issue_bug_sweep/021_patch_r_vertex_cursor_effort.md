@@ -106,7 +106,7 @@ After:
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { gatherRoutedModels } from "../src/codex/catalog";
 import { clearModelCache } from "../src/codex/model-cache";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const originalFetch = globalThis.fetch;
 let warn: ReturnType<typeof spyOn> | undefined;
@@ -118,7 +118,7 @@ afterEach(() => {
   warn = undefined;
 });
 
-function vertexProvider(name: string): OcxConfig {
+function vertexProvider(name: string): oprConfig {
   return {
     providers: {
       [name]: {
@@ -176,15 +176,15 @@ Before (현행 실측):
 
 ```ts
 export interface NormalizedComboConfig {
-  strategy: OcxComboStrategy;
+  strategy: oprComboStrategy;
   stickyLimit: number;
-  defaultEffort: OcxComboDefaultEffort;
-  targets: Array<Required<OcxComboTarget>>;
+  defaultEffort: oprComboDefaultEffort;
+  targets: Array<Required<oprComboTarget>>;
 }
 ```
 
 ```ts
-export function normalizeComboConfig(raw: OcxComboConfig): NormalizedComboConfig {
+export function normalizeComboConfig(raw: oprComboConfig): NormalizedComboConfig {
   return {
     strategy: raw.strategy ?? "failover",
     stickyLimit: raw.stickyLimit ?? 1,
@@ -195,15 +195,15 @@ After:
 
 ```ts
 export interface NormalizedComboConfig {
-  strategy: OcxComboStrategy;
+  strategy: oprComboStrategy;
   stickyLimit: number;
-  defaultEffort: OcxComboDefaultEffort | null;
-  targets: Array<Required<OcxComboTarget>>;
+  defaultEffort: oprComboDefaultEffort | null;
+  targets: Array<Required<oprComboTarget>>;
 }
 ```
 
 ```ts
-export function normalizeComboConfig(raw: OcxComboConfig): NormalizedComboConfig {
+export function normalizeComboConfig(raw: oprComboConfig): NormalizedComboConfig {
   return {
     strategy: raw.strategy ?? "failover",
     stickyLimit: raw.stickyLimit ?? 1,
@@ -220,8 +220,8 @@ Before (현행 실측):
 ```ts
 export function concreteComboRequestBody(
   body: unknown,
-  target: Pick<OcxComboTarget, "provider" | "model">,
-  defaultEffort: OcxComboDefaultEffort | null,
+  target: Pick<oprComboTarget, "provider" | "model">,
+  defaultEffort: oprComboDefaultEffort | null,
 ): Record<string, unknown> {
   const clone = structuredClone(body) as Record<string, unknown>;
   clone.model = `${target.provider}/${target.model}`;
@@ -235,8 +235,8 @@ const warnedUnsupportedDefaults = new Set<string>();
 
 export function concreteComboRequestBody(
   body: unknown,
-  target: Pick<OcxComboTarget, "provider" | "model">,
-  defaultEffort: OcxComboDefaultEffort | null,
+  target: Pick<oprComboTarget, "provider" | "model">,
+  defaultEffort: oprComboDefaultEffort | null,
   targetReasoningEfforts: readonly string[] | undefined,
 ): Record<string, unknown> {
   const clone = structuredClone(body) as Record<string, unknown>;
@@ -475,3 +475,4 @@ for (const model of CURSOR_STATIC_MODELS) {
 - [ ] `bun test tests/cursor-discovery.test.ts`
 - [ ] `bun test tests/cursor-static-catalog.test.ts`
 - [ ] `bun run typecheck`
+

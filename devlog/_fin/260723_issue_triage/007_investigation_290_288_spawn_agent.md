@@ -31,7 +31,7 @@ All technical conclusions below point back to these verbatim source anchors.
 
 `src/config.ts:731-750`:
 
-> `export function getDefaultConfig(): OcxConfig {`
+> `export function getDefaultConfig(): oprConfig {`
 >
 > `subagentModels: [...DEFAULT_SUBAGENT_MODELS],`
 
@@ -41,7 +41,7 @@ There is one important loading nuance. A valid pre-existing/manual config that o
 
 > `const result = configSchema.safeParse(parsed);`
 >
-> `if (result.success) return result.data as OcxConfig;`
+> `if (result.success) return result.data as oprConfig;`
 >
 > `const defaults = getDefaultConfig();`
 >
@@ -510,3 +510,4 @@ retain `bug` and implement the narrow adapter/bridge regression fix.
 - **#290 fix after capture:** 2–4 hours if it is a local schema/bridge defect; 1–2 hours for a
   provider-compatibility documentation/diagnostic change; external/unknown if upstream Codex must
   preserve or expand the V2 schema.
+

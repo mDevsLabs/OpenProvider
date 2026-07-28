@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 import { chatCompletionsToResponsesBody, ChatCompletionsRequestError } from "../src/chat/inbound";
 import { chatCompletionsUsage } from "../src/chat/outbound";
@@ -99,14 +99,14 @@ function mockDualWireUpstream() {
   return { server, captured };
 }
 
-function mockConfig(baseUrl: string): OcxConfig {
+function mockConfig(baseUrl: string): oprConfig {
   return {
     port: 0,
     defaultProvider: "mock",
     providers: {
       mock: { adapter: "openai-chat", baseUrl, apiKey: "k", allowPrivateNetwork: true },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 type StreamedToolCall = {
@@ -490,7 +490,7 @@ test("POST /v1/chat/completions direct mode forwards caller Authorization", asyn
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig);
+  } as oprConfig);
   const server = startServer(0);
   try {
     const response = await fetch(new URL("/v1/chat/completions", server.url), {
@@ -548,7 +548,7 @@ test("POST /v1/chat/completions finalizes native passthrough request logs", asyn
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig);
+  } as oprConfig);
   const server = startServer(0);
   try {
     const response = await fetch(new URL("/v1/chat/completions", server.url), {
@@ -696,7 +696,7 @@ test("non-streaming /v1/chat/completions returns error status on upstream failur
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig);
+  } as oprConfig);
   const server = startServer(0);
   try {
     const response = await fetch(new URL("/v1/chat/completions", server.url), {
@@ -754,7 +754,7 @@ test("streaming /v1/chat/completions does not clean-DONE after response.failed",
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig);
+  } as oprConfig);
   const server = startServer(0);
   try {
     const response = await fetch(new URL("/v1/chat/completions", server.url), {
@@ -1065,7 +1065,7 @@ test("collectChatCompletion throws ChatCompletionsStreamError on a stall incompl
 // --- #404: one gateway, two wires. Without a per-model override the provider-wide
 // adapter wins and Grok's hosted web_search is dropped before it ever goes out. ----
 
-function dualWireConfig(baseUrl: string): OcxConfig {
+function dualWireConfig(baseUrl: string): oprConfig {
   return {
     port: 0,
     defaultProvider: "mock",
@@ -1078,7 +1078,7 @@ function dualWireConfig(baseUrl: string): OcxConfig {
         modelAdapters: { "grok-4.5": "openai-responses" },
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 test("an overridden model reaches the responses wire with its hosted tool intact (#404)", async () => {
@@ -1196,7 +1196,7 @@ test("/v1/chat/completions non-OK upstream preserves structured model_not_found"
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig);
+  } as oprConfig);
   const server = startServer(0);
   try {
     const response = await fetch(new URL("/v1/chat/completions", server.url), {
@@ -1261,7 +1261,7 @@ test("/v1/chat/completions status:failed replay preserves structured model_not_f
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig);
+  } as oprConfig);
   const server = startServer(0);
   try {
     const response = await fetch(new URL("/v1/chat/completions", server.url), {
@@ -1289,3 +1289,4 @@ test("/v1/chat/completions status:failed replay preserves structured model_not_f
     globalThis.fetch = originalFetch;
   }
 });
+

@@ -1,14 +1,14 @@
 import type {
-  OcxAssistantMessage,
-  OcxContentPart,
-  OcxContext,
-  OcxMessage,
-  OcxParsedRequest,
-  OcxRequestOptions,
-  OcxTextContent,
-  OcxThinkingContent,
-  OcxTool,
-  OcxToolCall,
+  oprAssistantMessage,
+  oprContentPart,
+  oprContext,
+  oprMessage,
+  oprParsedRequest,
+  oprRequestOptions,
+  oprTextContent,
+  oprThinkingContent,
+  oprTool,
+  oprToolCall,
 } from "../types";
 import { namespacedToolName } from "../types";
 import { responsesRequestSchema } from "./schema";
@@ -16,6 +16,7 @@ import { compactionItemToText } from "./compaction";
 import { previousResponseReplayPrefixLength } from "./state";
 import { decodeReasoningEnvelope } from "./reasoning-envelope";
 import { extractHostedWebSearch, WEB_SEARCH_TOOL_NAME } from "../web-search/synthetic-tool";
+import { extractHostedImageGeneration, IMAGE_GEN_TOOL_NAME } from "../images/synthetic-tool";
 
 function isObj(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
@@ -32,12 +33,12 @@ function nonEmptyString(value: unknown): string | undefined {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
-function inputContentParts(blocks: unknown): string | OcxContentPart[] {
+function inputContentParts(blocks: unknown): string | oprContentPart[] {
   if (typeof blocks === "string") return blocks;
   // The catch-all can also hand back a non-array `content` (an object, a number), which would
   // throw at the loop below before any per-block guard runs.
   if (!Array.isArray(blocks)) return [];
-  const parts: OcxContentPart[] = [];
+  const parts: oprContentPart[] = [];
   for (const raw of blocks) {
     // A malformed message item fails its strict schema and falls through to inputItemSchema's
     // permissive catch-all, so blocks reaching here are NOT guaranteed to match the declared
@@ -82,10 +83,10 @@ function inputContentParts(blocks: unknown): string | OcxContentPart[] {
 
 type OutputBlock = { type: "output_text"; text: string } | { type: "text"; text: string } | { type: "refusal"; refusal: string };
 
-function outputTextOf(blocks: unknown): OcxTextContent[] {
+function outputTextOf(blocks: unknown): oprTextContent[] {
   if (typeof blocks === "string") return blocks.length > 0 ? [{ type: "text", text: blocks }] : [];
   if (!Array.isArray(blocks)) return [];
-  const out: OcxTextContent[] = [];
+  const out: oprTextContent[] = [];
   for (const raw of blocks) {
     // Same catch-all caveat as inputContentParts: validate before use.
     if (!isObj(raw)) continue;
@@ -99,13 +100,17 @@ function outputTextOf(blocks: unknown): OcxTextContent[] {
   return out;
 }
 
-function mapToolChoice(value: unknown): OcxRequestOptions["toolChoice"] {
+function mapToolChoice(value: unknown): oprRequestOptions["toolChoice"] {
   if (value === undefined || value === null) return undefined;
   if (value === "auto" || value === "none" || value === "required") return value;
   if (isObj(value) && "type" in value) {
     const t = (value as { type: string }).type;
     if ((t === "function" || t === "custom") && "name" in value) {
       return { name: (value as { name: string }).name };
+    }
+    // Hosted image tool types (with or without a name) map to the synthetic image_gen wire name.
+    if (t === "image_generation" || t === "image_gen") {
+      return { name: IMAGE_GEN_TOOL_NAME };
     }
     if (t === "allowed_tools" && Array.isArray(value.tools)) {
       const names = value.tools
@@ -124,15 +129,16 @@ function allowedToolName(tool: unknown): string | undefined {
   if (!isObj(tool)) return undefined;
   if (typeof tool.name === "string" && tool.name.length > 0) return tool.name;
   if (tool.type === "web_search" || tool.type === "web_search_preview") return WEB_SEARCH_TOOL_NAME;
+  if (tool.type === "image_generation" || tool.type === "image_gen") return IMAGE_GEN_TOOL_NAME;
   if (tool.type === "tool_search") return "tool_search";
   return undefined;
 }
 
-function buildTools(tools: unknown[] | undefined): OcxTool[] | undefined {
+function buildTools(tools: unknown[] | undefined): oprTool[] | undefined {
   if (!tools) return undefined;
-  const out: OcxTool[] = [];
+  const out: oprTool[] = [];
   const pushFn = (t: Record<string, unknown>, namespace?: string) => {
-    const tool: OcxTool = {
+    const tool: oprTool = {
       name: t.name as string,
       description: (t.description as string) ?? "",
       parameters: (t.parameters ?? {}) as Record<string, unknown>,
@@ -194,10 +200,10 @@ function buildTools(tools: unknown[] | undefined): OcxTool[] | undefined {
   return out.length > 0 ? out : undefined;
 }
 
-function ensureAssistantPlaceholder(messages: OcxMessage[], modelId: string, now: number): OcxAssistantMessage {
+function ensureAssistantPlaceholder(messages: oprMessage[], modelId: string, now: number): oprAssistantMessage {
   const last = messages[messages.length - 1];
   if (last && last.role === "assistant") return last;
-  const placeholder: OcxAssistantMessage = { role: "assistant", content: [], model: modelId, timestamp: now };
+  const placeholder: oprAssistantMessage = { role: "assistant", content: [], model: modelId, timestamp: now };
   messages.push(placeholder);
   return placeholder;
 }
@@ -207,10 +213,10 @@ function ensureAssistantPlaceholder(messages: OcxMessage[], modelId: string, now
  * `input_image` items): returns content parts when any image is present, else a plain joined string.
  * Never inlines an image_url as text (that would explode the token count).
  */
-function outputToToolResultContent(output: string | unknown[] | undefined): string | OcxContentPart[] {
+function outputToToolResultContent(output: string | unknown[] | undefined): string | oprContentPart[] {
   if (typeof output === "string") return output;
   if (!Array.isArray(output)) return "";
-  const parts: OcxContentPart[] = [];
+  const parts: oprContentPart[] = [];
   let hasImage = false;
   for (const raw of output) {
     if (!isObj(raw)) continue;
@@ -242,7 +248,7 @@ function normalizeImageDetail(detail: string): string {
   return detail === "original" ? "high" : detail;
 }
 
-function findToolById(messages: OcxMessage[], callId: string): { name: string; namespace?: string } {
+function findToolById(messages: oprMessage[], callId: string): { name: string; namespace?: string } {
   for (let i = messages.length - 1; i >= 0; i--) {
     const m = messages[i];
     if (m.role !== "assistant") continue;
@@ -255,7 +261,7 @@ function findToolById(messages: OcxMessage[], callId: string): { name: string; n
 
 const REASONING_EFFORTS = new Set(["none", "minimal", "low", "medium", "high", "xhigh", "max"]);
 
-export function parseRequest(body: unknown): OcxParsedRequest {
+export function parseRequest(body: unknown): oprParsedRequest {
   const replayedInputPrefixLength = previousResponseReplayPrefixLength(body);
   const parsed = responsesRequestSchema.safeParse(body);
   if (!parsed.success) {
@@ -263,15 +269,15 @@ export function parseRequest(body: unknown): OcxParsedRequest {
   }
   const data = parsed.data;
   const now = Date.now();
-  const messages: OcxMessage[] = [];
+  const messages: oprMessage[] = [];
   const systemPrompt: string[] = [];
   // Responses reasoning siblings belong to the following assistant, including across call items.
   // Keep them off the message list until that assistant arrives; turn boundaries clear the array.
-  const pendingReasoning: Array<{ part: OcxThinkingContent; envelopeSigned: boolean }> = [];
+  const pendingReasoning: Array<{ part: oprThinkingContent; envelopeSigned: boolean }> = [];
   // Assistant placeholder that first folds any pending reasoning into the same turn (official
   // grok-build preserves reasoning across call items; Anthropic replay requires thinking to
   // precede tool_use inside one assistant message).
-  const assistantHolderWithReasoning = (): OcxAssistantMessage => {
+  const assistantHolderWithReasoning = (): oprAssistantMessage => {
     const holder = ensureAssistantPlaceholder(messages, data.model, now);
     if (pendingReasoning.length > 0) {
       holder.content.push(...pendingReasoning.map(entry => entry.part));
@@ -316,7 +322,7 @@ export function parseRequest(body: unknown): OcxParsedRequest {
       }
 
       if (effectiveType === "compaction" || effectiveType === "compaction_summary" || effectiveType === "context_compaction") {
-        // A stored summary from a previous compaction. Decode our ocx1 envelope into plain text so
+        // A stored summary from a previous compaction. Decode our opr1 envelope into plain text so
         // the routed model keeps the compacted context; real OpenAI-encrypted blobs degrade to a note.
         // `context_compaction` (encrypted_content optional) is codex-rs's local-compaction marker;
         // with no payload it is a pure marker (the summary follows as its own user message), so it
@@ -406,10 +412,10 @@ export function parseRequest(body: unknown): OcxParsedRequest {
           : null;
         const thinkingText = envelope?.txt || text;
 
-        // Native/non-ocxr1 encrypted-only reasoning is opaque here. Do not create a detached
+        // Native/non-oprr1 encrypted-only reasoning is opaque here. Do not create a detached
         // assistant turn or invent replayable plaintext/signatures from the encrypted payload.
         if (thinkingText.length > 0) {
-          const part: OcxThinkingContent = {
+          const part: oprThinkingContent = {
             type: "thinking",
             thinking: thinkingText,
             signature: envelope?.sig ?? JSON.stringify(reasoning),
@@ -449,7 +455,7 @@ export function parseRequest(body: unknown): OcxParsedRequest {
         // reserved for Gemini/Antigravity opaque thought tokens; forwarding item ids as
         // thoughtSignature 400s Antigravity (Base64 / TYPE_BYTES). Continuity for CCA comes from
         // the in-process replay cache (and any already-real signature stored on the tool call).
-        const toolCall: OcxToolCall = {
+        const toolCall: oprToolCall = {
           type: "toolCall", id: call.call_id, name: call.name, arguments: args,
           ...(call.namespace ? { namespace: call.namespace } : {}),
         };
@@ -459,7 +465,7 @@ export function parseRequest(body: unknown): OcxParsedRequest {
 
       if (effectiveType === "custom_tool_call") {
         const call = item as { id?: string; call_id: string; name: string; input: string };
-        const toolCall: OcxToolCall = {
+        const toolCall: oprToolCall = {
           type: "toolCall", id: call.call_id, name: call.name,
           arguments: { input: call.input ?? "" },
           customWireName: call.name,
@@ -577,13 +583,13 @@ export function parseRequest(body: unknown): OcxParsedRequest {
     .map(t => loadedToolNames.has(namespacedToolName(t.namespace, t.name))
       ? { ...t, loadedFromToolSearch: true }
       : t);
-  const context: OcxContext = {
+  const context: oprContext = {
     ...(systemPrompt.length > 0 ? { systemPrompt } : {}),
     messages,
     ...(mergedTools.length > 0 ? { tools: mergedTools } : {}),
   };
 
-  const options: OcxRequestOptions = {};
+  const options: oprRequestOptions = {};
   if (data.max_output_tokens !== undefined) options.maxOutputTokens = data.max_output_tokens;
   if (data.temperature !== undefined) options.temperature = data.temperature;
   if (data.top_p !== undefined) options.topP = data.top_p;
@@ -612,6 +618,10 @@ export function parseRequest(body: unknown): OcxParsedRequest {
   // gpt-mini sidecar for routed providers. buildTools still drops the hosted tool; the sidecar path
   // re-injects a synthetic function tool only when it will actually handle the call.
   const webSearch = extractHostedWebSearch(data.tools as unknown[] | undefined);
+  const imageGen = extractHostedImageGeneration([
+    ...(data.tools as unknown[] ?? []),
+    ...loadedToolSpecs,
+  ]);
   // Detect structured-output mode (Responses `text.format`) so the web-search sidecar can render its
   // tool_result as JSON rather than prose that could corrupt the model's schema-constrained answer.
   const structuredOutput = detectStructuredOutput(data.text);
@@ -625,6 +635,7 @@ export function parseRequest(body: unknown): OcxParsedRequest {
     _rawBody: body,
     ...(replayedInputPrefixLength > 0 ? { _replayPrefixLen: replayedInputPrefixLength } : {}),
     ...(webSearch ? { _webSearch: webSearch } : {}),
+    ...(imageGen ? { _imageGeneration: imageGen } : {}),
     ...(structuredOutput ? { _structuredOutput: true } : {}),
     ...(compactionRequest ? { _compactionRequest: true } : {}),
     ...(contextCompactionBoundary ? { _contextCompactionBoundary: true } : {}),
@@ -639,3 +650,4 @@ function detectStructuredOutput(text: unknown): boolean {
   const t = (format as { type?: unknown }).type;
   return t === "json_schema" || t === "json_object";
 }
+

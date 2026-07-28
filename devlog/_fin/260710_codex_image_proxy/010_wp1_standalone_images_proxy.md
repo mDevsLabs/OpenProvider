@@ -32,7 +32,7 @@ Planned public surface:
 export type ImagesOperation = "generations" | "edits";
 export async function handleImagesRequest(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   operation: ImagesOperation,
 ): Promise<Response>;
 ```
@@ -81,7 +81,7 @@ Import only `handleImagesRequest`. Do not add forwarding logic to the listener.
 
 ### NEW — `tests/images-proxy.test.ts`
 
-Use an isolated `OPENCODEX_HOME`/Codex home and in-process upstream/server fixtures.
+Use an isolated `@mdevs/openprovider_HOME`/Codex home and in-process upstream/server fixtures.
 
 Required cases:
 
@@ -168,3 +168,5 @@ In each locale, update both the exposed-endpoint paragraph and the non-loopback 
 ## Verification
 
 Run the commands from `000_plan.md` and record fresh output in this unit before D. No completion claim may rely on the earlier 404 probe or subagent reports.
+
+

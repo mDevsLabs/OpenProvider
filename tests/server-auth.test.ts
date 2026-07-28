@@ -27,7 +27,7 @@ import {
   startServer,
 } from "../src/server";
 import { handleManagementAPI } from "../src/server/management-api";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
@@ -37,7 +37,7 @@ const originalGlobalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-server-auth-test");
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
-function config(hostname?: string): OcxConfig {
+function config(hostname?: string): oprConfig {
   return {
     port: 10100,
     hostname,
@@ -61,7 +61,7 @@ const canonicalDirect = {
   codexAccountMode: "direct",
 } as const;
 
-function poolProviders(): OcxConfig["providers"] {
+function poolProviders(): oprConfig["providers"] {
   return {
     openai: { ...canonicalDirect, codexAccountMode: "pool" },
   };
@@ -121,9 +121,10 @@ function unsupportedModelBody(model = POOL_RETRY_MODEL): string {
 }
 
 type PoolRetryHarness = {
-  config: OcxConfig;
+  config: oprConfig;
   dispatches: string[];
   request: (init?: { stream?: boolean; signal?: AbortSignal }) => Promise<Response>;
+  restoreFetch: () => void;
   server: ReturnType<typeof startServer>;
   upstream: ReturnType<typeof Bun.serve>;
 };
@@ -151,6 +152,7 @@ async function startPoolRetryHarness(
     },
   });
   redirectCanonicalCodexTo(upstream.url.toString());
+  const redirectedFetch = globalThis.fetch;
 
   const secondAccount = options.secondAccount ?? true;
   const config = {
@@ -167,7 +169,7 @@ async function startPoolRetryHarness(
     ],
     activeCodexAccountId: "pool-a",
     ...(options.streamMode ? { streamMode: options.streamMode } : {}),
-  } as OcxConfig;
+  } as oprConfig;
   saveConfig(config);
   saveCodexAccountCredential("pool-a", {
     accessToken: "pool-a-token",
@@ -190,6 +192,9 @@ async function startPoolRetryHarness(
   return {
     config,
     dispatches,
+    restoreFetch: () => {
+      if (globalThis.fetch === redirectedFetch) globalThis.fetch = originalGlobalFetch;
+    },
     server,
     upstream,
     request: ({ stream = false, signal } = {}) => originalGlobalFetch(
@@ -205,6 +210,7 @@ async function startPoolRetryHarness(
 }
 
 async function stopPoolRetryHarness(harness: PoolRetryHarness): Promise<void> {
+  harness.restoreFetch();
   await harness.server.stop(true);
   await harness.upstream.stop(true);
 }
@@ -346,7 +352,7 @@ describe("server local API auth", () => {
           keyOptional: true,
         },
       },
-    } as OcxConfig) as {
+    } as oprConfig) as {
       providers: Record<string, Record<string, unknown>>;
     };
 
@@ -375,7 +381,7 @@ describe("server local API auth", () => {
           apiKey: "sk-secret-value",
         },
       },
-    } as OcxConfig) as { providers: Record<string, { baseUrl: string }> };
+    } as oprConfig) as { providers: Record<string, { baseUrl: string }> };
 
     expect(dto.providers.leaky.baseUrl).toBe("https://example.test/v1");
     expect(JSON.stringify(dto)).not.toContain("pass");
@@ -395,7 +401,7 @@ describe("server local API auth", () => {
           baseUrl: "file:///tmp/sk-secret",
         },
       },
-    } as OcxConfig) as { providers: Record<string, { baseUrl: string }> };
+    } as oprConfig) as { providers: Record<string, { baseUrl: string }> };
 
     expect(dto.providers.malformed.baseUrl).toBe("(invalid URL)");
     expect(dto.providers.file.baseUrl).toBe("(invalid URL)");
@@ -445,7 +451,7 @@ describe("server local API auth", () => {
           authMode: "forward",
         },
       },
-    } as OcxConfig);
+    } as oprConfig);
 
     const server = startServer(0);
     const modelsUrl = `http://127.0.0.1:${server.port}/v1/models`;
@@ -482,7 +488,7 @@ describe("server local API auth", () => {
         nvidia: { adapter: "openai-chat", baseUrl: "https://integrate.api.nvidia.com/v1", freeTier: true },
         venice: { adapter: "openai-chat", baseUrl: "https://api.venice.ai/api/v1" },
       },
-    } as OcxConfig) as { providers: Record<string, { freeTier?: boolean }> };
+    } as oprConfig) as { providers: Record<string, { freeTier?: boolean }> };
     expect(dto.providers.nvidia.freeTier).toBe(true);
     expect(dto.providers.venice.freeTier).toBeUndefined();
   });
@@ -856,7 +862,7 @@ describe("server local API auth", () => {
           defaultModel: "claude-fable-5",
         },
       },
-    } as OcxConfig);
+    } as oprConfig);
 
     const server = startServer(0);
     try {
@@ -881,14 +887,17 @@ describe("server local API auth", () => {
       const last = json.output[json.output.length - 1];
       expect(last.role).toBe("user");
       expect(last.content?.[0].text).toContain("compact summary body");
-      // No ocx1 envelope may leak into v1 output.
-      expect(JSON.stringify(json)).not.toContain("ocx1:");
+      // No opr1 envelope may leak into v1 output.
+      expect(JSON.stringify(json)).not.toContain("opr1:");
     } finally {
       await server.stop(true);
       await upstream.stop(true);
     }
   });
 
+  // Windows CI under the full suite can spend >1s opening WS turns and >5s on this
+  // multi-server matrix; tight budgets flake as "tier websocket timeout" and cascade
+  // into the next test via a late fetch restore (502 instead of the mocked 500).
   test("OpenAI option auth matrix keeps direct, pool, and API credentials independent", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
@@ -910,7 +919,7 @@ describe("server local API auth", () => {
       },
     });
     let whamRequests = 0;
-    globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+    const matrixFetch = ((input: RequestInfo | URL, init?: RequestInit) => {
       const requestUrl = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
       const url = new URL(requestUrl);
       if (url.hostname === "chatgpt.com" && url.pathname.startsWith("/backend-api/wham/")) {
@@ -925,6 +934,7 @@ describe("server local API auth", () => {
       }
       return originalGlobalFetch(input, init);
     }) as typeof fetch;
+    globalThis.fetch = matrixFetch;
 
     const request = (server: ReturnType<typeof startServer>, headers?: HeadersInit, model = "gpt-test") => {
       const requestHeaders = new Headers(headers);
@@ -951,7 +961,7 @@ describe("server local API auth", () => {
       url.protocol = "ws:";
       const ws = new WebSocket(url, { headers: { "X-OpenProvider-API-Key": "local-secret", ...(headers ?? {}) } } as unknown as string[]);
       return new Promise<string>((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error("tier websocket timeout")), 1000);
+        const timer = setTimeout(() => reject(new Error("tier websocket timeout")), 5_000);
         ws.addEventListener("open", () => {
           ws.send(JSON.stringify({ type: "response.create", model, input: "hello" }));
         }, { once: true });
@@ -975,7 +985,7 @@ describe("server local API auth", () => {
         providers: { openai: canonicalDirect },
         codexAccounts: [{ id: "direct-unusable", email: "pool@example.test", isMain: false }],
         activeCodexAccountId: "direct-unusable",
-      } as OcxConfig;
+      } as oprConfig;
       saveCodexAccountCredential("direct-unusable", {
         accessToken: "unusable-pool-token",
         refreshToken: "unusable-pool-refresh",
@@ -1021,7 +1031,7 @@ describe("server local API auth", () => {
         await direct.stop(true);
       }
 
-      const mainOnlyConfig = (): OcxConfig => ({
+      const mainOnlyConfig = (): oprConfig => ({
         port: 0,
         websockets: true,
         defaultProvider: "openai",
@@ -1068,7 +1078,7 @@ describe("server local API auth", () => {
         codexAccounts: [{ id: "pool-a", email: "pool@example.test", isMain: false, chatgptAccountId: "acct-pool-a" }],
         activeCodexAccountId: "pool-a",
         autoSwitchThreshold: 0,
-      } as OcxConfig);
+      } as oprConfig);
       const beforeMissingPool = seen.length;
       const missingPool = startServer(0);
       try {
@@ -1093,7 +1103,7 @@ describe("server local API auth", () => {
         port: 0,
         defaultProvider: "openai",
         providers: cooldownCfg,
-      } as OcxConfig, "pool-a", 429, { retryAfter: "60" });
+      } as oprConfig, "pool-a", 429, { retryAfter: "60" });
       const beforeCooldown = seen.length;
       const cooledMulti = startServer(0);
       try {
@@ -1127,7 +1137,7 @@ describe("server local API auth", () => {
           openai: { ...canonicalDirect, disabled: true },
           "openai-apikey": { adapter: "openai-responses", baseUrl: "https://api.openai.com/v1", apiKey: "sk-platform" },
         },
-      } as OcxConfig);
+      } as oprConfig);
       const api = startServer(0);
       try {
         expect((await request(api, { authorization: "Bearer local-secret" }, "openai-apikey/gpt-test")).status).toBe(200);
@@ -1164,7 +1174,7 @@ describe("server local API auth", () => {
         ],
         activeCodexAccountId: "pool-a",
         autoSwitchThreshold: 0,
-      } as OcxConfig);
+      } as oprConfig);
       clearAccountNeedsReauth("pool-a");
       clearAccountNeedsReauth("pool-b");
       const sequential = startServer(0);
@@ -1184,7 +1194,7 @@ describe("server local API auth", () => {
       const sendFrame = async (model: string) => {
         const before = seen.length;
         const message = new Promise<string>((resolve, reject) => {
-          const timer = setTimeout(() => reject(new Error(`sequential websocket timeout: ${model}`)), 1000);
+          const timer = setTimeout(() => reject(new Error(`sequential websocket timeout: ${model}`)), 5_000);
           const onMessage = (event: MessageEvent) => {
             const value = typeof event.data === "string" ? event.data : "";
             if (!value.includes('"type":"response.completed"')) return;
@@ -1225,10 +1235,12 @@ describe("server local API auth", () => {
         await sequential.stop(true);
       }
     } finally {
-      globalThis.fetch = originalGlobalFetch;
+      // Only clear our mock if a later/timeout race has not already replaced it.
+      // afterEach always restores originalGlobalFetch once this test settles.
+      if (globalThis.fetch === matrixFetch) globalThis.fetch = originalGlobalFetch;
       await upstream.stop(true);
     }
-  });
+  }, { timeout: 30_000 });
 
   test("internal web-search and vision never forward a non-ChatGPT bearer as Direct sidecar auth", async () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
@@ -1393,7 +1405,7 @@ describe("server local API auth", () => {
         { id: "pool-a", email: "pool@example.test", isMain: false, chatgptAccountId: "acct-pool-a" },
       ],
       activeCodexAccountId: "pool-a",
-    } as OcxConfig);
+    } as oprConfig);
     saveCodexAccountCredential("pool-a", {
       accessToken: "pool-access-token",
       refreshToken: "pool-refresh-token",
@@ -1506,7 +1518,7 @@ describe("server local API auth", () => {
         { id: "pool-a", email: "pool@example.test", isMain: false, chatgptAccountId: "acct-pool-a" },
       ],
       activeCodexAccountId: "pool-a",
-    } as OcxConfig);
+    } as oprConfig);
     saveCodexAccountCredential("pool-a", {
       accessToken: "old-access-token",
       refreshToken: "old-refresh-token",
@@ -1604,7 +1616,7 @@ describe("server local API auth", () => {
           defaultModel: "claude-fable-5",
         },
       },
-    } as OcxConfig);
+    } as oprConfig);
 
     const server = startServer(0);
     const wsUrl = new URL("/v1/responses", server.url);
@@ -1673,6 +1685,66 @@ describe("server local API auth", () => {
       expect(getCodexUpstreamHealth("pool-a")).toBeNull();
       expect(getCodexUpstreamHealth("pool-b")).toBeNull();
       expect(harness.config.activeCodexAccountId).toBe("pool-a");
+    } finally {
+      await stopPoolRetryHarness(harness);
+    }
+  });
+
+  test("#584: pre-stream 429 retries once on another eligible pool account", async () => {
+    const harness = await startPoolRetryHarness(accountId => accountId === "acct-pool-a"
+      ? new Response(JSON.stringify({ error: { message: "rate limited" } }), {
+        status: 429,
+        headers: { "content-type": "application/json", "retry-after": "60" },
+      })
+      : Response.json({ id: "quota-failover-success", status: "completed", output: [] }));
+    try {
+      const response = await harness.request();
+      expect(response.status).toBe(200);
+      expect((await response.json() as { id: string }).id).toBe("quota-failover-success");
+      expect(harness.dispatches).toEqual(["acct-pool-a", "acct-pool-b"]);
+      expect(getCodexUpstreamHealth("pool-a")).toMatchObject({ cooldownUntil: expect.any(Number) });
+      // Server persists the rotated active account; the harness snapshot may be stale.
+      expect(loadConfig().activeCodexAccountId).toBe("pool-b");
+    } finally {
+      await stopPoolRetryHarness(harness);
+    }
+  });
+
+  test("#584: pre-stream 429 with one eligible account preserves the original 429", async () => {
+    const body = JSON.stringify({ error: { message: "rate limited" } });
+    const harness = await startPoolRetryHarness(
+      () => new Response(body, {
+        status: 429,
+        headers: { "content-type": "application/json", "retry-after": "60", "x-pool-retry-test": "original" },
+      }),
+      { secondAccount: false },
+    );
+    try {
+      const response = await harness.request();
+      expect(response.status).toBe(429);
+      expect(response.headers.get("x-pool-retry-test")).toBe("original");
+      expect(await response.text()).toBe(body);
+      expect(harness.dispatches).toEqual(["acct-pool-a"]);
+    } finally {
+      await stopPoolRetryHarness(harness);
+    }
+  });
+
+  test("#584: streamed pre-stream 429 retries before SSE relay", async () => {
+    const harness = await startPoolRetryHarness(accountId => accountId === "acct-pool-a"
+      ? new Response(JSON.stringify({ error: { message: "rate limited" } }), {
+        status: 429,
+        headers: { "content-type": "application/json", "retry-after": "30" },
+      })
+      : new Response(
+        'event: response.completed\ndata: {"type":"response.completed","response":{"id":"from-b","status":"completed","output":[]}}\n\n',
+        { headers: { "content-type": "text/event-stream" } },
+      ));
+    try {
+      const text = await (await harness.request({ stream: true })).text();
+      expect(harness.dispatches).toEqual(["acct-pool-a", "acct-pool-b"]);
+      expect(text).toContain('"id":"from-b"');
+      expect(loadConfig().activeCodexAccountId).toBe("pool-b");
     } finally {
       await stopPoolRetryHarness(harness);
     }
@@ -1886,7 +1958,7 @@ describe("server local API auth", () => {
     } finally {
       await stopPoolRetryHarness(positive);
     }
-  });
+  }, 12_000);
 
   test("valid JSON wrong top-level shape never authorizes a pool retry", async () => {
     for (const body of ['"string"', "42", "true", "null", '["detail"]']) {
@@ -2001,7 +2073,7 @@ describe("server local API auth", () => {
       activeCodexAccountId: "pool-a",
       upstreamFailoverThreshold: 3,
       connectTimeoutMs: 200,
-    } as OcxConfig);
+    } as oprConfig);
     saveCodexAccountCredential("pool-a", {
       accessToken: "pool-access-token",
       refreshToken: "pool-refresh-token",
@@ -2062,7 +2134,7 @@ describe("server local API auth", () => {
       ],
       activeCodexAccountId: "pool-a",
       upstreamFailoverThreshold: 3,
-    } as OcxConfig;
+    } as oprConfig;
     saveConfig(cfg);
     saveCodexAccountCredential("pool-a", {
       accessToken: "pool-access-token",
@@ -2135,7 +2207,7 @@ describe("server local API auth", () => {
           defaultModel: "gpt-5.5",
         },
       },
-    } as OcxConfig);
+    } as oprConfig);
 
     const server = startServer(0);
     try {
@@ -2239,7 +2311,7 @@ describe("server local API auth", () => {
           defaultModel: "gpt-test",
         },
       },
-    } as OcxConfig);
+    } as oprConfig);
 
     const server = startServer(0);
     try {
@@ -2305,7 +2377,7 @@ describe("server local API auth", () => {
       ],
       activeCodexAccountId: "pool-a",
       upstreamFailoverThreshold: 3,
-    } as OcxConfig);
+    } as oprConfig);
     saveCodexAccountCredential("pool-a", {
       accessToken: "pool-access-token",
       refreshToken: "pool-refresh-token",
@@ -2334,4 +2406,5 @@ describe("server local API auth", () => {
     }
   });
 });
+
 

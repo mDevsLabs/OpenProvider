@@ -2,7 +2,7 @@
 
 ## Goal and dependency
 
-Replace the single mutable stream-block state with per-index ownership, and harden malformed tool-argument handling only where an OCX fixture proves reachable loss.
+Replace the single mutable stream-block state with per-index ownership, and harden malformed tool-argument handling only where an opr fixture proves reachable loss.
 
 ## Diff map
 
@@ -43,3 +43,4 @@ bun run typecheck
 - `NOOP`: event shape cannot interleave on the owned endpoint and no reachable loss is reproduced; retain regression evidence.
 - `BLOCKED`: upstream fixture semantics remain ambiguous after official/event-source review.
 - `UNSAFE`: a sanitizer would silently alter executable tool arguments without an observable error contract.
+

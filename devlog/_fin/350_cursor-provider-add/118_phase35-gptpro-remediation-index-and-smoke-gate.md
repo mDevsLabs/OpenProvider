@@ -94,7 +94,7 @@ substitute for the unit tests above. Both review passes converged on the same pr
 
 **Safest minimal prompt** (transport-only; use a non-reasoning model `cursor/composer-2.5`):
 ```
-Reply with exactly: OCX_CURSOR_SMOKE_OK. Do not inspect files, run commands, use tools, browse, fetch URLs, record the screen, use computer control, or modify anything.
+Reply with exactly: opr_CURSOR_SMOKE_OK. Do not inspect files, run commands, use tools, browse, fetch URLs, record the screen, use computer control, or modify anything.
 ```
 Optional second smoke for suffixing: `cursor/claude-4.6-opus` + `reasoning:high` → wire id becomes
 `claude-4.6-opus-max` (per `108` tiers), same deny-all policy.
@@ -125,3 +125,4 @@ appears; any file outside the scratch dir is touched.
 - References: jawcode `packages/ai/src/providers/cursor.ts`, `utils/discovery/cursor.ts`; GJC
   `Yeachan-Heo/gajae-code packages/ai/src/providers/cursor.ts`; Connect Protocol Reference.
 - Source: GPT Pro plain review session `01KW2MT62EN9K2VJT2G938HDG4` (260627), two passes.
+

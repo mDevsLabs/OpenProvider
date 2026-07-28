@@ -46,13 +46,13 @@ matches existing native behavior; acceptable.
 ## WP4 — Claude vision executor + cap + cache (worker B)
 
 Write scope: src/vision/anthropic-describe.ts (new), src/vision/index.ts,
-src/types.ts (OcxVisionSidecarConfig fields), src/server/responses.ts (vision
+src/types.ts (oprVisionSidecarConfig fields), src/server/responses.ts (vision
 plan threading ~line 616), src/server/management-api.ts (vision backend r/w),
 tests/vision-anthropic.test.ts (new) + tests/vision-cache.test.ts (new).
 Out of scope: WP5 GUI (config schema only), src/web-search/*.
 
 Diffs (Godel-scoped):
-- types.ts OcxVisionSidecarConfig (~487): + `backend?: "openai"|"anthropic"` +
+- types.ts oprVisionSidecarConfig (~487): + `backend?: "openai"|"anthropic"` +
   `maxDescriptionsPerTurn?: number`.
 - new src/vision/anthropic-describe.ts: describeImageAnthropic — Anthropic
   /v1/messages with the SAME OAuth fingerprint as web-search anthropic-executor
@@ -143,3 +143,4 @@ Revised WP4 cache summary: process-level bounded LRU, injectable/resettable,
 key=(backend,model,detail,imageHash,contextHash), data:-images only, stores only
 non-empty successful descriptions; per-turn cap counts MISSES; over-cap => explicit
 "description cap reached" marker; ordering preserved.
+

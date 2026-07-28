@@ -62,7 +62,7 @@ body:
         Provide at least one concrete example: a CLI command, configuration fragment, API exchange, UI workflow, or before/after comparison.
       placeholder: |
         ```bash
-        ocx config set routing.fallback_provider anthropic
+        opr config set routing.fallback_provider anthropic
         ```
     validations:
       required: true
@@ -90,3 +90,4 @@ body:
           required: true
         - label: I removed secrets and personal data.
           required: true
+

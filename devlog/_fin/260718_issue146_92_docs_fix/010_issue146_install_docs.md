@@ -63,7 +63,7 @@ only inside explanatory prose, never in a fenced command block.
   `tests/install-scripts.test.ts` for assertions pinning either script's
   content and update in the same commit if the comment text is covered.
 
-## MODIFY [bin/ocx.mjs](../../../bin/ocx.mjs) `fail()` `~:190-198`
+## MODIFY [bin/opr.mjs](../../../bin/opr.mjs) `fail()` `~:190-198`
 
 - Extend hint string:
 
@@ -78,7 +78,7 @@ without --omit=optional / optional=false)
 - `rg -n "allow-scripts" README*.md docs-site scripts bin` → every hit carries
   the full package argument, except explanatory prose quoting npm's warning
   (see grep-gate note above).
-- `node --check bin/ocx.mjs` (tsconfig only includes `src/`, so tsc does not
+- `node --check bin/opr.mjs` (tsconfig only includes `src/`, so tsc does not
   cover the launcher; syntax-check it directly).
 - `bun x tsc --noEmit` for overall repo health (unchanged surface).
 - Docs gate: docs-site build (`cd docs-site && npm run build` or the repo's
@@ -87,4 +87,5 @@ without --omit=optional / optional=false)
   (`tests/install-scripts.test.ts` and any launcher-hint tests) and run them:
   `bun test --isolate tests/install-scripts.test.ts`.
 - Rollback: single revert commit; no state migration.
+
 

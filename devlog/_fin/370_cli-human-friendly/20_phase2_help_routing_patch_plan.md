@@ -23,7 +23,7 @@ Authoritative matrix:
 
 Relevant findings:
 
-- `opr --version`, `opr -v`, `opr version`, and `node bin/ocx.mjs --version` currently exit 1 as unknown commands.
+- `opr --version`, `opr -v`, `opr version`, and `node bin/opr.mjs --version` currently exit 1 as unknown commands.
 - `opr <command> --help` and `opr <command> -h` currently work for top-level commands.
 - `opr help <command>` prints top-level help instead of command-specific help.
 - `opr restart --help` and other unknown commands with help flags exit 0 and print top-level help, which makes unsupported commands look successful.
@@ -78,7 +78,7 @@ Planned changes:
    - no config load;
    - no network;
    - no proxy/service/shim mutation;
-   - same behavior through `node bin/ocx.mjs --version`.
+   - same behavior through `node bin/opr.mjs --version`.
 
 2. Introduce a command help registry.
 
@@ -132,7 +132,7 @@ Planned changes:
 Planned tests:
 
 - `opr --version`, `opr -v`, and `opr version` exit 0 and produce one line.
-- `node bin/ocx.mjs --version` matches source CLI behavior.
+- `node bin/opr.mjs --version` matches source CLI behavior.
 - `opr help start` matches or includes `Usage: opr start`.
 - `opr help service` includes service usage.
 - `opr restart --help` exits 1 and says unknown command.
@@ -169,8 +169,8 @@ Only if top-level README command list becomes inconsistent after implementation.
 ```bash
 bun test tests/cli-help.test.ts
 bun run typecheck
-node bin/ocx.mjs --version
-node bin/ocx.mjs --help
+node bin/opr.mjs --version
+node bin/opr.mjs --help
 ```
 
 ## Risk Notes
@@ -184,3 +184,4 @@ node bin/ocx.mjs --help
 ```text
 fix(cli): make help routing and version output predictable
 ```
+

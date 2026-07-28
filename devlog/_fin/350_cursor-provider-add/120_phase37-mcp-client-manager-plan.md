@@ -44,7 +44,7 @@ bun add @modelcontextprotocol/sdk@^1
 ### NEW file: `src/adapters/cursor/mcp-config.ts` (config types + parse)
 
 ```ts
-import type { OcxProviderConfig } from "../../types";
+import type { oprProviderConfig } from "../../types";
 
 export interface CursorMcpServerConfig {
   command?: string;
@@ -61,7 +61,7 @@ export interface ResolvedMcpServer extends CursorMcpServerConfig {
   serverName: string;
 }
 
-export function resolveMcpServers(provider: OcxProviderConfig): ResolvedMcpServer[] {
+export function resolveMcpServers(provider: oprProviderConfig): ResolvedMcpServer[] {
   const raw = provider.mcpServers;
   if (!raw) return [];
   return Object.entries(raw)
@@ -198,7 +198,7 @@ MCP tool-level errors resolve as `{isError:true}` and map to `McpSuccess{isError
 Mapping helpers `decodeMcpArgs`, `toContentItem`, plus `errorText` (reuse from
 `native-exec-common.ts`) live in this file.
 
-### MODIFY: `src/types.ts` — add config fields to `OcxProviderConfig`
+### MODIFY: `src/types.ts` — add config fields to `oprProviderConfig`
 
 ```ts
   // after liveModels / headers block, near other cursor-only options
@@ -317,3 +317,4 @@ tsconfig/test typecheck caveat noted.
 - Inject site: `src/adapters/cursor/live-transport.ts:199`
 - Advertise field: `RequestContext.tools` (`gen/agent_pb.ts:10251`), `McpToolDefinition` (`:8969`)
 - jawcode advertise pattern: subagent dc65e9c5 (buildMcpToolDefinitions, requestContextResult.tools)
+

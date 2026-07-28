@@ -51,7 +51,7 @@ or inject/revert the system environment.
 > src/server/system-env.ts:209-210
 >
 > ~~~ts
-> export async function injectSystemEnv(port: number, config: OcxConfig): Promise<SystemEnvResult> {
+> export async function injectSystemEnv(port: number, config: oprConfig): Promise<SystemEnvResult> {
 >   if (process.platform !== "darwin") return { injected: false, reason: "not macOS" };
 > ~~~
 >
@@ -81,14 +81,14 @@ the report without needing an additional live-host reproduction.
 It is a dual mechanism: launchctl plus a shell file sourced from .zshrc.
 
 First, it writes claude-env.sh under the OpenProvider config directory. The default
-is ~/.openprovider, overridable by OPENCODEX_HOME; the payload includes the proxy URL,
+is ~/.openprovider, overridable by OpenProvider_HOME; the payload includes the proxy URL,
 gateway discovery, optional token/model variables, and mode 0600.
 
 > src/config.ts:307-312
 >
 > ~~~ts
 > function resolveConfigDir(): string {
->   const raw = process.env["OPENCODEX_HOME"]?.trim() || undefined;
+>   const raw = process.env["OpenProvider_HOME"]?.trim() || undefined;
 >   if (resolvedConfigDirCache && resolvedConfigDirCache.raw === raw) return resolvedConfigDirCache.path;
 >   const path = raw ? resolve(expandUserPath(raw)) : join(homedir(), ".openprovider");
 >   resolvedConfigDirCache = { raw, path };
@@ -129,7 +129,7 @@ gateway discovery, optional token/model variables, and mode 0600.
 > ~~~
 
 Second, it appends an idempotent source block to ~/.zshrc. The source path is
-hard-coded to ~/.openprovider even though the writer supports OPENCODEX_HOME, showing
+hard-coded to ~/.openprovider even though the writer supports OpenProvider_HOME, showing
 that this hook is not a general platform abstraction.
 
 > src/server/system-env.ts:67-84
@@ -254,7 +254,7 @@ into the actual interactive shell startup files. Bash has no single universal fi
 login Bash reads the first available of ~/.bash_profile, ~/.bash_login, or ~/.profile;
 interactive non-login Bash reads ~/.bashrc. A correct implementation must therefore
 cover at least Bash login and non-login plus zsh, preserve contents and modes, remove
-only its own marker blocks, honor OPENCODEX_HOME, and define unsupported shells such
+only its own marker blocks, honor OpenProvider_HOME, and define unsupported shells such
 as fish. Source: [GNU Bash Reference Manual — Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html).
 
 The env-file renderer is reusable, but the current hook is one hard-coded .zshrc
@@ -302,9 +302,9 @@ interactive-shell environment.
 >   const log = logPath();
 >   const path = process.env.PATH ?? "/usr/local/bin:/usr/bin:/bin";
 >   const codexHome = systemdEnvironmentAssignment("CODEX_HOME", process.env.CODEX_HOME?.trim());
->   const openproviderHome = systemdEnvironmentAssignment("OPENCODEX_HOME", process.env.OPENCODEX_HOME?.trim());
+>   const openproviderHome = systemdEnvironmentAssignment("OpenProvider_HOME", process.env.OpenProvider_HOME?.trim());
 >   const envLines = [
->     systemdEnvironmentAssignment("OCX_SERVICE", "1"),
+>     systemdEnvironmentAssignment("opr_SERVICE", "1"),
 >     systemdEnvironmentAssignment("PATH", path),
 >     codexHome,
 >     openproviderHome,
@@ -438,7 +438,7 @@ The endpoint returns the stored boolean but no platform/support/reason field.
 > return jsonResponse({
 >   enabled: config.claudeCode?.enabled !== false,
 >   // Round-trip contract with the GUI auth-mode select (devlog 260720_claude_authmode_persist):
->   // absent config key = subscription (OcxClaudeCodeConfig.authMode is typed `"proxy"` only).
+>   // absent config key = subscription (oprClaudeCodeConfig.authMode is typed `"proxy"` only).
 >   authMode: config.claudeCode?.authMode === "proxy" ? "proxy" : "subscription",
 >   model: config.claudeCode?.model ?? "",
 >   smallFastModel: config.claudeCode?.smallFastModel ?? "",
@@ -529,7 +529,7 @@ the unconditional GUI promise.
 
 Scope: refactor system-env.ts into platform-neutral payload/sync plus Darwin and
 Linux backends; add safe Bash login/non-login and zsh hook install/uninstall;
-preserve OPENCODEX_HOME, ownership, user-wins semantics, stale cleanup, rollback,
+preserve OpenProvider_HOME, ownership, user-wins semantics, stale cleanup, rollback,
 cache and roster sync; optionally supplement with systemd user environment. Update
 docs and add Linux-specific tests.
 
@@ -631,3 +631,4 @@ secret-lifecycle semantics.
 state, locale strings, focused tests, typecheck, GUI lint/build, and full-suite
 verification. **Alternative (a): 2–4 engineering days** plus security/UX review and
 Linux shell/systemd CI coverage.
+

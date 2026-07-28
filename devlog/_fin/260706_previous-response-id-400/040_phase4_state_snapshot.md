@@ -20,7 +20,7 @@
 - Imports: `readFileSync`, `existsSync`, `mkdirSync` from node:fs; `join` from node:path;
   `atomicWriteFile`, `getConfigDir` from ../config.
 - `const SNAPSHOT_FILE = () => join(getConfigDir(), "responses-state.json")` (lazy — env may
-  change in tests via OPENCODEX_HOME).
+  change in tests via @mdevs/openprovider_HOME).
 - `const SNAPSHOT_DEBOUNCE_MS = 2_000;` — debounced async persist:
   `let persistTimer: ReturnType<typeof setTimeout> | null = null;`
   `function schedulePersist(): void` — if timer live, return; else setTimeout(persistNow, 2s).
@@ -42,7 +42,7 @@
 - No change needed: lazy ensureLoaded on first state access covers startup (no init hook).
 
 ## Tests (tests/responses-state.test.ts, new describe "snapshot persistence")
-- Use `process.env.OPENCODEX_HOME = mkdtempSync(...)` per test; restore after.
+- Use `process.env.@mdevs/openprovider_HOME = mkdtempSync(...)` per test; restore after.
 - Roundtrip: remember → flush → clearResponseStateForTests KEEPING file (need a memory-only
   clear — add `clearResponseStateMemoryForTests()`) → expand hits from disk.
 - TTL: write snapshot with stale createdAt → load → expand misses (pruned).
@@ -58,11 +58,11 @@
 
 ## D — landed (outcome: DONE)
 - Audit (Boole, gpt-5.5): PASS-WITH-FIXES; all 5 fixes applied — ensureLoaded on the three
-  runtime exports, OPENCODEX_HOME sandbox in tests, memory-only vs full clear helpers,
+  runtime exports, @mdevs/openprovider_HOME sandbox in tests, memory-only vs full clear helpers,
   per-entry 2MiB + total 24MiB snapshot caps (base64 input_image risk), flushResponseState
   called from drainAndShutdown.
 - Implementation nuance found in C: the debounced write must capture snapshotPath() at
-  SCHEDULE time — tests swap OPENCODEX_HOME between beforeEach blocks, and a late timer
+  SCHEDULE time — tests swap @mdevs/openprovider_HOME between beforeEach blocks, and a late timer
   fired into the real home during the first full-suite run. Fixed; verified the suite no
   longer creates ~/.openprovider/responses-state.json.
 - Evidence: bun test ./tests/ 1505 pass 0 fail (exit 0); tsc --noEmit exit 0; new tests:
@@ -71,3 +71,4 @@
 - LOOP-PESSIMIST-01: multi-instance opr sharing one home is last-writer-wins (acceptable,
   documented); snapshot covers restarts but not chains older than 1h TTL; falsifier for this
   fix = a post-restart miss warn in logs for an id recorded <1h earlier.
+

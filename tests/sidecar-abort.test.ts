@@ -5,11 +5,11 @@ import { describeImage } from "../src/vision/describe";
 import { parseRequest } from "../src/responses/parser";
 import { headersForCodexAuthContext } from "../src/codex/auth-context";
 import type { ProviderAdapter } from "../src/adapters/base";
-import type { OcxProviderConfig } from "../src/types";
+import type { oprProviderConfig } from "../src/types";
 
 const originalFetch = globalThis.fetch;
 
-const forwardProvider: OcxProviderConfig = {
+const forwardProvider: oprProviderConfig = {
   adapter: "openai-responses",
   baseUrl: "https://chatgpt.test",
   authMode: "forward",
@@ -317,3 +317,4 @@ describe("sidecar abort propagation", () => {
     expect(seenAccount).toBe("pool_acc");
   });
 });
+

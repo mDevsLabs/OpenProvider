@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { handleClaudeDesktopCommand } from "../src/cli/claude-desktop";
 import { loadConfig, saveConfig } from "../src/config";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 let dir = "";
 let previousHome: string | undefined;
@@ -22,7 +22,7 @@ beforeEach(() => {
     providers: {
       mock: { adapter: "openai-chat", baseUrl: "http://127.0.0.1:1/v1", apiKey: "k", allowPrivateNetwork: true, models: ["test-model"] },
     },
-  } as OcxConfig);
+  } as oprConfig);
 });
 
 afterEach(() => {
@@ -83,3 +83,4 @@ test("no-arg and legacy mode flags apply Desktop config", async () => {
     error.mockRestore();
   }
 });
+

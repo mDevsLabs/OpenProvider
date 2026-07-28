@@ -12,15 +12,15 @@
 
 - Record all provider namespace differences and semantic aliases.
 - List the 17 OpenRouter source-only IDs and all 11 changed `maxTokens` rows.
-- Record GPT-5.6 context/cost discrepancies and exact current OCX exposure.
+- Record GPT-5.6 context/cost discrepancies and exact current opr exposure.
 - Show jawcode pre-policy and final policy values separately. Treat costs as a separate non-consumed field.
-- Split `kimi-k2.7-code` from `kimi-k2.7-code-highspeed` and classify every OpenRouter source-only ID by its actual OCX exposure path.
+- Split `kimi-k2.7-code` from `kimi-k2.7-code-highspeed` and classify every OpenRouter source-only ID by its actual opr exposure path.
 - Distinguish model discovery, metadata enrichment, built-in provider ownership, and actual wire support.
 
 ## `008_logic_delta.md`
 
 - Explain line-level behavioral differences rather than commit-title summaries.
-- Explicitly document why direct ports are rejected or no-ops where OCX architecture already makes the jawcode fix unnecessary.
+- Explicitly document why direct ports are rejected or no-ops where opr architecture already makes the jawcode fix unnecessary.
 - Separate general Anthropic requests from the web-search sidecar.
 - Separate metadata fields generated from fields consumed.
 
@@ -48,3 +48,4 @@ for file in root.glob('*.md'):
 PY
 git diff --check
 ```
+

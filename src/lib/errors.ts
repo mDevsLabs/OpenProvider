@@ -1,4 +1,4 @@
-export interface OcxErrorPayload {
+export interface oprErrorPayload {
   message: string;
   type: string;
   code: string | null;
@@ -102,7 +102,7 @@ export function isClientClosedMessage(text: string): boolean {
   );
 }
 
-export function classifyError(status: number, type: string, message: string): OcxErrorPayload {
+export function classifyError(status: number, type: string, message: string): oprErrorPayload {
   const text = message.toLowerCase();
   // Preserve explicit cancel types used by compact/combo JSON errors; unify message-inferred
   // client closes (web-search abort text) onto client_closed_request for /api/logs.
@@ -304,7 +304,7 @@ export function inferHttpStatusFromAdapterMessage(message: string): number {
 }
 
 /** Map an adapter terminal error message to HTTP status + classified Codex error payload. */
-export function adapterFailureFromMessage(message: string): { httpStatus: number; error: OcxErrorPayload } {
+export function adapterFailureFromMessage(message: string): { httpStatus: number; error: oprErrorPayload } {
   const httpStatus = inferHttpStatusFromAdapterMessage(message);
   let finalMessage = message;
   const retryAfterSeconds = parseRetryAfterFromMessage(message);
@@ -359,3 +359,4 @@ export function httpStatusFromTerminalError(error: {
   if (message) return inferHttpStatusFromAdapterMessage(message);
   return 502;
 }
+

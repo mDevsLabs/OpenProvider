@@ -109,7 +109,7 @@ And `generateDesktop3pConfig` returns the config object, so guard there once.
 - the guard throws on: a name with uppercase/invalid chars, a duplicated name, a label
   containing `[`, an over-long label;
 - the full `writeDesktop3pConfig` output for a real catalog passes the guard
-  (integration, temp `OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR`).
+  (integration, temp `OpenProvider_CLAUDE_DESKTOP_CONFIG_DIR`).
 
 Existing suites must stay green: `tests/desktop-3p.test.ts`,
 `tests/desktop-profile.test.ts`, `tests/claude-desktop-native-context.test.ts`.
@@ -120,3 +120,4 @@ Existing suites must stay green: `tests/desktop-3p.test.ts`,
 |---------|----------|
 | `bun test tests/desktop-3p-guard.test.ts tests/desktop-3p.test.ts` | pass |
 | `bun run typecheck` / full `bun run test` | green |
+

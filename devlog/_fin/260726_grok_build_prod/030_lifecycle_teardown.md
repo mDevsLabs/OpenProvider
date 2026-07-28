@@ -35,7 +35,7 @@ throw는 "소유권 불일치"뿐이다. 호출자가 올바르게 분기할 수
 ### 1. 오류 타입 도입 (`src/service.ts`)
 
 ```ts
-/** 서비스가 다른 CODEX_HOME/OPENCODEX_HOME에 설치되어 이 프로세스가 건드릴 수 없음. */
+/** 서비스가 다른 CODEX_HOME/OpenProvider_HOME에 설치되어 이 프로세스가 건드릴 수 없음. */
 export class ServiceOwnershipError extends Error {
   readonly code = "service-ownership-mismatch" as const;
 }
@@ -84,7 +84,7 @@ try {
 
 `handleStop`에서 strip을 건너뛰어도 **프록시 종료 경로가 대신 strip한다**:
 `stopProxy` → `stopProxyGracefully` → `POST /api/stop` → (409) → `!res.ok` → `killProxy` SIGTERM
-→ 데몬의 `syncCleanup` → `OCX_SERVICE` 미설정이면 `stripGrokConfig()`.
+→ 데몬의 `syncCleanup` → `opr_SERVICE` 미설정이면 `stripGrokConfig()`.
 즉 수동 기동/고아 프록시에서는 공유 설정이 그대로 사라진다 — B2가 말한 바로 그 상황이다.
 
 두 곳을 함께 막는다:
@@ -193,7 +193,7 @@ if (url.pathname === "/api/stop" && req.method === "POST") {
 두 블록을 형제 `try`로 분리한다. 040의 배선 테스트가 이 구조를 고정한다.
 (초판에서 040이 이 변경을 전제했으나 어느 사이클도 소유하지 않았다 — 여기로 귀속.)
 
-`OCX_SERVICE=1` 크래시/재spawn 배제(`syncCleanup`의 게이트)는 **그대로 둔다** — 이 변경은
+`opr_SERVICE=1` 크래시/재spawn 배제(`syncCleanup`의 게이트)는 **그대로 둔다** — 이 변경은
 명시적 종료 경로에만 strip을 추가한다.
 
 ## 회귀 테스트 (뼈대만; 상세는 040에서)
@@ -205,8 +205,9 @@ if (url.pathname === "/api/stop" && req.method === "POST") {
 - `!ok` strip 결과가 `opr stop`을 실패로 만든다.
 - `service stop`/`uninstall`이 strip을 호출한다.
 - `/api/stop`이 strip을 호출하고, 소유권 불일치에는 409로 응답하며 프록시를 종료하지 않는다.
-- `syncCleanup`의 `OCX_SERVICE` 배제가 그대로 남아 있다.
+- `syncCleanup`의 `opr_SERVICE` 배제가 그대로 남아 있다.
 
 ## 게이트
 
 `bun test tests/service.test.ts tests/grok-*.test.ts` → `bun run typecheck` → 전체 `bun run test`.
+

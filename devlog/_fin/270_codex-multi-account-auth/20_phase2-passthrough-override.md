@@ -89,7 +89,7 @@ const threadAccountMap = new Map<string, string>();
 
 function resolveCodexAccountForThread(
   threadId: string | null,
-  config: OcxConfig,
+  config: oprConfig,
 ): string | null {
   // 1. 기존 thread에 할당된 계정 있으면 유지 (session affinity)
   if (threadId && threadAccountMap.has(threadId)) {
@@ -149,3 +149,4 @@ if (server.upgrade(req, { data: { headers: selectForwardHeaders(req.headers, wsO
 feat: inject codex account override in passthrough adapter
 feat: add session affinity for multi-account thread mapping
 ```
+

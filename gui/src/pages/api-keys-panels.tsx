@@ -295,7 +295,7 @@ export function ApiKeysUsagePanel({
       <div className="panel api-panel" style={{ marginTop: "1rem" }}>
         <h3 className="panel-title">{t("api.usageChatTitle")}</h3>
         <pre className="api-code">{`curl ${endpoints.chatCompletions} \\
-  -H "x-openprovider-api-key: ocx_YOUR_KEY_HERE" \\
+  -H "x-openprovider-api-key: opr_YOUR_KEY_HERE" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "gpt-5.4",
@@ -306,7 +306,7 @@ export function ApiKeysUsagePanel({
       <div className="panel api-panel" style={{ marginTop: "1rem" }}>
         <h3 className="panel-title">{t("api.usageResponsesTitle")}</h3>
         <pre className="api-code">{`curl ${endpoints.responses} \\
-  -H "x-openprovider-api-key: ocx_YOUR_KEY_HERE" \\
+  -H "x-openprovider-api-key: opr_YOUR_KEY_HERE" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "gpt-5.4",
@@ -318,7 +318,7 @@ export function ApiKeysUsagePanel({
         <div className="panel api-panel" style={{ marginTop: "1rem" }}>
           <h3 className="panel-title">{t("api.usageMessagesTitle")}</h3>
           <pre className="api-code">{`curl ${endpoints.messages} \\
-  -H "x-openprovider-api-key: ocx_YOUR_KEY_HERE" \\
+  -H "x-openprovider-api-key: opr_YOUR_KEY_HERE" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "claude-sonnet-4-6",
@@ -330,3 +330,4 @@ export function ApiKeysUsagePanel({
     </>
   );
 }
+

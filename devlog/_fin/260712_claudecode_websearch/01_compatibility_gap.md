@@ -20,7 +20,7 @@ The searchCount comes from UI.tsx getSearchSummary():
 - Counts SearchResult objects in output.results[]
 - SearchResult = { tool_use_id, content: [{title, url}] }
 
-OCX sidecar returns results as:
+opr sidecar returns results as:
 - Function tool_result (text) injected into conversation
 - Bridge converts to Responses SSE
 - Outbound translates to Anthropic Messages SSE
@@ -44,10 +44,10 @@ Claude Code's WebSearchTool.ts parses these directly.
 searchCount increments for each web_search_tool_result block.
 "Did N searches in Xs" shows correctly.
 
-### Path B: OCX Sidecar (current - for non-Anthropic models)
+### Path B: opr Sidecar (current - for non-Anthropic models)
 
 Claude Code sends web_search_20250305 tool.
-OCX inbound.ts converts to {type: "web_search"} Responses format.
+opr inbound.ts converts to {type: "web_search"} Responses format.
 planWebSearch() activates sidecar.
 gpt-5.6-luna does real search via ChatGPT passthrough.
 Results injected as function tool_result text.
@@ -89,7 +89,7 @@ For routed models, the sidecar handles it.
 
 Can Codex web_search work in Claude Code?
 - Not directly: Claude Code sends Anthropic format
-- OCX already translates web_search_20250305 -> {type:"web_search"}
+- opr already translates web_search_20250305 -> {type:"web_search"}
 - The sidecar works but results don't match expected format
 - Fix is the same: translate output format
 
@@ -105,3 +105,4 @@ OpenProvider (proxy):
 - src/claude/outbound.ts:268 - IGNORES web_search_call frames
 - src/web-search/index.ts - planWebSearch() sidecar activation
 - src/web-search/loop.ts - runWithWebSearch() sidecar loop
+

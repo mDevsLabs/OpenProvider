@@ -18,7 +18,7 @@ Grok Build 소스 `~/Developer/codex/180_grok-build` (SOURCE_REV `30192d2e`, `xa
 openprovider 쪽 경계:
 
 - `isApiAuthRequired(config) = !isLoopbackHostname(config.hostname)` (`src/server/auth-cors.ts:121`). 비루프백 바인드에서는 모든 데이터플레인 요청이 admission 토큰을 요구하므로, 현재 주입되는 `api_key = "openprovider-loopback"`은 **반드시 401**이 된다. 리뷰 지적이 실재한다.
-- `~/.grok/config.toml`은 공유 파일이므로 실제 토큰을 직렬화하면 안 된다. `env_key = "OPENCODEX_API_AUTH_TOKEN"`이 두 요구를 동시에 만족한다.
+- `~/.grok/config.toml`은 공유 파일이므로 실제 토큰을 직렬화하면 안 된다. `env_key = "OpenProvider_API_AUTH_TOKEN"`이 두 요구를 동시에 만족한다.
 
 ## 작업 순서 (의존성 순)
 
@@ -39,3 +39,4 @@ OUT: #403 머지, main 승격, 릴리스/dist-tag, 라우팅·어댑터 리팩�
 ## 게이트
 
 `bun run typecheck`, `bun run test`, `bun run privacy:scan` 전부 green. 새로 추가되는 모든 조건 분기는 그 분기를 실제로 발동시키는 테스트를 동반한다 (C-ACTIVATION-GROUNDING-01).
+

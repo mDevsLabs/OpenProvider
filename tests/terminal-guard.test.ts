@@ -5,9 +5,9 @@ import {
   guardTerminalEventStream,
 } from "../src/server/responses/terminal-guard";
 import { buildResponseJSON } from "../src/bridge";
-import type { AdapterEvent, OcxParsedRequest } from "../src/types";
+import type { AdapterEvent, oprParsedRequest } from "../src/types";
 
-function parsed(userText: string, withTools = true): OcxParsedRequest {
+function parsed(userText: string, withTools = true): oprParsedRequest {
   return {
     modelId: "se-claude-opus-4.8",
     stream: true,
@@ -224,3 +224,4 @@ describe("terminal guard", () => {
     expect((response.output as { type: string }[]).map(item => item.type)).toEqual(["message", "function_call"]);
   });
 });
+

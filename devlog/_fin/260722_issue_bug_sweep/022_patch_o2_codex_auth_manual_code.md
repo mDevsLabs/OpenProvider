@@ -250,7 +250,7 @@ OAuth module의 수동 제출 결과만 격리한다. private map을 우회하�
 - no login in progress: codex flow map은 pending이나 shared OAuth login state가 없는 경우 409.
 - state mismatch: 다른 시도의 state를 가진 redirect URL은 409; shared `oauth/index.ts` 검증 경유를 증명.
 - cancel/replace race: import/submit 직전 기존 flow를 cancel하고 새 flow를 시작한 뒤 늦은 old `flowId` 제출이 409이고 새 flow의 manual slot에 값이 들어가지 않음.
-- raw-import policy still gated: `OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT` 미설정 상태의 `POST /api/codex-auth/accounts`가 계속 403 `manual_import_disabled`; 신규 code endpoint가 이 gate를 바꾸지 않음.
+- raw-import policy still gated: `OpenProvider_ENABLE_UNVERIFIED_CODEX_IMPORT` 미설정 상태의 `POST /api/codex-auth/accounts`가 계속 403 `manual_import_disabled`; 신규 code endpoint가 이 gate를 바꾸지 않음.
 
 `tests/oauth-manual-code.test.ts`는 shared precedent 검증 파일로서 기존 raw-code PKCE 결속,
 redirect state mismatch, cancel/no-login-in-progress 케이스가 계속 통과해야 한다. 신규 codex route 전용
@@ -265,3 +265,4 @@ redirect state mismatch, cancel/no-login-in-progress 케이스가 계속 통과�
 - [ ] raw-import policy 403 gate, `isPublicOAuthProvider("chatgpt") === false`, shared state/PKCE 검증 경로가 변경되지 않음
 - [ ] 보안 불변식 체크리스트 전 항목 코드 리뷰 통과
 - [ ] 선택적 수동 확인: 로그인 링크 복사 → 다른 브라우저 인증 → redirect URL 붙여넣기/Enter → 기존 status polling으로 계정 추가 완료
+

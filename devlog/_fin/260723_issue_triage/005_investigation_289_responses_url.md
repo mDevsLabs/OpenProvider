@@ -124,12 +124,12 @@ rg -n -i 'responses(path|url|endpoint)|endpoint(path|url)|baseurl.*mode|complete
 ```
 
 There is no `responsesPath`, `responsesUrl`, endpoint-path override, or
-base-URL mode in `OcxProviderConfig`. The interface requires only `baseUrl` at
+base-URL mode in `oprProviderConfig`. The interface requires only `baseUrl` at
 its URL boundary:
 
 > `src/types.ts:638-645`
 > ```ts
-> export interface OcxProviderConfig {
+> export interface oprProviderConfig {
 >   adapter: string;
 >   baseUrl: string;
 >   /**
@@ -201,7 +201,7 @@ to management API and GUI work:
 >     if (Object.hasOwn(rawBody, "apiKey")) {
 >       return jsonResponse({ error: "apiKey cannot be patched here; use the provider API-key endpoints" }, 400);
 >     }
->     const next: OcxProviderConfig = { ...config.providers[name]! };
+>     const next: oprProviderConfig = { ...config.providers[name]! };
 >     let touched = false;
 > ```
 
@@ -298,7 +298,7 @@ not be reclassified as a feature request.
 ## Recommended direction
 
 Implement proposal 1 as an optional, relative `responsesPath?: string` on
-`OcxProviderConfig`. When absent, execute the current lines 443-444 unchanged;
+`oprProviderConfig`. When absent, execute the current lines 443-444 unchanged;
 when present, trim one trailing slash from `baseUrl` and append a validated path
 such as `/responses`. Require a leading `/` and reject schemes, query strings,
 and fragments. Do not add a Volcengine hostname/path special-case, and do not
@@ -315,3 +315,4 @@ focused URL tests, and docs. **Medium (about 1 day total)** if the setting must
 also be editable and visible in the dashboard/management API. No persisted
 configuration migration is required because the field is optional and its
 absence preserves the existing URL algorithm.
+

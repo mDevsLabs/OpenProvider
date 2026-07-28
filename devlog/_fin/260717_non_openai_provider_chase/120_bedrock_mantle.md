@@ -19,7 +19,7 @@ Add the lower-cost OpenAI-compatible Bedrock path before designing a native Conv
 ## Contract details
 
 - Official base is `https://bedrock-mantle.<region>.api.aws/v1`; use an allowlist/validated AWS region grammar.
-- Bedrock API keys are Bearer tokens. Short-term keys are preferred; OCX does not generate or refresh them in this phase.
+- Bedrock API keys are Bearer tokens. Short-term keys are preferred; opr does not generate or refresh them in this phase.
 - Live `/models` decides availability because Responses support varies by model.
 - Bedrock stores Responses state for 30 days when `store:true/default`. The plan must make this visible; it must not silently claim stateless behavior.
 - No SigV4 or native Converse event parsing in WP12.
@@ -45,3 +45,4 @@ bun run build:gui
 - `NEEDS_HUMAN`: no Bedrock key/project/model access.
 - `UNSAFE`: storage behavior cannot be presented accurately or requires long-term keys by default.
 - `BLOCKED`: target models are unavailable on Mantle; continue to WP14 only for a named native requirement.
+

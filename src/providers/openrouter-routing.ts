@@ -1,4 +1,4 @@
-import type { OcxProviderConfig, OpenRouterProviderRouting } from "../types";
+import type { oprProviderConfig, OpenRouterProviderRouting } from "../types";
 
 const ROUTING_KEYS = new Set(["order", "only", "allowFallbacks"]);
 const MAX_PROVIDER_SLUGS = 64;
@@ -52,7 +52,7 @@ function routingPreferenceError(value: unknown, field: string): string | null {
   return null;
 }
 
-export function openRouterRoutingConfigError(provider: OcxProviderConfig): string | null {
+export function openRouterRoutingConfigError(provider: oprProviderConfig): string | null {
   const hasDefault = provider.openRouterRouting !== undefined;
   const hasModels = provider.modelOpenRouterRouting !== undefined;
   if (!hasDefault && !hasModels) return null;
@@ -81,7 +81,7 @@ export function openRouterRoutingConfigError(provider: OcxProviderConfig): strin
 }
 
 export function resolveOpenRouterRouting(
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
   modelId: string,
 ): OpenRouterProviderRouting | undefined {
   if (!isCanonicalOpenRouterTarget(provider.baseUrl)) return undefined;
@@ -100,3 +100,4 @@ export function openRouterProviderPayload(
     ...(preference.allowFallbacks !== undefined ? { allow_fallbacks: preference.allowFallbacks } : {}),
   };
 }
+

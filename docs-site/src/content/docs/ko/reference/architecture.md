@@ -26,7 +26,7 @@ src/
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
 ├── responses/
-│   ├── parser.ts       # Responses request → OcxParsedRequest
+│   ├── parser.ts       # Responses request → oprParsedRequest
 │   ├── schema.ts       # Zod validation
 │   └── compaction.ts   # remote compaction prompts, envelopes, compact history
 ├── service.ts          # launchd / systemd / Task Scheduler background service
@@ -67,9 +67,9 @@ HTTP 경계는 `server/index.ts`가 맡고, Responses 데이터 플레인은 `se
 ## 파서
 
 `responses/parser.ts`는 들어오는 요청을 `responses/schema.ts`(Zod)로 검증한 다음
-`OcxParsedRequest`를 구성합니다:
+`oprParsedRequest`를 구성합니다:
 
-- **Messages** — `input` 항목은 정규화된 `OcxMessage[]`가 됩니다: user / developer / assistant /
+- **Messages** — `input` 항목은 정규화된 `oprMessage[]`가 됩니다: user / developer / assistant /
   toolResult. `reasoning` 항목은 thinking 블록이 되고, `function_call`, `custom_tool_call`,
   `tool_search_call` 항목은 툴 호출이 되며, 그에 대응하는 `*_output`은 툴 결과가 됩니다.
 - **Tools** — function 툴은 그대로 통과합니다. **네임스페이스가 있는 (MCP) 툴은 평탄화되어**
@@ -145,8 +145,9 @@ Codex 카탈로그는 Codex가 수용하는 레이블(`low` / `medium` / `high` 
 
 ## 코어 타입
 
-내부 모델은 `types.ts`에 있습니다: `OcxParsedRequest`, `OcxContext`, `OcxMessage` 유니온,
-`OcxContentPart`(text / image), `OcxToolCall`, `OcxTool`, `AdapterEvent`, 그리고 설정 타입
-(`OcxConfig`, `OcxProviderConfig`). 두 가지 헬퍼가 널리 사용됩니다: `namespacedToolName()`과
+내부 모델은 `types.ts`에 있습니다: `oprParsedRequest`, `oprContext`, `oprMessage` 유니온,
+`oprContentPart`(text / image), `oprToolCall`, `oprTool`, `AdapterEvent`, 그리고 설정 타입
+(`oprConfig`, `oprProviderConfig`). 두 가지 헬퍼가 널리 사용됩니다: `namespacedToolName()`과
 `modelInList()`(`noVisionModels` / `noReasoningModels`에 대한 관대한 `:size` 태그 매칭).
+
 

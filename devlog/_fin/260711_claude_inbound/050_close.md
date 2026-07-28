@@ -65,7 +65,7 @@ was reproduced locally against the REAL ChatGPT backend and fixed:
 | 3 | (would-be) `401 {"detail":"Unauthorized"}` for pool-less installs | `opr claude` placeholder Bearer was forwarded upstream as ChatGPT auth | internal replay strips `authorization`; native routes inject the main codex login (`getMainAccountToken`); pool rotation still overrides |
 | 3b | `400 {"detail":"System messages are not allowed"}` | first fix for #1 mapped system-role to system message ITEMS — native backend rejects those | superseded by the instructions-folding fix |
 
-Local live proof (isolated OPENCODEX_HOME, real backend): `claude-opr-native--gpt-5.5`
+Local live proof (isolated @mdevs/openprovider_HOME, real backend): `claude-opr-native--gpt-5.5`
 and `claude-opr-native--gpt-5.6-sol` with placeholder Bearer + system-role message ->
 full `message_start .. text_delta("Hi"/" there"/", friend") .. message_delta(end_turn)
 .. message_stop` sequence.
@@ -78,7 +78,9 @@ should now answer; then a tool-use turn + a ROUTED (non-native) provider turn.
 ## Follow-ups (filed, non-blocking)
 
 - `surface="claude"` request-log tag + GUI Logs filter chip (040 §4).
-- Anthropic-family signed-thinking replay via ocxr1 envelope (040 §1) — only if
+- Anthropic-family signed-thinking replay via oprr1 envelope (040 §1) — only if
   a real replay failure is demonstrated.
 - count_tokens drift check vs provider-reported input_tokens on live turns (040 §3).
 - ccs-wrapper deprecation banner (separate repo, when touched next).
+
+

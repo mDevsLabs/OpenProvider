@@ -29,7 +29,7 @@
 - `bun test ./tests/`: 1487 pass / 0 fail (includes new oauth-store-multi 11,
   oauth-accounts-api 3; token-guardian key assertion updated).
 - `bun run privacy:scan`: passed.
-- Runtime smoke: isolated OPENCODEX_HOME proxy served masked 2-account list,
+- Runtime smoke: isolated @mdevs/openprovider_HOME proxy served masked 2-account list,
   PUT active switched, DELETE promoted; live dashboard (10100) screenshot shows
   divider gone + dropdown open with active badge; mobile 487px rowFits=true.
 - Live catalog healed via `opr sync` after temp-proxy catalog overwrite
@@ -45,3 +45,4 @@
 - 429 auto-rotation across accounts is NOT in this unit (next unit; design sketch
   in 000_plan research: cooldown + Retry-After + next-request switch).
 - Cross-process store races accepted (single-proxy assumption).
+

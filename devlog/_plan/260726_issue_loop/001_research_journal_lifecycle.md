@@ -22,7 +22,7 @@ in the same process and the same function body as the `writeJournal()` at 532.
 
 `restoreJournalState()` is reached from `restoreNativeCodex()`
 (`src/codex/inject.ts:714`), which runs on foreground `syncCleanup`
-(`src/cli/index.ts:212-222`, skipped when `OCX_SERVICE` is set), `POST /api/stop`
+(`src/cli/index.ts:212-222`, skipped when `opr_SERVICE` is set), `POST /api/stop`
 (`src/server/management-api.ts:151`), `opr stop`, `opr uninstall`, and
 `opr restore`. `reconcileJournal()` runs at the top of `opr start`
 (`src/cli/index.ts:153`) and `opr ensure` (`:307`).
@@ -76,3 +76,4 @@ Path 2 matches the reported symptom and is what the frozen snapshot enables.
 - **Timestamp staleness bound.** An arbitrary threshold discards valid recovery
   for a long-running service and still permits destructive replay inside the
   window. Recorded as a possible later defence, not this unit's fix.
+

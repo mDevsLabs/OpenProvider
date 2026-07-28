@@ -22,7 +22,7 @@ provider-keyed and makes no model-identity claim.
 
 ### MODIFY `src/providers/derive.ts`
 
-Extend `DerivedProviderPreset` with `provider?: OcxProviderConfig`. For the reserved
+Extend `DerivedProviderPreset` with `provider?: oprProviderConfig`. For the reserved
 forward presets `openai` and `openai-multi`, `entryToPreset` sets `provider` to a deep
 clone of `providerConfigSeed(entry)`. Other presets retain their existing shape. This
 gives the modal the same immutable full canonical seed that management admission
@@ -110,7 +110,7 @@ fields, and max-input metadata.
 
 ## Render-grounded GUI QA
 
-Run a temporary proxy with deterministic temp `OPENCODEX_HOME` and a newly-created
+Run a temporary proxy with deterministic temp `OpenProvider_HOME` and a newly-created
 empty temporary `CODEX_HOME`, both established before process import/start. Assert no
 credential-bearing request leaves localhost. Build/serve GUI, then use the native
 in-app browser. Phase A contains all three tiers. Phase B removes Multi while preserving
@@ -160,7 +160,7 @@ not evidence.
 - Focused contract gate after independent-review repairs: `bun test tests/provider-payload.test.ts tests/codex-multi-state.test.ts tests/server-auth.test.ts tests/provider-registry-parity.test.ts` — 85 pass, 0 fail, 620 assertions.
 - Static gates: root `bun x tsc --noEmit`, GUI `bun run lint:i18n`, and GUI `bun run build` all exited 0.
 - The requested native in-app browser id (`iab`) was not exposed by the current Codex browser runtime; `agent.browsers.list()` exposed only the installed Chrome extension. Browser QA therefore used the same bundled browser client's Chrome/CDP backend and records that environment fallback explicitly.
-- Fixture isolation: a new temp `OPENCODEX_HOME` and an empty temp `CODEX_HOME` were set before proxy startup. OpenAI API live discovery was disabled in the fixture. CDP observed 146 browser requests; all HTTP(S) requests were loopback, the only non-loopback schemes were browser-extension assets, and no authorization/API-key/cookie/token signal appeared in request headers or POST bodies.
+- Fixture isolation: a new temp `OpenProvider_HOME` and an empty temp `CODEX_HOME` were set before proxy startup. OpenAI API live discovery was disabled in the fixture. CDP observed 146 browser requests; all HTTP(S) requests were loopback, the only non-loopback schemes were browser-extension assets, and no authorization/API-key/cookie/token signal appeared in request headers or POST bodies.
 - `/#providers` English DOM asserted title `Providers`, all three cards, Direct/Multi/API badges, API-key-required setup state, and zero horizontal overflow at CSS 1280×720. The Add Provider modal exposed exactly the three intended OpenAI choices. Captured POST bodies deep-equaled:
   - Direct: `{"name":"openai","provider":{"adapter":"openai-responses","baseUrl":"https://chatgpt.com/backend-api/codex","authMode":"forward"}}`
   - Multi: `{"name":"openai-multi","provider":{"adapter":"openai-responses","baseUrl":"https://chatgpt.com/backend-api/codex","authMode":"forward"}}`
@@ -195,3 +195,4 @@ Screenshot receipts:
 `done` — implementation and browser evidence landed in `9bba3605`; Cycle B confirmed the
 runtime-facing GUI sources remained byte-identical and reused the inspected screenshots.
 See `050`, `190`, and the final `051` audit for terminal integration evidence.
+

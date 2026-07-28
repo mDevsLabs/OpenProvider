@@ -24,7 +24,7 @@ Submitted and waiting on the external GPT Pro review.
 |---|---|---|
 | Switch to `dev` | `git status --short --branch` -> `## dev...origin/dev` | PROVEN |
 | Use current dev branch URL | Prompt and `REVIEW_REQUEST.md` include `https://github.com/lidge-jun/openprovider/tree/dev` | PROVEN |
-| Package relevant Windows/cross-platform evidence | Zip has 58 files including Windows devlogs, workflows, `bin/ocx.mjs`, service/runtime sources, and tests | PROVEN |
+| Package relevant Windows/cross-platform evidence | Zip has 58 files including Windows devlogs, workflows, `bin/opr.mjs`, service/runtime sources, and tests | PROVEN |
 | Submit via `agbrowse web-ai` | ChatGPT session `01KW41ADNQHG975C8HS7BWBZW3` created successfully | PROVEN |
 | Register durable bgtask | `cli-jaw bgtask show bg_4b52dcb6-93bd-4e3c-9ebb-8f7ccd9a0aca` shows running poll command for the session | PROVEN |
 | Preserve branches/backups | `origin/main`, `origin/preview`, `origin/dev`, `origin/cursor-provider-stack`, and `origin/dev-with-cursor-backup` refs verified unchanged for this work-phase | PROVEN |
@@ -41,3 +41,4 @@ Submitted and waiting on the external GPT Pro review.
 ## Remaining Work
 
 No local action remains until bgtask `bg_4b52dcb6-93bd-4e3c-9ebb-8f7ccd9a0aca` completes. On completion, resume the goal to summarize GPT Pro's verdict/findings and plan patches if the review returns `NEEDS FIX` or `BLOCKER`.
+

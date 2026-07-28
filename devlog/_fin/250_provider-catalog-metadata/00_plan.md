@@ -41,7 +41,7 @@ Preserve these ideas instead:
 
 ### MODIFY `/Users/jun/Developer/new/700_projects/openprovider/src/types.ts`
 
-Add optional provider catalog metadata fields to `OcxProviderConfig`:
+Add optional provider catalog metadata fields to `oprProviderConfig`:
 
 - `contextWindow?: number`
 - `modelContextWindows?: Record<string, number>`
@@ -120,7 +120,7 @@ Extend `catalogHintsFromProviderConfig()` so provider config metadata reaches `C
 live value. Add a merge helper for live/cached models:
 
 ```ts
-function applyProviderConfigHints(name: string, prov: OcxProviderConfig, model: CatalogModel): CatalogModel
+function applyProviderConfigHints(name: string, prov: oprProviderConfig, model: CatalogModel): CatalogModel
 ```
 
 The helper should:
@@ -197,3 +197,4 @@ After the dev commit is verified and pushed:
 - Comment on PR #21 that the metadata plumbing has landed on `dev` with credit, but the OpenAI Chat
   Umans runtime shape was intentionally not merged because `dev` keeps the verified Anthropic
   Messages provider, then close the draft PR as superseded.
+

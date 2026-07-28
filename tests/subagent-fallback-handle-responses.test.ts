@@ -28,7 +28,7 @@ import {
 } from "../src/codex/subagent-model-fallback";
 import type { CodexAuthContext } from "../src/codex/auth-context";
 import { handleResponses } from "../src/server/responses";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import type { RequestLogContext } from "../src/server/request-log";
 import type { ResponsesTerminalStatus } from "../src/bridge";
 
@@ -103,7 +103,7 @@ function spawnHeaders(extra: HeadersInit = {}): Headers {
   });
 }
 
-function poolNativePlusRoutedConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function poolNativePlusRoutedConfig(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 0,
     defaultProvider: "openai",
@@ -134,7 +134,7 @@ function poolNativePlusRoutedConfig(overrides: Partial<OcxConfig> = {}): OcxConf
       { id: "pool-a", email: "pool@example.test", isMain: false, chatgptAccountId: "pool_acc" },
     ],
     ...overrides,
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function installPoolCredential(accountId: string, chatgptAccountId: string, now: number): void {
@@ -178,7 +178,7 @@ function mockSseUpstream(sseBody: string, capture?: { urls: string[] }): void {
 }
 
 async function postSpawn(
-  config: OcxConfig,
+  config: oprConfig,
   body: Record<string, unknown>,
   options: Parameters<typeof handleResponses>[3] = {},
   logCtx: RequestLogContext = { model: "", provider: "" },
@@ -300,7 +300,7 @@ describe("subagent fallback without primary auth cooldown failure", () => {
     const now = 1_800_000_000_000;
     Date.now = () => now;
     installPoolCredential("pool-a", "pool_acc", now);
-    const cfg: OcxConfig = {
+    const cfg: oprConfig = {
       port: 0,
       defaultProvider: "openai",
       activeCodexAccountId: "pool-a",
@@ -941,3 +941,4 @@ describe("native passthrough terminal finalization", () => {
     });
   }
 });
+

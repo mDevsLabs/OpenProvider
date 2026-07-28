@@ -4,14 +4,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 let testDir = "";
 let previousHome: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
-function baseConfig(): OcxConfig {
+function baseConfig(): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -19,7 +19,7 @@ function baseConfig(): OcxConfig {
     providers: {
       "opencode-go": { adapter: "openai-chat", baseUrl: "https://opencode.ai/zen/go/v1", apiKey: "key-first-000111222333" },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 beforeEach(() => {
@@ -116,3 +116,4 @@ describe("provider API key pool", () => {
     }
   });
 });
+

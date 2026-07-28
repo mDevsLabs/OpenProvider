@@ -10,7 +10,7 @@ Capture Codex fast/priority requests accurately in openprovider request logs wit
 
 - Live `codex exec` succeeds through openprovider with `/Users/jun/.codex/config.toml` containing `service_tier = "fast"` and `[features].fast_mode = true`.
 - Current `/api/logs` entries only include `model`, `provider`, `status`, `durationMs`, and stream close metadata.
-- `src/responses/schema.ts` accepts `service_tier`, but `src/responses/parser.ts` does not copy it into `OcxRequestOptions.serviceTier` yet.
+- `src/responses/schema.ts` accepts `service_tier`, but `src/responses/parser.ts` does not copy it into `oprRequestOptions.serviceTier` yet.
 - `devlog/90_service-tier-fast/00_investigation.md` establishes the split: config spelling `fast`, runtime/catalog/request id `priority`.
 
 ## Plan
@@ -61,4 +61,5 @@ Then run a live `codex exec` smoke against the already-running local opr and con
 ## Commit
 
 One atomic commit: `feat(logs): capture service tier metadata`.
+
 

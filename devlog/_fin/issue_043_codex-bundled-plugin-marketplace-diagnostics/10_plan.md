@@ -180,7 +180,7 @@ Separate PR after Phase 1. Medium risk: mutates Codex plugin config -> opt-in.
   which PATH-scans for `codex.exe/.cmd/.ps1`. An app-package/plugins-cache
   locator is net-new.
 - Tests: `bun test`; model after `tests/cli-status-json.test.ts` (spawns the CLI
-  with `OPENCODEX_HOME` override:16, `mkdtempSync`:23, asserts read-only:45-47).
+  with `OpenProvider_HOME` override:16, `mkdtempSync`:23, asserts read-only:45-47).
   Because `CODEX_HOME` is a load-time `const` in codex-paths.ts, stale-path tests
   must run in a freshly spawned process with `CODEX_HOME` set (not in-process
   env mutation). `tests/codex-inject.test.ts` is the reference for config.toml
@@ -212,3 +212,4 @@ repair is acceptable later as an explicit opt-in command, decided separately.
 One correction for scoping: the bundled-plugin set should be treated as data -
 the upstream Rust allowlist currently defines only `chrome@openai-bundled` and
 `computer-use@openai-bundled`.
+

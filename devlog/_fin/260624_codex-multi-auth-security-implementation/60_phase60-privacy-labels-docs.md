@@ -62,7 +62,7 @@ flowchart TD
 - Pool-token failure logs use the non-PII log label only.
 - Token-refresh errors no longer include local account aliases, raw upstream `error_description`, refresh tokens, access tokens, or account ids in the thrown message.
 - Missing-account token lookup errors no longer include the local alias/account id in the thrown message.
-- `OCX_DEBUG_FRAMES=1` no longer prints any frame payload preview.
+- `opr_DEBUG_FRAMES=1` no longer prints any frame payload preview.
 - `/api/oauth/status` returns masked email values.
 - `/api/codex-auth/login-status` returns masked email values if a transient flow status includes an email.
 - Codex Auth account API remains masked by default.
@@ -181,7 +181,7 @@ import { codexAccountLogLabel } from "./codex-account-label";
 Before:
 
 ```ts
-export function formatCodexProviderForLog(providerName: string, accountId: string | null, config: OcxConfig): string {
+export function formatCodexProviderForLog(providerName: string, accountId: string | null, config: oprConfig): string {
   if (!accountId) return providerName;
   const poolIndex = (config.codexAccounts ?? []).filter(a => !a.isMain).findIndex(a => a.id === accountId);
   return poolIndex >= 0 ? `${providerName}-${poolIndex + 1}` : providerName;
@@ -191,7 +191,7 @@ export function formatCodexProviderForLog(providerName: string, accountId: strin
 After:
 
 ```ts
-export function formatCodexProviderForLog(providerName: string, accountId: string | null, config: OcxConfig): string {
+export function formatCodexProviderForLog(providerName: string, accountId: string | null, config: oprConfig): string {
   if (!accountId) return providerName;
   const account = (config.codexAccounts ?? []).find(a => !a.isMain && a.id === accountId);
   return account ? `${providerName}-${codexAccountLogLabel(account)}` : providerName;
@@ -318,7 +318,7 @@ Change env handling from module-load constant to per-call check:
 
 ```ts
 function debugFramesEnabled(): boolean {
-  return process.env.OCX_DEBUG_FRAMES === "1";
+  return process.env.opr_DEBUG_FRAMES === "1";
 }
 ```
 
@@ -366,7 +366,7 @@ Add assertions:
 - `GET /api/codex-auth/accounts` still returns masked emails and does not reveal unmasked pool email.
 - `GET /api/codex-auth/login-status` masks transient flow-state emails in the direct flow-id response and the legacy pending fallback.
 
-Manual import remains disabled by default, so the manual `logLabel` test must enable `OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT=1` and use the existing manual import harness.
+Manual import remains disabled by default, so the manual `logLabel` test must enable `@mdevs/openprovider_ENABLE_UNVERIFIED_CODEX_IMPORT=1` and use the existing manual import harness.
 
 ### ADD `tests/oauth-status-privacy.test.ts`
 
@@ -395,15 +395,15 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { debugDroppedFrame } from "../src/debug";
 
 describe("debug frame logging", () => {
-  const previous = process.env.OCX_DEBUG_FRAMES;
+  const previous = process.env.opr_DEBUG_FRAMES;
 
   afterEach(() => {
-    if (previous === undefined) delete process.env.OCX_DEBUG_FRAMES;
-    else process.env.OCX_DEBUG_FRAMES = previous;
+    if (previous === undefined) delete process.env.opr_DEBUG_FRAMES;
+    else process.env.opr_DEBUG_FRAMES = previous;
   });
 
   test("debugDroppedFrame redacts payload content", () => {
-    process.env.OCX_DEBUG_FRAMES = "1";
+    process.env.opr_DEBUG_FRAMES = "1";
     const error = spyOn(console, "error").mockImplementation(() => {});
     try {
       debugDroppedFrame("openai-chat", "secret frame body bearer-token@example.test");
@@ -480,7 +480,7 @@ git diff --check
 
 GUI browser smoke:
 
-1. Start the proxy from the current source on a disposable `OPENCODEX_HOME`.
+1. Start the proxy from the current source on a disposable `@mdevs/openprovider_HOME`.
 2. Seed fixture Codex accounts through the config/API using `raw-gui-email@example.test` style data.
 3. Open the Codex Auth page with `cli-jaw browser`.
 4. Assert the DOM contains the masked value and does not contain the raw fixture email in:
@@ -510,3 +510,5 @@ Expected scan handling:
 - Build verification: independent read-only employee verification required before C.
 - Commit discipline: one atomic commit for Phase 60.
 - No push/reset/clean.
+
+

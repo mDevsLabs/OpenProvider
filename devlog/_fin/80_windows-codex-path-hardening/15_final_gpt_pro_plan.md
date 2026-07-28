@@ -119,7 +119,7 @@ Classification: strongly recommended; include if possible.
 
 Implement:
 
-- Add validated `OPENCODEX_BUN_PATH` or equivalent config field.
+- Add validated `OpenProvider_BUN_PATH` or equivalent config field.
 - Log whether bundled Bun or override Bun is used.
 - Reject invalid override paths loudly.
 - Do not auto-switch all users to canary/stable without Windows smoke validation.
@@ -177,3 +177,4 @@ For the next hotfix branch, do Patch 1 first. In the same branch or immediately 
 Then do Patch 3 task hardening. Patch 4 and 5 can follow if the hotfix budget allows, but Patch 4 should be included before making any claim that Bun runtime crashes are addressed.
 
 Patch 6 is low-risk and can ship with the hotfix, but it should not be described as fixing Windows stopping.
+

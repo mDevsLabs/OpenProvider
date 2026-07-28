@@ -6,16 +6,16 @@
  */
 import { describe, expect, test } from "bun:test";
 import { resolveWireProtocolOverride } from "../src/server/adapter-resolve";
-import type { OcxProviderConfig } from "../src/types";
+import type { oprProviderConfig } from "../src/types";
 
-function gateway(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
+function gateway(overrides: Partial<oprProviderConfig> = {}): oprProviderConfig {
   return {
     adapter: "openai-chat",
     baseUrl: "https://gateway.example/v1",
     authMode: "key",
     apiKey: "test-key",
     ...overrides,
-  } as OcxProviderConfig;
+  } as oprProviderConfig;
 }
 
 describe("per-model wire override (#404)", () => {
@@ -90,3 +90,4 @@ describe("per-model wire override (#404)", () => {
       .toBe("openai-responses");
   });
 });
+

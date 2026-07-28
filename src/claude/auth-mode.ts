@@ -10,7 +10,7 @@
  * The admission-key axis is separate and untouched: when the proxy requires an
  * admission key, `buildClaudeEnv` injects it regardless of mode.
  */
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import type { AuthDetectResult, AuthSourceId } from "./auth-detect";
 
 export type MarkerMode = "proxy" | "subscription";
@@ -34,7 +34,7 @@ export interface ResolvedAuthMode {
  * subscriber into proxy mode on a failed read (denied keychain, unreadable file) is
  * the worst outcome this feature can produce.
  */
-export function resolveClaudeAuthMode(config: OcxConfig, detection: AuthDetectResult): ResolvedAuthMode {
+export function resolveClaudeAuthMode(config: oprConfig, detection: AuthDetectResult): ResolvedAuthMode {
   const authMode = config.claudeCode?.authMode;
   if (authMode === "proxy") return { markerMode: "proxy", origin: "manual", detection };
   if (authMode === "subscription") return { markerMode: "subscription", origin: "manual", detection };
@@ -57,6 +57,7 @@ export function resolveClaudeAuthMode(config: OcxConfig, detection: AuthDetectRe
 /** The three-state intent as the API and GUI express it. */
 export type AuthModeIntent = "auto" | "proxy" | "subscription";
 
-export function authModeIntent(config: OcxConfig): AuthModeIntent {
+export function authModeIntent(config: oprConfig): AuthModeIntent {
   return config.claudeCode?.authMode ?? "auto";
 }
+

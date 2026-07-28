@@ -64,7 +64,7 @@ their tier.
 - `src/lib/token-estimate.ts` — ready-made estimator for `count_tokens`.
 - `src/cli/index.ts` — `handleEnsure()` spawns a detached `start` and waits on
   `findLiveProxy()`; `opr claude` reuses it. Config schema is `.passthrough()`, so
-  `config.claudeCode` needs only an OcxConfig type addition.
+  `config.claudeCode` needs only an oprConfig type addition.
 
 ### ccs-wrapper (predecessor, ../010_2025/ccs-wrapper — read this session)
 
@@ -117,3 +117,4 @@ already speaks this wire from the client side, Tier 2 local):
   second daemon, duplicated auth/logging, nothing reusable that config can't carry.
 - Rebuild-on-CCS rejected outright: CCS third-party dependency is dead on this
   machine and upstream direction is unaligned.
+

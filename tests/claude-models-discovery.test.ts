@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 // Full-suite Windows load: startServer + discovery GETs exceed the default 5s budget
@@ -30,7 +30,7 @@ afterEach(() => {
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
-function configWithStaticModels(claudeCode?: OcxConfig["claudeCode"]): OcxConfig {
+function configWithStaticModels(claudeCode?: oprConfig["claudeCode"]): oprConfig {
   return {
     port: 0,
     defaultProvider: "mock",
@@ -46,7 +46,7 @@ function configWithStaticModels(claudeCode?: OcxConfig["claudeCode"]): OcxConfig
       },
     },
     ...(claudeCode ? { claudeCode } : {}),
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 test("anthropic-version header flips /v1/models to the discovery contract", async () => {
@@ -155,3 +155,4 @@ test("OpenAI list shape and Codex catalog shape stay unchanged", async () => {
     server.stop(true);
   }
 });
+

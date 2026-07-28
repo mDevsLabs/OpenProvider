@@ -26,7 +26,7 @@ Round 4 (user report 260711 20:05): "캐싱이 하나도 처리가 안되고, �
 
 ## Canonical convention (v2, this commit)
 
-`OcxUsage` is OpenAI-Responses-shaped everywhere:
+`oprUsage` is OpenAI-Responses-shaped everywhere:
 
 - `inputTokens` — TOTAL prompt tokens, INCLUDING cache read + cache write.
 - `cachedInputTokens` — cache READ tokens only (subset of inputTokens).
@@ -37,7 +37,7 @@ Round 4 (user report 260711 20:05): "캐싱이 하나도 처리가 안되고, �
   re-add cache detail.
 
 Normalization happens at the two Anthropic parse sites (`usageFromAnthropic`,
-`anthropicUsageToOcx`): `inputTokens = raw_input + cache_read + cache_creation`.
+`anthropicUsageToopr`): `inputTokens = raw_input + cache_read + cache_creation`.
 
 Wire mapping:
 - Responses SSE (`bridge.responsesUsage`): `input_tokens = usage.inputTokens`,
@@ -62,3 +62,4 @@ Anthropic `message_delta.usage` is cumulative, so addition double-counted
   i18n-labelled tooltip breakdown (input/output/read/write/reasoning).
 - Usage page: cached card = reads; new cache-write card when nonzero.
 - i18n en/ko/zh/de.
+

@@ -22,7 +22,7 @@ Kiro Gateway already treats `contextUsagePercentage` as the authoritative contex
    `contextWindow`, because Kiro Auto is a router with no fixed source-of-truth window.
 4. Extend `/Users/jun/Developer/new/700_projects/openprovider/src/types.ts` and
    `/Users/jun/Developer/new/700_projects/openprovider/src/bridge.ts` with optional
-   `OcxUsage.totalTokens`, preserving the existing `input + output` default for all other adapters.
+   `oprUsage.totalTokens`, preserving the existing `input + output` default for all other adapters.
 5. Update Kiro stream tests to prove:
    - parser preserves `contextUsagePercentage`;
    - known-window Kiro models use percentage-derived `totalTokens`;
@@ -42,3 +42,4 @@ without a Codex-side protocol change.
 - `bun test tests/kiro-stream.test.ts`
 - `bun test tests/kiro-adapter.test.ts tests/kiro-stream.test.ts tests/bridge.test.ts`
 - `bun x tsc --noEmit`
+

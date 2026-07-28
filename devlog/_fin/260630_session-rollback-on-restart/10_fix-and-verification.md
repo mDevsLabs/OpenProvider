@@ -53,6 +53,7 @@ endpoint, and `src/service.ts` service stop/uninstall. The inject (openprovider)
 
 ## Operational note
 
-Running the proxy as a service (`opr service install`, `OCX_SERVICE=1`) skips the on-shutdown
+Running the proxy as a service (`opr service install`, `opr_SERVICE=1`) skips the on-shutdown
 restore entirely, which also avoids the churn for users who never intend to drop back to native
 Codex between restarts.
+

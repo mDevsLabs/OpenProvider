@@ -6,7 +6,7 @@ import { KIRO_COMPLETION_TOOL_NAME } from "../src/adapters/kiro-constants";
 import { saveConfig } from "../src/config";
 import { encodeMessage } from "../src/lib/eventstream-decoder";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const enc = new TextEncoder();
@@ -68,7 +68,7 @@ function streamOf(frames: Uint8Array[]): ReadableStream<Uint8Array> {
   });
 }
 
-function kiroConfig(baseUrl: string): OcxConfig {
+function kiroConfig(baseUrl: string): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -84,7 +84,7 @@ function kiroConfig(baseUrl: string): OcxConfig {
         models: ["gpt-5.6-sol"],
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function scriptedKiroUpstream(attempts: Uint8Array[][]) {
@@ -217,4 +217,5 @@ describe("Kiro completion through public server endpoints", () => {
     }
   });
 });
+
 

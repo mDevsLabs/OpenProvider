@@ -19,7 +19,7 @@ Socrates(보안) + Noether(견고성) 감사: **P0 없음.** P1 수정 반영:
 - [N-P1] web-search 사이드카 스트림 trackStreamLifetime 등록 (drainAndShutdown이 대기/중단 가능)
 - [N-P1] service stop/uninstall + /api/stop이 restoreNativeCodex() 결과를 검사 — 실패 시 성공 위장 대신 opr restore 안내
 - [S-P2] key-failover 로그에서 사용자 라벨 제거(id만)
-- [N-P2] flushResponseState가 schedule 시점 캡처 경로 사용(OPENCODEX_HOME 스왑 안전)
+- [N-P2] flushResponseState가 schedule 시점 캡처 경로 사용(@mdevs/openprovider_HOME 스왑 안전)
 
 ### 수용된 리스크 (수정 안 함)
 - Windows 네이티브 패스스루가 raw body 유지(클라이언트 disconnect 시 JS cancel 훅 없음): Bun#32111 JS-sink 세그폴트 회피용 의도적 설계. Bun 픽스 후 재평가.
@@ -32,3 +32,4 @@ auth.json/config/usage.jsonl 퍼미션, apiKeyPool 마스킹 전 표면(safeConf
 
 - 로컬: 1587 pass / 0 fail, tsc 0 (P1 수정 후 재확인)
 - CI: push 후 전 워크플로 success 확인 필요
+

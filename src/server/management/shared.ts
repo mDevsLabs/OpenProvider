@@ -33,7 +33,6 @@ import { clearThreadAccountMap } from "../../codex/routing";
 import { primeCodexPoolQuotas } from "../../codex/auth-api";
 import { DEFAULT_PROVIDER_CONTEXT_CAP, globalContextCapValue, providerContextCap, providerContextCaps, setAllProviderContextCaps, setGlobalContextCapValue, setProviderContextCap } from "../../providers/context-cap";
 import { resolveCodexHomeDir } from "../../codex/home";
-import { scanStorage } from "../../storage/scanner";
 import { readUsageEntries } from "../../usage/log";
 import { getUsageDebugLogEntries } from "../../usage/debug";
 import { parseRange, parseUsageSurface, summarizeUsage } from "../../usage/summary";
@@ -48,7 +47,7 @@ import {
   setDebugSettings,
   type DebugFlag,
 } from "../../lib/debug-settings";
-import type { OcxClaudeCodeConfig, OcxClaudeDesktopProfile, OcxConfig, OcxCustomModel, OcxProviderConfig } from "../../types";
+import type { oprClaudeCodeConfig, oprClaudeDesktopProfile, oprConfig, oprCustomModel, oprProviderConfig } from "../../types";
 import type { DesktopProfileModel } from "../../claude/desktop-profile";
 import { drainAndShutdown } from "../lifecycle";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "../request-log";
@@ -168,7 +167,7 @@ export function requestLogDto(entry: RequestLogEntry): Record<string, unknown> {
  * share the same fetch, the same per-provider cache (dedups Codex's frequent /v1/models polling),
  * and the same stale fallback when a provider blips, instead of a parallel uncached copy.
  */
-export async function fetchAllModels(config: OcxConfig): Promise<CatalogModel[]> {
+export async function fetchAllModels(config: oprConfig): Promise<CatalogModel[]> {
   const { gatherRoutedModels } = await import("../../codex/catalog");
   return gatherRoutedModels(config);
 }
@@ -185,7 +184,7 @@ export interface GrokCandidateModel {
  * model is absent from the fence, so readGrokStatus alone could never list it. Built
  * from the same two sources as the sync so the two can never disagree.
  */
-export async function fetchGrokCandidateModels(config: OcxConfig): Promise<GrokCandidateModel[]> {
+export async function fetchGrokCandidateModels(config: oprConfig): Promise<GrokCandidateModel[]> {
   const { filterCatalogVisibleModels, nativeOpenAiContextWindow, visibleNativeSlugs } = await import("../../codex/catalog");
   const routed = filterCatalogVisibleModels(await fetchAllModels(config), config);
   return [
@@ -201,7 +200,7 @@ export async function fetchGrokCandidateModels(config: OcxConfig): Promise<GrokC
   ];
 }
 
-export function stripRegistryOnlyStaticHeaders(name: string, provider: OcxProviderConfig): OcxProviderConfig {
+export function stripRegistryOnlyStaticHeaders(name: string, provider: oprProviderConfig): oprProviderConfig {
   const entry = getProviderRegistryEntry(name);
   if (!entry?.staticHeaders || !provider.headers) return provider;
   const headerEntries = Object.entries(provider.headers);
@@ -214,7 +213,7 @@ export function stripRegistryOnlyStaticHeaders(name: string, provider: OcxProvid
 }
 
 /** Shared Desktop profile DTO builder for the management API and CLI. */
-export async function buildClaudeDesktopState(config: OcxConfig, stored?: OcxClaudeDesktopProfile) {
+export async function buildClaudeDesktopState(config: oprConfig, stored?: oprClaudeDesktopProfile) {
   const { filterCatalogVisibleModels, nativeOpenAiContextWindow, visibleNativeSlugs } = await import("../../codex/catalog");
   const { DESKTOP_SUPPORTS_1M_THRESHOLD } = await import("../../claude/desktop-3p");
   const { reconcileDesktopProfile, renderDesktopProfile } = await import("../../claude/desktop-profile");
@@ -263,3 +262,4 @@ export async function buildClaudeDesktopState(config: OcxConfig, stored?: OcxCla
     port: config.port,
   };
 }
+

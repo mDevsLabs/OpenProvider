@@ -1,10 +1,10 @@
 ---
 title: プロバイダー
-description: OpenProvider が LLM プロバイダーを認証し通信するすべての方式 — OAuth、API キー、ChatGPT 転送、そしてローカル。
+description: opencodex が LLM プロバイダーを認証し通信するすべての方式 — OAuth、API キー、ChatGPT 転送、そしてローカル。
 ---
 
 **プロバイダー**は一つの上流 LLM エンドポイントとそこへの到達方法を合わせたものです: アダプター、ベース URL、認証
-モード、そしてオプションのモデル一覧で構成されます。プロバイダーは `~/.OpenProvider/config.json` の `providers` の下にあります。
+モード、そしてオプションのモデル一覧で構成されます。プロバイダーは `~/.opencodex/config.json` の `providers` の下にあります。
 
 ## OpenAI アカウントモード
 
@@ -21,8 +21,8 @@ max input 922,000 で `*-pro` virtual ID は公開状態を維持し、wire で�
 組み込み `openai` が欠落または無効な場合、ダッシュボードの Accounts ピッカーと Codex Auth から復元できます。欠落行は正規プリセットから作成され、正規の無効行は保存済みのモードやモデル設定を置き換えずに再有効化され、非正規の `openai` 行にはその復元経路は出ません。
 
 出荷版 v1 config は marker 2 の単一オプション行に自動移行されます。オリジナルは
-`~/.OpenProvider/config.json.pre-openai-tiers-v2.bak` に一度保存され、次のコマンドで復元します:
-`cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json`。
+`~/.opencodex/config.json.pre-openai-tiers-v2.bak` に一度保存され、次のコマンドで復元します:
+`cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`。
 
 ## 認証モード
 
@@ -61,18 +61,18 @@ ChatGPT パススルーカタログには GPT-5.6 Sol/Terra/Luna の名前空間
 ## 2. アカウントログイン(OAuth)
 
 OAuth ログインを使うプロバイダープリセットは 6 つです。認証情報は
-`~/.OpenProvider/auth.json` に保存され、自動更新されます。ログイン CLI は `chatgpt` も受け付けます。
+`~/.opencodex/auth.json` に保存され、自動更新されます。ログイン CLI は `chatgpt` も受け付けます。
 このコマンドは ChatGPT 認証情報を発行し `forward` モードのプロバイダーエントリを作成します。
 
 ```bash
-opr login xai          # xAI Grok
-opr login anthropic    # Anthropic Claude (Pro/Max)
-opr login kimi         # Moonshot Kimi
-opr login kiro         # kiro-cli 認証情報の取り込み(トークンフォールバック対応)
-opr login google-antigravity
-opr login cursor       # Cursor 専用 PKCE ログイン
-opr login chatgpt      # 別途 ChatGPT OAuth ログイン
-opr logout <provider>
+ocx login xai          # xAI Grok
+ocx login anthropic    # Anthropic Claude (Pro/Max)
+ocx login kimi         # Moonshot Kimi
+ocx login kiro         # kiro-cli 認証情報の取り込み(トークンフォールバック対応)
+ocx login google-antigravity
+ocx login cursor       # Cursor 専用 PKCE ログイン
+ocx login chatgpt      # 別途 ChatGPT OAuth ログイン
+ocx logout <provider>
 ```
 
 | プロバイダー | アダプター | ベース URL | 備考 |
@@ -80,9 +80,16 @@ opr logout <provider>
 | `xai` | `openai-chat` | `https://api.x.ai/v1` | ライブ一覧を優先し、フォールバックのデフォルトモデルは `grok-4.5`。 |
 | `anthropic` | `anthropic` | `https://api.anthropic.com` | Claude モデル; ライブモデル一覧は `/v1/models` から取得。 |
 | `kimi` | `openai-chat` | `https://api.kimi.com/coding/v1` | Kimi K2.7/K2.6/K2.5 コーディングモデル。 |
-| `kiro` | `kiro` | `https://runtime.us-east-1.kiro.dev` | インストール済み `kiro-cli` ログインを優先取得。Kiro CLI のインストール(`curl -fsSL https://cli.kiro.dev/install | bash`)と `kiro-cli login` が必要。 |
+| `kiro` | `kiro` | `https://runtime.us-east-1.kiro.dev` | 初回ログインは Kiro CLI をインストール（`curl -fsSL https://cli.kiro.dev/install | bash`）し、`kiro-cli login` でサインインした既存セッションを取り込みます。**アカウントを追加**は `kiro-cli` をログアウトして新しいブラウザログインを開始し、`kiro-cli` 自体のアカウントを切り替えてアカウント別プロファイルメタデータを保存します。既存の OpenCodex アカウントは保持され、キャンセルまたは失敗時には以前の `kiro-cli` セッションが復元されます。 |
 | `google-antigravity` | `google` | `https://daily-cloudcode-pa.googleapis.com` | Google OAuth を Cloud Code Assist wire で使用。 |
 | `cursor` | `cursor` | `https://api2.cursor.sh` | 実験的 PKCE ログイン、HTTP/2 トランスポート、アカウント別モデル探索をサポート。 |
+
+正規の Kimi Coding Plan プリセット（`kimi` アカウントログインと `kimi-code` API key）では、
+opencodex は呼び出し元が指定した安定した `prompt_cache_key` だけを Chat Completions リクエストへ
+転送し、自ら生成しません。Kimi のドキュメントでは、Code Plan のキャッシュヒット率を高めるために
+安定したセッション/タスク key が必須とされています。key のないリクエストは keyless のままです。
+opt-in した上流がこのフィールドを拒否しても、opencodex はフィールドを削除して再試行したり、保存済み
+設定を変更したりしません。他のプロバイダーは deny-by-default のままです。
 
 [ウェブダッシュボード](/ja/guides/web-dashboard/)からも OAuth を開始できます。
 
@@ -90,13 +97,26 @@ opr logout <provider>
 
 認証情報に固定アカウント ID やメールがある OAuth プロバイダーはログインを複数保持できます。
 Providers ページでアカウントを追加し、別アカウントをログアウトせずにアクティブアカウントだけを切り替えられます。
-アカウント識別情報がない Kimi と Kiro はアクティブスロットを差し替え、`chatgpt` は Codex アカウントプールに別の保存場所が
-あり常に単一スロットのみ書き込みます。トークンは `~/.OpenProvider/auth.json` に保存され、
+アカウント識別情報がない Kimi 認証情報だけがアクティブスロットを差し替え、Kiro アカウントはプロファイル ARN をキーに保存されます。
+`chatgpt` は Codex アカウントプールに別の保存場所があり、常に単一スロットのみ書き込みます。トークンは `~/.opencodex/auth.json` に保存され、
 `/api/oauth/accounts` はマスク済みメタデータのみを返します。
+
+### Kiro 認証情報の取り込み
+
+Kiro のログインには Kiro CLI が必要です。`curl -fsSL https://cli.kiro.dev/install | bash` でインストールし、先に `kiro-cli login` でサインインしてください。`kiro-cli` セッションがない場合、`ocx login kiro` は貼り付けたアクセストークンまたは `KIRO_ACCESS_TOKEN` 環境変数にフォールバックします。
+
+通常の `ocx login kiro` 取り込みは CLI の SQLite データベースを読み取り専用で開き、データベース、WAL、SHM を変更しません。
+
+- `KIROCLI_DB_PATH` は標準外の Kiro CLI SQLite データベースを選択します。指定するデータベースは既に存在している必要があります。
+- `KIROCLI_TOKEN_KEY` は複数の曖昧なトークン行がある場合に、取り込む正確な `auth_kv` 行のキーを指定します。選択がない場合、推測せずログインに失敗します。
+
+取り込んだ認証情報は `~/.opencodex/auth.json` に保存されます。**アカウントを追加**のロールバックは別処理で、以前のスナップショットを復元する際にデータベースを置き換え、現在の WAL、SHM、journal サイドカーを削除します。
+
+ロールバックはスナップショットがある場合にのみ可能なため、セッションストアが存在するのに取得できない場合（ファイルが読めない、スキーマの不一致、トークン選択があいまい）、`KIROCLI_DB_PATH` / `KIRO_CLI_DB_FILE` が実際の CLI ストアと異なるインポート先を指す場合、またはプライマリ CLI データベースに認識できるトークン行がない場合、**アカウントを追加**は `kiro-cli` のログアウトを拒否します。通常の `kiro-cli` データパス上の壊れたデータベースを修復または削除し、インポート専用セレクタが設定されていれば解除してから再試行してください。既存の `kiro-cli` セッションがまったくない環境には影響しません。
 
 ## 3. API キーカタログ
 
-OpenProvider v2.7.1 には組み込みプリセットが 50 個含まれています。キー方式 40、OAuth 6、ローカル 3、
+opencodex v2.7.1 には組み込みプリセットが 50 個含まれています。キー方式 40、OAuth 6、ローカル 3、
 デフォルト ChatGPT 転送プリセット 1 です。ダッシュボードの **Add provider** ピッカーはキー発行ページを開き、
 入力したキーを検証した後保存します。主な項目は以下のとおりです:
 
@@ -119,6 +139,7 @@ OpenProvider v2.7.1 には組み込みプリセットが 50 個含まれてい�
 | Hugging Face | `https://router.huggingface.co/v1` |
 | NVIDIA NIM | `https://integrate.api.nvidia.com/v1` |
 | Z.AI (GLM Coding) | `https://api.z.ai/api/coding/paas/v4` |
+| Zhipu AI (BigModel) | `https://open.bigmodel.cn/api/paas/v4` |
 | Qwen Cloud | トークンプラン(デフォルト): `https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1` · 従量課金: `https://dashscope.aliyuncs.com/compatible-mode/v1` · またはカスタム |
 | Tencent Cloud Coding Plan | `https://api.lkeap.cloud.tencent.com/coding/v3` |
 | SiliconFlow | `https://api.siliconflow.cn/v1` |
@@ -135,6 +156,10 @@ OpenProvider v2.7.1 には組み込みプリセットが 50 個含まれてい�
 > コーディングツール専用としています。一般的な API 自動化、カスタムアプリのバックエンド、
 > 非対話型バッチ利用は禁止されており、プランキーが停止される場合があります。
 
+> **GLM の経路は 2 つあります:** `zai` は Z.AI の国際コーディングプラン契約、`zhipu-bigmodel`
+> は Zhipu の中国国内向け BigModel 従量課金エンドポイントです。ホストもキーも課金も別で、
+> 一方で発行したキーはもう一方では認証されません。
+
 ### 複数の API キー
 
 キーベースのプロバイダーも複数キーを保持できます。Providers ページでキーを追加すると
@@ -144,13 +169,13 @@ OpenProvider v2.7.1 には組み込みプリセットが 50 個含まれてい�
 
 ### ターミナルでアカウントを切り替え
 
-ダッシュボードを開かずに `opr account list`、`opr account current`、`opr account use` で同じ Codex、
+ダッシュボードを開かずに `ocx account list`、`ocx account current`、`ocx account use` で同じ Codex、
 OAuth、API キープールを確認・切り替えできます。完全なコマンド、JSON 出力、新規セッション適用方式は
-[CLI リファレンス](/ja/reference/cli/#opr-account-subcommand)を参照してください。
+[CLI リファレンス](/ja/reference/cli/#ocx-account-subcommand)を参照してください。
 
 ### GPT-5.6 プレビュー経路
 
-ライブモデルカタログの更新が遅れても `opr sync` でモデルが消えないよう、GPT-5.6
+ライブモデルカタログの更新が遅れても `ocx sync` でモデルが消えないよう、GPT-5.6
 Sol/Terra/Luna をフォールバックリストに入れています。
 
 | Codex 経路 | 事前登録されたモデル ID | Codex に表示されるコンテキスト |
@@ -165,25 +190,25 @@ Sol/Terra/Luna をフォールバックリストに入れています。
 使います。4 経路すべてで実際の利用権は上流アカウントが決定し、Cursor はライブ探索結果に基づき現在のアカウントで使えるモデルのみ残します。
 
 :::note[ゲートウェイとサブスクリプションプロキシ]
-プロバイダー対応可否は「エージェント」製品かどうかではなく、OpenProvider に合う wire アダプターがあるかで
+プロバイダー対応可否は「エージェント」製品かどうかではなく、opencodex に合う wire アダプターがあるかで
 決まります。現在のアダプター ID は `openai-chat`、`openai-responses`、`anthropic`、`google`(AI Studio、
 Vertex、Antigravity/Cloud Code Assist モード)、`azure` / `azure-openai`、`kiro`、`cursor` です。
 Amazon Bedrock ネイティブ API のような、これらの実装のいずれにも合わない独自プロトコルは直接サポートしません。
 **GitHub Copilot** と **GitLab Duo** は独自の汎用 OpenAI 互換エンドポイントにマッピングされたマルチモデル
-ゲートウェイです。Copilot は `opr login github-copilot` で GitHub デバイスフロー OAuth ログインを
+ゲートウェイです。Copilot は `ocx login github-copilot` で GitHub デバイスフロー OAuth ログインを
 サポートします(非公式ブリッジ — VS Code 公開クライアント ID でログイン後、短期 Copilot API トークンに
 交換し、有効な Copilot サブスクリプションが必要で GitHub ポリシー変更でブロックされる可能性あり)。GitLab Duo は Bearer
 **サブスクリプショントークン**(通常の API キーではない)で認証します。**Cloudflare AI
 Gateway** は URL にアカウント + ゲートウェイ ID を埋める必要があります。
 
-Cursor は別の実験的アダプターとして追跡します。`adapter: "cursor"` は `opr init` とダッシュボード Add
+Cursor は別の実験的アダプターとして追跡します。`adapter: "cursor"` は `ocx init` とダッシュボード Add
 Provider ピッカーに実験的 local config 項目として表示され、Cursor の静的フォールバックモデルカタログ
-メタデータを保存します。Cursor アクセストークンを設定すると OpenProvider は Cursor ライブ HTTP/2 トランスポートを
+メタデータを保存します。Cursor アクセストークンを設定すると opencodex は Cursor ライブ HTTP/2 トランスポートを
 使います。v2.7.1 フォールバックリストには 1M コンテキストの `gpt-5.6-sol` / `terra` / `luna` と 500K コンテキストの
 `grok-4.5` / `grok-4.5-fast` が含まれ、ライブ探索結果に基づき現在のアカウントに表示するモデルを
 決定します。Cursor サーバーが直接送るネイティブ read/write/delete/ls/grep/shell/fetch 実行は Codex
 承認とサンドボックス経路をバイパスするためデフォルトで無効です。信頼できるローカル実験でのみ
-`~/.OpenProvider/config.json` の `providers.cursor` に `unsafeAllowNativeLocalExec: true` を設定してください。
+`~/.opencodex/config.json` の `providers.cursor` に `unsafeAllowNativeLocalExec: true` を設定してください。
 ダッシュボードからは **Providers → Cursor → Edit JSON** で設定できます。完全な例は
 [設定リファレンス](/ja/reference/configuration/#cursor-provider-adapter-cursor)を参照してください。
 MCP、画面録画、computer-use はエグゼキューターフックで開かれており、ローカル
@@ -195,7 +220,7 @@ MCP、画面録画、computer-use はエグゼキューターフックで開か�
 ### Ollama Cloud
 
 Ollama Cloud はホステッド型(ローカルではない)Ollama で、`https://ollama.com/v1` で OpenAI 互換、キーは
-[ollama.com/settings/keys](https://ollama.com/settings/keys) で発行されます。OpenProvider はクラウド
+[ollama.com/settings/keys](https://ollama.com/settings/keys) で発行されます。opencodex はクラウド
 ラインナップをビジョン機能で分類し、[ビジョンサイドカー](/ja/guides/sidecars/)がテキスト専用モデルにのみ
 動作するようにします。テキスト専用モデル(例: `glm-5.2`、`deepseek-v4-pro`、`gpt-oss`、`qwen3-coder`、
 `minimax-m2.x`、`nemotron-3-*`)は `noVisionModels` に列挙され、ビジョンネイティブモデル(例:
@@ -204,7 +229,7 @@ Ollama の `:size` タグに寛容なので `gpt-oss` は `gpt-oss:120b` と `gp
 
 ## 4. ローカルプロバイダー
 
-OpenProvider をローカルの OpenAI 互換サーバーに向けてください — 通常は空キーで使います:
+opencodex をローカルの OpenAI 互換サーバーに向けてください — 通常は空キーで使います:
 
 | プロバイダー | ベース URL |
  --- | --- |
@@ -215,7 +240,6 @@ OpenProvider をローカルの OpenAI 互換サーバーに向けてくださ�
 ## すべての OpenAI 互換エンドポイント
 
 プロバイダーが Chat Completions を使うなら `openai-chat` アダプターが処理します — ダッシュボードで
-**Custom** を選ぶか `opr init` で `custom` を選んだ後ベース URL を入力してください。すべてのプロバイダーフィールド
+**Custom** を選ぶか `ocx init` で `custom` を選んだ後ベース URL を入力してください。すべてのプロバイダーフィールド
 (`headers`、`noReasoningModels`、`noVisionModels`、`models`、…)は
 [設定リファレンス](/ja/reference/configuration/)を参照してください。
-

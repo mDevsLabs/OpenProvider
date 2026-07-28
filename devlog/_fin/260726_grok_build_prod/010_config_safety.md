@@ -12,7 +12,7 @@
 
 루프백: 기존대로 `api_key = "openprovider-loopback"` (프록시가 무시하는 더미).
 
-비루프백: `api_key` 대신 `env_key = "OPENCODEX_API_AUTH_TOKEN"`을 쓴다. 토큰 값은 config에 남지 않고, 변수가 없으면 grok이 세션 토큰으로 폴백하지 않고 fail-closed다 (`180_grok-build .../model_providers.rs:741`). 프록시 자신도 같은 환경변수에서 토큰을 읽으므로(`auth-cors.ts:111`) 이름이 자연히 일치한다.
+비루프백: `api_key` 대신 `env_key = "OpenProvider_API_AUTH_TOKEN"`을 쓴다. 토큰 값은 config에 남지 않고, 변수가 없으면 grok이 세션 토큰으로 폴백하지 않고 fail-closed다 (`180_grok-build .../model_providers.rs:741`). 프록시 자신도 같은 환경변수에서 토큰을 읽으므로(`auth-cors.ts:111`) 이름이 자연히 일치한다.
 
 자동 등록 거부보다 이 쪽을 택하는 이유: 거부는 비루프백 사용자에게 기능을 완전히 없애고, 손수 쓴 설정도 fence 밖에 두어야 해 카탈로그 갱신 이점을 잃는다. `env_key`는 비밀 직렬화 금지라는 리뷰의 실제 요구를 지키면서 기능을 유지한다.
 
@@ -25,7 +25,7 @@
 -  const host = providerBaseHost(hostname);
 -  const baseUrl = `http://${host}:${port}/v1`;
 +/** Env var the proxy reads its admission token from; also what grok is told to read. */
-+const ADMISSION_TOKEN_ENV = "OPENCODEX_API_AUTH_TOKEN";
++const ADMISSION_TOKEN_ENV = "OpenProvider_API_AUTH_TOKEN";
 +
 +export function buildGrokManagedBlock(port: number, models: GrokInjectModel[], hostname?: string, reservedAliases?: ReadonlySet<string>): string {
 +  const host = providerBaseHost(hostname);
@@ -112,9 +112,10 @@ function canonicalTomlKey(raw: string | undefined): string | undefined {
 
 기존 스타일(mkdtemp `grokHome` 주입)을 따라 4건 추가:
 
-1. `non-loopback bind uses env_key instead of a literal token` — `injectGrokConfig(port, models, { grokHome, hostname: "192.168.1.50" })` 후 파일에 `env_key = "OPENCODEX_API_AUTH_TOKEN"`이 있고 `api_key`와 실제 토큰 문자열이 **없음**을 단언.
+1. `non-loopback bind uses env_key instead of a literal token` — `injectGrokConfig(port, models, { grokHome, hostname: "192.168.1.50" })` 후 파일에 `env_key = "OpenProvider_API_AUTH_TOKEN"`이 있고 `api_key`와 실제 토큰 문자열이 **없음**을 단언.
 2. `loopback keeps the placeholder api_key` — 대조군.
 3. `reserves aliases declared with a quoted first key segment` — `["model"."opr-probe"]`, `['model'.opr-other]`를 미리 둔 뒤 생성 별칭이 충돌하지 않고 `-2` 접미사를 받는지 단언.
 4. `restores a config that had no trailing newline byte-for-byte` — 원본 문자열을 저장 → inject → strip → `readFileSync`가 원본과 **정확히** 같은지 단언.
 
 `tests/grok-sync.test.ts`에는 비루프백 hostname을 넘겼을 때 `env_key`가 나오는 경로 1건을 추가한다.
+

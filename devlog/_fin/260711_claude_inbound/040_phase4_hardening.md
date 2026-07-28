@@ -15,7 +15,7 @@ observability, deprecate ccs-wrapper, and ship a release with docs/changelog.
 - Today (post-Phase 1): thinking streamed to Claude Code without signature;
   replayed thinking blocks dropped inbound.
 - Harden: when the ROUTED provider is anthropic-family, reuse the existing
-  ocxr1 reasoning-envelope machinery (src/responses/reasoning-envelope.ts,
+  oprr1 reasoning-envelope machinery (src/responses/reasoning-envelope.ts,
   bridge signature capture) so signed thinking survives Claude Code replay the
   same way it survives Codex replay. Decision gate: only if a real failure mode
   is demonstrated (tool-use turn 400s on replay); otherwise document drop policy
@@ -87,4 +87,5 @@ observability, deprecate ccs-wrapper, and ship a release with docs/changelog.
   speculatively build.
 - Release + protocol edges in one cycle is wide; if 1-3 produce big diffs,
   split release into its own mini-cycle (blast-radius rule).
+
 

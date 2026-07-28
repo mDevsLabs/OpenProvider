@@ -23,7 +23,7 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
 }
 ```
 2. NEW root-key setter `setRootOpenaiBaseUrl(content, port, hostname)`:
-   insert `OCX_SECTION_MARKER` comment + the line BEFORE the first table header
+   insert `opr_SECTION_MARKER` comment + the line BEFORE the first table header
    (same insertion discipline as `setRootModelProvider`). If a root
    `openai_base_url` already exists and is NOT marker-owned (user's own), leave it
    and do not inject a duplicate — journal still snapshots the original for restore;
@@ -33,7 +33,7 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
    immediately following root `openai_base_url` line (marker-adjacent only —
    a user's own override elsewhere survives). Tolerate marker-orphan lines.
 4. `injectCodexConfig(port, config, options)`:
-   - keep: journal write, legacy cleanup (`removeOcxSection`, `removeProfileSection`,
+   - keep: journal write, legacy cleanup (`removeoprSection`, `removeProfileSection`,
      `stripExistingModelProvider` — now removing the legacy root model_provider is the
      UPGRADE path), context-window strip, service-tier normalize, fast_mode, catalog.
    - branch: `if (shouldInjectApiAuthHeader(config))` → legacy body unchanged
@@ -45,8 +45,8 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
 5. `buildProfileFile` (fallback `openprovider.config.toml`): Design-B variant becomes
    root `openai_base_url` + optional catalog + `[features] fast_mode`; drops
    model_provider + table. Legacy variant unchanged for non-loopback.
-6. `stripOpencodexConfig`: additionally run `stripInjectedOpenaiBaseUrl`; keep all
-   legacy stripping (downgrade/upgrade safe both ways). `hasOpencodexRouting` also
+6. `strip@mdevs/openproviderConfig`: additionally run `stripInjectedOpenaiBaseUrl`; keep all
+   legacy stripping (downgrade/upgrade safe both ways). `has@mdevs/openproviderRouting` also
    returns true when a marker-owned openai_base_url line exists (so
    `removeCodexConfig` reports correctly).
 7. `restoreNativeCodex`: unchanged flow (journal → fallback strip → catalog →
@@ -55,7 +55,7 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
 
 ## Audit fixes folded in (2026-07-06 reviewer verdict)
 
-- **(blocker 1) `stripRootRoutedModel` gate:** in `stripOpencodexConfig`, fire the
+- **(blocker 1) `stripRootRoutedModel` gate:** in `strip@mdevs/openproviderConfig`, fire the
   routed-model strip when EITHER legacy root `model_provider == "openprovider"` OR a
   marker-owned `openai_base_url` line is present (`hadInjectedBaseUrl`). Otherwise a
   TUI-persisted root `model = "provider/slug"` survives fallback restore and breaks
@@ -97,3 +97,5 @@ export function buildOpenaiBaseUrlLine(port: number, hostname?: string): string 
 - `bun test tests/codex-inject.test.ts tests/codex-journal.test.ts` green.
 - `bun test` full green.
 - rg proof: no remaining call path injects the openprovider table for loopback configs.
+
+

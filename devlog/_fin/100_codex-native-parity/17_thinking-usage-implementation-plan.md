@@ -26,7 +26,7 @@ Current gaps:
    `response.reasoning_summary_text.delta`.
 2. OpenAI-compatible `delta.reasoning_content` is raw reasoning-like content but currently gets
    downgraded to a summary.
-3. `OcxUsage` only has `inputTokens` and `outputTokens`, so Responses usage lacks:
+3. `oprUsage` only has `inputTokens` and `outputTokens`, so Responses usage lacks:
    - `input_tokens_details.cached_tokens`
    - `output_tokens_details.reasoning_tokens`
 4. Non-streaming JSON responses ignore reasoning deltas entirely.
@@ -72,10 +72,10 @@ Change `AdapterEvent`:
    | { type: "tool_call_start"; id: string; name: string }
 ```
 
-Extend `OcxUsage`:
+Extend `oprUsage`:
 
 ```diff
- export interface OcxUsage {
+ export interface oprUsage {
    inputTokens: number;
    outputTokens: number;
 +  cachedInputTokens?: number;
@@ -92,7 +92,7 @@ Extend `OcxUsage`:
 Add a helper:
 
 ```ts
-function responsesUsage(usage: OcxUsage | undefined): Record<string, unknown> {
+function responsesUsage(usage: oprUsage | undefined): Record<string, unknown> {
   if (!usage) return { input_tokens: 0, output_tokens: 0, total_tokens: 0 };
   const out: Record<string, unknown> = {
     input_tokens: usage.inputTokens,
@@ -289,3 +289,4 @@ all pass
 3. Non-streaming translated responses preserve raw reasoning content.
 4. Usage details are present when upstream providers expose them and absent when unknown.
 5. No provider gets fabricated cache/reasoning token counts.
+

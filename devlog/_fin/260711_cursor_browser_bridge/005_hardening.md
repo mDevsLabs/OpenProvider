@@ -21,7 +21,7 @@ consistent.
 Non-blocking findings (confirmed, no change needed):
 - No double execution: a returned client tool call is surfaced once and
   deduped by call id (`completedToolCalls`, protobuf-events.ts:131/159/245);
-  OCX_RESPONSES mcpArgs is intercepted by the Responses bridge, not run locally.
+  opr_RESPONSES mcpArgs is intercepted by the Responses bridge, not run locally.
 - Wire shape correct: `create(McpToolsSchema, { mcpTools: defs })` matches
   `McpTools.mcp_tools = repeated McpToolDefinition`.
 - `toolChoice:"none"` and empty tools both yield `[]` -> mcpTools stays unset.
@@ -46,3 +46,4 @@ Non-blocking findings (confirmed, no change needed):
 
 Fix hardened: channel-consistency defect fixed, edge cases locked by tests, sol
 reviewed. Committed on the branch.
+

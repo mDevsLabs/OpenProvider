@@ -24,3 +24,23 @@ test("readJsonOrThrow surfaces server error messages", async () => {
   await expect(readJsonOrThrow(res, "fallback")).rejects.toThrow("locked");
 });
 
+test("readJsonOrThrow prefers error, then message, then fallback", async () => {
+  await expect(
+    readJsonOrThrow(Response.json({ message: "repair marker" }, { status: 500 }), "fallback"),
+  ).rejects.toThrow("repair marker");
+  await expect(
+    readJsonOrThrow(Response.json({ error: "err", message: "msg" }, { status: 500 }), "fallback"),
+  ).rejects.toThrow("err");
+  await expect(
+    readJsonOrThrow(Response.json({ detail: "other" }, { status: 500 }), "fallback"),
+  ).rejects.toThrow("fallback");
+});
+
+test("readJsonOrThrow accepts Response-like mocks that only implement json()", async () => {
+  const mock = {
+    ok: true,
+    status: 200,
+    json: async () => ({ hello: "world" }),
+  } as unknown as Response;
+  expect(await readJsonOrThrow<{ hello: string }>(mock)).toEqual({ hello: "world" });
+});

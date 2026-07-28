@@ -1,7 +1,7 @@
 # WP2 — provider opt-in wiring
 
 ## Scope
-- MODIFY src/types.ts (OcxProviderConfig: + parallelToolCalls?: boolean).
+- MODIFY src/types.ts (oprProviderConfig: + parallelToolCalls?: boolean).
 - MODIFY src/providers/registry.ts (ProviderRegistryEntry: + parallelToolCalls?: boolean; xai entry: parallelToolCalls: true).
 - MODIFY src/providers/derive.ts (providerConfigSeed + enrichProviderFromRegistry propagate the flag).
 - MODIFY src/router.ts (routedProviderConfig registry->user-config backfill merges parallelToolCalls;
@@ -13,7 +13,7 @@
 - OUT: zai/GLM enablement, cursor path changes, other adapters.
 
 ## Diffs
-1. types.ts OcxProviderConfig (after noPenaltyModels block):
+1. types.ts oprProviderConfig (after noPenaltyModels block):
 ```ts
 /**
  * Allow multiple tool calls per completion. Opt-in per provider with PROVEN support
@@ -71,3 +71,4 @@ if (tools) {
   default routed entry -> false; cursor/ slug -> true (unchanged).
 - Assistant tool_calls history message serializes content "" (test asserts no null).
 - Existing catalog/provider tests stay green.
+

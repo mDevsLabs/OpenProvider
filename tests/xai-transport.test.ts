@@ -10,7 +10,7 @@ import {
   XAI_GROK_CLIENT_VERSION,
 } from "../src/providers/xai-transport";
 import { getProviderRegistryEntry } from "../src/providers/registry";
-import type { OcxAssistantMessage, OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprAssistantMessage, oprParsedRequest, oprProviderConfig } from "../src/types";
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const OMITTED = [
@@ -22,7 +22,7 @@ const OMITTED = [
   "x-grok-client-mode",
 ] as const;
 
-function provider(authMode: "oauth" | "key"): OcxProviderConfig {
+function provider(authMode: "oauth" | "key"): oprProviderConfig {
   return {
     adapter: "openai-chat",
     baseUrl: "https://api.x.ai/v1",
@@ -32,7 +32,7 @@ function provider(authMode: "oauth" | "key"): OcxProviderConfig {
   };
 }
 
-function parsed(): OcxParsedRequest {
+function parsed(): oprParsedRequest {
   return {
     modelId: "grok-4.5",
     context: { messages: [{ role: "user", content: "hi", timestamp: 0 }] },
@@ -238,7 +238,7 @@ function lower(headers: Headers): Record<string, string> {
 
 async function capture(authMode: "oauth" | "key", calls = 1) {
   const seen: Headers[] = [];
-  const configured = provider(authMode) as OcxProviderConfig & { fetch?: typeof globalThis.fetch };
+  const configured = provider(authMode) as oprProviderConfig & { fetch?: typeof globalThis.fetch };
   configured.fetch = async (_input, init) => {
     seen.push(new Headers(init?.headers));
     return new Response("{}", { status: 200 });
@@ -311,7 +311,7 @@ describe("xAI outbound compatibility headers", () => {
 
   test("mixed-case caller overrides win without duplicates", async () => {
     const seen: Headers[] = [];
-    const configured = provider("oauth") as OcxProviderConfig & { fetch?: typeof globalThis.fetch };
+    const configured = provider("oauth") as oprProviderConfig & { fetch?: typeof globalThis.fetch };
     configured.headers = { "user-agent": "custom-agent", "X-Grok-Req-Id": "caller-id" };
     configured.fetch = async (_input, init) => {
       seen.push(new Headers(init?.headers));
@@ -332,7 +332,7 @@ describe("xAI outbound compatibility headers", () => {
   test("blank cache keys omit affinity but retain UA and fresh req-id in both modes", async () => {
     for (const authMode of ["oauth", "key"] as const) {
       const seen: Headers[] = [];
-      const configured = provider(authMode) as OcxProviderConfig & { fetch?: typeof globalThis.fetch };
+      const configured = provider(authMode) as oprProviderConfig & { fetch?: typeof globalThis.fetch };
       configured.fetch = async (_input, init) => {
         seen.push(new Headers(init?.headers));
         return new Response("{}", { status: 200 });
@@ -365,7 +365,7 @@ describe("xAI reasoning_content cache preservation", () => {
   });
 
   test("parseRequest folds summary reasoning into one Grok assistant wire message", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -386,7 +386,7 @@ describe("xAI reasoning_content cache preservation", () => {
   });
 
   test("parseRequest drops opaque encrypted-only reasoning without detaching an assistant wire message", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -408,7 +408,7 @@ describe("xAI reasoning_content cache preservation", () => {
   });
 
   test("parseRequest clears pending reasoning at a user boundary", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -428,7 +428,7 @@ describe("xAI reasoning_content cache preservation", () => {
   });
 
   test("parseRequest folds pending reasoning into the assistant turn that carries the call", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -455,7 +455,7 @@ describe("xAI reasoning_content cache preservation", () => {
   });
 
   test("parseRequest newline-joins reasoning siblings before one assistant", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -469,7 +469,7 @@ describe("xAI reasoning_content cache preservation", () => {
     });
     const body = JSON.parse(createOpenAIChatAdapter(prov).buildRequest(req).body as string) as { messages: Array<Record<string, unknown>> };
     const assistants = body.messages.filter(message => message.role === "assistant");
-    const parsedAssistant = req.context.messages.find(message => message.role === "assistant") as OcxAssistantMessage;
+    const parsedAssistant = req.context.messages.find(message => message.role === "assistant") as oprAssistantMessage;
     const thinkingParts = parsedAssistant.content.filter(part => part.type === "thinking");
 
     expect(thinkingParts).toHaveLength(1);
@@ -491,3 +491,4 @@ describe("xAI reasoning_content cache preservation", () => {
     expect(req.context.messages).toHaveLength(1);
   });
 });
+

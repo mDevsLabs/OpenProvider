@@ -15,7 +15,7 @@ On `opr stop`, Ctrl+C, SIGTERM, or process exit: revert via `launchctl unsetenv`
 |------|--------|
 | `src/server/system-env.ts` | NEW — `injectSystemEnv(port)`, `revertSystemEnv()`, `cleanStaleSystemEnv()` |
 | `src/cli/index.ts` | Wire inject after server start, revert in `syncCleanup` |
-| `src/types.ts` | Add `claudeCode.systemEnv?: boolean` to `OcxConfig` |
+| `src/types.ts` | Add `claudeCode.systemEnv?: boolean` to `oprConfig` |
 | `tests/system-env.test.ts` | NEW — unit tests for inject/revert/stale/toggle |
 | `gui/src/…` | Claude tab: systemEnv toggle |
 | `docs/…` | en/ko/zh-cn system-env section |
@@ -44,7 +44,7 @@ shutdown / Ctrl+C / SIGTERM
 ### Implementation details
 
 1. **`src/server/system-env.ts`**
-   - `injectSystemEnv(port: number, config: OcxConfig)`:
+   - `injectSystemEnv(port: number, config: oprConfig)`:
      - Guard: `process.platform !== "darwin"` → no-op with log
      - Guard: `config.claudeCode?.systemEnv === false` → no-op
      - Guard: `config.claudeCode?.enabled === false` → no-op
@@ -135,3 +135,4 @@ Reviewer: Hegel (sol). Evidence: `.codexclaw/evidence/260711-system-env-plan-aud
 | `tests/claude-management-api.test.ts` | Add systemEnv round-trip test |
 | `gui/src/pages/ClaudeCode.tsx` | systemEnv toggle row |
 | `docs/…` | en/ko/zh-cn system-env section with caveats |
+

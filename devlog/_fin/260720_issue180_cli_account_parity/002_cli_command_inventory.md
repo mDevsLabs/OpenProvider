@@ -1,7 +1,7 @@
 # 002 — Existing `opr` CLI surface (research)
 
 Source: explorer lane "Nietzsche" (read-only repo scan, 2026-07-20). Entry chain:
-`opr`/`openprovider` → bin/ocx.mjs (update intercept :246, spawns Bun on
+`opr`/`openprovider` → bin/opr.mjs (update intercept :246, spawns Bun on
 src/cli/index.ts :258, mirrors child exit code :290) → dispatch switch
 src/cli/index.ts:451.
 
@@ -38,7 +38,7 @@ src/cli/index.ts:451.
 - Port/host: `findLiveProxy()` (src/server/proxy-liveness.ts:93) — liveness-first,
   identity-probed, never a blind `config.port`; URL host via `probeHostname()` (:46).
 - Auth headers: `runningProxyUpdateHeaders()` (src/oauth/login-cli.ts:9-14) sets
-  `X-OpenProvider-API-Key` from `OPENCODEX_API_AUTH_TOKEN`; `opr claude` falls back to
+  `X-OpenProvider-API-Key` from `OpenProvider_API_AUTH_TOKEN`; `opr claude` falls back to
   `config.apiKeys[0].key` when the env is absent (src/cli/claude.ts:120-121).
 - Endpoints consumed today: `/healthz`, POST `/api/stop`, GET/PUT `/api/debug*`,
   POST `/api/providers`, GET `/api/claude-code`, GET `/v1/models?ids=cli`.
@@ -72,3 +72,4 @@ exact parity gap.
 Known inconsistencies NOT to copy: `opr v2` documented in docs but missing from
 `helpEntries`; `opr claude` has a help entry but is absent from all three docs-site
 CLI reference pages; help.ts `debug` entry omits the `injection` scope.
+

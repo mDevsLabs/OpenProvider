@@ -38,7 +38,7 @@ per-request):
      authorization value — otherwise an unauthenticated request would bounce off
      chatgpt.com as an opaque `{"detail":"Unauthorized"}`.
    - A bearer equal to the proxy's own admission secret (non-loopback binds accept
-     `Authorization: Bearer <OPENCODEX_API_AUTH_TOKEN>`) is stripped before selection —
+     `Authorization: Bearer <@mdevs/openprovider_API_AUTH_TOKEN>`) is stripped before selection —
      the proxy secret must never be relayed to chatgpt.com
      (`isProxyAdmissionSecret`, extracted from `hasValidApiAuth`).
    - Forward-auth FAILURES (pool cooldown 429, reauth 401, affinity 409) are captured,
@@ -83,3 +83,4 @@ upstream error passthrough, 504 timeout via `config.images.timeoutMs`, GET falls
 guard, non-loopback auth/origin, admission-secret never relayed.
 server-auth.test.ts's 404-guard list swaps `/v1/images/generations` for
 `/v1/realtime/sessions`.
+

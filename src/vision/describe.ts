@@ -1,4 +1,4 @@
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 import { FORWARD_HEADERS } from "../adapters/openai-responses";
 import { signalWithTimeout, cancelBodyOnAbort } from "../lib/abort";
 import { redactSecretString } from "../lib/redact";
@@ -50,7 +50,7 @@ export async function describeImage(
   imageUrl: string,
   detail: string | undefined,
   contextText: string,
-  forwardProvider: OcxProviderConfig,
+  forwardProvider: oprProviderConfig,
   selectedForwardHeaders: Headers,
   settings: VisionSettings,
   abortSignal?: AbortSignal,
@@ -123,3 +123,4 @@ export async function describeImage(
     linkedSignal.cleanup();
   }
 }
+

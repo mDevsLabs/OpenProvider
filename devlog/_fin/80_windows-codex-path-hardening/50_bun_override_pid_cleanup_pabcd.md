@@ -17,7 +17,7 @@ This can be one PABCD cycle or two smaller cycles if implementation grows. Keep 
 
 Scope:
 
-- MODIFY `bin/ocx.mjs` for npm launcher Bun selection
+- MODIFY `bin/opr.mjs` for npm launcher Bun selection
 - MODIFY `src/service.ts` if service wrapper embeds selected Bun path
 - MODIFY `src/process-control.ts` for safe PID cleanup behavior
 - MODIFY `src/config.ts` or add a config helper only if persistent config is chosen over env-only override
@@ -33,7 +33,7 @@ Non-goals:
 
 Ask a read-only auditor to verify:
 
-- `OPENCODEX_BUN_PATH` or the chosen equivalent is validated before use.
+- `OpenProvider_BUN_PATH` or the chosen equivalent is validated before use.
 - Invalid override paths fail loudly.
 - Service wrapper uses the same selected Bun path as the CLI launcher.
 - PID cleanup cannot kill unrelated user processes silently.
@@ -42,7 +42,7 @@ Ask a read-only auditor to verify:
 
 Implementation checklist:
 
-- Add `OPENCODEX_BUN_PATH` support or an equivalent config field.
+- Add `OpenProvider_BUN_PATH` support or an equivalent config field.
 - Validate override path exists and is executable enough for the current platform.
 - Log whether bundled Bun or override Bun is used.
 - Ensure `opr service install` embeds or resolves the selected Bun consistently.
@@ -52,7 +52,7 @@ Implementation checklist:
 Suggested commits:
 
 ```bash
-git add bin/ocx.mjs src/service.ts tests && git commit -m "fix(windows): allow validated bun override"
+git add bin/opr.mjs src/service.ts tests && git commit -m "fix(windows): allow validated bun override"
 git add src/process-control.ts tests && git commit -m "fix(windows): make explicit pid cleanup resilient"
 ```
 
@@ -68,7 +68,7 @@ bun x tsc --noEmit
 Manual Windows smoke:
 
 ```powershell
-$env:OPENCODEX_BUN_PATH = "C:\\path\\to\\bun.exe"
+$env:OpenProvider_BUN_PATH = "C:\\path\\to\\bun.exe"
 opr -v
 opr service install
 opr service start
@@ -83,3 +83,4 @@ opr service status
 - Invalid override path fails with a clear message.
 - PID inspection failure during explicit stop/uninstall still attempts logged cleanup.
 - Tests cover default, valid override, invalid override, and PID uncertainty.
+

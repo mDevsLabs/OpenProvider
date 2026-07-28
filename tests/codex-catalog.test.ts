@@ -2,7 +2,7 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { augmentRoutedModelsWithJawcodeMetadata, augmentRoutedModelsWithRegistryOpenAiApiRows, buildCatalogEntries, catalogModelSlug, clampCatalogModelsToCodexSupport, clampEntryToCodexSupportedEfforts, clampedDefaultEffort, deriveComboCatalogModel, exactComboCatalogSlugs, filterCatalogVisibleModels, filterSupportedNativeSlugs, gatherRoutedModels, isDatedVariantId, isMediaGenerationModelId, loadBundledCodexCatalog, materializeBundledCodexCatalog, mergeCatalogEntriesForSync, NATIVE_OPENAI_MODELS, normalizeRoutedCatalogEntry, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests } from "../src/codex/catalog";
+import { augmentRoutedModelsWithJawcodeMetadata, augmentRoutedModelsWithRegistryOpenAiApiRows, buildCatalogEntries, buildComboCatalogOmission, catalogModelSlug, clampCatalogModelsToCodexSupport, clampEntryToCodexSupportedEfforts, clampedDefaultEffort, comboCatalogOmissionReason, deriveComboCatalogModel, exactComboCatalogSlugs, filterCatalogVisibleModels, filterSupportedNativeSlugs, gatherRoutedModels, isDatedVariantId, isMediaGenerationModelId, loadBundledCodexCatalog, materializeBundledCodexCatalog, mergeCatalogEntriesForSync, NATIVE_OPENAI_MODELS, normalizeRoutedCatalogEntry, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests, shouldExposeRoutedModel } from "../src/codex/catalog";
 import {
   CURSOR_STATIC_MODELS,
   filterCursorConfiguredModelsByLiveDiscovery,
@@ -20,7 +20,7 @@ import {
   setCached,
   type ProviderModelDiscoveryStatus,
 } from "../src/codex/model-cache";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import type { NormalizedComboConfig } from "../src/combos/types";
 import { enrichProviderFromRegistry } from "../src/providers/derive";
 import { handleManagementAPI } from "../src/server/management-api";
@@ -202,6 +202,33 @@ describe("combo catalog capability intersection", () => {
         { provider: "a", model: "m1", weight: 1 },
       ],
     }), [memberA, memberA])).toBeNull();
+  });
+
+  test("omission diagnostics distinguish incomplete metadata from disjoint modalities (#516)", () => {
+    const incompleteMembers = [memberA];
+    expect(comboCatalogOmissionReason(normalizedCombo(), incompleteMembers)).toBe("incomplete_metadata");
+    const incomplete = buildComboCatalogOmission("missing-meta", normalizedCombo(), incompleteMembers);
+    expect(incomplete).toMatchObject({
+      id: "missing-meta",
+      reason: "incomplete_metadata",
+    });
+    expect(incomplete.message).toContain("member capabilities are incomplete");
+    expect(incomplete.message).not.toContain("no common input modalities");
+
+    const disjointMembers = [
+      { ...memberA, inputModalities: ["image"] },
+      { ...memberB, inputModalities: ["text"] },
+    ];
+    expect(comboCatalogOmissionReason(normalizedCombo(), disjointMembers)).toBe("incompatible_modalities");
+    expect(deriveComboCatalogModel("disjoint", normalizedCombo(), disjointMembers)).toBeNull();
+    const incompatible = buildComboCatalogOmission("disjoint", normalizedCombo(), disjointMembers);
+    expect(incompatible).toMatchObject({
+      id: "disjoint",
+      reason: "incompatible_modalities",
+      targets: ["a/m1", "b/m2"],
+    });
+    expect(incompatible.message).toContain("no common input modalities");
+    expect(incompatible.message).not.toContain("member capabilities are incomplete");
   });
 
   test("requires member identity to follow target order", () => {
@@ -452,7 +479,7 @@ describe("combo catalog capability intersection", () => {
 
   test("gathers sorted rows, filters disabled combos, and deduplicates redacted warnings until reset", async () => {
     const warningSentinel = ["sk", "warning-secret-123456"].join("-");
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "a",
       providers: {
@@ -477,10 +504,65 @@ describe("combo catalog capability intersection", () => {
       expect(String(warn.mock.calls[0]?.[0])).toContain("[REDACTED]");
       expect(String(warn.mock.calls[0]?.[0])).not.toContain(warningSentinel);
       expect(second).toEqual(first);
+      const { getLastComboCatalogOmissions } = await import("../src/codex/catalog");
+      const hidden = getLastComboCatalogOmissions().find(item => item.id === "hidden");
+      expect(hidden).toMatchObject({
+        id: "hidden",
+        reason: "incomplete_metadata",
+      });
+      expect(hidden?.message).toContain("member capabilities are incomplete");
+      expect(hidden?.message).toContain("[REDACTED]");
 
       resetCatalogRuntimeStateForTests();
       await gatherRoutedModels(config);
       expect(warn).toHaveBeenCalledTimes(2);
+    } finally {
+      warn.mockRestore();
+    }
+  }, 15_000);
+
+  test("gather warns about disjoint modalities without calling them incomplete (#516)", async () => {
+    const config: oprConfig = {
+      port: 10100,
+      defaultProvider: "a",
+      providers: {
+        a: {
+          adapter: "openai-chat",
+          baseUrl: "https://a.example/v1",
+          liveModels: false,
+          models: ["m1"],
+          modelContextWindows: { m1: 200_000 },
+          modelInputModalities: { m1: ["image"] },
+        },
+        b: {
+          adapter: "openai-chat",
+          baseUrl: "https://b.example/v1",
+          liveModels: false,
+          models: ["m2"],
+          modelContextWindows: { m2: 128_000 },
+          modelInputModalities: { m2: ["text"] },
+        },
+      },
+      combos: {
+        disjoint: { targets: [{ provider: "a", model: "m1" }, { provider: "b", model: "m2" }] },
+      },
+    };
+    const warn = spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      resetCatalogRuntimeStateForTests();
+      const models = await gatherRoutedModels(config);
+      expect(models.some(model => model.provider === "combo" && model.id === "disjoint")).toBe(false);
+      const { getLastComboCatalogOmissions } = await import("../src/codex/catalog");
+      const omission = getLastComboCatalogOmissions().find(item => item.id === "disjoint");
+      expect(omission).toMatchObject({
+        id: "disjoint",
+        reason: "incompatible_modalities",
+      });
+      expect(omission?.message).toContain("no common input modalities");
+      expect(omission?.message).not.toContain("member capabilities are incomplete");
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0]?.[0])).toContain("no common input modalities");
+      expect(String(warn.mock.calls[0]?.[0])).not.toContain("member capabilities are incomplete");
     } finally {
       warn.mockRestore();
     }
@@ -511,7 +593,7 @@ describe("combo catalog capability intersection", () => {
     // fix, memberByKey never contained openai/<slug>, so combos with a native-openai target were
     // silently dropped from the catalog.
     globalThis.fetch = (() => { throw new Error("forward providers must not fetch /models"); }) as typeof fetch;
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "openai",
       providers: {
@@ -555,7 +637,7 @@ describe("combo catalog capability intersection", () => {
     // they must NOT leak into the returned all[] array (they are already emitted via the
     // native catalog / /v1/models path).
     globalThis.fetch = (() => { throw new Error("forward providers must not fetch /models"); }) as typeof fetch;
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "openai",
       providers: {
@@ -727,7 +809,7 @@ describe("configured CatalogModel displayName -> catalog display_name", () => {
   });
 });
 
-function openAiApiCatalogConfig(overrides: Record<string, unknown> = {}): OcxConfig {
+function openAiApiCatalogConfig(overrides: Record<string, unknown> = {}): oprConfig {
   return {
     port: 10100,
     defaultProvider: "openai-apikey",
@@ -2104,6 +2186,26 @@ describe("Codex catalog routed normalization", () => {
     expect(routed?.supports_reasoning_summaries).toBe(false);
   });
 
+  test("model-specific reasoning-summary delivery keeps summaries enabled in the routed catalog (#538)", async () => {
+    const models = await gatherRoutedModels({
+      providers: {
+        compat: {
+          adapter: "openai-responses",
+          baseUrl: "https://compat.example.test/v1",
+          authMode: "key",
+          liveModels: false,
+          models: ["summary-model"],
+          modelReasoningSummaryDelivery: { "summary-model": "sequential" },
+        },
+      },
+    });
+    const entries = buildCatalogEntries(null, [], models);
+    const routed = entries.find(e => e.slug === "compat/summary-model");
+
+    expect(models.find(model => model.id === "summary-model")?.supportsReasoningSummaries).toBe(true);
+    expect(routed?.supports_reasoning_summaries).toBe(true);
+  });
+
   test("generated jawcode snapshot is restricted to mapped providers", () => {
     expect(resolveJawcodeProvider("kimi")).toBe("moonshot");
     expect(resolveJawcodeProvider("nanogpt")).toBeUndefined();
@@ -2457,7 +2559,7 @@ describe("OpenAI API trusted catalog augmentation", () => {
 
   test("actual gathering exposes no API rows when the API tier is absent or disabled", async () => {
     globalThis.fetch = async input => { throw new Error(`unexpected fetch: ${String(input)}`); };
-    const absent: OcxConfig = {
+    const absent: oprConfig = {
       port: 10100,
       defaultProvider: "custom",
       providers: { custom: { adapter: "openai-chat", baseUrl: "https://example.test/v1", liveModels: false, models: ["model"] } },
@@ -2487,7 +2589,7 @@ describe("OpenAI API trusted catalog augmentation", () => {
 
   test("is a no-op when API tier is absent or disabled", () => {
     const source = [{ provider: "other", id: "model" }];
-    const absent: OcxConfig = { port: 10100, defaultProvider: "other", providers: { other: { adapter: "openai-chat", baseUrl: "https://example.test/v1" } } };
+    const absent: oprConfig = { port: 10100, defaultProvider: "other", providers: { other: { adapter: "openai-chat", baseUrl: "https://example.test/v1" } } };
     expect(augmentRoutedModelsWithRegistryOpenAiApiRows(source, absent)).toBe(source);
     expect(augmentRoutedModelsWithRegistryOpenAiApiRows(source, openAiApiCatalogConfig({ disabled: true }))).toBe(source);
   });
@@ -2569,6 +2671,33 @@ describe("media-generation model filtering", () => {
   });
 });
 
+describe("shouldExposeRoutedModel — Gemini image-capable exemption", () => {
+  test("exposes gemini-3.1-flash-image (image-capable chat model, not media-gen)", () => {
+    expect(shouldExposeRoutedModel({ provider: "google-antigravity", id: "gemini-3.1-flash-image" })).toBe(true);
+  });
+
+  test("exposes cursor gemini-3-pro-image-preview", () => {
+    expect(shouldExposeRoutedModel({ provider: "cursor", id: "gemini-3-pro-image-preview" })).toBe(true);
+  });
+
+  test("does not resurrect standalone media-gen gemini image ids", () => {
+    expect(shouldExposeRoutedModel({ provider: "google-antigravity", id: "gemini-3-pro-image" })).toBe(false);
+    expect(shouldExposeRoutedModel({ provider: "openrouter", id: "gemini-3-pro-image" })).toBe(false);
+  });
+
+  test("still filters true media-generation models", () => {
+    for (const id of [
+      "grok-2-image", "gpt-image-1", "dall-e-3", "imagen-4", "sora-2", "veo-3", "flux",
+    ]) {
+      expect(shouldExposeRoutedModel({ provider: "openrouter", id })).toBe(false);
+    }
+  });
+
+  test("still filters compatibility-excluded slugs", () => {
+    expect(shouldExposeRoutedModel({ provider: "opencode-go", id: "hy3-preview" })).toBe(false);
+  });
+});
+
 describe("Codex reasoning-effort capability clamp", () => {
   function bundledCatalogDeps(efforts: string[]) {
     return {
@@ -2640,3 +2769,4 @@ describe("Codex reasoning-effort capability clamp", () => {
     expect(models).toEqual(before);
   });
 });
+

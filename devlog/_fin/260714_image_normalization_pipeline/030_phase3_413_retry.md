@@ -39,7 +39,7 @@ spiral.
   (every image one tier lower; tier-2 → floor 500px/q40/100KiB per 020's table). Threading:
   optional field on `IncomingMeta` (`src/adapters/base.ts:4-7,18-23`) — additive, other
   adapters ignore it (audit-verified).
-- Image presence detection: `parsed.context.messages` carries `OcxImageContent.imageUrl`
+- Image presence detection: `parsed.context.messages` carries `oprImageContent.imageUrl`
   data URLs in ordinary and tool-result content (`src/types.ts:81-90`,
   `src/responses/parser.ts:29-53,173-199`) — gate the branch on at least one data-URL
   image (audit-verified reachable).
@@ -85,3 +85,4 @@ Implementation delta: NEW src/server/image-retry.ts (gate, unit-testable);
 responses.ts non-OK handling restructured into a labeled recovery loop with one mutable
 activeAdapter + imageTierBias + imageRetryAttempted; base.ts IncomingMeta.imageTierBias;
 anthropic.ts consumes incoming.imageTierBias into normalizeAnthropicImages.
+

@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync,
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildClaudeAgentDefs, injectClaudeAgentDefs, syncClaudeAgentDefs } from "../src/claude/agents-inject";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const dirs: string[] = [];
 function tempDir(): string {
@@ -13,11 +13,11 @@ function tempDir(): string {
 }
 afterEach(() => { for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true }); });
 
-function cfg(extra?: Partial<OcxConfig>): OcxConfig {
-  return { port: 10100, defaultProvider: "mock", providers: {}, ...extra } as OcxConfig;
+function cfg(extra?: Partial<oprConfig>): oprConfig {
+  return { port: 10100, defaultProvider: "mock", providers: {}, ...extra } as oprConfig;
 }
 
-function generatedBodies(config: OcxConfig, dir: string): string[] {
+function generatedBodies(config: oprConfig, dir: string): string[] {
   const defs = buildClaudeAgentDefs(config, {}, dir);
   syncClaudeAgentDefs(defs, dir);
   return defs.map(def => readFileSync(join(dir, "agents", def.file), "utf8"));
@@ -225,3 +225,4 @@ describe("syncClaudeAgentDefs ownership contract (audit 071 #2/#3)", () => {
     expect(readdirSync(join(dir, "agents"))).toEqual([]);
   });
 });
+

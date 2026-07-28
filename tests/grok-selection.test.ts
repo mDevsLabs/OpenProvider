@@ -6,7 +6,7 @@ import { buildGrokManagedBlock, injectGrokConfig } from "../src/grok/inject";
 import { syncGrokConfig } from "../src/grok/sync";
 import { nativeOpenAiContextWindow, visibleNativeSlugs } from "../src/codex/catalog";
 import type { CatalogModel } from "../src/codex/catalog";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * Alias-stable exclusion (WP3, audit blocker 3): aliases are allocated over the
@@ -105,7 +105,7 @@ test("a user-reserved alias still pushes generated aliases past it while exclusi
   }
 });
 
-const baseConfig = { port: 10100, defaultProvider: "openai", providers: {} } as unknown as OcxConfig;
+const baseConfig = { port: 10100, defaultProvider: "openai", providers: {} } as unknown as oprConfig;
 
 test("syncGrokConfig with grokExcludedModels omits that model's table end to end", async () => {
   const { root, grokHome } = tempGrokHome();
@@ -113,7 +113,7 @@ test("syncGrokConfig with grokExcludedModels omits that model's table end to end
     const routed: CatalogModel[] = [
       { id: "grok-4.5", provider: "cursor", contextWindow: 500_000 } as CatalogModel,
     ];
-    const config = { ...baseConfig, grokExcludedModels: ["cursor/grok-4.5"] } as OcxConfig;
+    const config = { ...baseConfig, grokExcludedModels: ["cursor/grok-4.5"] } as oprConfig;
     const result = await syncGrokConfig(10190, config, { grokHome }, {
       fetchAllModels: async () => routed,
       injectGrokConfig,
@@ -129,3 +129,4 @@ test("syncGrokConfig with grokExcludedModels omits that model's table end to end
     rmSync(root, { recursive: true, force: true });
   }
 });
+

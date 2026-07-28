@@ -27,7 +27,7 @@
 | R2-2 | 030 | 수용 | 읽기-재병합-원자적 rename은 CAS가 아님. 결정: 모든 whole-store writer(`persist` 경유 전부)가 동일 글로벌 락을 짧게 획득(로그인·계정전환 포함, 쓰기 빈도 낮아 비용 무시 가능), refresh는 교환 전체 동안 보유. CAS-read 직후 결정적 테스트 seam 추가, 무관 writer 경쟁 테스트를 그 seam에서 수행 |
 | R2-3 | 030 | 수용 | cleanup/release 전 exact-byte/stat 스냅샷 검증(스탈 takeover와 동일 기법). 부분 기록 실패·release-검사-unlink 사이 교체 테스트 추가 |
 | R2-4 | 050 | 수용 | adapter-level fetchResponse hook이 서버의 `fetchWithHeaderTimeout`(responses.ts:1228) 경로를 우회함. req-id 주입을 timeout-capable fetch 경계 안쪽(transport fetch wrapper)으로 이동, `ctx.timeoutMs`/`ctx.stream` 의미 보존. timeout 활성화 테스트 추가 |
-| R2-5 | 010 | 수용 | 서명 무결성: newline join은 unsigned plaintext sibling에만 적용. `ocxr1` 서명 sibling은 각각 독립 thinking part로 보존(서명↔텍스트 대응 유지). 서명 2개 sibling의 Anthropic replay 테스트 추가 |
+| R2-5 | 010 | 수용 | 서명 무결성: newline join은 unsigned plaintext sibling에만 적용. `oprr1` 서명 sibling은 각각 독립 thinking part로 보존(서명↔텍스트 대응 유지). 서명 2개 sibling의 Anthropic replay 테스트 추가 |
 
 ## Round 3 (VERDICT: FAIL, blockers 3 — R2-1/R2-3/R2-5 해소 확인) + 아키텍처 재계획
 
@@ -50,3 +50,4 @@ LOOP-REPAIR-01 3회 도달 → 메인 에이전트가 계획을 구조적으로 
 |---|------|------|-----------|
 | R5-1 | 030 | 수용(메인 직접 수정) | 020-adoption 분기(pre-IdP)에도 동일 `expectedGeneration` 가드 적용: superseded 시 usable→채택, 아니면 fail-closed. adoption 경쟁 테스트 방침 기록 |
 | R5-2 | 030 | 수용(메인 직접 수정) | 테스트 코드 결함: `XaiTokenRequestError` 인자 순서 `(status, oauthError, message)`로 정정, 가상 픽스처 별칭 제거 — 파일 내 실제 헬퍼(`seed`/`def`/`saveCredential`/`getAccountSet`)로 재작성 |
+

@@ -4,7 +4,7 @@
 
 ## 블로커 4 — 소유권 가드 실패 후에도 공유 fence를 제거한다
 
-`handleStop`은 `stopServiceIfInstalled()`을 try/catch로 감싸 경고만 남기고 계속 진행한다(`src/cli/index.ts:390`). 이 함수는 `assertServiceEnvironmentMatchesInstall()`이 먼저 던지므로(`src/service.ts:870`), CODEX_HOME/OPENCODEX_HOME이 다른 홈에서 실행하면 **서비스 매니저를 건드리지도 못한 채** 예외가 난다. 그런데도 흐름은 447행의 `stripGrokConfig()`까지 내려가 다른 홈이 소유한 살아 있는 서비스의 라우팅 블록을 지운다.
+`handleStop`은 `stopServiceIfInstalled()`을 try/catch로 감싸 경고만 남기고 계속 진행한다(`src/cli/index.ts:390`). 이 함수는 `assertServiceEnvironmentMatchesInstall()`이 먼저 던지므로(`src/service.ts:870`), CODEX_HOME/OpenProvider_HOME이 다른 홈에서 실행하면 **서비스 매니저를 건드리지도 못한 채** 예외가 난다. 그런데도 흐름은 447행의 `stripGrokConfig()`까지 내려가 다른 홈이 소유한 살아 있는 서비스의 라우팅 블록을 지운다.
 
 로컬 프록시/Codex 복원은 이 홈의 것이므로 계속해도 되지만, `~/.grok/config.toml`은 **전역 공유 파일**이라 다르다.
 
@@ -55,7 +55,7 @@
 
 ## 블로커 5 — 의도적 서비스 종료 경로가 fence를 남긴다
 
-데몬은 `OCX_SERVICE=1`일 때 `syncCleanup`에서 strip을 일부러 건너뛴다(`cli/index.ts:212`) — 재시작 사이에 블록을 유지하려는 설계다. 문제는 **영구 종료** 경로도 아무도 지우지 않는다는 점이다:
+데몬은 `opr_SERVICE=1`일 때 `syncCleanup`에서 strip을 일부러 건너뛴다(`cli/index.ts:212`) — 재시작 사이에 블록을 유지하려는 설계다. 문제는 **영구 종료** 경로도 아무도 지우지 않는다는 점이다:
 
 - `opr service stop` (`src/service.ts:1149`) — `stripGrokConfig` 호출 없음. 파일 전체에 해당 심볼이 없다.
 - `opr service uninstall|remove` (`:1165`) — 동일.
@@ -108,7 +108,7 @@ function stripGrokConfigBestEffort(): void {
 -    stopServiceIfInstalled();
 +    const { stripGrokConfig } = await import("../grok/inject");
 +    // The ownership guard inside stopServiceIfInstalled throws when this process's
-+    // CODEX_HOME/OPENCODEX_HOME differs from the installed service's. That must not abort
++    // CODEX_HOME/OpenProvider_HOME differs from the installed service's. That must not abort
 +    // the handler: without this catch the request never gets a response and the drain timer
 +    // never runs. A guard failure also means another home may still be serving the Grok
 +    // models, so the shared fence stays.
@@ -134,6 +134,7 @@ function stripGrokConfigBestEffort(): void {
 2. `opr service stop strips the Grok fence after restoring Codex` — `service.ts`의 `case "stop":` 슬라이스에서 `stripGrokConfig` 존재와 `restoreNativeCodex` 뒤 순서를 단언.
 3. `opr service uninstall strips the Grok fence` — 동일 패턴.
 4. `POST /api/stop guards the service stop and strips the fence` — `management-api.ts` 슬라이스에서 `stopServiceIfInstalled()`가 try 안에 있고 `stripGrokConfig`가 존재함을 단언.
-5. `service-mode daemon shutdown still keeps the fence` — `cli/index.ts`의 `syncCleanup` 슬라이스에서 `!process.env.OCX_SERVICE` 가드가 유지됨을 단언 (회귀 방지: 크래시/respawn 예외를 없애면 안 된다).
+5. `service-mode daemon shutdown still keeps the fence` — `cli/index.ts`의 `syncCleanup` 슬라이스에서 `!process.env.opr_SERVICE` 가드가 유지됨을 단언 (회귀 방지: 크래시/respawn 예외를 없애면 안 된다).
 
 추가로 실제 발동 증거(C-ACTIVATION-GROUNDING-01)를 위해 `tests/grok-config-inject.test.ts`에서 `stripGrokConfig`가 실제 파일에 대해 도는 경로는 이미 wp1이 커버한다.
+

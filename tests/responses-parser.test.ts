@@ -81,6 +81,18 @@ describe("Responses parser", () => {
     expect(parsed.options.toolChoice).toEqual({ allowedTools: ["web_search"], mode: "required" });
   });
 
+  test("maps type-only hosted image_generation tool_choice to required image_gen", () => {
+    const parsed = parseRequest({
+      model: "claude-opus-4-6",
+      input: "draw a cat",
+      tools: [{ type: "image_generation" }],
+      tool_choice: { type: "image_generation" },
+    });
+
+    expect(parsed._imageGeneration?.toolNames.has("image_generation")).toBe(true);
+    expect(parsed.options.toolChoice).toEqual({ name: "image_gen" });
+  });
+
   test("preserves requested service_tier for request logging", () => {
     const parsed = parseRequest({
       model: "gpt-5.5",
@@ -200,9 +212,9 @@ describe("codex-rs compat surface (260707)", () => {
     ]);
   });
 
-  test("context_compaction with ocx1 payload replays the stored summary", () => {
+  test("context_compaction with opr1 payload replays the stored summary", () => {
     const summary = "previous work summary";
-    const encrypted = "ocx1:" + Buffer.from(summary, "utf-8").toString("base64");
+    const encrypted = "opr1:" + Buffer.from(summary, "utf-8").toString("base64");
     const parsed = parseRequest({ ...base, input: [
       { type: "context_compaction", encrypted_content: encrypted },
       { type: "message", role: "user", content: "next task" },
@@ -283,6 +295,20 @@ describe("codex-rs compat surface (260707)", () => {
     expect(parsed.options.reasoning).toBeUndefined();
   });
 
+  test("detects image_generation hosted tool arriving via additional_tools (responses_lite WS shape)", () => {
+    // Codex Desktop responses_websockets lite path: NO body.tools; the hosted tool spec rides
+    // inside an input item {type:"additional_tools", tools:[...]}. extractHostedImageGeneration
+    // must still see it so the image bridge activates.
+    const parsed = parseRequest({
+      model: "p/m",
+      input: [
+        { type: "additional_tools", tools: [{ type: "image_generation" }] },
+        { type: "message", role: "user", content: [{ type: "input_text", text: "draw a cat" }] },
+      ],
+    });
+    expect(parsed._imageGeneration?.toolNames.has("image_generation")).toBe(true);
+  });
+
   test("current parser ignores null empty and unknown string efforts", () => {
     expect(parseRequest({ model: "p/m", input: "hi", reasoning: null }).options.reasoning).toBeUndefined();
     expect(parseRequest({ model: "p/m", input: "hi", reasoning: { effort: "" } }).options.reasoning).toBeUndefined();
@@ -290,3 +316,4 @@ describe("codex-rs compat surface (260707)", () => {
     expect(() => parseRequest({ model: "p/m", input: "hi", reasoning: { effort: null } })).toThrow();
   });
 });
+

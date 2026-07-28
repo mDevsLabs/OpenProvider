@@ -29,7 +29,7 @@ P2 — freeform(custom) 툴콜 입력 스트리밍 패리티: `response.custom_t
 아이템만으로 실행). 수정: 부분 JSON 언랩 스트리머로 delta/done 방출(src/bridge.ts).
 
 P2 — 문서/주석 표면: structure/01_runtime.md 모듈 지도에 adapters/oauth/responses/
-vision/web-search 누락 보완, flat 경로 잔존 주석 4곳(bin/ocx.mjs, catalog.ts,
+vision/web-search 누락 보완, flat 경로 잔존 주석 4곳(bin/opr.mjs, catalog.ts,
 cursor-errors.ts, bun-runtime.ts) 갱신.
 
 ## 기존 사용자 업그레이드 호환 확인 (감사 결과: 안전)
@@ -41,7 +41,7 @@ cursor-errors.ts, bun-runtime.ts) 갱신.
   `.pre-multiauth` 백업). 위 P0 수정으로 identity 없는 레거시도 안전.
 - 상태 파일: usage.jsonl / opr.pid / 런타임 포트 / codex-accounts.json 전부 경로 불변.
   responses-state.json은 additive.
-- 패키지 엔트리: bin/ocx.mjs → src/cli/index.ts 해석 확인, `node bin/ocx.mjs --version`
+- 패키지 엔트리: bin/opr.mjs → src/cli/index.ts 해석 확인, `node bin/opr.mjs --version`
   실측 통과. CLI 명령 표면 dev 대비 보존.
 - codex-rs 프로토콜(업스트림 소스 대조: sse/responses.rs, compact_remote{,_v2}.rs,
   client.rs): SSE 수명주기/컴팩션 v1·v2/WS 426 폴백/reasoning ladder/usage 표면 모두
@@ -61,3 +61,4 @@ cursor-errors.ts, bun-runtime.ts) 갱신.
 - 수정 후: tsc 0 / 1609 pass 0 fail (신규 회귀 테스트 +4).
 - 감사 리포트: gpt-5.5 xhigh 3렌즈(업그레이드/프로토콜/구조) — P0 1건은 코드로 실증
   후 수정, 나머지 표면은 "정합" 판정 근거와 함께 수신.
+

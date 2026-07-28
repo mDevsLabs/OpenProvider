@@ -13,14 +13,14 @@ server config is judged against, or a later stale save would look like "our chan
 
 ```ts
 /** Per-config-instance baseline; no cross-instance leakage. */
-const claudeCodeBaseline = new WeakMap<OcxConfig, unknown>();
+const claudeCodeBaseline = new WeakMap<oprConfig, unknown>();
 
 /** Called once where the long-lived server config is created (startServer). */
-export function armClaudeCodeBaseline(config: OcxConfig): void {
+export function armClaudeCodeBaseline(config: oprConfig): void {
   claudeCodeBaseline.set(config, structuredClone(config.claudeCode));
 }
 
-export function saveConfigPreservingClaudeCode(config: OcxConfig): void {
+export function saveConfigPreservingClaudeCode(config: oprConfig): void {
   const onDisk = readRawConfigJson();            // literal file, no schema merge
   const armed = claudeCodeBaseline.has(config);
   if (armed && onDisk !== undefined) {
@@ -29,7 +29,7 @@ export function saveConfigPreservingClaudeCode(config: OcxConfig): void {
     const weChanged = !deepEqual(config.claudeCode, baseline);
     if (diskChanged && !weChanged) {
       // Hand-edited while we ran and we have no own change to defend: their edit wins.
-      config.claudeCode = onDisk.claudeCode as OcxConfig["claudeCode"];
+      config.claudeCode = onDisk.claudeCode as oprConfig["claudeCode"];
     }
     // diskChanged && weChanged -> our change wins and the baseline rebases below.
     // Documented conflict policy; a three-way merge is out of scope (002 §6).
@@ -158,3 +158,4 @@ No new defence in this unit — an honest coverage check instead:
 (LOOP-PESSIMIST-01) — expected residuals: F3 (subscription mode carries no
 settings.json hijack defence by design, because the flag without a token is F4),
 #488's non-`claudeCode` subtrees still unprotected, and the save TOCTOU window.
+

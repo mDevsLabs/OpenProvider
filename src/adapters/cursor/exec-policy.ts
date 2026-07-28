@@ -1,4 +1,4 @@
-import type { OcxProviderConfig } from "../../types";
+import type { oprProviderConfig } from "../../types";
 import type { CursorClientMessage } from "./types";
 
 export type CursorNativeExecMode = "off" | "codex-sandbox" | "on";
@@ -14,7 +14,7 @@ export const CURSOR_SANDBOX_FULL_ACCESS_RE = /sandbox_mode[^\n]{0,80}danger-full
  * fail-closed: openprovider has no trustworthy per-request attestation that caller-supplied
  * Responses instructions/system/developer prose reflects a real Codex sandbox state.
  */
-export function resolveCursorNativeExecMode(provider: OcxProviderConfig): CursorNativeExecMode {
+export function resolveCursorNativeExecMode(provider: oprProviderConfig): CursorNativeExecMode {
   const mode = provider.nativeLocalExec;
   if (mode === "off" || mode === "codex-sandbox" || mode === "on") return mode;
   return provider.unsafeAllowNativeLocalExec === true ? "on" : "off";
@@ -38,7 +38,7 @@ export function cursorRequestDeclaresFullAccess(
 }
 
 /** Effective per-request allowance: only server-local config opt-in enables native exec. */
-export function effectiveCursorNativeExecAllow(provider: OcxProviderConfig, requestDeclaresFullAccess: boolean): boolean {
+export function effectiveCursorNativeExecAllow(provider: oprProviderConfig, requestDeclaresFullAccess: boolean): boolean {
   const mode = resolveCursorNativeExecMode(provider);
   void requestDeclaresFullAccess;
   return mode === "on";
@@ -86,3 +86,4 @@ export function cursorExecResult(requestId: string, execCase: string): CursorCli
     message: cursorExecDeniedMessage(execCase),
   };
 }
+

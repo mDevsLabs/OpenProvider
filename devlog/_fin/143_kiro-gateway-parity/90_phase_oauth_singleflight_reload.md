@@ -2,7 +2,7 @@
 
 ## Security boundary
 
-Trust boundary: local credential store (`OPENCODEX_HOME/auth.json`) + imported
+Trust boundary: local credential store (`@mdevs/openprovider_HOME/auth.json`) + imported
 Kiro CLI SQLite token cache -> outbound Kiro runtime Authorization header.
 
 Protecting: OAuth access/refresh tokens and correct persisted credential state.
@@ -50,7 +50,7 @@ NEW tests/oauth-refresh.test.ts:
 - failed refresh recovers if SQLite now has a valid token
 - non-expired stored credential still returns without refresh
 
-Use isolated `OPENCODEX_HOME` and `HOME` temp dirs. Seed auth.json via
+Use isolated `@mdevs/openprovider_HOME` and `HOME` temp dirs. Seed auth.json via
 `saveCredential`, seed Kiro SQLite with the same schema used in kiro-oauth tests,
 and mock `globalThis.fetch`.
 
@@ -70,3 +70,4 @@ and mock `globalThis.fetch`.
 ## Commit
 
 fix(oauth): singleflight refresh and reload Kiro CLI tokens
+

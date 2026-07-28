@@ -18,8 +18,8 @@ export type CodexAccountMode = "direct" | "pool";
 export const OPENAI_PROVIDER_TIER_VERSION = 1;
 ```
 
-Extend `OcxConfig` with `openaiProviderTierVersion?: 1`. Do not add
-`codexAccountMode` to persisted `OcxProviderConfig`; built-in account ownership is
+Extend `oprConfig` with `openaiProviderTierVersion?: 1`. Do not add
+`codexAccountMode` to persisted `oprProviderConfig`; built-in account ownership is
 trusted code metadata, not user configuration.
 
 Before: any forward Responses provider can consume the global pool.
@@ -37,8 +37,8 @@ export const OPENAI_API_PROVIDER_ID = "openai-apikey";
 export const LEGACY_CHATGPT_PROVIDER_ID = "chatgpt";
 
 export function builtInCodexAccountMode(providerName: string): CodexAccountMode | undefined;
-export function isCanonicalOpenAiForwardProvider(provider: OcxProviderConfig): boolean;
-export function projectOpenAiTierMigration(config: OcxConfig): { config: OcxConfig; changed: boolean; legacyPoolIntent: boolean };
+export function isCanonicalOpenAiForwardProvider(provider: oprProviderConfig): boolean;
+export function projectOpenAiTierMigration(config: oprConfig): { config: oprConfig; changed: boolean; legacyPoolIntent: boolean };
 ```
 
 Contracts:
@@ -75,8 +75,8 @@ Export a read-only/no-network, currently uncalled helper:
 
 ```ts
 export function projectNativeModelsForOpenAiMulti(
-  config: OcxConfig,
-  provider: OcxProviderConfig,
+  config: oprConfig,
+  provider: oprProviderConfig,
   nativeSlugs?: readonly string[],
   nativeTemplate?: Record<string, unknown> | null,
 ): CatalogModel[];
@@ -152,3 +152,4 @@ two additive type members; no config has been persisted.
 `done` — landed in `3f6caeb2`; final cross-tier proof and terminal criteria are indexed in
 [`050_integration_verification.md`](./050_integration_verification.md),
 [`190_consolidated_finish_plan.md`](./190_consolidated_finish_plan.md), and the `051` audit.
+

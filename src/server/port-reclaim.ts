@@ -20,7 +20,7 @@ export type ReclaimListenPortOptions = WaitForPortOptions & {
    * When true AND `onlyKillPids` is a non-empty allowlist, those PIDs may be
    * killed after revalidation. Default false — never kill without an allowlist.
    */
-  killOcxHolders?: boolean;
+  killoprHolders?: boolean;
   /**
    * Explicit PIDs the caller just stopped / hard-killed. An omitted or empty
    * list means no process may be killed.
@@ -37,7 +37,7 @@ export type ReclaimListenPortOptions = WaitForPortOptions & {
   scanIntervalMs?: number;
   listListenPidsFn?: (port: number) => ListenPidScan | number[];
   isAliveFn?: (pid: number) => boolean;
-  verifyOcxFn?: (pid: number) => number | null;
+  verifyoprFn?: (pid: number) => number | null;
   killFn?: (pid: number) => void;
   dropTcpFn?: (port: number) => number | { dropped: number; skippedIpv6: number };
   isAvailableFn?: (port: number, hostname?: string) => Promise<boolean>;
@@ -157,7 +157,7 @@ export function listListenPids(port: number): number[] {
 
 /**
  * Wait until `port` can bind.
- * Never kills a process unless `killOcxHolders === true` and `onlyKillPids` is a
+ * Never kills a process unless `killoprHolders === true` and `onlyKillPids` is a
  * non-empty allowlist of PIDs the caller itself just stopped — then revalidates
  * immediately before each kill.
  * Never kills foreign processes. Never drops TCP rows while a live foreign or
@@ -174,11 +174,11 @@ export async function reclaimListenPort(
   const allowedKillPids = new Set(
     (opts.onlyKillPids ?? []).filter(pid => Number.isSafeInteger(pid) && pid > 0),
   );
-  const mayKill = opts.killOcxHolders === true && allowedKillPids.size > 0;
+  const mayKill = opts.killoprHolders === true && allowedKillPids.size > 0;
   const dropTcpRows = opts.dropTcpRows ?? process.platform === "win32";
   const listFn = opts.listListenPidsFn ?? scanListenPids;
   const isAliveFn = opts.isAliveFn ?? isProcessAlive;
-  const verifyOcxFn = opts.verifyOcxFn ?? verifyPidIdentity;
+  const verifyoprFn = opts.verifyoprFn ?? verifyPidIdentity;
   const killFn = opts.killFn ?? killProxy;
   const dropTcpFn = opts.dropTcpFn ?? dropWindowsTcpRowsForLocalPort;
   const isAvailableFn = opts.isAvailableFn ?? isPortAvailable;
@@ -203,41 +203,41 @@ export async function reclaimListenPort(
       }
 
       let foreignLive = false;
-      let protectedOcxListener = false;
+      let protectedoprListener = false;
 
       for (const pid of scan.pids) {
         if (pid === process.pid) continue;
         if (!isAliveFn(pid)) continue; // Windows may still list a dead owner briefly
-        const isOcx = verifyOcxFn(pid) === pid;
-        if (!isOcx) {
+        const isopr = verifyoprFn(pid) === pid;
+        if (!isopr) {
           foreignLive = true;
           continue;
         }
         if (!mayKill || !allowedKillPids.has(pid)) {
           // Healthy / intentional opr proxy — never steal its port.
-          protectedOcxListener = true;
+          protectedoprListener = true;
           continue;
         }
         if (!killed.has(pid)) {
           // Revalidate immediately before termination.
-          if (isAliveFn(pid) && verifyOcxFn(pid) === pid && allowedKillPids.has(pid)) {
+          if (isAliveFn(pid) && verifyoprFn(pid) === pid && allowedKillPids.has(pid)) {
             try {
               killFn(pid);
               killed.add(pid);
             } catch {
               // Kill failed: keep waiting and never reset this listener's TCP rows.
-              protectedOcxListener = true;
+              protectedoprListener = true;
             }
           } else {
             // Revalidation failed while the allowlisted listener is still listed live.
-            protectedOcxListener = true;
+            protectedoprListener = true;
           }
         }
         // Only reset TCP rows after confirmed process death.
-        if (isAliveFn(pid)) protectedOcxListener = true;
+        if (isAliveFn(pid)) protectedoprListener = true;
       }
 
-      if (foreignLive || protectedOcxListener) {
+      if (foreignLive || protectedoprListener) {
         // Foreign app or an unprotected live opr listener owns the port: never
         // SetTcpEntry-reset their sockets, and fail reclaim once the deadline hits.
         await sleep(intervalMs);
@@ -259,3 +259,4 @@ export async function reclaimListenPort(
     await sleep(intervalMs);
   }
 }
+

@@ -6,7 +6,7 @@ Audit and harden openprovider caching end-to-end: provider prompt-cache request 
 ## Evidence read
 - README.md: openprovider is a local Responses proxy with provider adapters, dashboard logs, model sync, and Codex cache refresh.
 - src/server.ts: request parsing, adapter selection, usage logging, model cache invalidation, `/api/usage`, `/v1/models` flow.
-- src/responses/parser.ts and src/responses/schema.ts: `prompt_cache_key` exists in schema/types but is not mapped into `OcxParsedRequest.options`.
+- src/responses/parser.ts and src/responses/schema.ts: `prompt_cache_key` exists in schema/types but is not mapped into `oprParsedRequest.options`.
 - src/adapters/anthropic.ts: recent commit added block-level `cache_control` for system prompts and final tool definitions; usage maps `cache_read_input_tokens` and `cache_creation_input_tokens`.
 - src/adapters/openai-chat.ts: usage maps `prompt_tokens_details.cached_tokens`; request does not propagate Responses `prompt_cache_key` to upstream where supported.
 - src/adapters/google.ts and src/adapters/google-antigravity-replay.ts: usage maps `cachedContentTokenCount`; Antigravity has thoughtSignature replay cache for eligible Gemini models.
@@ -43,7 +43,7 @@ Audit and harden openprovider caching end-to-end: provider prompt-cache request 
 Goal: make parsed request cache options honest and testable.
 
 MODIFY: src/types.ts
-- Before: `OcxRequestOptions` has `promptCacheKey?: string`, but parser does not populate it.
+- Before: `oprRequestOptions` has `promptCacheKey?: string`, but parser does not populate it.
 - After: keep the field and use it consistently in tests and adapters.
 
 MODIFY: src/responses/parser.ts
@@ -105,3 +105,4 @@ Acceptance criteria:
 - Some OpenAI-compatible providers may reject unknown `prompt_cache_key`; if so, do not send it on generic chat-completions and document usage-only automatic caching instead.
 - Anthropic block cache_control currently changes API-key `system` from string to block array; tests already cover this, but compatible gateways may vary. Keep Umans tests in the gate.
 - Google explicit context caching is not equivalent to cachedContentTokenCount usage; avoid inventing persistent cache resources without a design pass.
+

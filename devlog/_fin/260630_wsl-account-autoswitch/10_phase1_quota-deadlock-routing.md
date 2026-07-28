@@ -44,13 +44,13 @@ function isUnknownUsage(usage: number): boolean {
 }
 
 // Round-robin among eligible unknown-quota candidates, starting after `active`.
-function pickNextUnknownAccount(config: OcxConfig, active: string, now: number): string | null {
+function pickNextUnknownAccount(config: oprConfig, active: string, now: number): string | null {
   const eligible = getEligiblePoolAccounts(config, active, now)
     .filter(id => isUnknownUsage(computeCodexUsageScore(getAccountQuota(id), getPoolAccountPlan(config, id))));
   return eligible.length > 0 ? eligible[0]! : null;
 }
 
-function applyQuotaAutoSwitch(config: OcxConfig, active: string, now: number): string {
+function applyQuotaAutoSwitch(config: oprConfig, active: string, now: number): string {
   const threshold = config.autoSwitchThreshold ?? 80;
   if (threshold <= 0) return active;
   const quota = getAccountQuota(active);
@@ -150,3 +150,4 @@ in `beforeEach`, `saveTestCredential` where selectability matters.
 - `bun test tests/codex-routing.test.ts` -> new cases pass, existing pass.
 - `bun run privacy:scan` -> clean (warn strings log only account ids and the
   threshold, no emails or tokens).
+

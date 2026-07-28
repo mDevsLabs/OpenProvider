@@ -66,10 +66,10 @@ describe("Codex autostart shim", () => {
     expect(script).toContain(SHIM_MARKER);
     expect(script).toContain("ensure");
     expect(script).not.toContain("sync-cache");
-    expect(script).toContain('set "OCX_REAL_CODEX=C:\\Tools\\codex-real.exe"');
-    expect(script).toContain('set "OCX_API_TOKEN_FILE=');
-    expect(script).toContain('set /p OPENPROVIDER_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"');
-    expect(script).toContain('"%OCX_REAL_CODEX%" %*');
+    expect(script).toContain('set "opr_REAL_CODEX=C:\\Tools\\codex-real.exe"');
+    expect(script).toContain('set "opr_API_TOKEN_FILE=');
+    expect(script).toContain('set /p OPENPROVIDER_API_AUTH_TOKEN=<"%opr_API_TOKEN_FILE%"');
+    expect(script).toContain('"%opr_REAL_CODEX%" %*');
   });
 
   test("Windows cmd shim escapes executable paths through variables", () => {
@@ -79,10 +79,10 @@ describe("Codex autostart shim", () => {
       "C:\\opr&Dir\\cli.ts",
     );
 
-    expect(script).toContain('set "OCX_REAL_CODEX=C:\\Tools&A\\100%%codex^^\\codex-real.exe"');
-    expect(script).toContain('set "OCX_BUN=C:\\Bun&Dir\\100%%bun^^\\bun.exe"');
-    expect(script).toContain('set "OCX_CLI=C:\\opr&Dir\\cli.ts"');
-    expect(script).toContain('"%OCX_BUN%" "%OCX_CLI%" ensure >nul 2>nul');
+    expect(script).toContain('set "opr_REAL_CODEX=C:\\Tools&A\\100%%codex^^\\codex-real.exe"');
+    expect(script).toContain('set "opr_BUN=C:\\Bun&Dir\\100%%bun^^\\bun.exe"');
+    expect(script).toContain('set "opr_CLI=C:\\opr&Dir\\cli.ts"');
+    expect(script).toContain('"%opr_BUN%" "%opr_CLI%" ensure >nul 2>nul');
     expect(script).not.toContain('"C:\\Bun&Dir\\100%bun^\\bun.exe"');
     expect(script).not.toContain('"C:\\Tools&A\\100%codex^\\codex-real.exe" %*');
   });
@@ -99,8 +99,8 @@ describe("Codex autostart shim", () => {
         "C:\\Users\\한글사용자\\AppData\\Roaming\\npm\\node_modules\\openprovider\\src\\cli.ts",
       );
 
-      expect(script).toContain('set "OCX_REAL_CODEX=%APPDATA%\\npm\\codex.openprovider-real.cmd"');
-      expect(script).toContain('set "OCX_BUN=%APPDATA%\\npm\\node_modules\\bun\\bin\\bun.exe"');
+      expect(script).toContain('set "opr_REAL_CODEX=%APPDATA%\\npm\\codex.openprovider-real.cmd"');
+      expect(script).toContain('set "opr_BUN=%APPDATA%\\npm\\node_modules\\bun\\bin\\bun.exe"');
       expect(script).not.toContain("한글사용자");
       // No chcp in the shim: it runs in the USER's console and must not leak a codepage change.
       expect(script).not.toContain("chcp");
@@ -164,17 +164,17 @@ describe("Codex autostart shim", () => {
 
   test("Unix shim uses bypass env var to skip proxy start", () => {
     const script = buildUnixCodexShim("/bin/codex", "/bin/bun", "/cli.ts");
-    expect(script).toContain("OCX_SHIM_BYPASS");
+    expect(script).toContain("opr_SHIM_BYPASS");
   });
 
   test("Windows shim uses bypass env var to skip proxy start", () => {
     const script = buildWindowsCodexShim("C:\\codex.exe", "C:\\bun.exe", "C:\\cli.ts");
-    expect(script).toContain("OCX_SHIM_BYPASS");
+    expect(script).toContain("opr_SHIM_BYPASS");
   });
 
   test("PowerShell shim uses bypass env var to skip proxy start", () => {
     const script = buildWindowsPowerShellCodexShim("C:\\codex-real.ps1", "C:\\bun.exe", "C:\\cli.ts");
-    expect(script).toContain("OCX_SHIM_BYPASS");
+    expect(script).toContain("opr_SHIM_BYPASS");
     expect(script).toContain("Test-Path -LiteralPath");
     expect(script).toContain("OPENPROVIDER_API_AUTH_TOKEN");
     expect(script).toContain("& 'C:\\codex-real.ps1' @args");
@@ -255,7 +255,7 @@ describe("Codex autostart shim", () => {
     chmodSync(realCodexPath, 0o755);
     chmodSync(shimPath, 0o755);
     const env = { ...process.env };
-    delete env.OCX_SHIM_BYPASS;
+    delete env.opr_SHIM_BYPASS;
 
     const doctor = spawnSync(shimPath, ["doctor"], { encoding: "utf8", env });
     expect(doctor.status).toBe(0);
@@ -296,7 +296,7 @@ describe("Codex autostart shim", () => {
     expect(script).not.toContain('if /I "%~1"=="resume" goto run_codex');
     expect(script).not.toContain('if /I "%~1"=="review" goto run_codex');
     expect(script).toContain('if /I "%~1"=="--help" goto run_codex');
-    expect(script).toContain('"%OCX_REAL_CODEX%" %*');
+    expect(script).toContain('"%opr_REAL_CODEX%" %*');
   });
 
   test("PowerShell shim scans past value-taking global options", () => {
@@ -749,3 +749,4 @@ describe("WSL PATH interop guard", () => {
     expect(found).toBe(`${dir}/codex`);
   });
 });
+

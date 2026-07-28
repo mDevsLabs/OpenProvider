@@ -8,9 +8,9 @@ explicit without running `opr`, `codex`, `cursor`, or `cursor-agent`.
 
 ## Symlink Targets
 
-- `dist/bin/opr` -> `ocx.mjs`
-- `dist/bin/ocx.mjs` -> `../../bin/ocx.mjs`
-- `dist/bin/openprovider` -> `ocx.mjs`
+- `dist/bin/opr` -> `opr.mjs`
+- `dist/bin/opr.mjs` -> `../../bin/opr.mjs`
+- `dist/bin/openprovider` -> `opr.mjs`
 
 ## Safety Boundary
 
@@ -19,3 +19,4 @@ explicit without running `opr`, `codex`, `cursor`, or `cursor-agent`.
 - No write/delete/shell capability smoke through Cursor.
 - Verification is filesystem metadata only: `readlink`, `test -L`, and git
   tracking state.
+

@@ -130,7 +130,7 @@ The landed `attempts[]` row is additive request-log/usage data:
   >;
   usageStatus: "reported" | "unreported" | "unsupported" | "estimated";
   inputTokenEstimate?: number;
-  usage?: OcxUsage;
+  usage?: oprUsage;
   totalTokens?: number;
   errorCode?: string;
 }
@@ -685,3 +685,4 @@ the explicit constrained waiver), and no PR #148 backend file has entered the ra
   provider, preserve it as a row-local option. Add test: existing combo with
   `chatgpt` member saves unchanged without unknownProvider error.
   Rebuttal: none.
+

@@ -47,7 +47,7 @@ In `/Users/jun/Developer/new/700_projects/openprovider/src/config.ts` add export
 
 ```ts
 export type ConfigDiagnostics = {
-  config: OcxConfig;
+  config: oprConfig;
   source: "default" | "file" | "fallback";
   error: string | null;
 };
@@ -124,7 +124,7 @@ Run:
 bun test tests/cli-status-json.test.ts tests/config.test.ts
 bun test tests/cli-status-json.test.ts tests/cli-help.test.ts
 bun run typecheck
-node bin/ocx.mjs status --json
+node bin/opr.mjs status --json
 ```
 
 Use Backend read-only verification before B->C.
@@ -136,3 +136,4 @@ Expected commit:
 ```text
 fix(cli): keep status diagnostics read-only
 ```
+

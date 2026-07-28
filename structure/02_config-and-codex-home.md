@@ -7,19 +7,19 @@
 
 ```text
 $CODEX_HOME/config.toml
-$CODEX_HOME/OpenProvider.config.toml
-$CODEX_HOME/OpenProvider-catalog.json
+$CODEX_HOME/opencodex.config.toml
+$CODEX_HOME/opencodex-catalog.json
 $CODEX_HOME/models_cache.json
 ```
 
 Never assume macOS-only paths. Windows, service installs, and app-launched Codex can all depend on
 the resolved `CODEX_HOME`.
 
-OpenProvider never overrides an explicit `CODEX_HOME`. On Windows, `opr doctor` and `opr status`
+OpenCodex never overrides an explicit `CODEX_HOME`. On Windows, `ocx doctor` and `ocx status`
 nevertheless diagnose the high-confidence Orca dual-home case: both `CODEX_HOME` and
 `ORCA_CODEX_HOME` select Orca's `orca/codex-runtime-home/home`, while the ChatGPT/Codex app uses the
 default `%USERPROFILE%\\.codex`. Sync and restore output always prints the exact target Codex home;
-display and JSON paths redact the OS username. The diagnostic tells users to invoke OpenProvider with
+display and JSON paths redact the OS username. The diagnostic tells users to invoke OpenCodex with
 the app home explicitly rather than silently claiming that an unrelated app was configured. If a
 service was installed under the Orca home, it must first be uninstalled from that original Orca
 environment and then reinstalled under the app home; changing only the current shell cannot migrate
@@ -33,12 +33,12 @@ the recorded service ownership.
 - 다른 대안 대신 이 방식을 선택한 이유: It fixes the silent failure while avoiding destructive or noisy behavior for intentional custom homes.
 - 장점, 단점 및 영향: Orca users get an actionable warning; other multi-home products remain unchanged until they have an equally reliable signature.
 
-`atomicWriteFile` uses a temp file named `{path}.opr.{pid}.{seq}.tmp` (process ID + incrementing
-sequence number) to avoid collisions when concurrent writers (e.g. `opr stop` and the proxy's own
+`atomicWriteFile` uses a temp file named `{path}.ocx.{pid}.{seq}.tmp` (process ID + incrementing
+sequence number) to avoid collisions when concurrent writers (e.g. `ocx stop` and the proxy's own
 shutdown handler) both restore Codex config simultaneously. The temp is renamed atomically into place.
 
 Response-state loading performs a bounded recovery pass for interrupted snapshot writes. It only
-matches regular files named `responses-state.json.opr.<pid>.<sequence>.tmp`, waits at least 15
+matches regular files named `responses-state.json.ocx.<pid>.<sequence>.tmp`, waits at least 15
 minutes, and skips the current or any live PID. Eligible files are truncated before unlinking so a
 matching stale path is unlinked without following it. Path-based truncation is intentionally avoided:
 a same-user replacement could otherwise turn cleanup into a write through a symlink. Unrelated
@@ -55,23 +55,30 @@ are consumed incrementally and at most 512 stale files are attempted per process
 
 ## Config injection
 
-`src/codex/inject.ts` inserts root-level keys and an OpenProvider provider table:
+`src/codex/inject.ts` inserts root-level keys and an opencodex provider table:
 
 ```toml
-model_provider = "OpenProvider"
-model_catalog_json = "/absolute/path/to/OpenProvider-catalog.json"
+model_provider = "opencodex"
+model_catalog_json = "/absolute/path/to/opencodex-catalog.json"
 
-[model_providers.OpenProvider]
-name = "OpenProvider Proxy"
+[model_providers.opencodex]
+name = "OpenCodex Proxy"
 base_url = "http://127.0.0.1:10100/v1"
 wire_api = "responses"
 requires_openai_auth = true
 ```
 
-Root TOML keys must be written before the first `[table]`. Re-injection strips stale OpenProvider
-blocks, stale root context-window overrides, and stale OpenProvider catalog paths before rewriting.
+Root TOML keys must be written before the first `[table]`. Re-injection strips stale opencodex
+blocks, stale root context-window overrides, and stale opencodex catalog paths before rewriting.
 
-If the root config selects a provider other than `openai` or `OpenProvider`, injection must leave the
+Native Codex sub-agent defaults are a separate, explicit opt-in. When
+`syncCodexSubagentDefaults` is true and `injectionModel` is set, injection writes marker-owned
+`agents.default_subagent_model` and, when configured,
+`agents.default_subagent_reasoning_effort`. Unmarked values are user-owned and must never be
+overwritten. Disabling the option and fallback restore remove only marker-owned values; journal
+restore must preserve later user edits while stripping those managed values.
+
+If the root config selects a provider other than `openai` or `opencodex`, injection must leave the
 config byte-for-byte unchanged and skip profile creation/updates and history migration. External
 provider managers own that routing configuration, and replacing their provider id can hide
 otherwise intact Codex sessions. This ownership check must run before catalog/cache refresh,
@@ -81,7 +88,7 @@ journal creation, and the background history migration guardian.
 
 ## Profile and fast tier
 
-When OpenProvider owns routing, it also writes `$CODEX_HOME/OpenProvider.config.toml` as an explicit profile
+When opencodex owns routing, it also writes `$CODEX_HOME/opencodex.config.toml` as an explicit profile
 target. Codex config uses `service_tier = "fast"` and `[features].fast_mode = true`;
 catalog/request tier metadata may use `priority`. Do not collapse these spellings into one value.
 
@@ -98,6 +105,5 @@ and `routeModel`, but user config overrides registry defaults per field/key.
 
 ## Restore
 
-`opr stop`, `opr restore` / `opr eject`, `opr service stop`, and `opr service uninstall` must strip
-OpenProvider config and routed catalog entries without damaging native Codex state.
-
+`ocx stop`, `ocx restore` / `ocx eject`, `ocx service stop`, and `ocx service uninstall` must strip
+opencodex config and routed catalog entries without damaging native Codex state.

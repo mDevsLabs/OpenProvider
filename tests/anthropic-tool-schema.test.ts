@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { createAnthropicAdapter } from "../src/adapters/anthropic";
-import type { OcxParsedRequest, OcxProviderConfig, OcxTool } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig, oprTool } from "../src/types";
 
-const provider = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x", authMode: "apiKey" } as unknown as OcxProviderConfig;
+const provider = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x", authMode: "apiKey" } as unknown as oprProviderConfig;
 
-async function toolsOf(tools: OcxTool[]): Promise<Array<{ name: string; input_schema: Record<string, unknown> }>> {
-  const parsed: OcxParsedRequest = {
+async function toolsOf(tools: oprTool[]): Promise<Array<{ name: string; input_schema: Record<string, unknown> }>> {
+  const parsed: oprParsedRequest = {
     modelId: "anthropic/claude-sonnet-4.5",
     stream: false,
     options: {},
@@ -19,7 +19,7 @@ async function toolsOf(tools: OcxTool[]): Promise<Array<{ name: string; input_sc
 }
 
 async function toolSchema(parameters: unknown): Promise<Record<string, unknown>> {
-  const [tool] = await toolsOf([{ name: "sample_tool", description: "Sample", parameters } as OcxTool]);
+  const [tool] = await toolsOf([{ name: "sample_tool", description: "Sample", parameters } as oprTool]);
   return tool.input_schema;
 }
 
@@ -182,3 +182,4 @@ describe("anthropic tool input_schema normalization", () => {
     expect(schema).toEqual(before);
   });
 });
+

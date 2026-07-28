@@ -11,7 +11,7 @@ import { clearAccountNeedsReauth, clearAccountQuota } from "../src/codex/auth-ap
 import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../src/codex/routing";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
@@ -84,7 +84,7 @@ function fakeSearchUpstream(captured: CapturedRequest[], status = 200, payload?:
   return upstream;
 }
 
-function forwardConfig(_baseUrl = ""): OcxConfig {
+function forwardConfig(_baseUrl = ""): oprConfig {
   return {
     port: 0,
     defaultProvider: "openai",
@@ -97,7 +97,7 @@ function forwardConfig(_baseUrl = ""): OcxConfig {
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 test("POST /v1/alpha/search relays to the ChatGPT forward provider with forwarded auth", async () => {
@@ -148,7 +148,7 @@ test("a routed pool account's token overrides the caller bearer on the search re
       { id: "pool-a", email: "pool@example.test", isMain: false, chatgptAccountId: "acct-pool-a" },
     ],
     activeCodexAccountId: "pool-a",
-  } as OcxConfig);
+  } as oprConfig);
   saveCodexAccountCredential("pool-a", {
     accessToken: "pool-access-token",
     refreshToken: "pool-refresh-token",
@@ -227,7 +227,7 @@ test("returns an honest 400 when no ChatGPT forward provider is configured", asy
     providers: {
       groq: { adapter: "openai-chat", baseUrl: "https://api.groq.example/v1", apiKey: "gsk-x" },
     },
-  } as OcxConfig);
+  } as oprConfig);
 
   const server = startServer(0);
   try {
@@ -292,7 +292,7 @@ test("a hung search upstream times out with 504 after config.search.timeoutMs", 
   saveConfig({
     ...forwardConfig(upstream.url.toString().replace(/\/$/, "")),
     search: { timeoutMs: 100 },
-  } as OcxConfig);
+  } as oprConfig);
 
   const server = startServer(0);
   try {
@@ -336,7 +336,7 @@ test("a short connectTimeoutMs does NOT cut a slow search (total deadline is sea
   saveConfig({
     ...forwardConfig(upstream.url.toString().replace(/\/$/, "")),
     connectTimeoutMs: 50,
-  } as OcxConfig);
+  } as oprConfig);
 
   const server = startServer(0);
   try {
@@ -424,3 +424,4 @@ test("the proxy admission secret is never relayed to the search upstream", async
     await upstream.stop(true);
   }
 });
+

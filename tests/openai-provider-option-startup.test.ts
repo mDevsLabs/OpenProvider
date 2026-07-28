@@ -13,9 +13,9 @@ import {
 } from "../src/config";
 import { runOpenAiTierStartupMigration } from "../src/providers/openai-tier-startup";
 import { OpenAiTierMigrationCollisionError, projectOpenAiTierMigration } from "../src/providers/openai-tiers";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
-const config: OcxConfig = {
+const config: oprConfig = {
   port: 10100,
   defaultProvider: "openai",
   providers: { openai: { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" } },
@@ -376,3 +376,4 @@ describe("OpenAI provider option startup coordinator", () => {
     }
   });
 });
+

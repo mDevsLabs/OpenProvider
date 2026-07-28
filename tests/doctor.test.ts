@@ -21,8 +21,8 @@ import { collectOrcaCodexHomeDiagnostic } from "../src/codex/home";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-doctor-test");
 const TEST_CODEX_HOME = join(TEST_DIR, "codex");
-const TEST_OPENPROVIDER_HOME = join(TEST_DIR, "openprovider");
-let prevOpenproviderHome: string | undefined;
+const TEST_OPENCODEX_HOME = join(TEST_DIR, "opencodex");
+let prevOpencodexHome: string | undefined;
 let prevCodexHome: string | undefined;
 let prevHttpsProxy: string | undefined;
 let prevLowerHttpsProxy: string | undefined;
@@ -30,15 +30,15 @@ let prevProxyRef: string | undefined;
 
 describe("doctor", () => {
   beforeEach(() => {
-    prevOpenproviderHome = process.env.OPENPROVIDER_HOME;
+    prevOpencodexHome = process.env.OPENCODEX_HOME;
     prevCodexHome = process.env.CODEX_HOME;
     prevHttpsProxy = process.env.HTTPS_PROXY;
     prevLowerHttpsProxy = process.env.https_proxy;
     prevProxyRef = process.env.OCX_TEST_PROXY_REF;
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_CODEX_HOME, { recursive: true });
-    mkdirSync(TEST_OPENPROVIDER_HOME, { recursive: true });
-    process.env.OPENPROVIDER_HOME = TEST_OPENPROVIDER_HOME;
+    mkdirSync(TEST_OPENCODEX_HOME, { recursive: true });
+    process.env.OPENCODEX_HOME = TEST_OPENCODEX_HOME;
     process.env.CODEX_HOME = TEST_CODEX_HOME;
     delete process.env.HTTPS_PROXY;
     delete process.env.https_proxy;
@@ -46,8 +46,8 @@ describe("doctor", () => {
   });
 
   afterEach(() => {
-    if (prevOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
-    else process.env.OPENPROVIDER_HOME = prevOpenproviderHome;
+    if (prevOpencodexHome === undefined) delete process.env.OPENCODEX_HOME;
+    else process.env.OPENCODEX_HOME = prevOpencodexHome;
     if (prevCodexHome === undefined) delete process.env.CODEX_HOME;
     else process.env.CODEX_HOME = prevCodexHome;
     if (prevHttpsProxy === undefined) delete process.env.HTTPS_PROXY;
@@ -62,12 +62,12 @@ describe("doctor", () => {
   test("path report flips auth.json/config.json from absent to present", () => {
     let rows = collectPaths();
     const auth = () => rows.find(r => r.label === "CODEX_HOME/auth.json")!;
-    const cfg = () => rows.find(r => r.label === "OPENPROVIDER_HOME/config.json")!;
+    const cfg = () => rows.find(r => r.label === "OPENCODEX_HOME/config.json")!;
     expect(auth().exists).toBe(false);
     expect(cfg().exists).toBe(false);
 
     writeFileSync(join(TEST_CODEX_HOME, "auth.json"), "{}");
-    writeFileSync(join(TEST_OPENPROVIDER_HOME, "config.json"), "{}");
+    writeFileSync(join(TEST_OPENCODEX_HOME, "config.json"), "{}");
     rows = collectPaths();
     expect(auth().exists).toBe(true);
     expect(cfg().exists).toBe(true);
@@ -88,11 +88,11 @@ describe("doctor", () => {
       appCodexHome: appHome,
     });
     expect(mismatch.mismatch).toBe(true);
-    expect(mismatch.warning).toContain("OpenProvider injection will not reach that app");
+    expect(mismatch.warning).toContain("OpenCodex injection will not reach that app");
     expect(mismatch.effectiveCodexHome).toContain("C:\\Users\\[USER]\\");
     expect(mismatch.effectiveCodexHome).not.toContain("alice");
-    expect(mismatch.action).toContain("opr service uninstall");
-    expect(mismatch.action).toContain("opr service install");
+    expect(mismatch.action).toContain("ocx service uninstall");
+    expect(mismatch.action).toContain("ocx service install");
     expect(mismatch.action).toContain("%USERPROFILE%\\.codex");
     expect(mismatch.action).toContain("Remove-Item Env:ORCA_CODEX_HOME");
     expect(mismatch.action).toContain("SilentlyContinue; $env:CODEX_HOME");
@@ -121,7 +121,7 @@ describe("doctor", () => {
     const usersRoot = join(TEST_DIR, "mnt-c", "Users");
     const windowsCodexHome = join(usersRoot, "example", ".codex");
     mkdirSync(windowsCodexHome, { recursive: true });
-    writeFileSync(join(windowsCodexHome, "config.toml"), "model_provider = \"openprovider\"\n");
+    writeFileSync(join(windowsCodexHome, "config.toml"), "model_provider = \"opencodex\"\n");
 
     expect(resolveCodexHomeDir({
       env: { WSL_DISTRO_NAME: "Ubuntu" },
@@ -217,12 +217,12 @@ describe("doctor", () => {
       "drivers /mnt/c drvfs rw,noatime 0 0",
     ].join("\n");
 
-    const c = detectFsType("/mnt/c/Users/test/.openprovider", mounts);
+    const c = detectFsType("/mnt/c/Users/test/.opencodex", mounts);
     expect(c.isDrvfs).toBe(true);
     expect(c.isMntDrive).toBe(true);
     expect(c.fstype).toBe("drvfs");
 
-    const home = detectFsType("/home/test/.openprovider", mounts);
+    const home = detectFsType("/home/test/.opencodex", mounts);
     expect(home.isDrvfs).toBe(false);
     expect(home.isMntDrive).toBe(false);
     expect(home.fstype).toBe("ext4");
@@ -284,7 +284,7 @@ describe("doctor", () => {
   });
 
   test("collectConfiguredProxy reports effective config proxy without leaking values", () => {
-    writeFileSync(join(TEST_OPENPROVIDER_HOME, "config.json"), JSON.stringify({ proxy: "${OCX_TEST_PROXY_REF}" }));
+    writeFileSync(join(TEST_OPENCODEX_HOME, "config.json"), JSON.stringify({ proxy: "${OCX_TEST_PROXY_REF}" }));
 
     let diagnostic = collectConfiguredProxy();
     expect(diagnostic.configured).toBe(true);
@@ -329,6 +329,8 @@ describe("service memory section (#314 WP4)", () => {
     platform: "win32",
     rss: 5 * 1024 ** 3,
     heapUsed: 200 * 1024 ** 2,
+    external: 300 * 1024 ** 2,
+    arrayBuffers: 200 * 1024 ** 2,
     jscHeap: { heapSize: 180 * 1024 ** 2 },
     streamMode: "auto",
     eagerRelay: { useEagerRelay: false, reason: "auto-known-bad" },
@@ -366,15 +368,16 @@ describe("service memory section (#314 WP4)", () => {
     expect(lines.some(l => l.includes("native-side growth"))).toBe(true);
   });
 
-  test("interpretation: high RSS dominated by JS heap → bug-report line", () => {
+  test("interpretation: high RSS with large JS counters asks for corroboration", () => {
     const lines = formatServiceMemoryLines({
       status: "ok",
       data: { ...baseData, heapUsed: 4 * 1024 ** 3, jscHeap: { heapSize: 4 * 1024 ** 3 } },
     });
-    expect(lines.some(l => l.includes("likely an openprovider bug"))).toBe(true);
+    expect(lines.some(l => l.includes("possible JS-side retention"))).toBe(true);
+    expect(lines.some(l => l.includes("likely an opencodex bug"))).toBe(false);
   });
 
-  test("interpretation: rss below threshold → normal line", () => {
+  test("interpretation: all observed counters below threshold → normal line", () => {
     const lines = formatServiceMemoryLines({
       status: "ok",
       data: { ...baseData, rss: 300 * 1024 ** 2 },
@@ -383,9 +386,24 @@ describe("service memory section (#314 WP4)", () => {
     expect(lines.some(l => l.includes("native-side growth"))).toBe(false);
   });
 
+  test("interpretation: high external memory is not hidden by low RSS (#509)", () => {
+    const lines = formatServiceMemoryLines({
+      status: "ok",
+      data: {
+        ...baseData,
+        rss: 300 * 1024 ** 2,
+        external: 5 * 1024 ** 3,
+        arrayBuffers: 2 * 1024 ** 3,
+      },
+    });
+    expect(lines.some(l => l.includes("observed=5120MB (external)"))).toBe(true);
+    expect(lines.some(l => l.includes("high observed memory via external"))).toBe(true);
+    expect(lines.some(l => l.includes("looks normal"))).toBe(false);
+  });
+
   test("guidance gating: win32 + auto-known-bad prints version-claiming guidance", () => {
     const lines = formatServiceMemoryLines({ status: "ok", data: baseData });
-    expect(lines.some(l => l.includes("OPENPROVIDER_BUN_PATH"))).toBe(true);
+    expect(lines.some(l => l.includes("OPENCODEX_BUN_PATH"))).toBe(true);
     // Version-claiming, never binary-claiming.
     expect(lines.join("\n")).not.toContain("bundled binary");
   });
@@ -395,13 +413,13 @@ describe("service memory section (#314 WP4)", () => {
       status: "ok",
       data: { ...baseData, platform: "darwin", eagerRelay: null },
     });
-    expect(darwin.some(l => l.includes("OPENPROVIDER_BUN_PATH"))).toBe(false);
+    expect(darwin.some(l => l.includes("OPENCODEX_BUN_PATH"))).toBe(false);
 
     const fixedRuntime = formatServiceMemoryLines({
       status: "ok",
       data: { ...baseData, eagerRelay: { useEagerRelay: true, reason: "auto-fixed-runtime" } },
     });
-    expect(fixedRuntime.some(l => l.includes("OPENPROVIDER_BUN_PATH"))).toBe(false);
+    expect(fixedRuntime.some(l => l.includes("OPENCODEX_BUN_PATH"))).toBe(false);
   });
 
   test("unauthorized and unreachable render honest lines without fake data", () => {
@@ -423,15 +441,14 @@ describe("service memory section (#314 WP4)", () => {
     const hint = proxyDownRestartHint({ proxyRunning: false, port: 10100, serviceViable: false });
     expect(hint).toContain("error sending request for url");
     expect(hint).toContain("127.0.0.1:10100");
-    expect(hint).toContain("opr start");
-    expect(hint).toContain("opr service install");
+    expect(hint).toContain("ocx start");
+    expect(hint).toContain("ocx service install");
   });
 
-  test("proxyDownRestartHint prefers 'opr service start' when a service is installed", () => {
+  test("proxyDownRestartHint prefers 'ocx service start' when a service is installed", () => {
     const hint = proxyDownRestartHint({ proxyRunning: false, port: 12000, serviceViable: true });
-    expect(hint).toContain("opr service start");
+    expect(hint).toContain("ocx service start");
     expect(hint).toContain("127.0.0.1:12000");
-    expect(hint).not.toContain("opr service install");
+    expect(hint).not.toContain("ocx service install");
   });
 });
-

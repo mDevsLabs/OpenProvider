@@ -16,10 +16,11 @@ import {
 } from "../chat/outbound";
 import { classifyError, CYBER_POLICY_ERROR_CODE, isCyberPolicyCode } from "../lib/errors";
 import { redactSecretString } from "../lib/redact";
+import { resolveClientRetryAfter } from "../lib/retry-after";
 import { estimateTokens } from "../lib/token-estimate";
 import { routeModel } from "../router";
 import { resolveWireProtocolOverride } from "./adapter-resolve";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { readJsonRequestBody } from "./request-decompress";
 import {
   addFinalRequestLog,
@@ -46,7 +47,7 @@ async function readChatBody(req: Request): Promise<unknown> {
 
 export async function handleChatCompletions(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
   logIds?: { requestId: string; start: number },
 ): Promise<Response> {
@@ -180,7 +181,11 @@ export async function handleChatCompletions(
         if (text) message = `upstream error (${upstream.status}): ${redactSecretString(text).slice(0, 400)}`;
       }
     } catch { /* keep fallback */ }
-    const retryAfter = upstream.headers.get("retry-after");
+    const retryAfter = resolveClientRetryAfter({
+      status: upstream.status,
+      message,
+      upstreamRetryAfter: upstream.headers.get("retry-after"),
+    });
     const classified = classifyError(
       upstream.status,
       upstreamType
@@ -316,3 +321,4 @@ export async function handleChatCompletions(
     },
   });
 }
+

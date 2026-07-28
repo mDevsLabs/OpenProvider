@@ -34,7 +34,7 @@ import {
   clearThreadAccountMap,
   recordCodexUpstreamOutcome,
 } from "../src/codex/routing";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
 let testDir: string;
 let previousOpenproviderHome: string | undefined;
@@ -66,7 +66,7 @@ afterEach(() => {
   else process.env.CODEX_HOME = previousCodexHome;
 });
 
-function config(): OcxConfig {
+function config(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "routed",
@@ -82,7 +82,7 @@ function config(): OcxConfig {
   };
 }
 
-const forwardProvider: OcxProviderConfig = {
+const forwardProvider: oprProviderConfig = {
   adapter: "openai-responses",
   baseUrl: "https://chatgpt.test/backend-api/codex",
   authMode: "forward",
@@ -454,3 +454,4 @@ describe("cooldown error surface", () => {
     expect(cooldownErrorResponse(err, now).headers.get("Retry-After")).toBe("1");
   });
 });
+

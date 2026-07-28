@@ -13,7 +13,7 @@ Goal: preview 브랜치 전체를 대상으로 플랫폼 의존 가정 전수 �
 - shim.ts: win32 다중 래퍼(.cmd 등), gui-static.ts: 백슬래시 정규화 + traversal 차단.
 - codex/home.ts: WSL 감지(WSL_DISTRO_NAME/proc/version) + /mnt/c/Users 프로필 매칭.
 - server/responses.ts: win32 네이티브 릴레이 유지(Bun#32111).
-- config.ts expandUserPath: `~/`와 `~\` 둘 다 처리. bin/ocx.mjs: npm.cmd, 경로 split `[\\/]`.
+- config.ts expandUserPath: `~/`와 `~\` 둘 다 처리. bin/opr.mjs: npm.cmd, 경로 split `[\\/]`.
 - chmod 계열 전부 try/catch best-effort (Windows no-op 안전).
 
 ## 실결함 2건 (패치 완료)
@@ -28,3 +28,4 @@ Goal: preview 브랜치 전체를 대상으로 플랫폼 의존 가정 전수 �
 - `bun test ./tests/` 1613 pass / 0 fail, `bun x tsc --noEmit` clean.
 - 신규 tests/local-token-detect.test.ts (3 케이스) + gcp-adc.test.ts CLOUDSDK_CONFIG authorized_user 케이스(호스트 GOOGLE_APPLICATION_CREDENTIALS 오염 차단 포함).
 - 독립 리뷰어(gpt-5.5, James) 감사: **PASS, blocking_issues 없음.** 자체 재검증(대상 테스트 16 pass, tsc clean, git diff --check clean) 포함. 논블로킹 지적 1건(darwin not-found 메시지가 Keychain만 언급) → 즉시 반영 후 전체 스위트 재확인(1613 pass).
+

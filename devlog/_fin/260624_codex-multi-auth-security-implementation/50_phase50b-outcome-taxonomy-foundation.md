@@ -107,7 +107,7 @@ Add tests:
 
 Add a server integration test:
 
-- create a temporary `OPENCODEX_HOME`;
+- create a temporary `@mdevs/openprovider_HOME`;
 - save a config with default provider `chatgpt` using the `openai-responses` passthrough adapter and an unreachable loopback port;
 - save pool credentials and set `activeCodexAccountId` to that pool account;
 - start the proxy with `startServer(0)`;
@@ -184,3 +184,4 @@ bun test tests/codex-routing.test.ts tests/server-auth.test.ts
 - Added a `startServer(0)` integration test plan for the passthrough connect-failure catch so server wiring is verified, not only the routing helper.
 - Clarified that credential quarantine must not rely on threshold-based `applyFailureFailover()`.
 - Explicitly scoped sidecar account-outcome recording out of Phase 50B and into a follow-up Patch 5 slice.
+

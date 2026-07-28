@@ -257,7 +257,7 @@ Modify:
 
 - `src/bridge.ts`, `src/usage-totals.ts`, `src/usage-summary.ts`
   - Verify existing cache-write fields flow through summaries. Modify only if
-    `OcxUsage` already distinguishes read/write and the path currently drops writes.
+    `oprUsage` already distinguishes read/write and the path currently drops writes.
 
 Tests:
 
@@ -323,3 +323,4 @@ Check that:
 - `xhigh` requests still work.
 - Direct `max` requests reach upstream as `max` where supported or are clamped only by
   explicit smaller support metadata.
+

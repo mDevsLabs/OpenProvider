@@ -21,14 +21,14 @@ model = "gpt-5.6-sol"
 base_url = "http://127.0.0.1:10100/v1"
 api_backend = "chat_completions"
 api_key = "openprovider-loopback"
-name = "OCX gpt-5.6-sol"
+name = "opr gpt-5.6-sol"
                                    # <- NO context_window: Grok falls back to 200k
 
 # >>> openprovider managed block — do not edit (removed by `opr stop`) >>>   # line 196
 [model.opr-gpt-5-6-sol-2]          # line 197, INSIDE the fence
 model = "gpt-5.6-sol"
 api_key = "openprovider-loopback"
-name = "OCX gpt-5.6-sol"
+name = "opr gpt-5.6-sol"
 extra_headers = { "x-openprovider-grok" = "1" }
 context_window = 372000            # <- correct, but nothing selects this alias
 # <<< openprovider managed block <<<                                        # line 397
@@ -74,7 +74,7 @@ Every orphan on this machine carries all three:
 |---|---|---|
 | `api_key = "openprovider-loopback"` | strong | a literal we own; no reason for a human to type it |
 | `base_url = "http://127.0.0.1:<port>/v1"` | medium | a user CAN legitimately point at the local proxy |
-| `name = "OCX <id>"` / alias prefix `opr-` | weak | a human could name a model this way |
+| `name = "opr <id>"` / alias prefix `opr-` | weak | a human could name a model this way |
 | `extra_headers = { "x-openprovider-grok" = "1" }` | strong | present on newer writes only — absent on the oldest orphans |
 
 The oldest orphans predate `extra_headers`, so the header alone is insufficient as the
@@ -94,3 +94,4 @@ sole adoption key; it would leave exactly the entries causing this bug unadopted
 Reformatting or normalizing user content outside the fence, changing the alias
 allocation scheme, and touching `stripGrokConfig`'s removal semantics beyond the
 adoption sweep.
+

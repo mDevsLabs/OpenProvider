@@ -3,7 +3,7 @@ import {
   handleResponses,
   hasUnreadableEncryptedAgentTask,
 } from "../src/server/responses";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const originalFetch = globalThis.fetch;
 
@@ -45,7 +45,7 @@ function agentMessage(content: Array<Record<string, unknown>>): unknown[] {
   }];
 }
 
-function routedConfig(): OcxConfig {
+function routedConfig(): oprConfig {
   return {
     port: 0,
     defaultProvider: "xai",
@@ -57,10 +57,10 @@ function routedConfig(): OcxConfig {
         apiKey: "test-xai-key",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
-function nativeConfig(): OcxConfig {
+function nativeConfig(): oprConfig {
   return {
     port: 0,
     defaultProvider: "openai",
@@ -72,10 +72,10 @@ function nativeConfig(): OcxConfig {
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
-function mixedComboConfig(): OcxConfig {
+function mixedComboConfig(): oprConfig {
   return {
     port: 0,
     defaultProvider: "xai",
@@ -102,11 +102,11 @@ function mixedComboConfig(): OcxConfig {
         ],
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 async function post(
-  config: OcxConfig,
+  config: oprConfig,
   model: string,
   input: unknown[],
   headers: HeadersInit = {},
@@ -451,3 +451,4 @@ describe("V2 routed agent-message ciphertext guard", () => {
     expect(forwardedBody).toContain(FERNET_TASK);
   });
 });
+

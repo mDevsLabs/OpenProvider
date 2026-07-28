@@ -20,7 +20,7 @@
   picker shows default low..xhigh ladder that maps to an ignored reasoning_effort.
 
 ## Scope (B)
-1. types.ts OcxProviderConfig + registry.ts entry key: `thinkingToggleModels?: string[]`.
+1. types.ts oprProviderConfig + registry.ts entry key: `thinkingToggleModels?: string[]`.
 2. registry opencode-go: thinkingToggleModels = [mimo-v2.5, mimo-v2.5-pro, mimo-v2-omni,
    mimo-v2-pro, glm-5, glm-5.1]; those models get modelReasoningEfforts ["low","high"]
    (picker: low = thinking off, high = thinking on; default high) and
@@ -34,3 +34,4 @@
 
 ## Verification
 bun test ./tests/ && bun x tsc --noEmit
+

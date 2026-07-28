@@ -42,7 +42,7 @@ Self-contained module; never throws out to startup.
   - `shouldConsider(): { channel: Channel; current: string } | null` - returns
     null when: `detectInstall() === "source"`, source build version, the star
     marker is absent (O1 first-run skip), or the triple TTY/service guard fails
-    (`process.env.OCX_SERVICE || !process.stdin.isTTY || !process.stdout.isTTY`).
+    (`process.env.opr_SERVICE || !process.stdin.isTTY || !process.stdout.isTTY`).
   - `getUpgradeVersionForPopup(cache, current, channel): string | null` -
     returns cached `latest_version` only if `isNewer` and it is not the
     `dismissed_version`.
@@ -89,7 +89,7 @@ Self-contained module; never throws out to startup.
 - Add a hidden subcommand `__refresh-version` in the top-level `switch`:
   `await refreshVersionCache(args[1] as Channel)` then return/exit. Not shown in
   help. Guarded so it only ever writes the cache.
-- Do NOT touch `handleEnsure`: its child carries `OCX_SERVICE=1`, and ensure
+- Do NOT touch `handleEnsure`: its child carries `opr_SERVICE=1`, and ensure
   itself must stay silent (autostart hot path).
 
 ## Prompt copy (openprovider wording)
@@ -119,7 +119,7 @@ Command string and `@latest`/`@preview` suffix come from the channel, matching
 - dismiss suppression: `dismissed_version === latest` -> no popup; a strictly
   newer latest re-surfaces.
 - source build / `detectInstall==="source"` -> `shouldConsider` null.
-- guard: `OCX_SERVICE` set, or non-TTY stdin/stdout -> null.
+- guard: `opr_SERVICE` set, or non-TTY stdin/stdout -> null.
 - first-run skip (O1): star marker absent -> null even when newer exists.
 - cache tag mismatch -> `readVersionCache` returns null (re-fetch path).
 - stale `last_checked_at` (>20h) triggers refresh spawn; fresh does not
@@ -133,7 +133,7 @@ TTY (pure helpers exported; the readline shell stays thin).
 
 - `bun x tsc --noEmit`.
 - `bun test tests/update-notify.test.ts`.
-- Manual matrix: `OCX_SERVICE=1 opr start` (silent), `opr start | cat` (silent,
+- Manual matrix: `opr_SERVICE=1 opr start` (silent), `opr start | cat` (silent,
   non-TTY), `opr ensure` (silent), `opr gui` spawn (silent), interactive
   `opr start` with a stubbed newer cache (prompt shows), pick 3 then restart
   (stays silent), bump cache to a higher version (prompt returns).
@@ -147,4 +147,5 @@ TTY (pure helpers exported; the readline shell stays thin).
 STANDARD. Touches the startup path. Mitigated by: hard source-build/TTY guards,
 full try/catch so it can never block startup, prompt fires before any port/PID
 is taken, and no change to the existing upgrade mechanics.
+
 

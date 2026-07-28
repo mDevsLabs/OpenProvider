@@ -368,37 +368,37 @@ if [ -z "$OPENPROVIDER_API_AUTH_TOKEN" ] && [ -f ${shQuote(tokenFile)} ]; then
   OPENPROVIDER_API_AUTH_TOKEN="$(cat ${shQuote(tokenFile)})"
   export OPENPROVIDER_API_AUTH_TOKEN
 fi
-ocx_subcommand=""
-ocx_skip_next=0
-for ocx_arg in "$@"; do
-  if [ "$ocx_skip_next" -eq 1 ]; then
-    ocx_skip_next=0
+opr_subcommand=""
+opr_skip_next=0
+for opr_arg in "$@"; do
+  if [ "$opr_skip_next" -eq 1 ]; then
+    opr_skip_next=0
     continue
   fi
-  case "$ocx_arg" in
+  case "$opr_arg" in
     --)
       break
       ;;
     ${valueOptions})
-      ocx_skip_next=1
+      opr_skip_next=1
       ;;
     --help|-h|--version|-V)
-      ocx_subcommand="$ocx_arg"
+      opr_subcommand="$opr_arg"
       break
       ;;
     -*)
       ;;
     *)
-      ocx_subcommand="$ocx_arg"
+      opr_subcommand="$opr_arg"
       break
       ;;
   esac
 done
-case "$ocx_subcommand" in
+case "$opr_subcommand" in
   ${internalCommands}|--help|-h|--version|-V)
     ;;
   *)
-    if [ -z "$OCX_SHIM_BYPASS" ]; then
+    if [ -z "$opr_SHIM_BYPASS" ]; then
       ${shQuote(bunPath)} ${shQuote(cliPath)} ensure >/dev/null 2>&1 || true
     fi
     ;;
@@ -429,35 +429,35 @@ export function buildWindowsCodexShim(realCodexPath: string, bunPath: string, cl
   const valueOptionChecks = CODEX_GLOBAL_OPTIONS_WITH_VALUE.map(option => `if /I "%~1"=="${option}" goto skip_option_value`).join("\r\n");
   return `@echo off\r
 rem ${SHIM_MARKER}\r
-${windowsBatchSet("OCX_REAL_CODEX", realCodexPath)}\r
-${windowsBatchSet("OCX_BUN", bunPath)}\r
-${windowsBatchSet("OCX_CLI", cliPath)}\r
-${windowsBatchSet("OCX_API_TOKEN_FILE", serviceApiTokenFilePath())}\r
-if "%OPENPROVIDER_API_AUTH_TOKEN%"=="" if exist "%OCX_API_TOKEN_FILE%" set /p OPENPROVIDER_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"\r
-if not "%OCX_SHIM_BYPASS%"=="" goto run_codex\r
+${windowsBatchSet("opr_REAL_CODEX", realCodexPath)}\r
+${windowsBatchSet("opr_BUN", bunPath)}\r
+${windowsBatchSet("opr_CLI", cliPath)}\r
+${windowsBatchSet("opr_API_TOKEN_FILE", serviceApiTokenFilePath())}\r
+if "%OPENPROVIDER_API_AUTH_TOKEN%"=="" if exist "%opr_API_TOKEN_FILE%" set /p OPENPROVIDER_API_AUTH_TOKEN=<"%opr_API_TOKEN_FILE%"\r
+if not "%opr_SHIM_BYPASS%"=="" goto run_codex\r
 goto scan_codex_args\r
 :scan_codex_args\r
-if "%~1"=="" goto ensure_ocx\r
-if "%~1"=="--" goto ensure_ocx\r
+if "%~1"=="" goto ensure_opr\r
+if "%~1"=="--" goto ensure_opr\r
 ${valueOptionChecks}\r
 ${internalCommandChecks}\r
 if /I "%~1"=="--help" goto run_codex\r
 if /I "%~1"=="-h" goto run_codex\r
 if /I "%~1"=="--version" goto run_codex\r
 if /I "%~1"=="-V" goto run_codex\r
-set "OCX_SCAN_ARG=%~1"\r
-if "%OCX_SCAN_ARG:~0,1%"=="-" goto shift_codex_arg\r
-goto ensure_ocx\r
+set "opr_SCAN_ARG=%~1"\r
+if "%opr_SCAN_ARG:~0,1%"=="-" goto shift_codex_arg\r
+goto ensure_opr\r
 :skip_option_value\r
 shift\r
-if "%~1"=="" goto ensure_ocx\r
+if "%~1"=="" goto ensure_opr\r
 :shift_codex_arg\r
 shift\r
 goto scan_codex_args\r
-:ensure_ocx\r
-"%OCX_BUN%" "%OCX_CLI%" ensure >nul 2>nul\r
+:ensure_opr\r
+"%opr_BUN%" "%opr_CLI%" ensure >nul 2>nul\r
 :run_codex\r
-"%OCX_REAL_CODEX%" %*\r
+"%opr_REAL_CODEX%" %*\r
 `;
 }
 
@@ -488,7 +488,7 @@ foreach ($argValue in $args) {
   $subcommand = $argText
   break
 }
-$skipEnsure = $env:OCX_SHIM_BYPASS -or $internalCommands -contains $subcommand -or @("--help", "-h", "--version", "-V") -contains $subcommand
+$skipEnsure = $env:opr_SHIM_BYPASS -or $internalCommands -contains $subcommand -or @("--help", "-h", "--version", "-V") -contains $subcommand
 if (-not $skipEnsure) {
   & ${psString(bunPath)} ${psString(cliPath)} ensure *> $null
 }
@@ -1178,3 +1178,4 @@ export function diagnoseCodexShim(): CodexShimDiagnostic {
 export function codexShimStatus(): string {
   return diagnoseCodexShim().summary;
 }
+

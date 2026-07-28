@@ -22,7 +22,7 @@ import {
   type RecordScreenResult,
 } from "./gen/agent_pb";
 import { errorText, execBytes } from "./native-exec-common";
-import { OCX_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
+import { opr_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
 
 export interface CursorNativeToolDeps {
   mcp?: (args: McpArgs) => McpResult | Promise<McpResult>;
@@ -35,7 +35,7 @@ export interface CursorNativeToolDeps {
 export async function mcpExec(execMsg: ExecServerMessage, deps: CursorNativeToolDeps): Promise<Uint8Array> {
   if (execMsg.message.case !== "mcpArgs") throw new Error("invalid mcp exec");
   try {
-    if (execMsg.message.value.providerIdentifier === OCX_RESPONSES_TOOL_PROVIDER) {
+    if (execMsg.message.value.providerIdentifier === opr_RESPONSES_TOOL_PROVIDER) {
       return execBytes(execMsg, "mcpResult", create(McpResultSchema, {
         result: { case: "error", value: create(McpErrorSchema, { error: "Responses client tools are surfaced to Codex and must not execute through the local MCP native-exec channel." }) },
       }));
@@ -116,3 +116,4 @@ export async function recordScreenExec(execMsg: ExecServerMessage, deps: CursorN
     }));
   }
 }
+

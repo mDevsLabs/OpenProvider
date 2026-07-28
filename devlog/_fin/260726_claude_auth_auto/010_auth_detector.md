@@ -53,7 +53,7 @@ export interface AuthDetectDeps {
   env(): NodeJS.ProcessEnv;
 }
 
-// NOTE: no `hasOcxAnthropicCredential` — S4 was removed by the audit (002 §5).
+// NOTE: no `hasoprAnthropicCredential` — S4 was removed by the audit (002 §5).
 
 export interface AuthDetectResult {
   /** Aggregate: present if ANY source is present; unknown if none present but ANY unknown. */
@@ -130,3 +130,4 @@ Default IO wiring (same module, exported as `defaultAuthDetectDeps()`): real pat
 |---------|----------|
 | `bun test tests/claude-auth-detect.test.ts` | pass |
 | `bun x tsc --noEmit` | clean |
+

@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
 const cliPath = join(repoRoot, "src", "cli", "index.ts");
-const binPath = join(repoRoot, "bin", "ocx.mjs");
+const binPath = join(repoRoot, "bin", "opr.mjs");
 
 function runCli(args: string[], env: NodeJS.ProcessEnv = {}) {
   return spawnSync(process.execPath, [cliPath, ...args], {
@@ -255,3 +255,4 @@ describe("CLI subcommand help", () => {
     }
   });
 });
+

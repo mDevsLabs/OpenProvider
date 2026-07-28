@@ -86,7 +86,7 @@ Plan:
     `x-codex-turn-state`, `openai-model`, `x-models-etag`, `x-reasoning-included`, and
     `x-ratelimit-*`.
 - Add routed continuation safety:
-  - preserve parsed `previous_response_id` in `OcxParsedRequest`;
+  - preserve parsed `previous_response_id` in `oprParsedRequest`;
   - for routed/non-passthrough WS responses, emit empty response ids so Codex sends a full next
     request rather than an unresolved incremental suffix;
   - native passthrough keeps upstream ids.
@@ -183,4 +183,5 @@ Acceptance:
   HTTP Responses upstream as long as Codex-facing WS protocol behavior is correct.
 - Non-representable provider modalities outside the current openprovider/jawcode type model are out of
   scope.
+
 

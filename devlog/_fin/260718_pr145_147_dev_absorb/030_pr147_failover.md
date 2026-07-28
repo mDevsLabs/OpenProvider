@@ -181,18 +181,18 @@ landed policy:
 
 ```ts
 import { classifyError } from "../lib/errors";
-import type { OcxComboTarget } from "../types";
+import type { oprComboTarget } from "../types";
 import { targetKey } from "./types";
 
 const DEFAULT_COOLDOWN_MS = 60_000;
 const MAX_COOLDOWN_MS = 10 * 60_000;
 const cooldowns = new Map<string, number>();
 
-function mapKey(comboId: string, target: Pick<OcxComboTarget, "provider" | "model">): string {
+function mapKey(comboId: string, target: Pick<oprComboTarget, "provider" | "model">): string {
   return `${comboId}\0${targetKey(target)}`;
 }
 
-export function isComboTargetInCooldown(comboId: string, target: OcxComboTarget, now = Date.now()): boolean {
+export function isComboTargetInCooldown(comboId: string, target: oprComboTarget, now = Date.now()): boolean {
   const key = mapKey(comboId, target);
   const until = cooldowns.get(key);
   if (until === undefined) return false;
@@ -203,7 +203,7 @@ export function isComboTargetInCooldown(comboId: string, target: OcxComboTarget,
 
 export function coolComboTarget(
   comboId: string,
-  target: OcxComboTarget,
+  target: oprComboTarget,
   options: { retryAfter?: string | null; now?: number; cooldownMs?: number } = {},
 ): void {
   const now = options.now ?? Date.now();
@@ -235,7 +235,7 @@ Add `clearComboTargetCooldowns(comboId?)` and a pure exported
 Add:
 
 ```ts
-export function noteComboFailure(comboId: string, target: OcxComboTarget): void {
+export function noteComboFailure(comboId: string, target: oprComboTarget): void {
   const state = selectionState.get(comboId);
   if (state?.activeKey === targetKey(target)) {
     delete state.activeKey;
@@ -244,7 +244,7 @@ export function noteComboFailure(comboId: string, target: OcxComboTarget): void 
 }
 
 export function advanceComboAfterFailure(
-  config: OcxConfig,
+  config: oprConfig,
   pick: ComboPick,
   options: { retryAfter?: string | null; now?: number } = {},
 ): ComboPick | null {
@@ -266,7 +266,7 @@ is incidental.
 This file folds the safe half of PR commit `6824e7bc` into execution:
 
 ```ts
-import type { OcxComboDefaultEffort, OcxComboTarget } from "../types";
+import type { oprComboDefaultEffort, oprComboTarget } from "../types";
 
 export function comboIdFromRawBody(body: unknown): string | null {
   if (!body || typeof body !== "object" || Array.isArray(body)) return null;
@@ -277,8 +277,8 @@ export function comboIdFromRawBody(body: unknown): string | null {
 
 export function concreteComboRequestBody(
   body: unknown,
-  target: Pick<OcxComboTarget, "provider" | "model">,
-  defaultEffort: OcxComboDefaultEffort | null,
+  target: Pick<oprComboTarget, "provider" | "model">,
+  defaultEffort: oprComboDefaultEffort | null,
 ): Record<string, unknown> {
   const clone = structuredClone(body) as Record<string, unknown>;
   clone.model = `${target.provider}/${target.model}`;
@@ -553,7 +553,7 @@ async function handleComboResponses(
   req: Request,
   rawBody: unknown,
   comboId: string,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
   options: HandleResponsesOptions,
 ): Promise<Response> {
@@ -690,7 +690,7 @@ content returns the status-only sanitized envelope and is canceled.
 Retry-After is parsed and sanitized once at original-response ownership and carried on
 `failure.retryAfter` only for cooldown calculation. It is never recovered from the
 sanitized wrapper and never forwarded as an arbitrary client header. 040 may add
-`usage?: OcxUsage`, pass `logCtx` into this same bounded helper, and inspect only its
+`usage?: oprUsage`, pass `logCtx` into this same bounded helper, and inspect only its
 retained text; it must not restore `.text()`, move read ownership, or add another reader.
 
 Do not publish a failed child's auth context, terminal recorder, or native passthrough
@@ -844,7 +844,7 @@ cooldown resets are independent.
 ### 4.10 `tests/server-combo-failover-e2e.test.ts` — NEW/RE-DERIVE — fault matrix
 
 The PR's one openai-chat 403→openai-chat 200 case is insufficient. Build isolated
-`OPENCODEX_HOME` fixtures and call either the real server or `handleResponses` directly.
+`OpenProvider_HOME` fixtures and call either the real server or `handleResponses` directly.
 Use `Bun.serve` for HTTP adapters and a scoped `globalThis.fetch` stub only where the
 built-in xAI URL/refresh endpoint must be intercepted. Restore every stub/server in
 `afterEach`.
@@ -1093,7 +1093,7 @@ are green at the 030 tip.
   PATCH-disable-all full-engine activation with no member, backup, or default-provider
   hit.
 - Cross-doc interface sync for 040 (HIGH): additively extended
-  `ConsumedComboFailure` with `usage?: OcxUsage` and added the internal-only
+  `ConsumedComboFailure` with `usage?: oprUsage` and added the internal-only
   `HandleResponsesOptions.onConsumedComboFailure` callback. The pre-build round-4 fold
   below supersedes its original ownership split: 030 now creates and publishes the base
   failure at both bounded original-body sites, while 040 adds only optional usage.
@@ -1141,3 +1141,4 @@ are green at the 030 tip.
   aborted -> 499, zero success accounting, zero callback publication.
 - Correction: sanitizedRetryAfter sentinel fixed to `!== undefined` matching
   source-faithful parseRetryAfterMs return type. Rebuttal: none.
+

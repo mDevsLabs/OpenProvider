@@ -19,7 +19,7 @@ import {
   type ProviderModelDiscoveryFailure,
 } from "../model-cache";
 import { buildModelsRequest, resolveModelsAuthToken } from "../../oauth";
-import type { OcxConfig, OcxProviderConfig } from "../../types";
+import type { oprConfig, oprProviderConfig } from "../../types";
 import { modelInList } from "../../types";
 import { CODEX_REASONING_LEVELS, codexEffortRank, configuredReasoningEfforts, modelRecordValue, sanitizeCodexReasoningEfforts } from "../../reasoning-effort";
 import { getJawcodeModelMetadata, getJawcodeModelMetadataCaseInsensitive, listJawcodeModelMetadata, resolveJawcodeProvider } from "../../generated/jawcode-model-metadata";
@@ -47,11 +47,8 @@ import upstreamModelsSnapshot from "../data/upstream-models.json";
 import { JAWCODE_CATALOG_AUGMENT_PROVIDERS, catalogModelSlug, shouldExposeRoutedModel } from "./parsing";
 import type { CatalogModel } from "./parsing";
 import { disabledNativeSlugs, hasComboTargets, nativeInputModalities, nativeOpenAiContextWindow, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
-import { deriveComboCatalogModel, normalizedOpenAiApiSignature, openAiApiCollisionWarnings, warnUncataloguedComboOnce } from "./aggregation";
-
-type OcxProviderConfigWithReasoningSummaries = OcxProviderConfig & {
-  modelSupportsReasoningSummaries?: Record<string, boolean>;
-};
+import { deriveComboCatalogModel, normalizedOpenAiApiSignature, openAiApiCollisionWarnings, replaceLastComboCatalogOmissions, warnUncataloguedComboOnce } from "./aggregation";
+import type { ComboCatalogOmission } from "./aggregation";
 
 export type ProviderModelsApiItem = {
   id: string;
@@ -74,22 +71,29 @@ export function isProviderModelsApiItems(value: unknown): value is ProviderModel
   );
 }
 
-export function configuredContextWindow(prov: OcxProviderConfig, id: string): number | undefined {
+export function configuredContextWindow(prov: oprProviderConfig, id: string): number | undefined {
   const configured = modelRecordValue(prov.modelContextWindows, id) ?? prov.contextWindow;
   return typeof configured === "number" && configured > 0 ? configured : undefined;
 }
 
-export function configuredInputModalities(prov: OcxProviderConfig, id: string): string[] | undefined {
+export function configuredInputModalities(prov: oprProviderConfig, id: string): string[] | undefined {
   const modalities = modelRecordValue(prov.modelInputModalities, id);
   return Array.isArray(modalities) && modalities.length > 0 ? [...modalities] : undefined;
 }
 
-export function configuredMaxInputTokens(prov: OcxProviderConfig, id: string): number | undefined {
+export function configuredMaxInputTokens(prov: oprProviderConfig, id: string): number | undefined {
   const configured = modelRecordValue(prov.modelMaxInputTokens, id);
   return typeof configured === "number" && configured > 0 ? configured : undefined;
 }
 
-export function applyProviderConfigHints(name: string, prov: OcxProviderConfig, model: CatalogModel, providerCap?: number): CatalogModel {
+function configuredReasoningSummarySupport(prov: oprProviderConfig | undefined, id: string): boolean | undefined {
+  if (!prov) return undefined;
+  const explicit = modelRecordValue(prov.modelSupportsReasoningSummaries, id);
+  if (explicit !== undefined) return explicit;
+  return modelRecordValue(prov.modelReasoningSummaryDelivery, id) !== undefined ? true : undefined;
+}
+
+export function applyProviderConfigHints(name: string, prov: oprProviderConfig, model: CatalogModel, providerCap?: number): CatalogModel {
   void name;
   const configuredCap = configuredContextWindow(prov, model.id);
   const configuredMaxInput = configuredMaxInputTokens(prov, model.id);
@@ -104,10 +108,7 @@ export function applyProviderConfigHints(name: string, prov: OcxProviderConfig, 
   }
   const reasoningEfforts = configuredReasoningEfforts(prov, model.id);
   const defaultReasoningEffort = modelRecordValue(prov.modelDefaultReasoningEfforts, model.id) ?? model.defaultReasoningEffort;
-  const supportsReasoningSummaries = modelRecordValue(
-    (prov as OcxProviderConfigWithReasoningSummaries).modelSupportsReasoningSummaries,
-    model.id,
-  );
+  const supportsReasoningSummaries = configuredReasoningSummarySupport(prov, model.id);
   const hinted = {
     ...model,
     ...(configuredCap !== undefined
@@ -142,13 +143,13 @@ export function applyProviderConfigHints(name: string, prov: OcxProviderConfig, 
   return providerCap !== undefined ? { ...hinted, contextCap: providerCap, contextCapped: false } : hinted;
 }
 
-export function catalogHintsFromProviderConfig(name: string, prov: OcxProviderConfig, id: string, contextCap?: number): Partial<CatalogModel> {
+export function catalogHintsFromProviderConfig(name: string, prov: oprProviderConfig, id: string, contextCap?: number): Partial<CatalogModel> {
   const hinted = applyProviderConfigHints(name, prov, { id, provider: name }, contextCap);
   const { provider: _provider, id: _id, ...hints } = hinted;
   return hints;
 }
 
-export function applyConfigHintsToCachedModels(name: string, prov: OcxProviderConfig, models: CatalogModel[], contextCap?: number): CatalogModel[] {
+export function applyConfigHintsToCachedModels(name: string, prov: oprProviderConfig, models: CatalogModel[], contextCap?: number): CatalogModel[] {
   return models.map(model => applyProviderConfigHints(name, prov, model, contextCap));
 }
 
@@ -217,7 +218,7 @@ export function catalogHintsFromModelsApiItem(providerName: string, item: Provid
   };
 }
 
-export async function fetchProviderModels(name: string, prov: OcxProviderConfig, ttlMs: number, contextCap?: number): Promise<CatalogModel[]> {
+export async function fetchProviderModels(name: string, prov: oprProviderConfig, ttlMs: number, contextCap?: number): Promise<CatalogModel[]> {
   if (prov.authMode === "forward") return []; // ChatGPT backend has no /models
   const apiKey = await resolveModelsAuthToken(name, prov);
   const seedVertexDefault = prov.adapter === "google"
@@ -443,7 +444,7 @@ export function shouldRetainConfiguredProviderModel(providerName: string, modelI
 
 export function filterCatalogVisibleModels(
   models: CatalogModel[],
-  config: Pick<OcxConfig, "disabledModels" | "providers">,
+  config: Pick<oprConfig, "disabledModels" | "providers">,
 ): CatalogModel[] {
   const disabled = new Set(config.disabledModels ?? []);
   const allowByProvider = new Map<string, Set<string>>();
@@ -464,7 +465,12 @@ export function filterCatalogVisibleModels(
   });
 }
 
-export async function gatherRoutedModels(config: OcxConfig): Promise<CatalogModel[]> {
+export async function gatherRoutedModels(
+  config: oprConfig,
+  options?: { comboOmissions?: ComboCatalogOmission[] },
+): Promise<CatalogModel[]> {
+  // Per-invocation list: sync passes `comboOmissions` so overlapping gathers cannot race.
+  const localOmissions: ComboCatalogOmission[] = [];
   const ttlMs = config.modelCacheTtlMs ?? DEFAULT_MODEL_CACHE_TTL_MS;
   // Persisted provider entries can predate newer registry fields (noVisionModels,
   // modelInputModalities, ...). The ROUTER merges registry seeds at request time
@@ -474,7 +480,7 @@ export async function gatherRoutedModels(config: OcxConfig): Promise<CatalogMode
   // Enrich a CLONE: hydrated defaults must never leak into the persisted config.
   const activeProviders = Object.entries(config.providers)
     .filter(([, prov]) => prov.disabled !== true)
-    .map(([name, prov]): [string, OcxProviderConfig] => {
+    .map(([name, prov]): [string, oprProviderConfig] => {
       const enriched = { ...prov };
       enrichProviderFromRegistry(name, enriched);
       return [name, enriched];
@@ -542,15 +548,20 @@ export async function gatherRoutedModels(config: OcxConfig): Promise<CatalogMode
       .filter((member): member is CatalogModel => member !== undefined);
     const derived = deriveComboCatalogModel(id, combo, members);
     if (derived) all.push(derived);
-    else warnUncataloguedComboOnce(id, combo, members);
+    else warnUncataloguedComboOnce(id, combo, members, localOmissions);
+  }
+  replaceLastComboCatalogOmissions(localOmissions);
+  if (options?.comboOmissions) {
+    options.comboOmissions.length = 0;
+    options.comboOmissions.push(...localOmissions);
   }
   all.sort((a, b) => (a.provider === b.provider ? a.id.localeCompare(b.id) : a.provider.localeCompare(b.provider)));
   // Enriched (registry-hydrated) provider clones, keyed by name — the same view used above so
   // custom rows get the same noVisionModels / inputModalities treatment as discovered rows.
   const enrichedByName = new Map(activeProviders);
   const customModels = (config.customModels ?? []).map(cm => {
-    const rawProvider = config.providers[cm.provider] as OcxProviderConfigWithReasoningSummaries | undefined;
-    const supportsReasoningSummaries = modelRecordValue(rawProvider?.modelSupportsReasoningSummaries, cm.modelId);
+    const rawProvider = config.providers[cm.provider];
+    const supportsReasoningSummaries = configuredReasoningSummarySupport(rawProvider, cm.modelId);
     const base: CatalogModel = {
       id: cm.modelId,
       provider: cm.provider,
@@ -582,7 +593,7 @@ export async function gatherRoutedModels(config: OcxConfig): Promise<CatalogMode
 
 export function augmentRoutedModelsWithRegistryOpenAiApiRows(
   models: CatalogModel[],
-  config: OcxConfig,
+  config: oprConfig,
 ): CatalogModel[] {
   const configured = config.providers[OPENAI_API_PROVIDER_ID];
   if (!configured || configured.disabled === true) return models;
@@ -636,8 +647,8 @@ export function augmentRoutedModelsWithRegistryOpenAiApiRows(
 export function augmentRoutedModelsWithJawcodeMetadata(
   models: CatalogModel[],
   providerNames: string[],
-  providers?: Record<string, OcxProviderConfig>,
-  caps?: Pick<OcxConfig, "providerContextCaps">,
+  providers?: Record<string, oprProviderConfig>,
+  caps?: Pick<oprConfig, "providerContextCaps">,
 ): CatalogModel[] {
   const out = [...models];
   const seen = new Set(out.map(m => `${m.provider}/${m.id}`));
@@ -666,3 +677,4 @@ export function augmentRoutedModelsWithJawcodeMetadata(
   }
   return out;
 }
+

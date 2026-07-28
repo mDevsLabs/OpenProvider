@@ -7,7 +7,7 @@ lands (same contract as `110/00_overview.md:83-84`, `120/00_overview.md:64-66`).
 
 `resolveAdapter()` (`server.ts:72-86`) is a closed switch. Options per provider:
 
-1. **Extend `google`** — new `OcxProviderConfig` fields (e.g. `googleMode: "ai-studio" | "vertex" | "cloud-code-assist"`) interpreted inside `createGoogleAdapter`.
+1. **Extend `google`** — new `oprProviderConfig` fields (e.g. `googleMode: "ai-studio" | "vertex" | "cloud-code-assist"`) interpreted inside `createGoogleAdapter`.
 2. **Add adapter ids** — e.g. `bedrock`, `kiro`, `cursor` with new files under `src/adapters/` and new `case` arms in `resolveAdapter()`.
 
 Adding adapters does not break the "five adapter" *concept* if we treat Google variants as one
@@ -241,3 +241,4 @@ Run `bun test` + `bun x tsc --noEmit` after each sub-phase (baseline per `110/00
 - [ ] User approves Cursor MVP scope (text-only vs exec)
 - [ ] User approves Kiro IDE-impersonation headers ethically / ToS
 - [ ] Sequencing 140.1–140.5 accepted or reordered
+

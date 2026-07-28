@@ -27,7 +27,7 @@ Create a zip containing:
   - `.github/workflows/service-lifecycle.yml`
   - `package.json`
   - `bun.lock`
-  - `bin/ocx.mjs`
+  - `bin/opr.mjs`
   - `scripts/release.ts`
 - Relevant Windows/service/runtime source and tests:
   - `src/bun-runtime.ts`
@@ -47,7 +47,7 @@ Create a zip containing:
 Ask GPT Pro to review Windows compatibility risks specifically:
 
 - npm global install behavior on Windows without a separately-installed Bun.
-- `bin/ocx.mjs`, package `bin`, and the local tracked `dist/bin/*` symlinks
+- `bin/opr.mjs`, package `bin`, and the local tracked `dist/bin/*` symlinks
   (not shipped in package `files`) as a Windows risk surface.
 - Task Scheduler service install/uninstall behavior.
 - Windows path, quoting, shell interpolation, symlink, and executable detection risks.
@@ -60,3 +60,4 @@ Ask GPT Pro to review Windows compatibility risks specifically:
 - Send to ChatGPT/GPT Pro with the dev GitHub URL and zip attachment.
 - If the GPT Pro session is long-running, register it as a durable `cli-jaw bgtask`.
 - Do not change source code in this work-phase.
+

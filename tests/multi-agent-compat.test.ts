@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { injectDeveloperMessage, multiAgentGuidanceText, sanitizeEncryptedContentInPlace } from "../src/server/responses";
 import { parseRequest } from "../src/responses/parser";
-import type { OcxParsedRequest } from "../src/types";
+import type { oprParsedRequest } from "../src/types";
 import { effectiveSubagentRoster } from "../src/codex/catalog";
 import { clearDebugSettings, setDebugSettings } from "../src/lib/debug-settings";
 import {
@@ -64,7 +64,7 @@ function parsedFixture(over: {
   reasoning?: string;
   tools?: Array<{ name: string; namespace?: string }>;
   rawInput?: unknown;
-}): OcxParsedRequest {
+}): oprParsedRequest {
   return {
     modelId: "gpt-5.5",
     context: {
@@ -765,3 +765,4 @@ describe("spawn-message delivery (agent_message + encrypted slot)", () => {
     expect(flat).toContain("TASK: build the thing exactly as specified.");
   });
 });
+

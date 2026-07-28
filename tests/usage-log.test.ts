@@ -22,15 +22,15 @@ let testDir = "";
 let previousHome: string | undefined;
 
 beforeEach(() => {
-  previousHome = process.env.OPENPROVIDER_HOME;
-  testDir = mkdtempSync(join(tmpdir(), "opr-usage-"));
-  process.env.OPENPROVIDER_HOME = testDir;
+  previousHome = process.env.OPENCODEX_HOME;
+  testDir = mkdtempSync(join(tmpdir(), "ocx-usage-"));
+  process.env.OPENCODEX_HOME = testDir;
   resetUsageReadCacheForTests();
 });
 
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENPROVIDER_HOME;
-  else process.env.OPENPROVIDER_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
+  else process.env.OPENCODEX_HOME = previousHome;
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
@@ -83,9 +83,28 @@ describe("usage log", () => {
     expect(usageLogRevisionKey(newSnapshot.revision)).not.toBe(usageLogRevisionKey(oldSnapshot.revision));
   });
 
+  test("persists conversationId for Logs session correlation", () => {
+    appendUsageEntry({
+      requestId: "ocx-conversation",
+      timestamp: 1,
+      provider: "openai",
+      model: "gpt-5.5",
+      status: 200,
+      durationMs: 1,
+      usageStatus: "reported",
+      conversationId: "thread-abc",
+      usage: { inputTokens: 1, outputTokens: 1 },
+      totalTokens: 2,
+    });
+    expect(readUsageEntries()).toEqual([expect.objectContaining({
+      requestId: "ocx-conversation",
+      conversationId: "thread-abc",
+    })]);
+  });
+
   test("persists only canonical ordered attempt fields", () => {
     appendUsageEntry({
-      requestId: "opr-attempts",
+      requestId: "ocx-attempts",
       timestamp: 1,
       provider: "combo",
       model: "combo/free",
@@ -109,6 +128,10 @@ describe("usage log", () => {
         inputTokenEstimate: 5,
         usage: { inputTokens: 5, outputTokens: 0, estimated: true },
         totalTokens: 5,
+        requestedEffort: "max",
+        effectiveEffort: "high",
+        reasoningWireField: "reasoning_effort",
+        reasoningWireValue: "high",
         headers: { authorization: "Bearer attempt-token" },
         body: "attempt body secret",
         messages: ["attempt message secret"],
@@ -141,7 +164,45 @@ describe("usage log", () => {
       inputTokenEstimate: 5,
       usage: { inputTokens: 5, outputTokens: 0, estimated: true },
       totalTokens: 5,
+      requestedEffort: "max",
+      effectiveEffort: "high",
+      reasoningWireField: "reasoning_effort",
+      reasoningWireValue: "high",
     }]);
+  });
+
+  test("omits malformed optional attempt reasoning metadata without dropping the attempt", () => {
+    appendUsageEntry({
+      requestId: "ocx-attempt-reasoning",
+      timestamp: 1,
+      provider: "combo",
+      model: "combo/free",
+      status: 200,
+      durationMs: 4,
+      usageStatus: "unreported",
+      attempts: [{
+        ordinal: 1,
+        provider: "a",
+        model: "m1",
+        adapter: "openai-chat",
+        status: 200,
+        durationMs: 3,
+        sendCount: 1,
+        recoveryKinds: [],
+        usageStatus: "unreported",
+        requestedEffort: 123,
+        effectiveEffort: null,
+        reasoningWireField: {},
+        reasoningWireValue: -1,
+      } as never],
+    });
+
+    const attempt = readUsageEntries()[0]?.attempts?.[0];
+    expect(attempt?.ordinal).toBe(1);
+    expect(attempt).not.toHaveProperty("requestedEffort");
+    expect(attempt).not.toHaveProperty("effectiveEffort");
+    expect(attempt).not.toHaveProperty("reasoningWireField");
+    expect(attempt).not.toHaveProperty("reasoningWireValue");
   });
 
   test("drops only malformed persisted attempts while preserving valid siblings", () => {
@@ -191,7 +252,7 @@ describe("usage log", () => {
 
   test("persists parent and attempt firstOutputMs roundtrip (WP4 TTFT)", () => {
     appendUsageEntry({
-      requestId: "opr-ttft",
+      requestId: "ocx-ttft",
       timestamp: 1,
       provider: "a",
       model: "m1",
@@ -227,7 +288,7 @@ describe("usage log", () => {
     for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, -5]) {
       rmSync(usageLogPath(), { force: true });
       appendUsageEntry({
-        requestId: "opr-ttft-bad",
+        requestId: "ocx-ttft-bad",
         timestamp: 1,
         provider: "a",
         model: "m1",
@@ -238,7 +299,7 @@ describe("usage log", () => {
         usage: { inputTokens: 10, outputTokens: 5 },
       });
       const [entry] = readUsageEntries();
-      expect(entry?.requestId).toBe("opr-ttft-bad");
+      expect(entry?.requestId).toBe("ocx-ttft-bad");
       expect(entry).not.toHaveProperty("firstOutputMs");
     }
   });
@@ -299,13 +360,13 @@ describe("usage log", () => {
     });
   });
 
-  test("uses OPENPROVIDER_HOME for the append-only JSONL path", () => {
+  test("uses OPENCODEX_HOME for the append-only JSONL path", () => {
     expect(usageLogPath()).toBe(join(testDir, "usage.jsonl"));
   });
 
   test("appends secret-safe usage entries and reads them back", () => {
     appendUsageEntry({
-      requestId: "opr-1",
+      requestId: "ocx-1",
       timestamp: 1,
       provider: "openai",
       model: "gpt-5.5",
@@ -321,11 +382,11 @@ describe("usage log", () => {
 
     expect(existsSync(usageLogPath())).toBe(true);
     const raw = readFileSync(usageLogPath(), "utf-8");
-    expect(raw).toContain("\"requestId\":\"opr-1\"");
+    expect(raw).toContain("\"requestId\":\"ocx-1\"");
     expect(raw).not.toContain("prompt");
     expect(raw).not.toContain("authorization");
     expect(readUsageEntries()).toEqual([{
-      requestId: "opr-1",
+      requestId: "ocx-1",
       timestamp: 1,
       provider: "openai",
       model: "gpt-5.5",
@@ -345,7 +406,7 @@ describe("usage log", () => {
 
   test("drops runtime extra fields before persisting usage JSONL", () => {
     appendUsageEntry({
-      requestId: "opr-extra",
+      requestId: "ocx-extra",
       timestamp: 2,
       provider: "openai",
       model: "gpt-5.5",
@@ -384,7 +445,7 @@ describe("usage log", () => {
       expect(raw).not.toContain(leaked);
     }
     expect(readUsageEntries()).toEqual([{
-      requestId: "opr-extra",
+      requestId: "ocx-extra",
       timestamp: 2,
       provider: "openai",
       model: "gpt-5.5",
@@ -431,7 +492,7 @@ describe("usage log", () => {
 
   test("preserves cached token counts alongside estimated status", () => {
     appendUsageEntry({
-      requestId: "opr-cache",
+      requestId: "ocx-cache",
       timestamp: 3,
       provider: "kiro",
       model: "claude-opus-4.8",
@@ -450,7 +511,7 @@ describe("usage log", () => {
     });
 
     expect(readUsageEntries()[0]).toEqual({
-      requestId: "opr-cache",
+      requestId: "ocx-cache",
       timestamp: 3,
       provider: "kiro",
       model: "claude-opus-4.8",
@@ -471,12 +532,15 @@ describe("usage log", () => {
 
   test("persists and reads back effort / service-tier GUI metadata", () => {
     appendUsageEntry({
-      requestId: "opr-effort",
+      requestId: "ocx-effort",
       timestamp: 9,
       provider: "openai",
       model: "gpt-5.6-sol",
       requestedModel: "gpt-5.6-sol",
-      requestedEffort: "high",
+      requestedEffort: "xhigh",
+      effectiveEffort: "high",
+      reasoningWireField: "reasoning_effort",
+      reasoningWireValue: "high",
       requestedServiceTier: "priority",
       requestedSpeedLabel: "fast",
       configuredServiceTier: "auto",
@@ -487,8 +551,11 @@ describe("usage log", () => {
       usageStatus: "unreported",
     });
     expect(readUsageEntries()[0]).toMatchObject({
-      requestId: "opr-effort",
-      requestedEffort: "high",
+      requestId: "ocx-effort",
+      requestedEffort: "xhigh",
+      effectiveEffort: "high",
+      reasoningWireField: "reasoning_effort",
+      reasoningWireValue: "high",
       requestedServiceTier: "priority",
       requestedSpeedLabel: "fast",
       configuredServiceTier: "auto",
@@ -500,7 +567,7 @@ describe("usage log", () => {
   test("readRecentUsageEntries returns only the newest N rows", () => {
     for (let i = 0; i < 12; i++) {
       appendUsageEntry({
-        requestId: `opr-tail-${i}`,
+        requestId: `ocx-tail-${i}`,
         timestamp: i,
         provider: "openai",
         model: "gpt",
@@ -510,11 +577,11 @@ describe("usage log", () => {
       });
     }
     expect(readRecentUsageEntries(5).map(e => e.requestId)).toEqual([
-      "opr-tail-7",
-      "opr-tail-8",
-      "opr-tail-9",
-      "opr-tail-10",
-      "opr-tail-11",
+      "ocx-tail-7",
+      "ocx-tail-8",
+      "ocx-tail-9",
+      "ocx-tail-10",
+      "ocx-tail-11",
     ]);
     expect(readRecentUsageEntries(0)).toEqual([]);
     expect(readRecentUsageEntries(-1)).toEqual([]);

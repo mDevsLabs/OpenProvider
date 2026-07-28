@@ -10,7 +10,7 @@
 | Cluster | Findings | Verdict |
 |---|---|---|
 | Windows shim/service encoding + install lifecycle | F2 (chcp/BOM/env-indirect), F5-l1 (ping vs timeout), F8-l7 (stop-before-write + retry, utf16le XML) | ALL CONFIRMED-FIXED (`service.ts:295/320/416-428`, `codex-shim.ts:237`, `win-paths.ts`; tests incl. `한글사용자` fixtures) |
-| Self-update / npm-spawn | F1, F1 audit-9, F7 | CONFIRMED-FIXED (`bin/ocx.mjs:99-149`, `src/update.ts:56-137`) + **1 NEW open (fixed below)** |
+| Self-update / npm-spawn | F1, F1 audit-9, F7 | CONFIRMED-FIXED (`bin/opr.mjs:99-149`, `src/update.ts:56-137`) + **1 NEW open (fixed below)** |
 | Graceful stop / lifecycle | F3 | CONFIRMED-FIXED (`process-control.ts:56-96`, `cli.ts:143-279`, `server.ts:2051-2061`); 2 accepted residuals |
 | Networking (loopback/oauth/port) | F4-l1, F5-l7, F6-l7 | CONFIRMED-FIXED (`codex-inject.ts:33-42`, `callback-server.ts:148-169`, `ports.ts:8-14`, `cli.ts:117-128`) + F4 symmetry note (fixed below) |
 | Linux (openUrl/systemd) | F6-l1, F9 | F6 CONFIRMED-FIXED (`open-url.ts:23`); **F9 was STILL-OPEN (fixed below)** |
@@ -20,7 +20,7 @@
 1. **opr.cmd shell-less restart → EINVAL (Windows, bun/source GUI restart).** `update-job.ts`
    `restartCommand()` non-npm branch spawned `opr.cmd` shell-less (`spawn`/`spawnSync` at `:250/267`)
    → EINVAL on Node/Bun ≥18.20/20.12 (same CVE-2024-27980 class F1/F7 fixed). Now restarts via
-   `process.execPath` + the package launcher (both real `.exe`, no shell). `ocxBin()` removed.
+   `process.execPath` + the package launcher (both real `.exe`, no shell). `oprBin()` removed.
 2. **F9 systemd no-DBUS SSH false negative.** `service.ts` `isSystemd()` hard-failed on
    `systemctl --user show-environment`, which errors in an SSH session without a user D-Bus even
    when systemd is present → first-time `opr service install` wrongly refused. Added
@@ -52,3 +52,4 @@ Cross-platform CI (ubuntu/windows/macos) is the standing safety net; the release
 
 ## Status: CLOSED — moved to `_fin`. All 9 original findings + loop-7 findings resolved; 2 narrow
 Windows signal-model residuals accepted and documented above.
+

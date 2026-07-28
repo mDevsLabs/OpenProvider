@@ -3,9 +3,9 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { atomicWriteFile, getConfigDir, loadConfig, readPid, readRuntimePort } from "../config";
-import { killProxy } from "../lib/process-control";
+import { isProcessAlive, killProxy } from "../lib/process-control";
 import { reclaimListenPort } from "../server/port-reclaim";
-import { proxyIdentityAt } from "../server/proxy-liveness";
+import { isOpenproviderHealthz, probeHostname, proxyIdentityAt, type HealthzIdentity } from "../server/proxy-liveness";
 import { isServiceInstalled } from "../service";
 import {
   type Channel,
@@ -28,6 +28,8 @@ const UPDATE_TIMEOUT_MS = 180_000;
 const RESTART_TIMEOUT_MS = 60_000;
 const RESTART_HEALTH_TIMEOUT_MS = 15_000;
 const RESTART_STABILITY_WINDOW_MS = 15_000;
+/** Legacy active records did not persist a worker PID, so age is their only safe recovery signal. */
+export const UPDATE_JOB_LEGACY_STALE_MS = 10 * 60_000;
 /** How long update restart waits for the captured port to become bindable after stop. */
 export const RESTART_PORT_RECLAIM_MS = 30_000;
 
@@ -77,6 +79,19 @@ export interface UpdateCheckDeps {
   latestVersion: (tag: Channel) => string | null;
 }
 
+interface UpdateWorkerProcess {
+  pid?: number;
+  unref(): void;
+  once(event: "error", listener: (error: Error) => void): unknown;
+}
+
+export interface StartUpdateJobDeps {
+  checkForUpdateFn: (channel: Channel) => UpdateCheckResult;
+  spawnWorkerFn: (jobId: string, channel: Channel, restart: boolean) => UpdateWorkerProcess;
+  isProcessAliveFn: (pid: number) => boolean;
+  nowMs: () => number;
+}
+
 const defaultCheckDeps: UpdateCheckDeps = {
   currentVersion,
   detectInstall,
@@ -88,8 +103,8 @@ function nodeBin(): string {
 }
 
 function packageLauncherPath(): string {
-  // This module lives at src/update/job.ts — the launcher is <pkg-root>/bin/ocx.mjs.
-  return join(dirname(fileURLToPath(import.meta.url)), "..", "..", "bin", "ocx.mjs");
+  // This module lives at src/update/job.ts — the launcher is <pkg-root>/bin/opr.mjs.
+  return join(dirname(fileURLToPath(import.meta.url)), "..", "..", "bin", "opr.mjs");
 }
 
 function formatCommand(bin: string, args: string[]): string {
@@ -225,19 +240,77 @@ function newJobId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export function startUpdateJob(channel: Channel, restart: boolean): UpdateJobState {
+/**
+ * [Decision Log]
+ * - Purpose: recover dashboard updates after a detached worker dies without unlocking concurrent live updates.
+ * - Existing constraints: legacy records have no PID, while a healthy update may legitimately run for minutes.
+ * - Alternatives considered: clear every active record by age, or require operators to delete the file manually.
+ * - Chosen approach: trust PID liveness first and use a conservative age limit only for legacy no-PID records.
+ * - Why: age-only recovery can start two installers, while never recovering leaves the dashboard permanently blocked.
+ * - Impact: live PID records remain locked regardless of age; dead PIDs recover immediately; legacy records recover after ten minutes.
+ */
+export function staleActiveUpdateJobReason(
+  job: Pick<UpdateJobState, "status" | "pid" | "updatedAt">,
+  now = Date.now(),
+  isAlive: (pid: number) => boolean = isProcessAlive,
+): string | null {
+  if (job.status !== "running" && job.status !== "restarting") return null;
+  if (typeof job.pid === "number" && Number.isSafeInteger(job.pid) && job.pid > 0) {
+    return isAlive(job.pid) ? null : `update worker PID ${job.pid} is no longer running`;
+  }
+  const updatedAt = Date.parse(job.updatedAt);
+  if (Number.isFinite(updatedAt) && now - updatedAt >= UPDATE_JOB_LEGACY_STALE_MS) {
+    return "legacy active update record has no worker PID and exceeded the stale window";
+  }
+  return null;
+}
+
+const defaultStartUpdateJobDeps: StartUpdateJobDeps = {
+  checkForUpdateFn: channel => checkForUpdate(channel),
+  spawnWorkerFn: (jobId, channel, restart) => spawn(
+    process.execPath,
+    [process.argv[1], "__gui-update-worker", jobId, channel, restart ? "restart" : "no-restart"],
+    {
+      detached: true,
+      stdio: "ignore",
+      windowsHide: true,
+      env: { ...process.env, opr_SERVICE: "1" },
+    },
+  ),
+  isProcessAliveFn: isProcessAlive,
+  nowMs: Date.now,
+};
+
+export function startUpdateJob(
+  channel: Channel,
+  restart: boolean,
+  deps: Partial<StartUpdateJobDeps> = {},
+): UpdateJobState {
+  const resolvedDeps = { ...defaultStartUpdateJobDeps, ...deps };
   const running = readUpdateJob();
   if (running?.status === "running" || running?.status === "restarting") {
-    throw new UpdateJobError("An update job is already running", 409, "update_already_running");
+    const staleReason = staleActiveUpdateJobReason(
+      running,
+      resolvedDeps.nowMs(),
+      resolvedDeps.isProcessAliveFn,
+    );
+    if (!staleReason) {
+      throw new UpdateJobError("An update job is already running", 409, "update_already_running");
+    }
+    updateJob(
+      running,
+      { status: "failed", error: `Recovered stale update job: ${staleReason}.`, exitCode: null },
+      `Recovered stale update job: ${staleReason}.`,
+    );
   }
 
-  const check = checkForUpdate(channel);
+  const check = resolvedDeps.checkForUpdateFn(channel);
   if (!check.canUpdate) {
     throw new UpdateJobError(check.reason ?? "No update is available", 409, check.reason ?? "update_unavailable");
   }
 
   const id = newJobId();
-  const now = new Date().toISOString();
+  const now = new Date(resolvedDeps.nowMs()).toISOString();
   const job: UpdateJobState = {
     id,
     status: "running",
@@ -254,14 +327,30 @@ export function startUpdateJob(channel: Channel, restart: boolean): UpdateJobSta
   };
   writeJob(job);
 
-  const child = spawn(process.execPath, [process.argv[1], "__gui-update-worker", id, channel, restart ? "restart" : "no-restart"], {
-    detached: true,
-    stdio: "ignore",
-    windowsHide: true,
-    env: { ...process.env, OCX_SERVICE: "1" },
+  let child: UpdateWorkerProcess;
+  try {
+    child = resolvedDeps.spawnWorkerFn(id, channel, restart);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    updateJob(job, { status: "failed", error: `Could not start update worker: ${message}` }, "Update worker failed to start.");
+    throw new UpdateJobError("Could not start update worker", 500, "update_worker_start_failed");
+  }
+  if (typeof child.pid !== "number" || !Number.isSafeInteger(child.pid) || child.pid <= 0) {
+    updateJob(job, { status: "failed", error: "Could not start update worker: no worker PID was returned." }, "Update worker failed to start.");
+    throw new UpdateJobError("Could not start update worker", 500, "update_worker_start_failed");
+  }
+  const startedJob = updateJob(job, { pid: child.pid }, `Update worker started as PID ${child.pid}.`);
+  child.once("error", error => {
+    const current = readUpdateJob(id);
+    if (!current || current.pid !== child.pid || (current.status !== "running" && current.status !== "restarting")) return;
+    updateJob(
+      current,
+      { status: "failed", error: `Update worker failed to start: ${error.message}` },
+      "Update worker emitted a startup error.",
+    );
   });
   child.unref();
-  return { ...job, pid: child.pid };
+  return startedJob;
 }
 
 function runLoggedCommand(job: UpdateJobState, bin: string, args: string[], timeout: number): { status: number | null; signal: NodeJS.Signals | null } {
@@ -281,7 +370,7 @@ function runLoggedCommand(job: UpdateJobState, bin: string, args: string[], time
 function spawnDetachedStart(job: UpdateJobState, installer: Installer, port?: number): void {
   const cmd = restartCommand(false, installer, packageLauncherPath(), port);
   const env = { ...process.env };
-  delete env.OCX_SERVICE;
+  delete env.opr_SERVICE;
   updateJob(job, {}, `$ ${cmd.display}`);
   const child = spawn(cmd.bin, cmd.args, {
     detached: true,
@@ -292,12 +381,20 @@ function spawnDetachedStart(job: UpdateJobState, installer: Installer, port?: nu
   child.unref();
 }
 
+/** Identity snapshot used to prove an npm self-update actually replaced the pre-update process. */
+export interface RestartProxyIdentity {
+  pid: number | null;
+  version?: string;
+}
+
 /** Test seam: the wait/spawn pair is injectable so the restart path is verifiable. */
 export interface RestartIo {
   waitForPort?: typeof reclaimListenPort;
   spawnStart?: (job: UpdateJobState, installer: Installer, port?: number) => void;
   serviceInstalledFn?: () => boolean;
   probeProxy?: (port: number, hostname?: string) => Promise<boolean>;
+  /** Richer /healthz read for update-correlated restart evidence (pid + version). */
+  probeProxyIdentity?: (port: number, hostname?: string) => Promise<RestartProxyIdentity | null>;
   sleepMs?: (ms: number) => Promise<void>;
   now?: () => number;
   /** Service-mode install/reinstall command (defaults to spawnSync via runLoggedCommand). */
@@ -306,6 +403,12 @@ export interface RestartIo {
     bin: string,
     args: string[],
   ) => { status: number | null; signal?: NodeJS.Signals | null };
+  /** Override the explicit restart path (used by finishGuiUpdateRestart tests). */
+  restartAfterUpdateFn?: (
+    job: UpdateJobState,
+    captured?: { port: number; hostname: string; oldPid?: number },
+    io?: RestartIo,
+  ) => Promise<void>;
 }
 
 async function restartAfterUpdate(
@@ -336,7 +439,7 @@ async function restartAfterUpdate(
     timeoutMs: RESTART_PORT_RECLAIM_MS,
     intervalMs: 100,
     scanIntervalMs: 500,
-    killOcxHolders: oldPid != null,
+    killoprHolders: oldPid != null,
     onlyKillPids: oldPid != null ? [oldPid] : [],
   };
 
@@ -347,8 +450,8 @@ async function restartAfterUpdate(
     if (!freed) {
       updateJob(job, {}, `Port ${port} still busy after ${Math.trunc(RESTART_PORT_RECLAIM_MS / 1000)}s; refusing to hop — reinstall may fail until the port is free.`);
     }
-    const prevBake = process.env.OCX_BAKE_PORT;
-    process.env.OCX_BAKE_PORT = String(Math.trunc(port));
+    const prevBake = process.env.opr_BAKE_PORT;
+    process.env.opr_BAKE_PORT = String(Math.trunc(port));
     let serviceOk = false;
     try {
       const run = io.runService ?? ((j, bin, args) => runLoggedCommand(j, bin, args, RESTART_TIMEOUT_MS));
@@ -364,8 +467,8 @@ async function restartAfterUpdate(
         updateJob(job, {}, `Service reinstall failed (exit ${result.status ?? "?"}); falling back to a direct proxy start. Run 'opr service install' as administrator to refresh the background service manager.`);
       }
     } finally {
-      if (prevBake === undefined) delete process.env.OCX_BAKE_PORT;
-      else process.env.OCX_BAKE_PORT = prevBake;
+      if (prevBake === undefined) delete process.env.opr_BAKE_PORT;
+      else process.env.opr_BAKE_PORT = prevBake;
     }
     if (serviceOk) return;
     // Fall through to the direct proxy start below so the update never leaves the
@@ -404,6 +507,50 @@ function restartFailureHint(port: number): string {
     + "reinstall with 'npm install -g --allow-scripts=bun @mdevs/openprovider'.";
 }
 
+type AwaitHealthyResult =
+  | { ok: true }
+  | { ok: false; reason: "timeout" | "flapped" };
+
+/**
+ * Wait for an identity-checked /healthz on the captured listen target, then require a short
+ * stability window. Soft: never marks the job failed (callers decide whether to fail or retry).
+ */
+async function awaitRestartedProxyHealthy(
+  job: UpdateJobState,
+  captured: { port: number; hostname: string },
+  io: RestartIo = {},
+): Promise<AwaitHealthyResult> {
+  const probe = io.probeProxy ?? (async (port: number, hostname?: string) => (
+    !!(await proxyIdentityAt(port, { hostname }))
+  ));
+  const sleep = io.sleepMs ?? (async (ms: number) => {
+    await new Promise(resolve => setTimeout(resolve, ms));
+  });
+  const now = io.now ?? (() => Date.now());
+  const port = captured.port;
+  const hostname = captured.hostname;
+  const startDeadline = now() + RESTART_HEALTH_TIMEOUT_MS;
+
+  while (now() < startDeadline) {
+    if (await probe(port, hostname)) {
+      updateJob(job, {}, `Proxy reported healthy on ${hostname}:${port}; confirming it stays up...`);
+      const stableUntil = now() + RESTART_STABILITY_WINDOW_MS;
+      while (now() < stableUntil) {
+        if (!(await probe(port, hostname))) {
+          updateJob(job, {}, `Proxy became unhealthy on ${hostname}:${port} during the stability window.`);
+          return { ok: false, reason: "flapped" };
+        }
+        await sleep(500);
+      }
+      updateJob(job, {}, `Proxy stayed healthy for ${Math.trunc(RESTART_STABILITY_WINDOW_MS / 1000)}s after restart.`);
+      return { ok: true };
+    }
+    await sleep(250);
+  }
+
+  return { ok: false, reason: "timeout" };
+}
+
 /**
  * Confirm that the detached/service restart really came back and stayed up. The GUI worker
  * used to mark success immediately after spawning the new process, which hid Windows cases
@@ -423,42 +570,17 @@ async function confirmRestartedProxy(
   - 다른 대안 대신 이 방식을 선택한 이유: GUI는 "업데이트가 설치됐지만 재시작은 실패"를 분리해 알려줘야 하며, 이 방식이 가장 적은 오탐으로 그 경계를 만든다.
   - 장점, 단점 및 영향: 장점은 silent restart failure가 update-job 상태로 드러난다는 점이다. 단점은 성공 판정이 최대 30초 늦어질 수 있다는 점이며, 대신 실제 복귀를 더 정확히 반영한다.
   */
-  const probe = io.probeProxy ?? (async (port: number, hostname?: string) => (
-    !!(await proxyIdentityAt(port, { hostname }))
-  ));
-  const sleep = io.sleepMs ?? (async (ms: number) => {
-    await new Promise(resolve => setTimeout(resolve, ms));
-  });
-  const now = io.now ?? (() => Date.now());
+  const result = await awaitRestartedProxyHealthy(job, captured, io);
+  if (result.ok) return true;
   const port = captured.port;
   const hostname = captured.hostname;
-  const startDeadline = now() + RESTART_HEALTH_TIMEOUT_MS;
-
-  while (now() < startDeadline) {
-    if (await probe(port, hostname)) {
-      updateJob(job, {}, `Proxy reported healthy on ${hostname}:${port}; confirming it stays up...`);
-      const stableUntil = now() + RESTART_STABILITY_WINDOW_MS;
-      while (now() < stableUntil) {
-        if (!(await probe(port, hostname))) {
-          updateJob(job, {
-            status: "failed",
-            restarted: false,
-            error: `proxy restart became unhealthy on ${hostname}:${port}`,
-          }, restartFailureHint(port));
-          return false;
-        }
-        await sleep(500);
-      }
-      updateJob(job, {}, `Proxy stayed healthy for ${Math.trunc(RESTART_STABILITY_WINDOW_MS / 1000)}s after restart.`);
-      return true;
-    }
-    await sleep(250);
-  }
-
+  const error = result.reason === "flapped"
+    ? `proxy restart became unhealthy on ${hostname}:${port}`
+    : `proxy restart never became healthy on ${hostname}:${port}`;
   updateJob(job, {
     status: "failed",
     restarted: false,
-    error: `proxy restart never became healthy on ${hostname}:${port}`,
+    error,
   }, restartFailureHint(port));
   return false;
 }
@@ -469,6 +591,178 @@ export function confirmRestartAfterUpdateForTests(
   io: RestartIo,
 ): Promise<boolean> {
   return confirmRestartedProxy(job, captured, io);
+}
+
+async function defaultProbeProxyIdentity(
+  port: number,
+  hostname?: string,
+): Promise<RestartProxyIdentity | null> {
+  try {
+    const res = await fetch(`http://${probeHostname(hostname)}:${port}/healthz`, {
+      signal: AbortSignal.timeout(750),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json().catch(() => null)) as HealthzIdentity | null;
+    if (!isOpenproviderHealthz(body)) return null;
+    return {
+      pid: typeof body?.pid === "number" ? body.pid : null,
+      ...(typeof body?.version === "string" ? { version: body.version } : {}),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Health alone is not enough to skip the GUI worker restart: a surviving pre-update
+ * process is still identity-healthy. Require update-correlated evidence — a new PID
+ * when the pre-update PID was captured, and/or /healthz reporting the job's target
+ * version when PID evidence is unavailable.
+ */
+export function npmSelfUpdateRestartEvidence(
+  job: Pick<UpdateJobState, "latestVersion">,
+  captured: { oldPid?: number },
+  identity: RestartProxyIdentity | null,
+): { ok: true; detail: string } | { ok: false; reason: string } {
+  if (!identity) return { ok: false, reason: "could not read proxy identity" };
+
+  const oldPid = typeof captured.oldPid === "number" && captured.oldPid > 0
+    ? captured.oldPid
+    : undefined;
+  const livePid = typeof identity.pid === "number" && identity.pid > 0 ? identity.pid : null;
+  const expected = typeof job.latestVersion === "string" && job.latestVersion.length > 0
+    ? job.latestVersion
+    : null;
+  const versionMatches = expected !== null && identity.version === expected;
+
+  if (oldPid !== undefined) {
+    if (livePid === oldPid) {
+      return { ok: false, reason: "still the pre-update PID" };
+    }
+    if (livePid !== null) {
+      if (expected !== null && identity.version && identity.version !== expected) {
+        return { ok: false, reason: `new pid but version ${identity.version} !== expected ${expected}` };
+      }
+      return { ok: true, detail: `pid changed ${oldPid}→${livePid}` };
+    }
+    // Pre-update PID known but healthz omitted pid — only accept matching target version.
+    if (versionMatches) return { ok: true, detail: `version ${identity.version}` };
+    return { ok: false, reason: "no PID in healthz and version did not match the update target" };
+  }
+
+  if (versionMatches) return { ok: true, detail: `version ${identity.version}` };
+  if (expected !== null && identity.version && identity.version !== expected) {
+    return { ok: false, reason: `version ${identity.version} !== expected ${expected}` };
+  }
+  return { ok: false, reason: "no pre-update PID capture and no expected-version match" };
+}
+
+/**
+ * Post-install restart for the GUI worker.
+ *
+ * npm installs run `node opr.mjs update`, which already stops the proxy and reinstalls /
+ * starts the service (or falls back to a direct start). A second `service install` here
+ * calls `stopWindows()` on that healthy listener, then often fails elevation from the
+ * non-interactive worker — leaving the captured port (default 10100) dead until a manual
+ * restart. Prefer confirming the npm self-update's own restart first; only re-run restart
+ * when that probe fails. Bun/source installs still always take the explicit restart path.
+ *
+ * Probe-first applies only to service-managed npm installs: without a service, `opr.mjs`
+ * only prints `opr start` and never brings the proxy back, so waiting would always burn
+ * the full health timeout. Skipping also requires update-correlated evidence (PID change
+ * and/or target version) so a surviving pre-update process cannot look like success.
+ * After an explicit npm restart the same evidence is required again — health alone is
+ * not enough when a no-op restart or failed port reclaim leaves the old proxy up.
+ */
+export async function finishGuiUpdateRestart(
+  job: UpdateJobState,
+  captured: { port: number; hostname: string; oldPid?: number },
+  installer: Installer,
+  io: RestartIo = {},
+): Promise<boolean> {
+  if (installer === "npm") {
+    const serviceInstalled = (io.serviceInstalledFn ?? isServiceInstalled)();
+    if (serviceInstalled) {
+      const already = await awaitRestartedProxyHealthy(job, captured, io);
+      if (already.ok) {
+        const identity = await (io.probeProxyIdentity ?? defaultProbeProxyIdentity)(
+          captured.port,
+          captured.hostname,
+        );
+        const evidence = npmSelfUpdateRestartEvidence(job, captured, identity);
+        if (evidence.ok) {
+          updateJob(
+            job,
+            {},
+            `Proxy already healthy on ${captured.hostname}:${captured.port} after npm self-update (${evidence.detail}); skipping redundant restart.`,
+          );
+          return true;
+        }
+        updateJob(
+          job,
+          {},
+          `npm self-update left a healthy proxy but ${evidence.reason}; performing explicit restart...`,
+        );
+      } else {
+        updateJob(job, {}, "npm self-update did not leave a healthy proxy; performing explicit restart...");
+      }
+    }
+  }
+  const restartFn = io.restartAfterUpdateFn ?? restartAfterUpdate;
+  await restartFn(job, captured, io);
+  if (installer !== "npm") {
+    // Bun/source: health alone remains enough unless a richer identity probe is supplied.
+    if (!io.probeProxyIdentity) return confirmRestartedProxy(job, captured, io);
+  }
+  return confirmNpmExplicitRestart(job, captured, io);
+}
+
+/**
+ * After an explicit npm (or identity-aware) restart, require update-correlated
+ * evidence — not merely a healthy OpenProvider listener. A no-op restart or a
+ * failed port reclaim can leave the pre-update process on the captured port;
+ * `confirmRestartedProxy` alone would treat that as success.
+ */
+async function confirmNpmExplicitRestart(
+  job: UpdateJobState,
+  captured: { port: number; hostname: string; oldPid?: number },
+  io: RestartIo = {},
+): Promise<boolean> {
+  const healthy = await awaitRestartedProxyHealthy(job, captured, io);
+  if (!healthy.ok) {
+    const port = captured.port;
+    const hostname = captured.hostname;
+    const error = healthy.reason === "flapped"
+      ? `proxy restart became unhealthy on ${hostname}:${port}`
+      : `proxy restart never became healthy on ${hostname}:${port}`;
+    updateJob(job, {
+      status: "failed",
+      restarted: false,
+      error,
+    }, restartFailureHint(port));
+    return false;
+  }
+
+  const identity = await (io.probeProxyIdentity ?? defaultProbeProxyIdentity)(
+    captured.port,
+    captured.hostname,
+  );
+  const evidence = npmSelfUpdateRestartEvidence(job, captured, identity);
+  if (!evidence.ok) {
+    updateJob(job, {
+      status: "failed",
+      restarted: false,
+      error: `proxy restart did not show update-correlated identity (${evidence.reason})`,
+    }, restartFailureHint(captured.port));
+    return false;
+  }
+
+  updateJob(
+    job,
+    {},
+    `Proxy restart confirmed on ${captured.hostname}:${captured.port} (${evidence.detail}).`,
+  );
+  return true;
 }
 
 export async function runGuiUpdateWorker(jobId: string, channel: Channel, restart: boolean): Promise<void> {
@@ -590,8 +884,7 @@ export async function runGuiUpdateWorker(jobId: string, channel: Channel, restar
 
     if (restart) {
       job = updateJob(job, { status: "restarting" }, "Update installed. Restarting proxy...");
-      await restartAfterUpdate(job, captured);
-      if (!(await confirmRestartedProxy(job, captured))) return;
+      if (!(await finishGuiUpdateRestart(job, captured, check.installer))) return;
       updateJob(job, { status: "succeeded", restarted: true }, "Restart requested and proxy is healthy.");
       return;
     }
@@ -610,5 +903,6 @@ export async function runGuiUpdateWorker(jobId: string, channel: Channel, restar
     });
   }
 }
+
 
 

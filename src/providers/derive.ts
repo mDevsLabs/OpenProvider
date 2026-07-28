@@ -1,10 +1,11 @@
-import type { CodexAccountMode, OcxProviderConfig } from "../types";
+import type { CodexAccountMode, oprProviderConfig } from "../types";
 import { PROVIDER_REGISTRY, type ProviderRegistryEntry } from "./registry";
 
 export interface DerivedKeyLoginProvider {
   label: string;
   baseUrl: string;
   adapter: string;
+  apiKeyTransport?: oprProviderConfig["apiKeyTransport"];
   dashboardUrl: string;
   models?: string[];
   liveModels?: boolean;
@@ -67,7 +68,7 @@ export interface DerivedProviderPreset {
    */
   baseUrlChoices?: Array<{ id: string; label: string; baseUrl?: string }>;
   /** Immutable canonical provider config seed for the reserved canonical `openai` forward preset. */
-  provider?: OcxProviderConfig;
+  provider?: oprProviderConfig;
 }
 
 export function listRegistryEntries(): readonly ProviderRegistryEntry[] {
@@ -99,10 +100,11 @@ function cloneNestedRecord(input: Record<string, Record<string, string>>): Recor
   return Object.fromEntries(Object.entries(input).map(([key, value]) => [key, { ...value }]));
 }
 
-export function providerConfigSeed(entry: ProviderRegistryEntry): OcxProviderConfig {
+export function providerConfigSeed(entry: ProviderRegistryEntry): oprProviderConfig {
   return {
     adapter: entry.adapter,
     baseUrl: entry.baseUrl,
+    ...(entry.apiKeyTransport !== undefined ? { apiKeyTransport: entry.apiKeyTransport } : {}),
     authMode: entry.authKind === "local" ? undefined : entry.authKind,
     ...(entry.codexAccountMode ? { codexAccountMode: entry.codexAccountMode } : {}),
     ...(entry.keyOptional !== undefined ? { keyOptional: entry.keyOptional } : {}),
@@ -129,6 +131,7 @@ export function providerConfigSeed(entry: ProviderRegistryEntry): OcxProviderCon
     ...(entry.noTopPModels ? { noTopPModels: [...entry.noTopPModels] } : {}),
     ...(entry.noPenaltyModels ? { noPenaltyModels: [...entry.noPenaltyModels] } : {}),
     ...(entry.parallelToolCalls !== undefined ? { parallelToolCalls: entry.parallelToolCalls } : {}),
+    ...(entry.promptCacheKey !== undefined ? { promptCacheKey: entry.promptCacheKey } : {}),
     ...(entry.autoToolChoiceOnlyModels ? { autoToolChoiceOnlyModels: [...entry.autoToolChoiceOnlyModels] } : {}),
     ...(entry.preserveReasoningContentModels ? { preserveReasoningContentModels: [...entry.preserveReasoningContentModels] } : {}),
     ...(entry.reasoningSplitModels ? { reasoningSplitModels: [...entry.reasoningSplitModels] } : {}),
@@ -150,6 +153,7 @@ export function deriveKeyLoginMap(): Record<string, DerivedKeyLoginProvider> {
       label: entry.label,
       baseUrl: entry.baseUrl,
       adapter: entry.adapter,
+      ...(entry.apiKeyTransport !== undefined ? { apiKeyTransport: entry.apiKeyTransport } : {}),
       dashboardUrl: entry.dashboardUrl,
       ...(entry.models ? { models: [...entry.models] } : {}),
       ...(entry.liveModels !== undefined ? { liveModels: entry.liveModels } : {}),
@@ -197,7 +201,7 @@ export function deriveInitProviders(): DerivedInitProvider[] {
   }));
 }
 
-export function deriveOAuthProviderConfig(id: string): OcxProviderConfig | undefined {
+export function deriveOAuthProviderConfig(id: string): oprProviderConfig | undefined {
   const entry = PROVIDER_REGISTRY.find(row => row.id === id && row.authKind === "oauth");
   return entry ? providerConfigSeed(entry) : undefined;
 }
@@ -217,10 +221,11 @@ export function deriveProviderPresets(): DerivedProviderPreset[] {
   return [...dedupePresets(presets), customPreset()];
 }
 
-export function enrichProviderFromRegistry(name: string, prov: OcxProviderConfig): void {
+export function enrichProviderFromRegistry(name: string, prov: oprProviderConfig): void {
   const entry = PROVIDER_REGISTRY.find(row => row.id === name);
   if (!entry) return;
   const seed = providerConfigSeed(entry);
+  if (prov.apiKeyTransport === undefined && seed.apiKeyTransport !== undefined) prov.apiKeyTransport = seed.apiKeyTransport;
   if (!prov.defaultModel && seed.defaultModel) prov.defaultModel = seed.defaultModel;
   // Fill mode only when absent: an explicit persisted `direct` must never be overwritten.
   if (prov.codexAccountMode === undefined && seed.codexAccountMode !== undefined) prov.codexAccountMode = seed.codexAccountMode;
@@ -242,6 +247,7 @@ export function enrichProviderFromRegistry(name: string, prov: OcxProviderConfig
   if (!prov.noTopPModels && seed.noTopPModels) prov.noTopPModels = [...seed.noTopPModels];
   if (!prov.noPenaltyModels && seed.noPenaltyModels) prov.noPenaltyModels = [...seed.noPenaltyModels];
   if (prov.parallelToolCalls === undefined && seed.parallelToolCalls !== undefined) prov.parallelToolCalls = seed.parallelToolCalls;
+  if (prov.promptCacheKey === undefined && seed.promptCacheKey !== undefined) prov.promptCacheKey = seed.promptCacheKey;
   if (!prov.autoToolChoiceOnlyModels && seed.autoToolChoiceOnlyModels) prov.autoToolChoiceOnlyModels = [...seed.autoToolChoiceOnlyModels];
   if (!prov.preserveReasoningContentModels && seed.preserveReasoningContentModels) prov.preserveReasoningContentModels = [...seed.preserveReasoningContentModels];
   if (!prov.reasoningSplitModels && seed.reasoningSplitModels) prov.reasoningSplitModels = [...seed.reasoningSplitModels];
@@ -319,3 +325,4 @@ function formatInitLabel(entry: ProviderRegistryEntry): string {
   }
   return entry.label;
 }
+

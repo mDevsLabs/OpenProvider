@@ -3,7 +3,7 @@
 ## Work-phase outcome
 
 `parseRequest`가 Responses 입력의 `[reasoning, assistant message]`를 두 개의
-`OcxAssistantMessage`로 분리하지 않고, reasoning part를 바로 뒤 assistant의 `content` 앞에
+`oprAssistantMessage`로 분리하지 않고, reasoning part를 바로 뒤 assistant의 `content` 앞에
 붙인다. 따라서 Grok reasoning 모델을 위한 `preserveReasoningContentModels`가 활성화된 경우
 chat-completions wire에는 assistant가 정확히 하나만 나가며 그 메시지에
 `reasoning_content`와 answer `content`가 함께 존재한다.
@@ -20,8 +20,8 @@ pending-reasoning fold와 `:8413-8446` 회귀 테스트다. OpenProvider의 현�
 IN:
 
 - `parseRequest`의 바로 앞 reasoning → 후속 assistant message fold.
-- summary/content 또는 `ocxr1` envelope에서 복구 가능한 thinking text 보존.
-- native/non-`ocxr1` encrypted-only reasoning을 assistant placeholder 없이 폐기.
+- summary/content 또는 `oprr1` envelope에서 복구 가능한 thinking text 보존.
+- native/non-`oprr1` encrypted-only reasoning을 assistant placeholder 없이 폐기.
 - `parseRequest`부터 Grok chat wire까지 통과하는 여섯 개의 회귀 테스트와, 두 signed
   sibling을 Anthropic wire까지 replay하는 activation test.
 
@@ -36,7 +36,7 @@ OUT:
 | Marker | Path | Change |
 |---|---|---|
 | MODIFY | `src/responses/parser.ts` | pending reasoning을 만들되 메시지를 즉시 생성하지 않고, 다음 assistant message에 prepend |
-| MODIFY | `tests/xai-transport.test.ts` | 수동 `OcxAssistantMessage` 테스트를 parser-to-wire 회귀 여섯 건으로 교체 |
+| MODIFY | `tests/xai-transport.test.ts` | 수동 `oprAssistantMessage` 테스트를 parser-to-wire 회귀 여섯 건으로 교체 |
 | MODIFY | `tests/anthropic-thinking-signature.test.ts` | 두 signed sibling의 text/signature 대응을 parser-to-Anthropic wire에서 고정 |
 | READ ONLY | `src/adapters/openai-chat.ts` | 기존 thinking → `reasoning_content` 변환을 그대로 소비 |
 | READ ONLY | `src/adapters/anthropic.ts` | 각 signed thinking part를 독립 block으로 replay하는 기존 변환을 그대로 소비 |
@@ -49,7 +49,7 @@ OUT:
 #### 1. Pending state 추가
 
 `parseRequest`의 현재 local state(`src/responses/parser.ts:227-236`)에 한 turn짜리 pending
-reasoning entry list를 추가한다. 각 entry는 thinking part와 `ocxr1` envelope signature의
+reasoning entry list를 추가한다. 각 entry는 thinking part와 `oprr1` envelope signature의
 실재 여부를 함께 기록한다. 이 boolean은 `signature` 문자열 자체로 재추론하지 않는다.
 현재 parser가 non-envelope reasoning에 넣는 `JSON.stringify(reasoning)` synthetic signature도
 유지하지만, join 분류에서는 **unsigned**다. 오직 `envelope?.sig`가 있는 part만 signed다.
@@ -58,7 +58,7 @@ reasoning entry list를 추가한다. 각 entry는 thinking part와 `ocxr1` enve
 Before:
 
 ```ts
-  const messages: OcxMessage[] = [];
+  const messages: oprMessage[] = [];
   const systemPrompt: string[] = [];
   // Tool specs surfaced by a prior tool_search (deferred tools, e.g. subagents). Codex does not
   // re-list these in `tools`, but chat models can only call listed tools — so we re-inject them.
@@ -68,11 +68,11 @@ Before:
 After:
 
 ```ts
-  const messages: OcxMessage[] = [];
+  const messages: oprMessage[] = [];
   const systemPrompt: string[] = [];
   // Responses reasoning siblings belong to the following assistant, including across call items.
   // Keep them off the message list until that assistant arrives; turn boundaries clear the array.
-  const pendingReasoning: Array<{ part: OcxThinkingContent; envelopeSigned: boolean }> = [];
+  const pendingReasoning: Array<{ part: oprThinkingContent; envelopeSigned: boolean }> = [];
   // Tool specs surfaced by a prior tool_search (deferred tools, e.g. subagents). Codex does not
   // re-list these in `tools`, but chat models can only call listed tools — so we re-inject them.
   const loadedToolSpecs: unknown[] = [];
@@ -116,9 +116,9 @@ After:
 현재 reasoning branch(`src/responses/parser.ts:333-350`)는 빈 thinking까지
 `ensureAssistantPlaceholder`에 넣는다. 이를 다음 규칙으로 교체한다.
 
-- 보존: summary text 우선, 없으면 content text, 없으면 `ocxr1` envelope의 `txt`.
-- 함께 보존: decodable `ocxr1`의 `sig`, `red`, reasoning `id`.
-- 폐기: summary/content가 비고 `decodeReasoningEnvelope`가 `null`인 native/non-`ocxr1`
+- 보존: summary text 우선, 없으면 content text, 없으면 `oprr1` envelope의 `txt`.
+- 함께 보존: decodable `oprr1`의 `sig`, `red`, reasoning `id`.
+- 폐기: summary/content가 비고 `decodeReasoningEnvelope`가 `null`인 native/non-`oprr1`
   encrypted-only blob. 원문 encrypted bytes와 빈 thinking part는 wire에 남기지 않는다.
   plaintext가 있는 non-envelope reasoning의 기존 synthetic JSON signature는 유지하되 unsigned로 분류한다.
 - `envelope?.sig`가 있는 reasoning은 signed entry로 append하며 절대 다른 sibling과 join하지
@@ -136,13 +136,13 @@ Before:
         const reasoning = item as { id?: string; summary?: { text: string }[]; content?: { text: string }[]; encrypted_content?: string };
         const fromSummary = (reasoning.summary ?? []).map(c => c.text).join("");
         const text = fromSummary || (reasoning.content ?? []).map(c => c.text).join("");
-        // ocxr1 envelope: the REAL Anthropic signature (+ redacted blocks, + hidden signed text)
+        // oprr1 envelope: the REAL Anthropic signature (+ redacted blocks, + hidden signed text)
         // captured by the bridge. Native OpenAI-encrypted blobs decode to null and keep today's
         // placeholder signature (which the anthropic adapter correctly rejects on replay).
         const envelope = typeof reasoning.encrypted_content === "string"
           ? decodeReasoningEnvelope(reasoning.encrypted_content)
           : null;
-        const thinking: OcxThinkingContent = {
+        const thinking: oprThinkingContent = {
           type: "thinking",
           thinking: envelope?.txt || text,
           signature: envelope?.sig ?? JSON.stringify(reasoning),
@@ -166,10 +166,10 @@ After:
           : null;
         const thinkingText = envelope?.txt || text;
 
-        // Native/non-ocxr1 encrypted-only reasoning is opaque here. Do not create a detached
+        // Native/non-oprr1 encrypted-only reasoning is opaque here. Do not create a detached
         // assistant turn or invent replayable plaintext/signatures from the encrypted payload.
         if (thinkingText.length > 0) {
-          const part: OcxThinkingContent = {
+          const part: oprThinkingContent = {
             type: "thinking",
             thinking: thinkingText,
             signature: envelope?.sig ?? JSON.stringify(reasoning),
@@ -257,11 +257,11 @@ Before:
   test("assistant thinking parts round-trip as reasoning_content on grok-4.5 history", () => {
     // xAI docs: dropped reasoning_content is the top cause of multi-turn cache misses
     // (docs.x.ai prompt-caching/multi-turn, 2026-07-13).
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
-    const assistant: OcxAssistantMessage = {
+    const assistant: oprAssistantMessage = {
       role: "assistant",
       content: [
         { type: "thinking", thinking: "cached chain" },
@@ -269,7 +269,7 @@ Before:
       ],
       timestamp: 0,
     };
-    const req: OcxParsedRequest = {
+    const req: oprParsedRequest = {
       modelId: "grok-4.5",
       context: { messages: [{ role: "user", content: "q1", timestamp: 0 }, assistant, { role: "user", content: "q2", timestamp: 0 }] },
       stream: false,
@@ -285,7 +285,7 @@ After:
 
 ```ts
   test("parseRequest folds summary reasoning into one Grok assistant wire message", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -306,7 +306,7 @@ After:
   });
 
   test("parseRequest drops opaque encrypted-only reasoning without detaching an assistant wire message", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -328,7 +328,7 @@ After:
   });
 
   test("parseRequest clears pending reasoning at a user boundary", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -348,7 +348,7 @@ After:
   });
 
   test("parseRequest preserves pending reasoning across a function call", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -372,7 +372,7 @@ After:
   });
 
   test("parseRequest newline-joins reasoning siblings before one assistant", () => {
-    const prov: OcxProviderConfig = {
+    const prov: oprProviderConfig = {
       ...provider("oauth"),
       preserveReasoningContentModels: getProviderRegistryEntry("xai")?.preserveReasoningContentModels ?? [],
     };
@@ -386,7 +386,7 @@ After:
     });
     const body = JSON.parse(createOpenAIChatAdapter(prov).buildRequest(req).body as string) as { messages: Array<Record<string, unknown>> };
     const assistants = body.messages.filter(message => message.role === "assistant");
-    const parsedAssistant = req.context.messages.find(message => message.role === "assistant") as OcxAssistantMessage;
+    const parsedAssistant = req.context.messages.find(message => message.role === "assistant") as oprAssistantMessage;
     const thinkingParts = parsedAssistant.content.filter(part => part.type === "thinking");
 
     expect(thinkingParts).toHaveLength(1);
@@ -410,12 +410,12 @@ After:
 ```
 
 After replacement, remove now-unused type imports only if TypeScript reports them:
-`OcxParsedRequest`. Keep `OcxAssistantMessage` for the one-part parser assertion and keep
-`OcxProviderConfig`.
+`oprParsedRequest`. Keep `oprAssistantMessage` for the one-part parser assertion and keep
+`oprProviderConfig`.
 
 ### MODIFY — `tests/anthropic-thinking-signature.test.ts`
 
-Add this activation inside `describe("parser ocxr1 decode + anthropic replay", ...)`. It goes
+Add this activation inside `describe("parser oprr1 decode + anthropic replay", ...)`. It goes
 through `parseRequest`, confirms two parser parts, then checks the actual Anthropic request blocks;
 it fails if sibling plaintext is joined while only the final signature survives.
 
@@ -445,7 +445,7 @@ it fails if sibling plaintext is joined while only the final signature survives.
       ],
     });
     const parsedAssistant = parsed.context.messages.find(message => message.role === "assistant") as {
-      content: OcxThinkingContent[];
+      content: oprThinkingContent[];
     };
     const parsedThinking = parsedAssistant.content.filter(part => part.type === "thinking");
 
@@ -491,14 +491,14 @@ it fails if sibling plaintext is joined while only the final signature survives.
 5. **Sibling join** — `[reasoning("first"), reasoning("second"), assistant]` emits
    exactly one parser thinking part and `reasoning_content: "first\nsecond"`.
 6. **Trailing drop** — `[user, reasoning]` creates no assistant placeholder and leaves only user history.
-7. **Signed sibling integrity** — two `ocxr1` siblings with distinct `sig`/`txt` values before
+7. **Signed sibling integrity** — two `oprr1` siblings with distinct `sig`/`txt` values before
    one assistant remain two parser thinking parts, and Anthropic emits two thinking blocks in the
    same order with each signature attached to its original text.
 8. **No detached parser message** — fold/drop activations assert the expected assistant count;
    `req.context.messages.filter(m => m.role === "assistant")` may additionally be asserted as
    length 1; the required wire assertion remains authoritative.
-9. **Preservation boundary** — decodable plaintext/`ocxr1` thinking metadata remains on the
-   following `OcxAssistantMessage`; only `envelope?.sig` marks a signed part. Synthetic JSON
+9. **Preservation boundary** — decodable plaintext/`oprr1` thinking metadata remains on the
+   following `oprAssistantMessage`; only `envelope?.sig` marks a signed part. Synthetic JSON
    signatures remain unsigned for joining; undecodable encrypted bytes and invented plaintext are dropped.
 10. **No adapter regression** — registry preset and Anthropic signature suites remain green; no
     change is made to `src/adapters/openai-chat.ts` or `src/adapters/anthropic.ts`.
@@ -567,7 +567,7 @@ record that regression explicitly in the revert/commit message.
   forwards the non-empty result only for `preserveReasoningContentModels`.
 - Confirm `anthropic.ts:396-422` still iterates multiple thinking parts in order and emits every
   real signature on the same block as that part's own thinking text.
-- Confirm `decodeReasoningEnvelope` still returns `null` for non-`ocxr1` blobs.
+- Confirm `decodeReasoningEnvelope` still returns `null` for non-`oprr1` blobs.
 - Validate all seven proposed request fixtures against the current Responses schema before editing.
 - Re-check current test filenames/imports and `package.json` `test`/`typecheck` scripts.
 
@@ -582,3 +582,4 @@ Anthropic replay는 thinking이 같은 turn의 tool_use 앞에 와야 한다. �
 `tests/responses-parser-agent-message.test.ts`(경계 앞 reasoning의 detached assistant 유지)를
 신계약으로 갱신했다. 검증: 대상 3개 스위트 33 pass, 풀 스위트 2596 pass / 0 fail,
 `bun run typecheck` 통과.
+

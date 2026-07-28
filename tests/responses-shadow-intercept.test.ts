@@ -5,7 +5,7 @@
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { handleResponses, isShadowSourceModel } from "../src/server/responses";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const originalFetch = globalThis.fetch;
 
@@ -47,7 +47,7 @@ describe("isShadowSourceModel", () => {
   });
 });
 
-function interceptConfig(): OcxConfig {
+function interceptConfig(): oprConfig {
   return {
     port: 0,
     defaultProvider: "xai",
@@ -60,10 +60,10 @@ function interceptConfig(): OcxConfig {
       },
     },
     shadowCallIntercept: { enabled: true, model: "xai/grok-4.5" },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
-async function post(config: OcxConfig, model: string): Promise<Response> {
+async function post(config: oprConfig, model: string): Promise<Response> {
   return handleResponses(new Request("http://localhost/v1/responses", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -111,3 +111,4 @@ describe("shadow call intercept request path (issue #311)", () => {
     expect(response.status).toBe(404);
   });
 });
+

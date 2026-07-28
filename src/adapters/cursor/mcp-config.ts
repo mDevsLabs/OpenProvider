@@ -1,4 +1,4 @@
-import type { OcxProviderConfig } from "../../types";
+import type { oprProviderConfig } from "../../types";
 
 /**
  * One MCP server openprovider starts/connects and exposes to the Cursor agent as callable tools.
@@ -32,7 +32,7 @@ export interface ResolvedMcpServer extends CursorMcpServerConfig {
  * Resolve the enabled, connectable MCP servers from a provider config. A server is
  * connectable only if it declares either a `command` (stdio) or a `url` (http).
  */
-export function resolveMcpServers(provider: OcxProviderConfig): ResolvedMcpServer[] {
+export function resolveMcpServers(provider: oprProviderConfig): ResolvedMcpServer[] {
   const raw = provider.mcpServers;
   if (!raw) return [];
   return Object.entries(raw)
@@ -40,3 +40,4 @@ export function resolveMcpServers(provider: OcxProviderConfig): ResolvedMcpServe
     .filter(server => server.enabled !== false)
     .filter(server => Boolean(server.command || server.url));
 }
+

@@ -65,7 +65,7 @@ Missing usage stays distinct from zero. Aggregations of token counts ignore entr
 
 ### Optional: `tests/api-usage.test.ts`
 
-- Light integration test of the HTTP handler, using `OPENCODEX_HOME` fixture + a hand-written `usage.jsonl` to assert response shape.
+- Light integration test of the HTTP handler, using `OpenProvider_HOME` fixture + a hand-written `usage.jsonl` to assert response shape.
 
 ## Out Of Scope
 
@@ -88,3 +88,4 @@ Missing usage stays distinct from zero. Aggregations of token counts ignore entr
 - Atomic commits:
   - `feat(usage): add /api/usage aggregate endpoint`
   - `feat(gui): show token totals in Logs table`
+

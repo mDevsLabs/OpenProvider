@@ -2,24 +2,24 @@ import { describe, expect, test } from "bun:test";
 import { createGoogleAdapter } from "../src/adapters/google";
 import { antigravitySessionId, isLikelyRealThoughtSignature } from "../src/adapters/google-antigravity-wire";
 import { ANTIGRAVITY_MODELS, ANTIGRAVITY_MODEL_EFFORTS, canonicalAntigravityUsageModel } from "../src/providers/antigravity-models";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { AdapterEvent, oprParsedRequest, oprProviderConfig } from "../src/types";
 
-function parsed(text = "hello world", stream = false, modelId = "gemini-3-pro"): OcxParsedRequest {
+function parsed(text = "hello world", stream = false, modelId = "gemini-3-pro"): oprParsedRequest {
   return {
     modelId,
     stream,
     context: { messages: [{ role: "user", content: text }], systemPrompt: [], tools: [] },
     options: {},
-  } as unknown as OcxParsedRequest;
+  } as unknown as oprParsedRequest;
 }
 
-function parsedWithEffort(modelId: string, effort?: string): OcxParsedRequest {
+function parsedWithEffort(modelId: string, effort?: string): oprParsedRequest {
   return {
     modelId,
     stream: false,
     context: { messages: [{ role: "user", content: "test" }], systemPrompt: [], tools: [] },
     options: effort ? { reasoning: effort } : {},
-  } as unknown as OcxParsedRequest;
+  } as unknown as oprParsedRequest;
 }
 
 const provider = {
@@ -28,12 +28,12 @@ const provider = {
   googleMode: "cloud-code-assist",
   project: "proj-123",
   apiKey: "ya29.token",
-} as OcxProviderConfig;
+} as oprProviderConfig;
 
 const effortProvider = {
   ...provider,
   modelReasoningEfforts: ANTIGRAVITY_MODEL_EFFORTS,
-} as OcxProviderConfig;
+} as oprProviderConfig;
 
 describe("antigravity CCA envelope", () => {
   test("wraps the gemini body in the CCA envelope with project/userAgent/requestType/requestId/sessionId", async () => {
@@ -72,6 +72,7 @@ describe("antigravity CCA envelope", () => {
     expect(ANTIGRAVITY_MODELS).toEqual([
       "gemini-3.6-flash",
       "gemini-3.1-pro",
+      "gemini-3.1-flash-image",
       "claude-sonnet-4-6",
       "claude-opus-4-6-thinking",
       "gpt-oss-120b-medium",
@@ -114,7 +115,7 @@ describe("antigravity CCA envelope", () => {
   });
 
   test("throws when no project id is available", async () => {
-    const noProj = { ...provider, project: undefined } as OcxProviderConfig;
+    const noProj = { ...provider, project: undefined } as oprProviderConfig;
     await expect(createGoogleAdapter(noProj).buildRequest(parsed())).rejects.toThrow(/project id/);
   });
 
@@ -124,7 +125,7 @@ describe("antigravity CCA envelope", () => {
   });
 
   test("claude-on-antigravity forces toolConfig.functionCallingConfig.mode=VALIDATED", async () => {
-    const claudeProvider = { ...provider } as OcxProviderConfig;
+    const claudeProvider = { ...provider } as oprProviderConfig;
     const withTools = {
       modelId: "claude-opus-4-6",
       stream: false,
@@ -134,7 +135,7 @@ describe("antigravity CCA envelope", () => {
         tools: [{ name: "bash", description: "run", parameters: { type: "object" } }],
       },
       options: {},
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
     const req = await createGoogleAdapter(claudeProvider).buildRequest(withTools);
     const env = JSON.parse(req.body);
     expect(env.request.toolConfig.functionCallingConfig.mode).toBe("VALIDATED");
@@ -150,7 +151,7 @@ describe("antigravity CCA envelope", () => {
         tools: [{ name: "bash", description: "run", parameters: { type: "object" } }],
       },
       options: {},
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
     const req = await createGoogleAdapter(provider).buildRequest(withTools);
     const env = JSON.parse(req.body);
     expect(env.request.toolConfig?.functionCallingConfig?.mode).toBeUndefined();
@@ -359,7 +360,7 @@ describe("antigravity history preserves tool-call thoughtSignature", () => {
         systemPrompt: [], tools: [],
       },
       options: {},
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
     const req = await createGoogleAdapter(provider).buildRequest(p);
     const env = JSON.parse(req.body);
     const modelTurn = (env.request.contents as { role: string; parts: Record<string, unknown>[] }[]).find(c => c.role === "model");
@@ -379,7 +380,7 @@ describe("antigravity history preserves tool-call thoughtSignature", () => {
         systemPrompt: [], tools: [],
       },
       options: {},
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
     const req = await createGoogleAdapter(provider).buildRequest(p);
     const env = JSON.parse(req.body);
     const modelTurn = (env.request.contents as { role: string; parts: Record<string, unknown>[] }[]).find(c => c.role === "model");
@@ -399,7 +400,7 @@ describe("antigravity history preserves tool-call thoughtSignature", () => {
         systemPrompt: [], tools: [],
       },
       options: {},
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
     const req = await createGoogleAdapter(provider).buildRequest(p);
     const env = JSON.parse(req.body);
     const modelTurn = (env.request.contents as { role: string; parts: Record<string, unknown>[] }[]).find(c => c.role === "model");
@@ -448,4 +449,5 @@ describe("canonicalAntigravityUsageModel", () => {
     expect(canonicalAntigravityUsageModel("unknown-model")).toBe("unknown-model");
   });
 });
+
 

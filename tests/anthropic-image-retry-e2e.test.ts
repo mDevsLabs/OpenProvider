@@ -7,7 +7,7 @@ import { clearKeyCooldowns } from "../src/providers/key-failover";
 import { startServer } from "../src/server";
 import { resetNormalizeStateForTests } from "../src/adapters/anthropic-image-normalize";
 import { sniffImageDimensions } from "../src/adapters/anthropic-image-guard";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 let testDir = "";
@@ -76,7 +76,7 @@ function scriptedUpstream(statuses: number[], seen: SeenRequest[]): ReturnType<t
   });
 }
 
-function anthropicConfig(baseUrl: string, pool = false): OcxConfig {
+function anthropicConfig(baseUrl: string, pool = false): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -97,7 +97,7 @@ function anthropicConfig(baseUrl: string, pool = false): OcxConfig {
         defaultModel: "claude-fable-5",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 async function postImageRequest(serverUrl: string, dataUrl: string): Promise<Response> {
@@ -180,3 +180,4 @@ describe("anthropic 413 tightened-retry (end-to-end)", () => {
     }
   });
 });
+

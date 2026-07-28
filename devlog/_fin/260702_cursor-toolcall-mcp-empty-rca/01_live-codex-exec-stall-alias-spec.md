@@ -14,7 +14,7 @@ Captured Codex REQ#1: `/private/tmp/claude-501/-Users-jun--cli-jaw-3466/72f7168d
 Facts:
 - model: `cursor/claude-4.6-sonnet`
 - tools: 17 total; shell tool is `function` named `exec_command`; hosted `web_search` and `image_generation` are present in raw Codex but parser drops hosted tools.
-- final user text: `Run: echo OCX_CX_S46 via your shell tool, report stdout.`
+- final user text: `Run: echo opr_CX_S46 via your shell tool, report stdout.`
 
 ## Disconfirmed hypotheses
 
@@ -26,7 +26,7 @@ Facts:
 ## Positive live findings
 
 Working baseline:
-- `run_shell` tool, simple `{cmd}` schema, user text `Use run_shell to run: echo OCX. Report stdout.` succeeds.
+- `run_shell` tool, simple `{cmd}` schema, user text `Use run_shell to run: echo opr. Report stdout.` succeeds.
 
 Stall triggers:
 - `exec_command` name, even with simple schema, can heartbeat-only.
@@ -40,8 +40,8 @@ Validated patch candidate:
 - On the return path, map Cursor tool name `run_shell` back to Responses/Codex name `exec_command` before emitting `function_call` events.
 
 Live proof using the full captured request shape, with only the candidate transform applied:
-- `cursor/composer-2.5`: completed, emitted `run_shell {"cmd":"echo OCX_CX_S46"}`.
-- `cursor/claude-4.6-sonnet`: completed, emitted `run_shell {"cmd":"echo OCX_CX_S46"}`.
+- `cursor/composer-2.5`: completed, emitted `run_shell {"cmd":"echo opr_CX_S46"}`.
+- `cursor/claude-4.6-sonnet`: completed, emitted `run_shell {"cmd":"echo opr_CX_S46"}`.
 
 ## Implementation target
 
@@ -58,7 +58,7 @@ Suggested API shape:
 export const CODEX_EXEC_COMMAND_TOOL = "exec_command";
 export const CURSOR_RUN_SHELL_TOOL = "run_shell";
 
-export function cursorToolWireName(tool: OcxTool): string {
+export function cursorToolWireName(tool: oprTool): string {
   const original = namespacedToolName(tool.namespace, tool.name);
   return !tool.namespace && tool.name === CODEX_EXEC_COMMAND_TOOL ? CURSOR_RUN_SHELL_TOOL : original;
 }
@@ -95,3 +95,4 @@ Acceptance:
 - Existing Cursor unit tests remain green.
 - New tests prove: `exec_command` is advertised as `run_shell`; `run_shell` returned by Cursor emits `exec_command`; active shell request gets alias hint; non-command user text is not polluted.
 - Live verification: `codex exec -m cursor/composer-2.5 ...` and `codex exec -m cursor/claude-4.6-sonnet ...` both complete tool-call roundtrip.
+

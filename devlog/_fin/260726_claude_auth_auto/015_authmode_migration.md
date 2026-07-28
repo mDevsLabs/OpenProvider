@@ -30,7 +30,7 @@ migrations (`src/server/index.ts:239-270` runs the Alibaba/OpenAI-tier ones):
  * EFFECTIVE behaviour for configs that already had a claudeCode block; only genuinely
  * untouched configs get auto.
  */
-export function runClaudeAuthModeMigration(config: OcxConfig): boolean {
+export function runClaudeAuthModeMigration(config: oprConfig): boolean {
   const cc = config.claudeCode;
   if (!cc) return false;                        // fresh/untouched -> auto, nothing to do
   if (cc.authModeMigratedAt) return false;      // already migrated, never re-run
@@ -40,7 +40,7 @@ export function runClaudeAuthModeMigration(config: OcxConfig): boolean {
 }
 ```
 
-`OcxClaudeCodeConfig.authModeMigratedAt?: string` is the sentinel; its ABSENCE is what
+`oprClaudeCodeConfig.authModeMigratedAt?: string` is the sentinel; its ABSENCE is what
 identifies a pre-upgrade config, so the migration is idempotent and cannot re-fire
 after the user later chooses auto.
 
@@ -73,3 +73,4 @@ user's choice. That is the single sharpest failure mode of this phase.
 |---------|----------|
 | `bun test tests/claude-authmode-migration.test.ts` | pass |
 | `bun test tests/claude-auth-mode.test.ts` | still pass (resolver unaffected) |
+

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { createCursorRequest } from "../src/adapters/cursor/request-builder";
 import { cursorEffortSuffix, cursorModelEffortLadder } from "../src/adapters/cursor/effort-map";
-import type { OcxParsedRequest } from "../src/types";
+import type { oprParsedRequest } from "../src/types";
 
 function modelIdFor(modelId: string, reasoning?: string): string {
-  const parsed: OcxParsedRequest = {
+  const parsed: oprParsedRequest = {
     modelId,
     context: { messages: [{ role: "user", content: "hi", timestamp: 1 }] },
     stream: false,
@@ -72,3 +72,4 @@ describe("Cursor per-model reasoning-effort suffix", () => {
     expect(cursorModelEffortLadder("composer-2.5")).toBeUndefined();
   });
 });
+

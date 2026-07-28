@@ -486,6 +486,10 @@ MCP, l’enregistrement d’écran et le contrôle de l’ordinateur sont expos�
 
 ## Interface en ligne de commande
 
+If Claude Desktop's footer picker does not change the model for an already-running 3P
+conversation, use `/model <id>` in that conversation. OpenProvider routes the model id carried by
+each request; **Logs → requestedModel** shows which id Desktop actually sent.
+
 ```bash
 opr init                       # Configuration interactive
 opr start [--port 10100]       # Démarrer le proxy

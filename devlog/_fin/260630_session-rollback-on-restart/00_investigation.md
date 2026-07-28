@@ -14,7 +14,7 @@ In the user's own notation, the expected loop was `a a' b' -> b -> b'` (tag flip
 
 ## Root cause
 
-The proxy runs without `OCX_SERVICE`, so its shutdown path
+The proxy runs without `opr_SERVICE`, so its shutdown path
 (`src/cli.ts` `syncCleanup` at the `SIGINT`/`SIGTERM`/`SIGHUP`/`exit` handlers) calls
 `restoreNativeCodex()` -> `syncCodexHistoryProvider("openai")` on every termination, including a
 normal `Ctrl-C`. That revert is intentional (native Codex can only resume a thread tagged
@@ -33,7 +33,7 @@ Cross-checked against codex-rs (`~/Developer/codex/121_openai-codex/codex-rs`):
 ## Evidence
 
 - `lsof` showed `codex app-server` holding `state_5.sqlite`; `ps` showed the foreground
-  `bun src/cli.ts start` proxy without `OCX_SERVICE`; `opr status` confirmed "Service: not installed".
+  `bun src/cli.ts start` proxy without `opr_SERVICE`; `opr status` confirmed "Service: not installed".
 - codex-rs `state/src/runtime.rs` opens the DB WAL + `synchronous=NORMAL` + `busy_timeout=5s`,
   pooled; the list view reads the DB as the single source (`use_state_db_only`).
 - codex-rs reads a thread's provider through TWO paths: the SQLite replay folds every `session_meta`
@@ -50,3 +50,4 @@ Cross-checked against codex-rs (`~/Developer/codex/121_openai-codex/codex-rs`):
   concurrent append and clips new turns. BLOCK.
 - v2 (append a trailing `session_meta`): fixed the truncate race but left line 1 as `openai`/stale,
   and missed validating the trailing line's thread id. BLOCK.
+

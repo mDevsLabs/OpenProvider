@@ -24,7 +24,7 @@ src/
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
 ├── responses/
-│   ├── parser.ts       # Responses request → OcxParsedRequest
+│   ├── parser.ts       # Responses request → oprParsedRequest
 │   ├── schema.ts       # Zod validation
 │   └── compaction.ts   # remote compaction prompts, envelopes, compact history
 ├── service.ts          # launchd / systemd / Task Scheduler background service
@@ -60,9 +60,9 @@ HTTP の境界は `server/index.ts` が担い、Responses データプレーン�
 ## パーサー
 
 `responses/parser.ts` は入ってくるリクエストを `responses/schema.ts`（Zod）で検証したのち
-`OcxParsedRequest` を構成します:
+`oprParsedRequest` を構成します:
 
-- **Messages** — `input` 項目は正規化された `OcxMessage[]` になります: user / developer / assistant /
+- **Messages** — `input` 項目は正規化された `oprMessage[]` になります: user / developer / assistant /
   toolResult。`reasoning` 項目は thinking ブロックになり、`function_call`、`custom_tool_call`、
   `tool_search_call` 項目はツール呼び出しになり、それに対応する `*_output` はツール結果になります。
 - **Tools** — function ツールはそのまま通過します。**名前空間付き (MCP) ツールは平坦化され**、
@@ -118,8 +118,9 @@ Codex カタログは Codex が受け入れるラベル（`low` / `medium` / `hi
 
 ## コア型
 
-内部モデルは `types.ts` にあります: `OcxParsedRequest`、`OcxContext`、`OcxMessage` ユニオン、
-`OcxContentPart`（text / image）、`OcxToolCall`、`OcxTool`、`AdapterEvent`、そして設定型
-（`OcxConfig`、`OcxProviderConfig`）。2 つのヘルパーが広く使われます: `namespacedToolName()` と
+内部モデルは `types.ts` にあります: `oprParsedRequest`、`oprContext`、`oprMessage` ユニオン、
+`oprContentPart`（text / image）、`oprToolCall`、`oprTool`、`AdapterEvent`、そして設定型
+（`oprConfig`、`oprProviderConfig`）。2 つのヘルパーが広く使われます: `namespacedToolName()` と
 `modelInList()`（`noVisionModels` / `noReasoningModels` に対する寛容な `:size` タグマッチング）。
+
 

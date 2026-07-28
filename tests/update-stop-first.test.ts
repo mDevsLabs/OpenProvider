@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const updateSource = readFileSync(join(import.meta.dir, "..", "src", "update", "index.ts"), "utf8");
-const launcherSource = readFileSync(join(import.meta.dir, "..", "bin", "ocx.mjs"), "utf8");
+const launcherSource = readFileSync(join(import.meta.dir, "..", "bin", "opr.mjs"), "utf8");
 const serverSource = readFileSync(join(import.meta.dir, "..", "src", "server", "index.ts"), "utf8");
 const cliSource = readFileSync(join(import.meta.dir, "..", "src", "cli", "index.ts"), "utf8");
 
@@ -46,8 +46,8 @@ describe("update stops the running proxy before replacing files", () => {
     expect(launcherSource).toContain("serviceReinstallArgs");
     // The launcher reads the state path for both service-installed detection and backend choice.
     expect(launcherSource).toContain('"service-state.json"');
-    expect(updateSource).toContain("OCX_BAKE_PORT");
-    expect(launcherSource).toContain("OCX_BAKE_PORT");
+    expect(updateSource).toContain("opr_BAKE_PORT");
+    expect(launcherSource).toContain("opr_BAKE_PORT");
     // Live runtime port 10100 must not be discarded as a missing-port sentinel.
     expect(launcherSource).toContain("sawRuntimePort");
     expect(updateSource).toContain("runtimeTrusted");
@@ -77,7 +77,7 @@ describe("update stops the running proxy before replacing files", () => {
 
   test("GUI worker update children use pipe stdio so Windows npm.cmd does not open consoles", () => {
     expect(updateSource).toContain("function updateChildStdio()");
-    expect(updateSource).toContain('process.env.OCX_SERVICE === "1"');
+    expect(updateSource).toContain('process.env.opr_SERVICE === "1"');
     expect(updateSource).toContain('return "pipe"');
     // All three update children (stop, installer, service reinstall) go through it.
     expect(updateSource).toContain("stdio: stopStdio");
@@ -116,3 +116,4 @@ describe("/healthz identity fields", () => {
     expect(serverSource).toContain("port: listenPort");
   });
 });
+

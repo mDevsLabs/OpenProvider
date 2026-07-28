@@ -13,7 +13,7 @@
 
 | # | Sev | OS | Defect | Evidence |
 |---|-----|----|--------|----------|
-| F1 | high | all | Stale/invalid `opr.pid` is never removed: `handleStop` prints "No running proxy found" and exits, but the npm launcher's update gate re-checks raw `existsSync(opr.pid)` after running stop → self-update aborts forever until the user hand-deletes the file. Orphan proxies (live server, missing/stale pid file) are also never stopped, so update can replace files under a running proxy. | `src/cli.ts:235-259`, `bin/ocx.mjs:110-116`, `src/config.ts:380-399` |
+| F1 | high | all | Stale/invalid `opr.pid` is never removed: `handleStop` prints "No running proxy found" and exits, but the npm launcher's update gate re-checks raw `existsSync(opr.pid)` after running stop → self-update aborts forever until the user hand-deletes the file. Orphan proxies (live server, missing/stale pid file) are also never stopped, so update can replace files under a running proxy. | `src/cli.ts:235-259`, `bin/opr.mjs:110-116`, `src/config.ts:380-399` |
 | F2 | high | all | `findLiveProxy` only consults `runtime-port.json` via the pid file. Pid file missing/corrupt ⇒ a live fallback-port proxy is invisible ⇒ duplicate starts, wrong-port GUI/status, update under a live proxy. | `src/proxy-liveness.ts:86-105` |
 | F3 | med | non-default host | `notifyRunningProxy` always POSTs to `127.0.0.1` even when liveness found the proxy on `::1`/LAN bind — login config push silently lost. | `src/oauth/login-cli.ts:23` |
 | F4 | med | IPv6 | `opr status` builds `http://::1:10100/healthz` (unbracketed IPv6) → healthy proxy reported unreachable. | `src/cli-status.ts:58-84` |
@@ -41,7 +41,7 @@
   (unconditional unlink is safe here: `readPid() === null` means the file is absent, invalid,
   dead, or not ours — stale by definition; live-pid stop-failure path still preserves files).
 
-**MODIFY `bin/ocx.mjs`** (F1)
+**MODIFY `bin/opr.mjs`** (F1)
 - Update gate condition adds the runtime record: stop first when `serviceWasInstalled ||
   opr.pid exists || runtime-port.json exists`, so orphan proxies (pid file lost, record
   present) are stopped before npm replaces files. Post-stop abort check unchanged
@@ -88,3 +88,4 @@
 ## Verification gate (C)
 
 `bun test ./tests/` (0 fail) + `bun x tsc --noEmit` (0 errors).
+

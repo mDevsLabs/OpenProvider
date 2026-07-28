@@ -4,14 +4,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 let testDir = "";
 let previousHome: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
-function baseConfig(): OcxConfig {
+function baseConfig(): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -19,7 +19,7 @@ function baseConfig(): OcxConfig {
     providers: {
       anthropic: { adapter: "anthropic", baseUrl: "https://api.anthropic.com", authMode: "oauth" },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function writeAccounts(): void {
@@ -187,3 +187,4 @@ describe("multiauth accounts API", () => {
     }
   });
 });
+

@@ -171,7 +171,7 @@ export interface GrokCandidateModel {
 }
 
 /** The model list `syncGrokConfig` would inject, before the user's exclusions. */
-export async function fetchGrokCandidateModels(config: OcxConfig): Promise<GrokCandidateModel[]> {
+export async function fetchGrokCandidateModels(config: oprConfig): Promise<GrokCandidateModel[]> {
   const { filterCatalogVisibleModels, nativeOpenAiContextWindow, visibleNativeSlugs } = await import("../../codex/catalog");
   const routed = filterCatalogVisibleModels(await fetchAllModels(config), config);
   return [
@@ -299,3 +299,4 @@ that can actually fail:
 | `bun test tests/grok-selection.test.ts tests/grok-management-api.test.ts tests/grok-writer-boundary.test.ts tests/grok-sync.test.ts tests/grok-config-inject.test.ts` | pass |
 | `bun run typecheck` | clean |
 | `bun run privacy:scan` | clean |
+

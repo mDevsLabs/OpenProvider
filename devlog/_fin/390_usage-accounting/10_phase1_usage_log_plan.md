@@ -32,12 +32,12 @@ Implementation notes:
 Imports:
 
 - import usage helpers and `UsageStatus`;
-- import `OcxUsage` type if needed.
+- import `oprUsage` type if needed.
 
 Request log changes:
 
-- add `usage?: OcxUsage` and `usageStatus?: UsageStatus` to `RequestLogContext`;
-- add `usage?: OcxUsage`, `usageStatus: UsageStatus`, and `totalTokens?: number` to `RequestLogEntry`;
+- add `usage?: oprUsage` and `usageStatus?: UsageStatus` to `RequestLogContext`;
+- add `usage?: oprUsage`, `usageStatus: UsageStatus`, and `totalTokens?: number` to `RequestLogEntry`;
 - extend `applyResponseLogMetadata` to parse OpenAI Responses usage objects:
   - `input_tokens`;
   - `output_tokens`;
@@ -57,7 +57,7 @@ Status rules:
 
 Test:
 
-- path respects `OPENCODEX_HOME`;
+- path respects `OpenProvider_HOME`;
 - append creates JSONL and preserves `0600` intent where observable;
 - read skips malformed lines;
 - token total includes input + output only;
@@ -77,3 +77,4 @@ Test:
 - `bun test tests/usage-log.test.ts tests/request-log.test.ts`
 - `bunx tsc --noEmit`
 - atomic commit: `feat(usage): persist request token usage`
+

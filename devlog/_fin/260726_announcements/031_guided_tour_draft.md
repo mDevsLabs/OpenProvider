@@ -93,11 +93,11 @@ accept explicitly rather than discover late.
 A first-run-only feature is normally hostile to review: the reviewer's own
 machine has a config, so the flow they are asked to approve never appears for
 them. That is not the case here — `src/config.ts:316` resolves the config
-directory from `OPENCODEX_HOME`, so a throwaway home reproduces a genuine first
+directory from `OpenProvider_HOME`, so a throwaway home reproduces a genuine first
 run on demand:
 
 ```
-OPENCODEX_HOME=$(mktemp -d) opr start
+OpenProvider_HOME=$(mktemp -d) opr start
 ```
 
 Worth writing down now, because H3 already establishes that the highlight
@@ -272,7 +272,7 @@ That cohort is precisely the population that exists when the tour launches.
 "onboarding does not fire for an upgrader"). Nothing makes the tour APPEAR. With
 H3 establishing that geometry cannot be asserted in happy-dom, the only
 acceptance path is visual — so `040` needs a positive procedure, using the
-`OPENCODEX_HOME` throwaway root documented above.
+`OpenProvider_HOME` throwaway root documented above.
 
 ### R4 (MEDIUM) — the investment now serves the narrowest possible cohort
 
@@ -301,7 +301,7 @@ proposals:
 | D1 | "New install = exactly the seeded canonical `openai` provider" | `opr init` REPLACES `providers` wholesale (`src/cli/init.ts:159-164`), and its featured first option is that same canonical openai row — so the documented onboarding path lands in the "new" bucket forever. Meanwhile ChatGPT pool accounts persist to `codex-accounts.json` (`src/codex/account-store.ts:17`), not `config.providers`, so a heavily-configured user still reads as new. Legacy tier migration (`src/providers/openai-tiers.ts`) can also rebuild an upgrader's row byte-identical to the seed. |
 | D2 | Split into `onboarding.stepper` / `onboarding.tour` | No migration was specified for configs the stepper release already wrote in the flat shape, so every graduate would see the stepper again. |
 | D3 | Suppress announcements only "in this session" | There is no session identity in a config-backed HTTP route, so the priority rule would silently move client-side, out of the substrate that exists to enforce it. |
-| D4 | `OPENCODEX_HOME=$(mktemp -d) opr start` as a safe first-run harness | `OPENCODEX_HOME` scopes only the opr config dir. The same `opr start` still rewrites the real `~/.codex/config.toml`, the shell hook, system env and `~/.grok/config.toml`, and fights the real proxy for port 10100. "Real config untouched" was false. |
+| D4 | `OpenProvider_HOME=$(mktemp -d) opr start` as a safe first-run harness | `OpenProvider_HOME` scopes only the opr config dir. The same `opr start` still rewrites the real `~/.codex/config.toml`, the shell hook, system env and `~/.grok/config.toml`, and fights the real proxy for port 10100. "Real config untouched" was false. |
 | D5 | Ship sidebar-only highlighting first | Reverses an explicit user answer without asking, and H2 already established the two highlight tiers are separate mechanisms — so the cost is duplicated later, not deferred. |
 
 ### The pattern behind all five failures
@@ -356,7 +356,7 @@ terminal stamp, which the substrate CAN express.
 
 ### D4′ — the first-run harness needs full isolation, and that needs verifying
 
-`OPENCODEX_HOME` alone is not enough. A usable procedure must also redirect
+`OpenProvider_HOME` alone is not enough. A usable procedure must also redirect
 `CODEX_HOME`, avoid the shell hook and system env, use a non-default port, and
 leave `~/.grok` alone. Whether the CLI supports all of that in one invocation is
 UNVERIFIED — the implementation pass must confirm it before `040` promises it.
@@ -400,7 +400,7 @@ Closes R3. Since H3 makes the geometry unassertable in happy-dom, the gate list
 must contain a way to make the tour APPEAR, not only checks that it stays hidden:
 
 ```
-OPENCODEX_HOME=$(mktemp -d) opr start   # genuine first run, real config untouched
+OpenProvider_HOME=$(mktemp -d) opr start   # genuine first run, real config untouched
 ```
 
 ### D5 — the cost question is answered by scope, not by argument
@@ -420,3 +420,4 @@ while refusing to pay for all of it before anything has been observed.
 Requires WP-B's state substrate (baseline + `onboarding.lastStep`) and WP-D's
 stepper. Building the tour first would mean inventing tour-specific state that the
 substrate then has to absorb.
+

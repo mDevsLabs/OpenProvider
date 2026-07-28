@@ -153,7 +153,7 @@ Each attempt contains only bounded operational metadata:
   recoveryKinds: [],
   usageStatus: "unreported",
   inputTokenEstimate?: 123,
-  usage?: OcxUsage,
+  usage?: oprUsage,
   totalTokens?: number,
   errorCode?: string
 }
@@ -422,7 +422,7 @@ bypass only rows in that set. This avoids classifying a physical provider litera
 `combo` as virtual:
 
 ```ts
-export function exactComboCatalogSlugs(config: OcxConfig): Set<string> {
+export function exactComboCatalogSlugs(config: oprConfig): Set<string> {
   return new Set(listComboIds(config).map(comboModelId));
 }
 
@@ -517,7 +517,7 @@ export interface PersistedUsageAttempt {
   recoveryKinds: AttemptRecoveryKind[];
   usageStatus: UsageStatus;
   inputTokenEstimate?: number;
-  usage?: OcxUsage;
+  usage?: oprUsage;
   totalTokens?: number;
   errorCode?: string;
 }
@@ -544,7 +544,7 @@ function isNonNegativeFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
-function normalizeAttemptUsage(raw: unknown): OcxUsage | null {
+function normalizeAttemptUsage(raw: unknown): oprUsage | null {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   const usage = raw as Record<string, unknown>;
   if (!isNonNegativeFiniteNumber(usage.inputTokens)
@@ -559,7 +559,7 @@ function normalizeAttemptUsage(raw: unknown): OcxUsage | null {
     if (key in usage && !isNonNegativeFiniteNumber(usage[key])) return null;
   }
   if ("estimated" in usage && typeof usage.estimated !== "boolean") return null;
-  return normalizeUsageValue(usage as unknown as OcxUsage) ?? null;
+  return normalizeUsageValue(usage as unknown as oprUsage) ?? null;
 }
 
 function normalizeUsageAttempt(raw: unknown): PersistedUsageAttempt | null {
@@ -660,14 +660,14 @@ the committed attempt without replacing its identity:
 
 ```ts
 interface FinalizedUsageResult {
-  usage?: OcxUsage;
+  usage?: oprUsage;
   status: UsageStatus;
   totalTokens?: number;
 }
 
 function finalizedUsage(
   adapter: string,
-  usage: OcxUsage | undefined,
+  usage: oprUsage | undefined,
   inputTokenEstimate: number | undefined,
 ): FinalizedUsageResult {
   const estimate = typeof inputTokenEstimate === "number"
@@ -744,7 +744,7 @@ export function finishRequestAttempt(
   attempt: PersistedUsageAttempt,
   status: number,
   durationMs: number,
-  usage?: OcxUsage,
+  usage?: oprUsage,
 ): PersistedUsageAttempt {
   const finalized = finalizedUsage(
     attempt.adapter,
@@ -800,7 +800,7 @@ export function aggregateAttemptUsage(
     (sum, usage) => sum + (usageTotalTokens(usage) ?? 0),
     0,
   );
-  const aggregate: OcxUsage = {
+  const aggregate: oprUsage = {
     inputTokens: usages.reduce((sum, usage) => sum + usage.inputTokens, 0),
     outputTokens: usages.reduce((sum, usage) => sum + usage.outputTokens, 0),
     totalTokens,
@@ -965,7 +965,7 @@ while the landed helper still owns the bounded text:
 ```diff
 + import { usageFromResponsesPayload } from "./request-log";
 
-+ function usageFromComboFailureText(text: string): OcxUsage | undefined {
++ function usageFromComboFailureText(text: string): oprUsage | undefined {
 +   try {
 +     const payload = JSON.parse(text) as Record<string, unknown>;
 +     const nested = payload.response;
@@ -985,7 +985,7 @@ while the landed helper still owns the bounded text:
  ): Promise<ConsumedComboFailure> {
    const fallback = `Provider error ${response.status}`;
    let classificationText = fallback;
-+  let usage: OcxUsage | undefined;
++  let usage: oprUsage | undefined;
    try {
      const body = await readBoundedResponseBody(response, { signal });
 +    usage = usageFromComboFailureText(body.text);
@@ -1200,7 +1200,7 @@ interface UsageAttribution {
   provider: string;
   model: string;
   usageStatus: UsageStatus;
-  usage?: OcxUsage;
+  usage?: oprUsage;
   totalTokens?: number;
 }
 
@@ -1564,7 +1564,7 @@ commits rather than changing routing.
   without structured usage, and exact attempt-usage assertions, plus an untouched
   non-JSON/oversized unreported control.
 - Cross-doc interface sync (HIGH): 030 now additively declares
-  `ConsumedComboFailure.usage?: OcxUsage` and the internal-only
+  `ConsumedComboFailure.usage?: oprUsage` and the internal-only
   `HandleResponsesOptions.onConsumedComboFailure` callback. This is the only 030
   interface expansion required by 040 and is recorded in both Round 3 changelogs.
 
@@ -1573,7 +1573,7 @@ commits rather than changing routing.
 - Cross-doc scope shift (supersedes §3.2 and §4.4A body-read ownership prose): 030 now
   owns the 64 KiB/5 s reads at both ordinary and passthrough JSON original-body sites,
   sanitized Retry-After handoff, `ConsumedComboFailure` creation, and the internal
-  callback. 040 only adds `usage?: OcxUsage` by inspecting the text retained by those
+  callback. 040 only adds `usage?: oprUsage` by inspecting the text retained by those
   same bounded reads; it must not retain/restore unbounded `.text()` or add another read.
 
 ### Pre-build fold-back round 5 (2026-07-18)
@@ -1608,3 +1608,4 @@ commits rather than changing routing.
   landed prohibition on backup, warning, cooldown, callback publication, and success
   accounting. The three existing abort activation paths now require matching
   `/api/logs` and JSONL `attempts[0].status === 499` receipts.
+

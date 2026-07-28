@@ -1,17 +1,17 @@
 import { isCodexReasoningEffort } from "../reasoning-effort";
 import type {
-  OcxComboConfig,
-  OcxComboDefaultEffort,
-  OcxComboStrategy,
-  OcxComboTarget,
-  OcxConfig,
-  OcxProviderConfig,
+  oprComboConfig,
+  oprComboDefaultEffort,
+  oprComboStrategy,
+  oprComboTarget,
+  oprConfig,
+  oprProviderConfig,
 } from "../types";
 
 export const COMBO_NAMESPACE = "combo";
 
 export function preservesPhysicalComboProvider(
-  config: Pick<OcxConfig, "providers" | "combos">,
+  config: Pick<oprConfig, "providers" | "combos">,
 ): boolean {
   return Object.hasOwn(config.providers, COMBO_NAMESPACE)
     && Object.keys(config.combos ?? {}).length === 0;
@@ -37,15 +37,15 @@ export interface ComboValidationIssue {
 }
 
 export interface NormalizedComboConfig {
-  strategy: OcxComboStrategy;
+  strategy: oprComboStrategy;
   stickyLimit: number;
-  defaultEffort: OcxComboDefaultEffort | null;
+  defaultEffort: oprComboDefaultEffort | null;
   /** Trimmed public alias, or null when the combo keeps the default `combo/<id>` slug. */
   alias: string | null;
-  targets: Array<Required<OcxComboTarget>>;
+  targets: Array<Required<oprComboTarget>>;
 }
 
-export function targetKey(target: Pick<OcxComboTarget, "provider" | "model">): string {
+export function targetKey(target: Pick<oprComboTarget, "provider" | "model">): string {
   return `${target.provider}/${target.model}`;
 }
 
@@ -71,7 +71,7 @@ export function comboPublicModelId(id: string, combo: { alias?: string | null })
  * form wins first (back-compat); otherwise an exact alias match across configured combos.
  */
 export function resolveComboId(
-  config: { combos?: Record<string, OcxComboConfig> },
+  config: { combos?: Record<string, oprComboConfig> },
   modelId: string,
 ): string | null {
   const direct = parseComboModelId(modelId);
@@ -93,7 +93,7 @@ export function resolveComboId(
 export function comboAliasIssues(
   id: string,
   alias: string,
-  combos: Record<string, OcxComboConfig> | undefined,
+  combos: Record<string, oprComboConfig> | undefined,
   options: { excludeComboId?: string } = {},
 ): ComboValidationIssue[] {
   const issues: ComboValidationIssue[] = [];
@@ -132,7 +132,7 @@ export function comboAliasIssues(
 export interface ComboValidationOptions {
   requireEnabledTarget?: boolean;
   /** Full combos map for alias uniqueness checks; omitted during early config load. */
-  combos?: Record<string, OcxComboConfig>;
+  combos?: Record<string, oprComboConfig>;
   /** Combo being renamed — its stored alias is excluded from uniqueness checks. */
   excludeComboId?: string;
 }
@@ -140,7 +140,7 @@ export interface ComboValidationOptions {
 export function comboConfigIssues(
   id: string,
   raw: unknown,
-  providers: Record<string, OcxProviderConfig>,
+  providers: Record<string, oprProviderConfig>,
   options: ComboValidationOptions = {},
 ): ComboValidationIssue[] {
   const issues: ComboValidationIssue[] = [];
@@ -263,13 +263,13 @@ export function comboConfigIssues(
 export function comboConfigError(
   id: string,
   raw: unknown,
-  providers: Record<string, OcxProviderConfig>,
+  providers: Record<string, oprProviderConfig>,
   options: ComboValidationOptions = {},
 ): string | null {
   return comboConfigIssues(id, raw, providers, options)[0]?.message ?? null;
 }
 
-export function normalizeComboConfig(raw: OcxComboConfig): NormalizedComboConfig {
+export function normalizeComboConfig(raw: oprComboConfig): NormalizedComboConfig {
   const alias = typeof raw.alias === "string" ? raw.alias.trim() : "";
   return {
     strategy: raw.strategy ?? "failover",
@@ -285,14 +285,14 @@ export function normalizeComboConfig(raw: OcxComboConfig): NormalizedComboConfig
 }
 
 export function comboDefaultEffort(
-  config: { combos?: Record<string, OcxComboConfig> },
+  config: { combos?: Record<string, oprComboConfig> },
   id: string,
-): OcxComboDefaultEffort | null {
+): oprComboDefaultEffort | null {
   const combos = config.combos;
   if (!combos || !Object.hasOwn(combos, id)) return null;
   const value: unknown = combos[id]!.defaultEffort ?? null;
   return typeof value === "string" && isCodexReasoningEffort(value)
-    ? value as OcxComboDefaultEffort
+    ? value as oprComboDefaultEffort
     : null;
 }
 
@@ -300,15 +300,16 @@ export function isValidComboId(id: string): boolean {
   return COMBO_ID_PATTERN.test(id);
 }
 
-export function listComboIds(config: { combos?: Record<string, OcxComboConfig> }): string[] {
+export function listComboIds(config: { combos?: Record<string, oprComboConfig> }): string[] {
   return Object.keys(config.combos ?? {}).sort((a, b) => a.localeCompare(b));
 }
 
 export function getCombo(
-  config: { combos?: Record<string, OcxComboConfig> },
+  config: { combos?: Record<string, oprComboConfig> },
   id: string,
 ): NormalizedComboConfig | undefined {
   const combos = config.combos;
   if (!combos || !Object.hasOwn(combos, id)) return undefined;
   return normalizeComboConfig(combos[id]!);
 }
+

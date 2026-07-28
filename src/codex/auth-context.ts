@@ -12,14 +12,14 @@ import {
   getCodexAccountHealthSnapshot,
   releaseCodexQuotaProbeLease,
   tryAcquireCodexQuotaProbeLease,
-  pickLowestUsageCodexAccount,
+  pickAlternateCodexAccount,
   resolveCodexAccountForThreadDetailed,
 } from "./routing";
 import type { CodexCooldownSource } from "./routing";
 import { maskAccountId } from "../lib/privacy";
 import { formatErrorResponse } from "../bridge";
 import { getAccountQuota } from "./quota";
-import type { CodexAccountMode, OcxConfig, OcxProviderConfig } from "../types";
+import type { CodexAccountMode, oprConfig, oprProviderConfig } from "../types";
 import { FORWARD_HEADERS } from "../adapters/openai-responses";
 
 export type CodexAuthContext =
@@ -62,7 +62,7 @@ export function releaseCodexAuthContextProbeLease(ctx: CodexAuthContext | undefi
   if (ctx && leaseId) releaseCodexQuotaProbeLease(ctx.accountId!, leaseId);
 }
 
-export type OcxRuntimeProviderConfig = OcxProviderConfig & {
+export type oprRuntimeProviderConfig = oprProviderConfig & {
   _codexAccountOverride?: { accessToken: string; chatgptAccountId: string };
   _codexAccountRequired?: boolean;
 };
@@ -161,7 +161,7 @@ export interface ResolveCodexAuthContextOptions {
 
 export async function resolveCodexAuthContext(
   headers: Headers,
-  config: OcxConfig,
+  config: oprConfig,
   mode: CodexAccountMode,
   options: ResolveCodexAuthContextOptions = {},
 ): Promise<CodexAuthContext> {
@@ -173,7 +173,7 @@ export async function resolveCodexAuthContext(
   const threadId = headers.get("x-codex-parent-thread-id");
   const resolution = options.excludeAccountId
     ? (() => {
-        const accountId = pickLowestUsageCodexAccount(config, options.excludeAccountId);
+        const accountId = pickAlternateCodexAccount(config, options.excludeAccountId!);
         return accountId
           ? { status: "selected" as const, accountId }
           : { status: "none" as const };
@@ -252,10 +252,10 @@ export function assertCodexAuthContextNotCooled(ctx: CodexAuthContext | undefine
 }
 
 export function applyCodexAuthContextToProvider(
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
   ctx: CodexAuthContext,
   mode: CodexAccountMode | undefined,
-): OcxRuntimeProviderConfig {
+): oprRuntimeProviderConfig {
   if (mode !== "pool" || (ctx.kind !== "pool" && ctx.kind !== "main-pool") || provider.authMode !== "forward") return provider;
   return {
     ...provider,
@@ -280,17 +280,18 @@ export function headersForCodexAuthContext(headers: Headers, ctx: CodexAuthConte
   return selected;
 }
 
-export function isCodexAuthContextUsable(ctx: CodexAuthContext, config: OcxConfig): boolean {
+export function isCodexAuthContextUsable(ctx: CodexAuthContext, config: oprConfig): boolean {
   if (ctx.kind === "main") return true;
   if (ctx.kind === "main-pool") return isCodexAccountUsable(config, ctx.accountId);
   return isCodexAccountUsable(config, ctx.accountId) && isCodexAccountGenerationLive(ctx.accountId, ctx.generation);
 }
 
-export function stripCodexRuntimeProviderFields(provider: OcxProviderConfig): OcxProviderConfig {
+export function stripCodexRuntimeProviderFields(provider: oprProviderConfig): oprProviderConfig {
   const {
     _codexAccountOverride: _override,
     _codexAccountRequired: _required,
     ...safeProvider
-  } = provider as OcxRuntimeProviderConfig;
+  } = provider as oprRuntimeProviderConfig;
   return safeProvider;
 }
+

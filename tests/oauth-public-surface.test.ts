@@ -10,7 +10,7 @@ import {
   upsertOAuthProvider,
 } from "../src/oauth";
 import { handleManagementAPI } from "../src/server/management-api";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import type { OAuthController } from "../src/oauth/types";
 import { getCredential } from "../src/oauth/store";
 
@@ -22,7 +22,7 @@ const canonical = {
   authMode: "forward" as const,
 };
 
-function config(): OcxConfig {
+function config(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "openai",
@@ -100,3 +100,4 @@ describe("legacy ChatGPT OAuth public-surface exclusion", () => {
     expect(cfg.providers.chatgpt).toBeUndefined();
   });
 });
+

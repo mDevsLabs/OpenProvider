@@ -10,7 +10,7 @@
   - 진짜 결과는 원래 호출 occurrence에 재부착 → 라운드 닫히면 deferred 해제.
   - 진짜 결과 없을 때만 합성 결과: `[opr] no tool result was recorded for "<name>";
     execution status unknown — do not treat this as success, failure, or user-provided input.`
-  - 빈 call id는 `call_ocx_minted_<n>` 발급(충돌 검사).
+  - 빈 call id는 `call_opr_minted_<n>` 발급(충돌 검사).
   - orphan result(매칭 호출 없음)는 기존 가짜 assistant 보정 유지, 단 열린 라운드 먼저
     합성 종료 → 중복 id 라운드 생성 안 함.
 
@@ -46,3 +46,4 @@
   reattach로 교체.
 - 방향이 틀렸다는 증거가 되려면: 패치 후에도 동일 400 재발(그때는 id 재작성 경로 추적으로
   전환).
+

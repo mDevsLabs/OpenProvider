@@ -27,7 +27,7 @@ import {
 import { isInjectionDebugEnabled } from "../../lib/debug-settings";
 import { injectionDebugLog } from "../../lib/injection-debug-log";
 import { modelInList, namespacedToolName } from "../../types";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig, OcxProviderContinuationState, OcxUsage } from "../../types";
+import type { AdapterEvent, oprConfig, oprParsedRequest, oprProviderConfig, oprProviderContinuationState, oprUsage } from "../../types";
 import {
   forceRefreshOAuthAccessSnapshot,
   getOAuthCredentialApiBaseUrl,
@@ -120,8 +120,8 @@ export function safeHostLabel(url: string): string {
 
 
 
-export function providerFetch(provider: OcxProviderConfig): typeof globalThis.fetch {
-  return (provider as OcxProviderConfig & { fetch?: typeof globalThis.fetch }).fetch ?? globalThis.fetch;
+export function providerFetch(provider: oprProviderConfig): typeof globalThis.fetch {
+  return (provider as oprProviderConfig & { fetch?: typeof globalThis.fetch }).fetch ?? globalThis.fetch;
 }
 
 
@@ -154,4 +154,5 @@ export async function fetchWithHeaderTimeout(
     clearTimeout(timer);
   }
 }
+
 

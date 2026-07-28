@@ -6,7 +6,7 @@ import { atomicWriteFile, expandUserPath, getConfigDir, websocketsEnabled } from
 import { CODEX_CONFIG_PATH, CODEX_MODELS_CACHE_PATH, DEFAULT_CATALOG_PATH, readRootTomlString, resolveCodexConfigPath } from "../paths";
 import { clearModelCache, DEFAULT_MODEL_CACHE_TTL_MS, getFreshCached, getStaleCached, isModelsFetchCoolingDown, markModelsFetchFailure, setCached } from "../model-cache";
 import { buildModelsRequest, resolveModelsAuthToken } from "../../oauth";
-import type { OcxConfig, OcxProviderConfig } from "../../types";
+import type { oprConfig, oprProviderConfig } from "../../types";
 import { modelInList } from "../../types";
 import { CODEX_REASONING_LEVELS, codexEffortRank, configuredReasoningEfforts, modelRecordValue, sanitizeCodexReasoningEfforts } from "../../reasoning-effort";
 import { getJawcodeModelMetadata, getJawcodeModelMetadataCaseInsensitive, listJawcodeModelMetadata, resolveJawcodeProvider } from "../../generated/jawcode-model-metadata";
@@ -72,7 +72,7 @@ export function nativeEffortClamp(slug: string, effort: string | undefined): str
 
 export function shouldApplyNativeEffortClamp(
   providerName: string,
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
   requestedModelId: string,
 ): boolean {
   return !requestedModelId.includes("/")
@@ -353,3 +353,4 @@ export function clampCatalogModelsToCodexSupport(models: RawEntry[], deps: Bundl
 
   return models;
 }
+

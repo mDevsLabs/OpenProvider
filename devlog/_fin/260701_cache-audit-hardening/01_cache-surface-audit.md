@@ -12,7 +12,7 @@ openprovider has several unrelated cache surfaces. Treat them separately:
    - Kiro: upstream does not report authoritative token usage to this adapter; usage remains estimated.
 
 2. Cached token usage counters
-   - `OcxUsage.cachedInputTokens` is the internal field.
+   - `oprUsage.cachedInputTokens` is the internal field.
    - `bridge.ts` maps it to Responses `input_tokens_details.cached_tokens`.
    - `usage-log.ts` persists it as a numeric field and keeps `estimated` as a separate boolean.
 
@@ -70,3 +70,4 @@ openprovider has several unrelated cache surfaces. Treat them separately:
 - Anthropic usage now also records optional `cacheReadInputTokens` and `cacheCreationInputTokens` when upstream reports `cache_read_input_tokens` or `cache_creation_input_tokens`.
 - Usage JSONL persistence preserves the optional read/write detail fields without changing total token math.
 - Request log tooltips include `cacheRead=<n>` and `cacheCreate=<n>` when present, so a row can distinguish true cache hits from first-turn cache writes.
+

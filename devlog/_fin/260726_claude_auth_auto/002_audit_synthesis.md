@@ -54,7 +54,7 @@ Decision: **intent becomes three-state end to end.**
   auto. The reviewer's suggestion (literal `"subscription"`) replaces my boolean
   (`authModeExplicitSubscription` is dropped): it is self-describing, backward-safe
   (old readers see a truthy non-"proxy" value; old GET code maps non-"proxy" to
-  "subscription" anyway), and needs no second field. `OcxClaudeCodeConfig.authMode`
+  "subscription" anyway), and needs no second field. `oprClaudeCodeConfig.authMode`
   type widens (`src/types.ts`), `configSchema` gains the enum.
 - API: GET returns `authMode: "auto" | "proxy" | "subscription"` (no more coercion);
   PUT accepts all three: `"proxy"` stores proxy, `"subscription"` stores
@@ -164,7 +164,7 @@ incoming request (`claude-messages.ts:85-96`). Renamed to **`markerMode`**
 `010`/`020` disagreed with themselves. Fixed: the CLI calls
 `detectClaudeAuth({ ...defaultAuthDetectDeps(), env: () => base })` so detection and
 the launch read the same environment by construction; `010` drops the removed S4
-dependency `hasOcxAnthropicCredential()` and carries `staleProxyMarker` in every
+dependency `hasoprAnthropicCredential()` and carries `staleProxyMarker` in every
 aggregation branch. The two-launch regression drives the DEFAULT dependency path, not
 only a fake.
 
@@ -256,7 +256,7 @@ Two real defects in my guard:
 
 - A module-global baseline is wrong when another `loadConfig()` refreshes it while the
   server holds an older object — a later stale save then looks like "our change".
-  Fixed: `WeakMap<OcxConfig, Snapshot>` keyed on the config INSTANCE, armed by
+  Fixed: `WeakMap<oprConfig, Snapshot>` keyed on the config INSTANCE, armed by
   `armClaudeCodeBaseline(config)` in `startServer`. Arming is eager, so the FIRST
   service save is already guarded (a lazy arm loses precisely the edit made before it).
 - "Every service-time save" was a claim with nothing checking it. Fixed: a stated
@@ -303,3 +303,4 @@ exception because they run before the server serves requests.
 Reviewer confirmed the three R3 amendments themselves are sound (WP3b dependencies,
 the honest daemon-scope divergence, the protected env binding, and the WeakMap
 baseline avoiding first-save and cross-instance loss).
+

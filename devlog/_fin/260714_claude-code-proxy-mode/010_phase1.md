@@ -1,6 +1,6 @@
 # 010 — Phase 1: authMode Implementation
 
-## src/types.ts (line ~251, OcxClaudeCodeConfig)
+## src/types.ts (line ~251, oprClaudeCodeConfig)
 ADD: authMode?: "subscription" | "proxy"
 
 ## src/cli/claude.ts (line ~49)
@@ -18,3 +18,4 @@ ADD: claude.authMode, claude.authModeHint, claude.authModeSubscription, claude.a
 
 ## src/server/management-api.ts
 MODIFY: /api/claude-code GET/PUT에 authMode 필드 추가
+

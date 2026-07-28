@@ -23,12 +23,12 @@ wp1 이후로는 자동 생성 블록이 비루프백에서 `env_key`를 쓰므�
 +
 +When the proxy is bound to a non-loopback host, openprovider requires a real admission token on
 +every request. The generated entries then carry
-+`env_key = "OPENCODEX_API_AUTH_TOKEN"` instead of a literal key: Grok Build reads the token
++`env_key = "OpenProvider_API_AUTH_TOKEN"` instead of a literal key: Grok Build reads the token
 +from that environment variable at request time, so no secret is written into your shared
 +`~/.grok/config.toml`. Export the same value you gave the proxy:
 +
 +```bash
-+export OPENCODEX_API_AUTH_TOKEN="…"   # same token the proxy was started with
++export OpenProvider_API_AUTH_TOKEN="…"   # same token the proxy was started with
 +grok -m opr-… -p "hello"
 +```
 +
@@ -74,3 +74,4 @@ bun run privacy:scan
 ## PR 갱신
 
 `dev`가 그동안 움직였는지 `git fetch origin dev` 후 확인하고, 필요하면 다시 리베이스한 뒤 게이트를 재실행한다. 그다음 `codex/260726-grok-build-prod`를 push하고 PR #403 본문에 이번 수정 요약(각 블로커 → 해소 방식 → 증거 테스트 이름)을 추가한다. 머지는 하지 않는다.
+

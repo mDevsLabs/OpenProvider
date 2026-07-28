@@ -112,6 +112,10 @@ Claude Code 2.1.129 이상은 `GET /v1/models?limit=1000`에서 게이트웨이 
 제공해요. 두 계열은 계속 디코딩할 수 있으므로 어느 형식이든 `settings.json`에 저장한 모델이
 계속 작동해요.
 
+Claude Desktop의 하단 선택기로 이미 실행 중인 3P 대화의 모델이 바뀌지 않는다면, 그 대화에서
+`/model <id>`를 사용하세요. OpenProvider는 선택기 상태를 따로 볼 수 없고 각 요청에 실린 모델 ID를
+라우팅해요. 적용 결과는 **Logs → requestedModel**에서 확인할 수 있어요.
+
 **별칭 문법 규칙:** provider에는 `/`나 `--`를 넣을 수 없고 `native`와 같아도 안 돼요. model에는
 `/`를 넣을 수 없어요. 읽기 쉬운 형식으로 표현할 수 없는 라우트는 해시 별칭으로 대체해요. 모델
 ID에는 `--`를 넣을 **수 있어요**(해석할 때 첫 번째 `--`만 기준으로 나눠요). `--`가 포함된
@@ -345,7 +349,7 @@ role, `tool_use_id` 없는 `tool_result`, id/name 없는 `tool_use`, name 없는
 
 ## 디버그 캡처
 
-`opr debug claude on|off|status|reset`, `OCX_CLAUDE_DEBUG=1` 또는
+`opr debug claude on|off|status|reset`, `opr_CLAUDE_DEBUG=1` 또는
 `PUT /api/debug {"claude": true}`로 입력 캡처를 제어해요. `GET /api/claude/inbound-debug`는
 `{enabled, entries}`를 반환해요(최신 항목부터, 20개 순환 버퍼).
 
@@ -409,4 +413,5 @@ Anthropic 백엔드를 명시하면 의도적으로 실패 후 중단해요.
 **서브에이전트가 잘못된 모델로 디스패치됨** — 로스터 에이전트(`opr-*`)는 Agent 도구의 `model`
 인자가 아니라 `<!-- opr-route: ... -->` 지시문을 사용해요. 지시문이 원하는 라우트와 일치하는지
 확인하고, 모델 자리 표시자로 `"haiku"`를 전달하세요.
+
 

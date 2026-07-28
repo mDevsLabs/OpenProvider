@@ -2,15 +2,15 @@ import { describe, expect, test } from "bun:test";
 import { claudeNotFoundHint } from "../src/cli/claude";
 import { commandInvocation } from "../src/lib/win-exec";
 import { buildClaudeEnv } from "../src/cli/claude";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
-function cfg(extra?: Partial<OcxConfig>): OcxConfig {
+function cfg(extra?: Partial<oprConfig>): oprConfig {
   return {
     port: 10100,
     defaultProvider: "mock",
     providers: { mock: { adapter: "openai-chat", baseUrl: "http://x/v1" } },
     ...extra,
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 /**
@@ -258,3 +258,4 @@ describe("opr claude Windows launch (devlog 260715_cross_platform_audit/020)", (
     expect(claudeNotFoundHint(0, null, "win32")).toBeNull();
   });
 });
+

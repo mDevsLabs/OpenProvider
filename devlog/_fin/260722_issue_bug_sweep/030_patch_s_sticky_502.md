@@ -123,7 +123,7 @@ logCtx?.terminalHttpStatus ?? 502` 순으로 502를 취해 transient 기록(`rec
 Before (`request-log.ts:93-95` 실측 — `RequestLogEntry` 말미):
 
 ```ts
-  usage?: OcxUsage;
+  usage?: oprUsage;
   totalTokens?: number;
   attempts?: PersistedUsageAttempt[];
 }
@@ -132,7 +132,7 @@ Before (`request-log.ts:93-95` 실측 — `RequestLogEntry` 말미):
 After:
 
 ```ts
-  usage?: OcxUsage;
+  usage?: oprUsage;
   totalTokens?: number;
   attempts?: PersistedUsageAttempt[];
   /** Codex pool affinity decision for this request (diagnostics for #186). */
@@ -171,3 +171,4 @@ catch(mid_stream) vs SSE terminal)에서 기록. 계정 label은 기존 `openai-
 - [ ] `bun run typecheck` 통과 — `ResponsesTerminalStatus` 유니언 무변경 확인 (`rg -n "type ResponsesTerminalStatus" src` diff 없음; 변경은 콜백 시그니처와 `RequestLogEntry`에 한정)
 - [ ] `bun test tests/codex-routing.test.ts` 내 escalation 단계(30s/2m/10m/30m)와 2연속-2xx 복구 단위 검증
 - [ ] `reportNativeTerminal`이 2-인자를 recorder로 전달하는지 회귀 assert (양 인자 캡처)
+

@@ -47,12 +47,12 @@ Imports only:
 
 - `getCodexAccountCredential` from `src/codex-account-store.ts`;
 - `isAccountNeedsReauth` from `src/codex-account-runtime-state.ts`;
-- `OcxConfig` type from `src/types.ts`.
+- `oprConfig` type from `src/types.ts`.
 
 Exports:
 
 ```ts
-export function isCodexAccountUsable(config: OcxConfig, accountId: string): boolean;
+export function isCodexAccountUsable(config: oprConfig, accountId: string): boolean;
 ```
 
 The predicate returns true only when:
@@ -71,7 +71,7 @@ Exports:
 
 ```ts
 export function purgeCodexAccountRuntimeState(accountId: string): void;
-export function deleteCodexAccount(runtimeConfig: OcxConfig, accountId: string): void;
+export function deleteCodexAccount(runtimeConfig: oprConfig, accountId: string): void;
 ```
 
 Responsibilities:
@@ -162,7 +162,7 @@ export function clearAccountQuota(accountId?: string): void {
 Add:
 
 ```ts
-export function isCodexAuthContextUsable(ctx: CodexAuthContext, config: OcxConfig): boolean;
+export function isCodexAuthContextUsable(ctx: CodexAuthContext, config: oprConfig): boolean;
 ```
 
 Main context is always usable. Pool context delegates to `isCodexAccountUsable(config, accountId)` from `src/codex-account-usability.ts`.
@@ -306,3 +306,4 @@ Residual risks accepted for Phase 20B:
 ## Commit Boundary
 
 One implementation commit for Phase 20A lifecycle cleanup. Do not mix in manual import identity changes, local API auth, safe DTOs, quota taxonomy, or persisted refresh-generation migration.
+

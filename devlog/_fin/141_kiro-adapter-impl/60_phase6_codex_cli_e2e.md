@@ -14,7 +14,7 @@ My kiro implementation lives only on `feat/kiro-on-dev` in the workspace, never 
 ## Fix
 Replace the running proxy on 10100 with the **branch build**:
 1. `kill -9` the stale published proxy holding 10100.
-2. `bun run src/cli.ts start --port 10100` (dev run — `bin/ocx.mjs` is the npm shim that
+2. `bun run src/cli.ts start --port 10100` (dev run — `bin/opr.mjs` is the npm shim that
    execs the *bundled published* package, so dev MUST use `src/cli.ts` directly).
 3. Branch `start` auto-injected **23 models incl. 11 `kiro/*`** into the Codex catalog
    (`/Users/jun/.codex/openprovider-catalog.json`) — verified `kiro/claude-sonnet-4.6` present.
@@ -40,4 +40,5 @@ write-time 62725). To make this permanent in the normal `opr` flow, the publishe
 must be updated to include the kiro adapter (publish from `feat/kiro-on-dev`, then
 `opr update`) — otherwise a future `opr start` from the global binary reverts to the
 kiro-less build. The full Codex CLI path is now proven working against the branch build.
+
 

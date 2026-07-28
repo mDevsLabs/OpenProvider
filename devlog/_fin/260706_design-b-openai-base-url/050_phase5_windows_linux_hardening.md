@@ -38,9 +38,9 @@
    and calls `syncCodexHistoryProvider("openai")` — same write open; on failure it
    prints "routed threads stay hidden", which is FALSE under Design B steady state
    (threads are already tagged openai; nothing is hidden).
-3. `countPendingOpencodexHistory` (codex-history-provider.ts:564) is a readonly
+3. `countPending@mdevs/openproviderHistory` (codex-history-provider.ts:564) is a readonly
    probe (busy_timeout 100ms) whose pending predicate mirrors
-   `ejectRemainingOpencodexHistory` exactly, and it counts backup manifest entries.
+   `ejectRemaining@mdevs/openproviderHistory` exactly, and it counts backup manifest entries.
    `{pendingRows:0, backupEntries:0, failed:undefined}` proves the openai-direction
    restore would be a no-op. The guardian already uses it as a gate; inject/stop
    do not.
@@ -55,7 +55,7 @@
 
 - **(major 1) CRLF scope was too narrow.** Every transform in the inject pipeline
   rebuilds content with hard `"\n"` (stripExistingModelProvider, ensureFastModeFeature,
-  removeOcxSection, setRootModelCatalogPath, ...), and `setRootOpenaiBaseUrl`'s
+  removeoprSection, setRootModelCatalogPath, ...), and `setRootOpenaiBaseUrl`'s
   idempotent rewrite (`lines[i] = key`) would LF-terminate one line of a CRLF file.
   Fix adopted: EOL normalization at the BOUNDARY instead of per-transform surgery —
   record `dominantEol(original)` once, normalize to LF before the transform pipeline,
@@ -90,7 +90,7 @@ Add a tiny helper and use it in the two openai-direction entry points:
 ```ts
 /** True when a readonly probe PROVES the openai-direction restore would be a no-op. */
 function openaiRestoreIsNoop(stateDbPath: string, backupPath: string): boolean {
-  const pending = countPendingOpencodexHistory(stateDbPath, backupPath);
+  const pending = countPending@mdevs/openproviderHistory(stateDbPath, backupPath);
   return !pending.failed && pending.pendingRows === 0 && pending.backupEntries === 0;
 }
 ```
@@ -104,7 +104,7 @@ function openaiRestoreIsNoop(stateDbPath: string, backupPath: string): boolean {
   gates.
 - Probe-failed (`failed: true`) falls through to today's write attempt — locked DBs
   with unknown state keep the current behavior and warnings.
-- Missing DB: `countPendingOpencodexHistory` still counts backup entries, so
+- Missing DB: `countPending@mdevs/openproviderHistory` still counts backup entries, so
   leftover-manifest reinstalls do not skip; ordering after the existsSync guard
   keeps the missing-DB early return identical to today.
 
@@ -137,7 +137,7 @@ firing when nothing is pending. Locked+pending keeps the warning — still true 
   `{rows:0,files:0}`, rollout files byte-unchanged.
 - Pending fixture still migrates through the gate (fallthrough proof).
 - Missing DB + leftover backup manifest does NOT satisfy the noop gate
-  (`countPendingOpencodexHistory` reports backupEntries>0).
+  (`countPending@mdevs/openproviderHistory` reports backupEntries>0).
 - `syncCodexHistoryProvider("openai", ..., { skipWhenProvablyNoop: true })`:
   steady state returns zeros without rewriting rollouts; with pending openprovider
   rows it still restores; WITHOUT the flag behavior is unchanged (existing tests
@@ -189,3 +189,5 @@ What did NOT change / dead hypotheses (LOOP-PESSIMIST-01):
 - Evidence that would falsify this direction: a Windows report where the READONLY
   probe itself blocks on the app's WAL handle — escalation stays as written in the
   plan header (drop item 1, NEEDS_HUMAN).
+
+

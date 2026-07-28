@@ -13,7 +13,7 @@
    (Kiro 401 becomes Anthropic overloaded_error instead of authentication_error)
 2. Medium — Kiro persists store:false conversation contents to disk
    (file mode 0600, no token leak, but caller prompts may contain secrets)
-3. Low — OcxProviderContinuationState type broader than implementation
+3. Low — oprProviderContinuationState type broader than implementation
 4. Low — Incomplete continuation behavior internally inconsistent
 
 ### Strengths noted by Sol
@@ -26,5 +26,6 @@
 ## Post-merge improvements needed (future commits)
 1. Coherent error status/type/code across Responses and Claude bridges
 2. Memory-only continuation for store:false (no disk persistence)
-3. Tighter OcxProviderContinuationState type
+3. Tighter oprProviderContinuationState type
 4. Formalize incomplete response chaining behavior
+

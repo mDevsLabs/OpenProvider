@@ -13,7 +13,7 @@ import { effectiveModelEnv, resolveAutoContext } from "../claude/context-windows
 import { refreshGatewayModelCacheFromProxy } from "../claude/gateway-cache";
 import { commandInvocation } from "../lib/win-exec";
 import { findLiveProxy } from "../server/proxy-liveness";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { PROXY_MARKER, ownAdmissionTokens, defaultAuthDetectDeps, detectClaudeAuth, type AuthDetectDeps } from "../claude/auth-detect";
 import { resolveClaudeAuthMode } from "../claude/auth-mode";
 
@@ -34,7 +34,7 @@ export type ClaudeEnvDeps = { authDetect?: Omit<Partial<AuthDetectDeps>, "env" |
  * ANTHROPIC_BASE_URL values owned by a previous openprovider launch.
  */
 export function buildClaudeEnv(
-  config: OcxConfig,
+  config: oprConfig,
   port: number,
   base: ClaudeLaunchEnv,
   contextWindows: Record<string, number> = {},
@@ -153,7 +153,7 @@ export function buildClaudeEnv(
  * (OPENPROVIDER_API_AUTH_TOKEN first, config key fallback — audit R4#1). Failure → {}
  * (no [1m] marking, conservative).
  */
-export async function fetchClaudeContextWindows(config: OcxConfig, port: number, timeoutMs = 3_000): Promise<Record<string, number>> {
+export async function fetchClaudeContextWindows(config: oprConfig, port: number, timeoutMs = 3_000): Promise<Record<string, number>> {
   try {
     const headers = new Headers();
     const token = process.env.OPENPROVIDER_API_AUTH_TOKEN || config.apiKeys?.[0]?.key;
@@ -180,7 +180,7 @@ async function ensureProxyForClaude(): Promise<number | null> {
     detached: true,
     stdio: "ignore",
     windowsHide: true,
-    env: { ...process.env, OCX_SERVICE: "1" },
+    env: { ...process.env, opr_SERVICE: "1" },
   });
   child.unref();
   const deadline = Date.now() + 8_000;
@@ -259,3 +259,4 @@ export async function cmdClaude(args: string[]): Promise<number> {
     });
   });
 }
+

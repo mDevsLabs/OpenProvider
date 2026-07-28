@@ -9,11 +9,11 @@ Make the generated Windows Task Scheduler wrapper leave durable startup evidence
 ### MODIFY `src/service.ts`
 
 - Export `serviceLogPath()` or keep `logPath()` internal but reuse it in Windows wrapper generation.
-- In `buildWindowsServiceScript(...)`, add `OCX_SERVICE_LOG` variable and append token-safe startup lines:
+- In `buildWindowsServiceScript(...)`, add `opr_SERVICE_LOG` variable and append token-safe startup lines:
   - timestamp;
   - Bun path;
   - CLI path;
-  - OPENCODEX_HOME;
+  - @mdevs/openprovider_HOME;
   - CODEX_HOME;
   - config dir/log path by variable.
 - Redirect child stdout/stderr to the same log file for this cycle if it can be done safely with batch redirection.
@@ -23,11 +23,11 @@ Make the generated Windows Task Scheduler wrapper leave durable startup evidence
 
 Add assertions that `buildWindowsServiceScript(...)` contains:
 
-- `OCX_SERVICE_LOG` assignment;
+- `opr_SERVICE_LOG` assignment;
 - startup log marker;
-- Bun/CLI/CODEX_HOME/OPENCODEX_HOME labels;
+- Bun/CLI/CODEX_HOME/@mdevs/openprovider_HOME labels;
 - child command appends to the log;
-- no raw `OPENCODEX_API_AUTH_TOKEN` value.
+- no raw `@mdevs/openprovider_API_AUTH_TOKEN` value.
 
 ## Verification
 
@@ -42,3 +42,5 @@ bun x tsc --noEmit
 - Startup evidence is token-safe.
 - Existing shell escaping tests still pass.
 - Focused tests and typecheck pass.
+
+

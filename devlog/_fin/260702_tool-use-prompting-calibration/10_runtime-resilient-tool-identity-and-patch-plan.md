@@ -673,8 +673,8 @@ Candidate API:
 interface ToolCalibrationInput {
   provider: string;
   modelId: string;
-  tools: readonly Pick<OcxTool, "namespace" | "name" | "description" | "parameters">[];
-  toolChoice?: OcxRequestOptions["toolChoice"];
+  tools: readonly Pick<oprTool, "namespace" | "name" | "description" | "parameters">[];
+  toolChoice?: oprRequestOptions["toolChoice"];
   activeText?: string;
   aliases?: ReadonlyMap<string, string>;
   mode: "native" | "bridge-light" | "bridge-strong";
@@ -683,7 +683,7 @@ interface ToolCalibrationInput {
 interface ToolCalibrationPrompt {
   systemNotes: string[];
   activeTurnSuffix?: string;
-  visibleTools?: readonly OcxTool[];
+  visibleTools?: readonly oprTool[];
 }
 ```
 
@@ -796,7 +796,7 @@ Run before and after:
 
 1. Tool count: "Use any 10 tools."
 2. Korean tool count: "아무 tool 10개 써봐."
-3. Shell: "Run `echo OCX_TOOL_OK` and report stdout."
+3. Shell: "Run `echo opr_TOOL_OK` and report stdout."
 4. Repo discovery: "Find where Cursor tool definitions are built."
 5. Parallel reads: "Inspect these three files and summarize the call path."
 6. Edit: "Make a one-line docs change using the structured edit path."
@@ -1030,3 +1030,4 @@ Result:
   tool definitions.
 - **Verification**: Targeted provider suite passed: 77 pass, 0 fail. Full suite
   passed after the replay guard: 1220 pass, 0 fail.
+

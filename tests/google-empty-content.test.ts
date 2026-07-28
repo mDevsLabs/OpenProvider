@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { createGoogleAdapter } from "../src/adapters/google";
-import type { OcxParsedRequest } from "../src/types";
+import type { oprParsedRequest } from "../src/types";
 
 // Antigravity translates these Gemini `contents` into Anthropic `messages` for Claude models, and
 // Anthropic rejects empty/absent text and empty content arrays. An empty Gemini text part reaches
@@ -10,11 +10,11 @@ import type { OcxParsedRequest } from "../src/types";
 
 const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "key" };
 
-function parsedWith(messages: unknown[]): OcxParsedRequest {
-  return { modelId: "gemini-3-pro", stream: false, options: {}, context: { messages } } as unknown as OcxParsedRequest;
+function parsedWith(messages: unknown[]): oprParsedRequest {
+  return { modelId: "gemini-3-pro", stream: false, options: {}, context: { messages } } as unknown as oprParsedRequest;
 }
 
-async function geminiContents(parsed: OcxParsedRequest): Promise<{ role: string; parts: Record<string, unknown>[] }[]> {
+async function geminiContents(parsed: oprParsedRequest): Promise<{ role: string; parts: Record<string, unknown>[] }[]> {
   const { body } = await createGoogleAdapter(provider).buildRequest(parsed);
   return JSON.parse(body).contents;
 }
@@ -204,3 +204,4 @@ describe("google adapter — empty content part guard (#420)", () => {
     ]);
   });
 });
+

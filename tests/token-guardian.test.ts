@@ -6,10 +6,10 @@ import { saveCredential } from "../src/oauth/store";
 import { getConfigPath } from "../src/config";
 import { markCodexAccountValidated, readCodexAccountRecord, saveCodexAccountCredential } from "../src/codex/account-store";
 import { __resetGuardianState, guardianSweep } from "../src/oauth/token-guardian";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
 const origHome = process.env.HOME;
-const origOcxHome = process.env.OPENPROVIDER_HOME;
+const origoprHome = process.env.OPENPROVIDER_HOME;
 const origCodexHome = process.env.CODEX_HOME;
 const origFetch = globalThis.fetch;
 const WARMUP_INPUT = [{ type: "message", role: "user", content: [{ type: "input_text", text: "hi" }] }];
@@ -17,14 +17,14 @@ let tmp: string;
 
 // kimi refresh is a single token POST (no OAuth discovery hop), so a blanket 200 mock exercises the
 // real getValidAccessToken → refreshKimiToken → saveCredential path cleanly.
-function kimiProvider(refreshPolicy?: OcxProviderConfig["refreshPolicy"]): OcxProviderConfig {
+function kimiProvider(refreshPolicy?: oprProviderConfig["refreshPolicy"]): oprProviderConfig {
   return { adapter: "openai-chat", baseUrl: "https://api.moonshot.ai/v1", authMode: "oauth", ...(refreshPolicy ? { refreshPolicy } : {}) };
 }
 
-function writeConfig(partial: Partial<OcxConfig>): void {
+function writeConfig(partial: Partial<oprConfig>): void {
   const providers = partial.providers ?? { kimi: kimiProvider() };
   const defaultProvider = partial.defaultProvider ?? Object.keys(providers)[0] ?? "kimi";
-  const cfg: OcxConfig = { port: 10100, ...partial, providers, defaultProvider };
+  const cfg: oprConfig = { port: 10100, ...partial, providers, defaultProvider };
   writeFileSync(getConfigPath(), JSON.stringify(cfg, null, 2));
 }
 
@@ -41,7 +41,7 @@ beforeEach(() => {
 
 afterEach(() => {
   if (origHome === undefined) delete process.env.HOME; else process.env.HOME = origHome;
-  if (origOcxHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = origOcxHome;
+  if (origoprHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = origoprHome;
   if (origCodexHome === undefined) delete process.env.CODEX_HOME; else process.env.CODEX_HOME = origCodexHome;
   globalThis.fetch = origFetch;
   rmSync(tmp, { recursive: true, force: true });
@@ -215,3 +215,4 @@ describe("token guardian", () => {
     expect(readFileSync(accountStore, "utf8")).toBe("invalid-added-store");
   });
 });
+

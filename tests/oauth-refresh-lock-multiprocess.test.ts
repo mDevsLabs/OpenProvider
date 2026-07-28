@@ -17,7 +17,7 @@ import {
 
 const repoRoot = dirname(fileURLToPath(new URL("../package.json", import.meta.url)));
 const origHome = process.env.HOME;
-const origOcxHome = process.env.OPENPROVIDER_HOME;
+const origoprHome = process.env.OPENPROVIDER_HOME;
 const origKimiRefresh = OAUTH_PROVIDERS.kimi!.refresh;
 let tmp: string;
 
@@ -35,8 +35,8 @@ afterEach(() => {
   OAUTH_PROVIDERS.kimi!.refresh = origKimiRefresh;
   if (origHome === undefined) delete process.env.HOME;
   else process.env.HOME = origHome;
-  if (origOcxHome === undefined) delete process.env.OPENPROVIDER_HOME;
-  else process.env.OPENPROVIDER_HOME = origOcxHome;
+  if (origoprHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = origoprHome;
   rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -128,3 +128,4 @@ describe("slow multi-process OAuth refresh lock", () => {
     expect(writerOut).toContain("writer-done");
   }, 30_000);
 });
+

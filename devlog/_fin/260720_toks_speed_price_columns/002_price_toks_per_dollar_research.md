@@ -6,7 +6,7 @@
 provider/model/usage가 있으며, 로그에는 combo의 attempt별 identity와 usage도 보존된다.
 단, 다음 두 조건을 구현 전 계약으로 고정해야 한다.
 
-1. `OcxUsage.inputTokens`는 캐시 읽기·쓰기를 포함하는 총 prompt 토큰이다. jawcode의
+1. `oprUsage.inputTokens`는 캐시 읽기·쓰기를 포함하는 총 prompt 토큰이다. jawcode의
    원식을 이 값에 그대로 적용한 뒤 cacheRead/cacheWrite를 다시 더하면 캐시 토큰을
    이중과금한다. 아래의 **정규화 변환식**을 전용 helper로 구현해야 한다.
 2. 가격 키는 화면에 보이는 `resolvedModel`도, 호출자가 보낸 `requestedModel`도 아닌,
@@ -52,7 +52,7 @@ total: input + output + cacheRead + cacheWrite;
 ([`../jawcode/packages/stats/src/aggregator.ts:368-389`](../../../../jawcode/packages/stats/src/aggregator.ts:368)).
 따라서 단위/공식의 근거로 aggregator를 쓰면 안 된다.
 
-## 2. HIGH — 캐시 이중과금 없는 `OcxUsage → CostTokens` 변환
+## 2. HIGH — 캐시 이중과금 없는 `oprUsage → CostTokens` 변환
 
 ### OpenProvider canonical 의미
 
@@ -282,7 +282,7 @@ resolved model label을 이미 표시한다
 | --- | --- | --- |
 | MODIFY | `scripts/generate-jawcode-metadata.ts` | RawModel/row에 cost 4값 생성 |
 | MODIFY (generated) | `src/generated/jawcode-model-metadata.ts` | compact cost data와 accessor 생성 |
-| NEW | `src/usage/cost.ts` (권장) | OcxUsage cache 정규화, exact provider/model lookup, combo attempt sum, display eligibility를 순수 함수화 |
+| NEW | `src/usage/cost.ts` (권장) | oprUsage cache 정규화, exact provider/model lookup, combo attempt sum, display eligibility를 순수 함수화 |
 | MODIFY | `src/server/request-log.ts` 또는 API view layer | `/api/logs`가 attempts를 GUI에 제공해야 하면 contract 확인; 파생을 server에서 할 경우 cost view field 추가 |
 | MODIFY | `gui/src/pages/Logs.tsx` | 두 열, tooltip, `—`/`구독` 상태, colSpan 8→10 |
 | MODIFY | `gui/src/i18n/{en,ko,de,zh}.ts` | 두 헤더와 상태 문자열 |
@@ -301,3 +301,4 @@ resolved model label을 이미 표시한다
 있다. 그러나 cache 변환과 native ID 키를 지키지 않으면 특히 캐시가 큰 요청에서 비용이
 최대 두 번 계산되며, 37.14% 미매칭 및 zero-rate rows를 `$0`으로 보이면 비용 UI 자체가
 오도한다. 따라서 위 두 blocker와 fail-closed 표시를 수용하는 경우에만 구현을 권장한다.
+

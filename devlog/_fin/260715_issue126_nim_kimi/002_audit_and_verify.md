@@ -21,4 +21,5 @@ VERDICT: **PASS**, 0 blockers, 5 advisories (all folded into B):
 - `bun test tests/nvidia-nim-hardening.test.ts` → **14 pass / 0 fail** (28 expects).
 - `bun test tests/parallel-tool-calls-optin.test.ts tests/reasoning-effort.test.ts tests/openai-chat-model-suffix.test.ts` → 70 pass / 0 fail (with new file).
 - `bun test tests/web-search*.test.ts` (5 files) → 66 pass / 0 fail; `tests/codex-catalog.test.ts tests/catalog-cursor-search.test.ts tests/umans-provider.test.ts` → 67 pass / 0 fail.
-- `npx tsc --noEmit`: 3 errors, ALL pre-existing in parallel agents' dirty files (`src/cli/claude.ts`, `src/server/system-env.ts` — authMode on OcxClaudeCodeConfig); zero errors in registry.ts / openai-chat.ts / new test.
+- `npx tsc --noEmit`: 3 errors, ALL pre-existing in parallel agents' dirty files (`src/cli/claude.ts`, `src/server/system-env.ts` — authMode on oprClaudeCodeConfig); zero errors in registry.ts / openai-chat.ts / new test.
+

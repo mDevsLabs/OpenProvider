@@ -372,7 +372,8 @@ expect(actionText(bytes)).toContain("Use the Codex shell bridge tool listed this
   덧붙지 않았음을 증명한다
 
 ```ts
-expect(actionText(bytes)).toBe("Run: echo OCX via your shell tool, report stdout.");
+expect(actionText(bytes)).toBe("Run: echo opr via your shell tool, report stdout.");
 ```
 
 PR head `f408f348`이 이미 같은 방향의 테스트 재작성을 포함한다.
+

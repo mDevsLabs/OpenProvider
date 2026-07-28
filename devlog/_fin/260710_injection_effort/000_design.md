@@ -32,7 +32,7 @@ Semantics guardrails:
 
 ## Files touched
 
-- `src/types.ts` — `OcxConfig.injectionEffort?: string`.
+- `src/types.ts` — `oprConfig.injectionEffort?: string`.
 - `src/reasoning-effort.ts` — exported `isCodexReasoningEffort()`.
 - `src/server/management-api.ts` — GET `/api/injection-model` now returns
   `{ model, effort, efforts, available }`; PUT accepts `{ model, effort }` with the
@@ -47,7 +47,7 @@ Semantics guardrails:
 - `tests/multi-agent-compat.test.ts` — +3 prompt tests (effort named; absent when
   unset; effort-alone keeps the gate).
 - `tests/injection-model-api.test.ts` — NEW, 5 tests for the PUT/GET roundtrip and
-  clearing/validation rules (isolated `OPENCODEX_HOME`).
+  clearing/validation rules (isolated `@mdevs/openprovider_HOME`).
 
 ## Verification (260710)
 
@@ -62,3 +62,5 @@ Semantics guardrails:
 Live note: the running proxy (v2.7.1-preview, port 10100) predates this change;
 the new fields appear after the next `opr restart`. No restart was performed here
 because live sub-agent traffic (gpt-5.6-sol) was in flight.
+
+

@@ -18,7 +18,7 @@ PROVIDER_REGISTRY seed
 | 1 | `src/providers/registry.ts:221` | built-in fallback 모델과 model-scoped capability를 제공한다. |
 | 2 | `src/router.ts:79-159` | 오래된 저장 config에 registry metadata를 backfill하고 사용자 override를 보존한다. |
 | 3 | `src/codex/catalog.ts:1126` | live `/models`를 TTL cache로 읽는다. 정상 live 응답은 ID 목록의 권위 있는 결과다. |
-| 4 | `src/codex/catalog.ts:1094` | `context_length`, `max_model_len`, `metadata.capabilities/limits`를 OCX catalog hint로 바꾼다. |
+| 4 | `src/codex/catalog.ts:1094` | `context_length`, `max_model_len`, `metadata.capabilities/limits`를 opr catalog hint로 바꾼다. |
 | 5 | `src/codex/catalog.ts:1297` | registry의 `jawcodeBundle` alias가 있는 provider에 생성된 jawcode metadata를 보강한다. |
 | 6 | `src/codex/catalog.ts:1247` | `disabledModels`, provider별 `selectedModels`, provider 특수 필터를 적용한다. |
 | 7 | `src/codex/catalog.ts:1478` | routed `provider/model` entry를 Codex catalog에 병합한다. |
@@ -70,3 +70,4 @@ bun test --isolate tests/codex-catalog.test.ts tests/provider-live-models.test.t
 bun run typecheck
 git diff --check
 ```
+

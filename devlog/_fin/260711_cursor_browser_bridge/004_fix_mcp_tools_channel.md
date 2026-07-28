@@ -46,7 +46,7 @@ phase45 assertion `run.mcpTools toBeUndefined` becomes `mcpTools.mcpTools.length
 
 To vary the wire shape without restarting the user's live proxy on 10100, the
 experiments ran on a throwaway second proxy (port 10199, isolated
-OPENCODEX_HOME/CODEX_HOME copies, tokens deleted after) driven through the real
+@mdevs/openprovider_HOME/CODEX_HOME copies, tokens deleted after) driven through the real
 `/v1/responses` request-builder path. Env-gated scaffolds tested each hypothesis;
 all scaffolds were removed before commit. sol cxc-search subagents (Socrates,
 Poincare) supplied the Tier-2 protobuf facts: `mcp_tools` = field 4 `McpTools`
@@ -73,5 +73,7 @@ bridge's shapes.
   turn). A full multi-turn browser round-trip (node_repl -> result -> next call)
   should be smoke-tested once, but no code on the return path changed.
 - Committed on branch claudecode. Scaffold fully removed (native-exec.ts /
-  tool-definitions.ts restored to clean baseline; the OCX_CURSOR_PROBE_* scaffold
+  tool-definitions.ts restored to clean baseline; the opr_CURSOR_PROBE_* scaffold
   that got swept into another session's commit 7f80b053 is removed here).
+
+

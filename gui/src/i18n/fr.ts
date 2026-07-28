@@ -189,6 +189,8 @@ export const fr = {
   "dash.injectionEffortLabel": "Effort de raisonnement",
   "dash.injectionEffortNone": "Valeur par défaut du modèle",
   "dash.effortCapLabel": "Limite d'effort ultra V2",
+  "dash.syncCodexSubagentDefaults": "Sync Codex subagent defaults",
+  "dash.syncCodexSubagentDefaultsHint": "Automatically sync Codex subagent configuration with default settings.",
   "dash.subagentEffortCapLabel": "Limite d'effort des sous-agents V2",
   "dash.effortCapHelp": "Limite l'effort de raisonnement des tours V2 en mode ultra. Lorsqu'une limite est définie, les requêtes d'effort maximal entrantes sont plafonnées au niveau sélectionné. La limite des sous-agents ne s'applique qu'aux agents enfants créés. Les limites peuvent uniquement réduire l'effort, jamais l'augmenter. Si un modèle ne prend pas en charge le niveau limité, le niveau inférieur compatible le plus proche est utilisé.",
   "dash.effortCapNone": "Aucune limite",
@@ -1047,9 +1049,9 @@ export const fr = {
   "api.endpointsTitle": "Points de terminaison",
   "api.authTitle": "Authentification",
   "api.authResponses": "Les requêtes Responses nécessitent x-OpenProvider-api-key, car Authorization peut être réservé au transfert Codex Direct.",
-  "api.authChatCompletions": "Chat Completions et /v1/models acceptent Authorization: Bearer ocx_... ou x-OpenProvider-api-key.",
-  "api.authLoopback": "Les liaisons en boucle locale (127.0.0.1 ou ::1) contournent l'authentification. Les liaisons distantes nécessitent une clé ocx_ générée ou OpenProvider_API_AUTH_TOKEN.",
-  "api.authMessages": "Messages accepte Authorization: Bearer ocx_... ou x-OpenProvider-api-key.",
+  "api.authChatCompletions": "Chat Completions et /v1/models acceptent Authorization: Bearer opr_... ou x-OpenProvider-api-key.",
+  "api.authLoopback": "Les liaisons en boucle locale (127.0.0.1 ou ::1) contournent l'authentification. Les liaisons distantes nécessitent une clé opr_ générée ou OpenProvider_API_AUTH_TOKEN.",
+  "api.authMessages": "Messages accepte Authorization: Bearer opr_... ou x-OpenProvider-api-key.",
   "api.authBaseUrlNote": "Configurez les clients avec l'URL de base, puis choisissez ci-dessous le point de terminaison correspondant au protocole.",
   "api.newKeyTitle": "Nouvelle clé créée",
   "api.newKeyNote": "Copiez cette clé maintenant — elle ne sera plus affichée.",
@@ -1352,3 +1354,4 @@ export const fr = {
   "claudeDesktop.effort.supported": "effort",
   "claudeDesktop.effort.displayOnly": "effort (affichage uniquement)",
 } as const;
+

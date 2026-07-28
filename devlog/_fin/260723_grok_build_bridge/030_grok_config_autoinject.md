@@ -16,7 +16,7 @@ api_key = "openprovider-loopback"
 [model.opr-gpt-5-6-sol]
 model = "gpt-5.6-sol"
 model_provider = "openprovider"
-name = "OCX gpt-5.6-sol"
+name = "opr gpt-5.6-sol"
 context_window = 1050000
 # <<< openprovider managed block <<<
 ```
@@ -32,7 +32,7 @@ context_window = 1050000
 | 시점 | 동작 |
 |---|---|
 | `opr start` (handleStart, syncModelsToCodex 이후) | `~/.grok` 존재 시에만 주입. 기존 펜스 블록은 통째로 교체(멱등). 첫 주입 전 1회 `config.toml.bak-openprovider` 백업 |
-| `opr stop` / daemon graceful shutdown (`!OCX_SERVICE`) | 펜스 블록만 제거, 사용자 블록 보존 |
+| `opr stop` / daemon graceful shutdown (`!opr_SERVICE`) | 펜스 블록만 제거, 사용자 블록 보존 |
 | `opr eject` / `opr uninstall` | 동일 strip + runStep 로깅 |
 | grok 미설치 (`~/.grok` 없음) | no-op, 로그 한 줄 |
 
@@ -54,3 +54,4 @@ context_window = 1050000
 - B안(models_base_url 카탈로그) — 네이티브 카탈로그 대체 부작용으로 보류
 - grok config 핫리로드 대응 (시작 순서만 문서화)
 - docs-site 문서화 (wp2 잔여로 유지)
+

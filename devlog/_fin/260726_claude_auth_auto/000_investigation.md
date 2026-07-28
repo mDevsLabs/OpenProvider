@@ -14,7 +14,7 @@ and folded into the phase docs below.
 
 ## Current authMode flow, with the source located
 
-`OcxClaudeCodeConfig.authMode?: "proxy"` (`src/types.ts:366-369`) — absent means
+`oprClaudeCodeConfig.authMode?: "proxy"` (`src/types.ts:366-369`) — absent means
 "subscription", the default. There is no third state today.
 
 `buildClaudeEnv` (`src/cli/claude.ts:28-113`) assembles the launch env:
@@ -116,3 +116,4 @@ c-hardening, c-gates, c-smoke.
 Round 2 added two criteria: **c-migration** (a legacy explicit Subscription survives
 the upgrade; a fresh install gets auto) and **c-ordering** (a stale marker never
 suppresses the admission key).
+

@@ -9,13 +9,13 @@ opens all native local-exec cases). So this is a DIFFERENT mechanism.
 The Browser plugin is not a set of dedicated tools; it is driven through the CLIENT
 MCP tool mcp__node_repl__js (runs browser-client.mjs). For a Cursor-routed model to
 use it, openprovider must let the Cursor model invoke a client Responses/MCP tool
-(providerIdentifier OCX_RESPONSES_TOOL_PROVIDER) and return its result.
+(providerIdentifier opr_RESPONSES_TOOL_PROVIDER) and return its result.
 
 Two possible paths inside src/adapters/cursor:
 - Streamed tool_call: Cursor emits an interaction toolCall; protobuf-events.ts surfaces
   tool_call_start/delta; Codex executes locally; result returns on the next request.
 - Native mcpArgs: Cursor's server wants to run the MCP tool synchronously. For
-  OCX_RESPONSES_TOOL_PROVIDER, planMcpArgsHandling (live-transport.ts:137) surfaces it
+  opr_RESPONSES_TOOL_PROVIDER, planMcpArgsHandling (live-transport.ts:137) surfaces it
   as tool_call events, ends turn 1 done, and expects the real result on the NEXT
   /v1/responses request. native-exec.ts:168 / native-exec-tools.ts:38 are fallback
   errors ("bridge suspension not implemented") that should not normally fire.
@@ -30,7 +30,7 @@ Provider debug is ON. Spawn a cursor/gpt-5.6-luna subagent and have it:
 2. attempt the Browser plugin bootstrap (open a page),
 and report verbatim: tool name used, SUCCESS/FAILURE, exact result/error.
 Then read /api/debug/logs frames to classify the path: streamed toolCall (works),
-mcpArgs OCX_RESPONSES (turn-1-done bridge), or tool-not-advertised.
+mcpArgs opr_RESPONSES (turn-1-done bridge), or tool-not-advertised.
 
 ## Root-cause classes (WP1 output)
 proxy-bridge-gap | tool-advertisement-gap | cursor-protocol-limitation | model-behavior.
@@ -40,3 +40,4 @@ IN: src/adapters/cursor/**, tests/**, this devlog, ~/.openprovider config only i
 provider setting is the fix. OUT: other session's dirty files (gui/**, docs-site/**,
 src/server/management-api.ts, tests/claude-management-api.test.ts, src/claude/**),
 no release, no proxy restart. Keep earlier cursor nativeLocalExec policy intact.
+

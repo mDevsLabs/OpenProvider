@@ -85,9 +85,9 @@ Complete content:
 
 ```ts
 // Opt-in frame-drop visibility. The streaming path is intentionally quiet (no unconditional
-// console output), so this no-ops unless OCX_DEBUG_FRAMES=1. Lets a malformed/chunk-split
+// console output), so this no-ops unless opr_DEBUG_FRAMES=1. Lets a malformed/chunk-split
 // upstream frame be detected instead of silently truncating content.
-const DEBUG_FRAMES = process.env.OCX_DEBUG_FRAMES === "1";
+const DEBUG_FRAMES = process.env.opr_DEBUG_FRAMES === "1";
 
 export function debugDroppedFrame(adapter: string, payload: string): void {
   if (!DEBUG_FRAMES) return;
@@ -149,7 +149,7 @@ Expected:
 
 ```text
 content-type survives; stale/hop-by-hop dropped; telemetry preserved
-OCX_DEBUG_FRAMES default off → no console output in normal runs
+opr_DEBUG_FRAMES default off → no console output in normal runs
 Bun auto-decompress confirmed
 full suite passes; typecheck clean
 ```
@@ -159,3 +159,4 @@ full suite passes; typecheck clean
 ```text
 [agent] test: lock passthrough SSE header survival; add opt-in frame-drop logging
 ```
+

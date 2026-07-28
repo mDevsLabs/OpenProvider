@@ -112,7 +112,7 @@ if (typeof msg.content === "string") {
 
 `reasoningSplitModels?: string[]`를 아래 4개 타입에 추가한다.
 
-- `OcxProviderConfig` (`src/types.ts`)
+- `oprProviderConfig` (`src/types.ts`)
 - `ProviderRegistryEntry`
 - `ProviderConfigSeed`
 - `DerivedKeyLoginProvider`
@@ -173,9 +173,9 @@ A-gate R2 blocker 5 반영: 최초 안의 `configWithMiniMax()` / `parsedWith()`
 실제 헬퍼 시그니처 (PR #431이 추가하는 파일 상단):
 
 ```ts
-function parsed(modelId: string, reasoning?: ReasoningEffort): OcxParsedRequest
-function body(provider: OcxProviderConfig, modelId: string, reasoning?: ReasoningEffort): Record<string, unknown>
-function minimaxRoute(modelId = "MiniMax-M3", provider: Partial<OcxProviderConfig> = {}): { provider: OcxProviderConfig; modelId: string }
+function parsed(modelId: string, reasoning?: ReasoningEffort): oprParsedRequest
+function body(provider: oprProviderConfig, modelId: string, reasoning?: ReasoningEffort): Record<string, unknown>
+function minimaxRoute(modelId = "MiniMax-M3", provider: Partial<oprProviderConfig> = {}): { provider: oprProviderConfig; modelId: string }
 ```
 
 `body()`가 이미 `buildRequest` 결과를 JSON 파싱해 돌려주므로 어댑터를 직접 만들 필요가 없다.
@@ -254,3 +254,4 @@ bun run typecheck
 ```
 
 원본 PR은 draft이고 branch/label 체크만 있다. 축소 슬라이스도 전체 스위트를 새로 돌린다.
+

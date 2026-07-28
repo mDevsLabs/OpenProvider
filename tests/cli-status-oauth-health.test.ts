@@ -7,7 +7,7 @@ import { collectOAuthHealthEntries } from "../src/oauth/health";
 import { getAccountSet, markAccountNeedsReauth, saveCredential } from "../src/oauth/store";
 
 const origHome = process.env.HOME;
-const origOcxHome = process.env.OPENPROVIDER_HOME;
+const origoprHome = process.env.OPENPROVIDER_HOME;
 let tmp: string;
 
 beforeEach(() => {
@@ -20,8 +20,8 @@ beforeEach(() => {
 afterEach(() => {
   if (origHome === undefined) delete process.env.HOME;
   else process.env.HOME = origHome;
-  if (origOcxHome === undefined) delete process.env.OPENPROVIDER_HOME;
-  else process.env.OPENPROVIDER_HOME = origOcxHome;
+  if (origoprHome === undefined) delete process.env.OPENPROVIDER_HOME;
+  else process.env.OPENPROVIDER_HOME = origoprHome;
   rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -102,3 +102,4 @@ describe("collectOAuthHealthEntries via status formatter", () => {
     expect(text).not.toContain("person@example.test");
   });
 });
+

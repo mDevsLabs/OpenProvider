@@ -12,7 +12,7 @@
  * install adds zero ToS-detection surface. See devlog 260703_oauth-multi-account-refresh-and-tos.
  */
 import { loadConfig } from "../config";
-import type { OcxConfig, OcxTokenGuardianConfig } from "../types";
+import type { oprConfig, oprTokenGuardianConfig } from "../types";
 import { listAccounts } from "./store";
 import { getValidAccessTokenForAccount, listOAuthProviders, OAuthLoginRequiredError, resolveRefreshPolicy } from "./index";
 import {
@@ -68,7 +68,7 @@ function num(value: number | undefined, fallback: number, min: number): number {
   return typeof value === "number" && Number.isFinite(value) && value >= min ? value : fallback;
 }
 
-function resolved(g: OcxTokenGuardianConfig | undefined) {
+function resolved(g: oprTokenGuardianConfig | undefined) {
   return {
     tickSeconds: num(g?.tickSeconds, DEFAULTS.tickSeconds, 60),
     jitterSeconds: num(g?.jitterSeconds, DEFAULTS.jitterSeconds, 0),
@@ -116,7 +116,7 @@ async function runWithConcurrency(tasks: Array<() => Promise<void>>, limit: numb
  * ids only, never tokens).
  */
 export async function guardianSweep(nowMs: number = Date.now()): Promise<GuardianSweepResult> {
-  const config: OcxConfig = loadConfig();
+  const config: oprConfig = loadConfig();
   const g = config.tokenGuardian;
   const result: GuardianSweepResult = { enabled: !!g?.enabled, refreshed: [], warmed: [], failed: [], skippedBackoff: [] };
   if (!g?.enabled) return result;
@@ -262,3 +262,4 @@ export function startTokenGuardian(): TokenGuardianHandle {
     },
   };
 }
+

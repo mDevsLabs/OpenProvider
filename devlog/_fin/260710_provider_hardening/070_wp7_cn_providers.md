@@ -19,7 +19,7 @@ IN this cycle:
   spelling is the documented Anthropic-path convention).
 - Z2 (AMENDED A-round1) bracket-strip scoping: new flag `modelSuffixBracketStrip:
   true` on zai only; openai-chat strips ONLY when set. Flag propagates through
-  the FULL chain (reviewer-enumerated): OcxProviderConfig + ProviderRegistryEntry
+  the FULL chain (reviewer-enumerated): oprProviderConfig + ProviderRegistryEntry
   + ProviderConfigSeed picks + providerConfigSeed + enrichProviderFromRegistry +
   routedProviderConfig. Tests: seed AND routed activation assertions (flagged
   zai strips; unflagged provider sends bracketed id verbatim). Reviewer
@@ -58,3 +58,4 @@ adapter-override loudness (cross-cutting, named); deepseek /anthropic base.
 ## Tests
 deepseek/minimax registry assertions (default/ctx/adapter/base); zai suffix
 tests rewritten for scoped behavior; freeze rows untouched.
+

@@ -48,7 +48,7 @@ absolute checkpoint가 per-attempt input보다 크다는 것을 단언한다.
 - 결과: exit 0, stderr/stdout 없음. 기준 `037e8f5e`에 clean apply된다.
 - 독립 리뷰 판정: `MERGE_OK`.
 - 2026-07-25 조회 당시 PR #447 head는 `0c73bd1f06a4b6a7fa9973043330bcd943869e6b`. 보안 경계 때문에 별도 보류된 Kiro 브라우저 멀티계정 PR이며 `src/adapters/kiro.ts`와 `src/types.ts`를 함께 수정한다.
-- #447의 직접 겹침은 base `src/adapters/kiro.ts:1101-1108`의 `createKiroAdapter().build()`에서 global region/profile lookup을 `parsed._kiroAuthContext` 기반으로 바꾸는 hunk다. #439가 같은 owner를 확장하고 행을 이동시키므로 **#439가 먼저**, #447은 이후 최신 dev 위 rebase/re-audit 대상이다. `src/types.ts`에서는 #447이 `OcxParsedRequest._kiroAuthContext`를 추가하고 #439가 `OcxUsage.contextTotalTokens`를 추가해 직접 동일 hunk는 아니지만 같은 파일 계약이므로 rebase 후 typecheck가 필요하다.
+- #447의 직접 겹침은 base `src/adapters/kiro.ts:1101-1108`의 `createKiroAdapter().build()`에서 global region/profile lookup을 `parsed._kiroAuthContext` 기반으로 바꾸는 hunk다. #439가 같은 owner를 확장하고 행을 이동시키므로 **#439가 먼저**, #447은 이후 최신 dev 위 rebase/re-audit 대상이다. `src/types.ts`에서는 #447이 `oprParsedRequest._kiroAuthContext`를 추가하고 #439가 `oprUsage.contextTotalTokens`를 추가해 직접 동일 hunk는 아니지만 같은 파일 계약이므로 rebase 후 typecheck가 필요하다.
 
 ## 변경 계약
 
@@ -144,7 +144,7 @@ index 9cb55e06..9e43e891 100644
  import { fetchKiroWithRetry } from "./kiro-retry";
  import { convertKiroToolContext } from "./kiro-tools";
  import { neutralizeIdentity } from "./identity";
-@@ -134,6 +135,52 @@ function messageLogText(msg: OcxMessage): string {
+@@ -134,6 +135,52 @@ function messageLogText(msg: oprMessage): string {
    }).filter(Boolean).join("\n");
  }
  
@@ -194,10 +194,10 @@ index 9cb55e06..9e43e891 100644
 +  return estimateKiroTokens(parts.join("\n"), modelId) + imageTokens;
 +}
 +
- function shouldCountStablePromptOverhead(parsed: OcxParsedRequest): boolean {
+ function shouldCountStablePromptOverhead(parsed: oprParsedRequest): boolean {
    return !parsed.previousResponseId && !parsed.context.messages.some(m => m.role === "assistant");
  }
-@@ -148,25 +195,21 @@ function estimateKiroInputTokens(parsed: OcxParsedRequest): number {
+@@ -148,25 +195,21 @@ function estimateKiroInputTokens(parsed: oprParsedRequest): number {
      if (parsed.context.tools?.length) parts.push(serializeForUsage(parsed.context.tools));
    }
  
@@ -205,7 +205,7 @@ index 9cb55e06..9e43e891 100644
 +  return estimateKiroTokens(parts.join("\n"), parsed.modelId);
  }
  
- function estimateKiroLogInputTokens(parsed: OcxParsedRequest): number {
+ function estimateKiroLogInputTokens(parsed: oprParsedRequest): number {
    const parts = parsed.context.messages.map(messageLogText).filter(Boolean);
    if (parsed.context.systemPrompt?.length) parts.push(...parsed.context.systemPrompt);
    if (parsed.context.tools?.length) parts.push(serializeForUsage(parsed.context.tools));
@@ -213,7 +213,7 @@ index 9cb55e06..9e43e891 100644
 +  return Math.max(estimateKiroInputTokens(parsed), estimateKiroTokens(parts.join("\n"), parsed.modelId));
  }
  
--function configuredKiroContextWindow(provider: OcxProviderConfig, modelId: string | undefined): number | undefined {
+-function configuredKiroContextWindow(provider: oprProviderConfig, modelId: string | undefined): number | undefined {
 +function kiroUpstreamContextWindow(modelId: string | undefined): number | undefined {
    if (!modelId) return undefined;
    const normalizedModelId = normalizeKiroModelId(modelId);
@@ -246,16 +246,16 @@ index 9cb55e06..9e43e891 100644
    sawReasoning: boolean,
  ) => Promise<KiroFallbackAttempt>;
  
--function mergeKiroUsage(first: OcxUsage | undefined, second: OcxUsage | undefined): OcxUsage | undefined {
+-function mergeKiroUsage(first: oprUsage | undefined, second: oprUsage | undefined): oprUsage | undefined {
 +function mergeKiroUsage(
-+  first: OcxUsage | undefined,
-+  second: OcxUsage | undefined,
++  first: oprUsage | undefined,
++  second: oprUsage | undefined,
 +  preserveFirstContextGrowth = false,
-+): OcxUsage | undefined {
++): oprUsage | undefined {
    if (!first) return second;
    if (!second) return first;
-   const sumOptional = (key: keyof OcxUsage): number | undefined => {
-@@ -488,9 +540,23 @@ function mergeKiroUsage(first: OcxUsage | undefined, second: OcxUsage | undefine
+   const sumOptional = (key: keyof oprUsage): number | undefined => {
+@@ -488,9 +540,23 @@ function mergeKiroUsage(first: oprUsage | undefined, second: oprUsage | undefine
    const totalTokens = typeof first.totalTokens === "number" && typeof second.totalTokens === "number"
      ? first.totalTokens + second.totalTokens
      : undefined;
@@ -297,13 +297,13 @@ index 9cb55e06..9e43e891 100644
    const providerState = (): { kiro: { conversationId: string } } | undefined =>
      returnedConversationId ? { kiro: { conversationId: returnedConversationId } } : undefined;
  
--  const usage = (): OcxUsage => authoritativeUsage ?? ({
+-  const usage = (): oprUsage => authoritativeUsage ?? ({
 +  const contextUsageTotalFloor = (): number | undefined => {
 +    if (contextUsagePercentage === undefined || !contextWindowState.value) return undefined;
 +    const floor = Math.ceil(contextWindowState.value * Math.min(contextUsagePercentage, 100) / 100);
 +    return Number.isFinite(floor) && floor > 0 ? floor : undefined;
 +  };
-+  const usage = (): OcxUsage => {
++  const usage = (): oprUsage => {
 +    const base = authoritativeUsage ?? {
        inputTokens,
 -      outputTokens: estimateTokens(outputChars, modelId),
@@ -406,7 +406,7 @@ index 9cb55e06..9e43e891 100644
        : {}),
    };
  }
-@@ -1080,6 +1173,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
+@@ -1080,6 +1173,7 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
    // Per-request closure (resolveAdapter builds a fresh adapter per request — server.ts:440 — so this
    // is race-free) carrying the heuristic input-token estimate from buildRequest into the stream.
    let inputTokens = 0;
@@ -414,7 +414,7 @@ index 9cb55e06..9e43e891 100644
    let modelId: string | undefined;
    let contextWindow: number | undefined;
    let toolNameMap: Map<string, string> | undefined;
-@@ -1097,6 +1191,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
+@@ -1097,6 +1191,7 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
      conversationId: string;
      completionMode: KiroCompletionMode;
      inputTokens: number;
@@ -422,7 +422,7 @@ index 9cb55e06..9e43e891 100644
    }> => {
      if (typeof provider.apiKey !== "string" || provider.apiKey.trim() === "") {
        throw new Error("kiro token missing — run opr login kiro");
-@@ -1118,6 +1213,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
+@@ -1118,6 +1213,7 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
      if (profileArn) headers["x-amzn-kiro-profile-arn"] = profileArn;
      const built = buildKiroPayload(parsed, profileArn, forcedCompletionMode);
      await normalizeKiroImages(built.payload);
@@ -430,7 +430,7 @@ index 9cb55e06..9e43e891 100644
      const body = JSON.stringify(built.payload);
      debugProviderDiagnostic("kiro", "request", {
        region,
-@@ -1141,6 +1237,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
+@@ -1141,6 +1237,7 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
        conversationId: built.conversationId,
        completionMode: built.completionMode,
        inputTokens: estimateKiroInputTokens(parsed),
@@ -438,7 +438,7 @@ index 9cb55e06..9e43e891 100644
      };
    };
  
-@@ -1179,6 +1276,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
+@@ -1179,6 +1276,7 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
      return {
        response,
        inputTokens: retry.inputTokens,
@@ -446,8 +446,8 @@ index 9cb55e06..9e43e891 100644
        nameMap: retry.nameMap,
        conversationId: retry.conversationId,
      };
-@@ -1189,8 +1287,9 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
-     async buildRequest(parsed: OcxParsedRequest, incoming) {
+@@ -1189,8 +1287,9 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
+     async buildRequest(parsed: oprParsedRequest, incoming) {
        const built = await build(parsed);
        modelId = parsed.modelId;
 -      contextWindow = configuredKiroContextWindow(provider, parsed.modelId);
@@ -457,7 +457,7 @@ index 9cb55e06..9e43e891 100644
        toolNameMap = built.nameMap;
        conversationId = built.conversationId;
        completionMode = built.completionMode;
-@@ -1209,6 +1308,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
+@@ -1209,6 +1308,7 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
          conversationId,
          completionMode,
          completionMode === "required" ? fallbackFactory : undefined,
@@ -465,7 +465,7 @@ index 9cb55e06..9e43e891 100644
        );
      },
  
-@@ -1239,6 +1339,7 @@ export function createKiroAdapter(provider: OcxProviderConfig): ProviderAdapter
+@@ -1239,6 +1339,7 @@ export function createKiroAdapter(provider: oprProviderConfig): ProviderAdapter
          conversationId,
          completionMode,
          completionMode === "required" ? fallbackFactory : undefined,
@@ -479,7 +479,7 @@ index 09f11dd4..6e7025f1 100644
 +++ b/src/bridge.ts
 @@ -15,20 +15,29 @@ function sseEvent(name: string, data: Record<string, unknown>): string {
  
- function responsesUsage(usage: OcxUsage | undefined): Record<string, unknown> {
+ function responsesUsage(usage: oprUsage | undefined): Record<string, unknown> {
    if (!usage) return { input_tokens: 0, output_tokens: 0, total_tokens: 0 };
 -  // inputTokens is already inclusive of cache read/write (types.ts convention).
 -  const inputTokens = usage.inputTokens;
@@ -516,8 +516,8 @@ diff --git a/src/types.ts b/src/types.ts
 index c5937600..9df4c114 100644
 --- a/src/types.ts
 +++ b/src/types.ts
-@@ -308,6 +308,12 @@ export interface OcxUrlCitation {
- export interface OcxUsage {
+@@ -308,6 +308,12 @@ export interface oprUrlCitation {
+ export interface oprUsage {
    inputTokens: number;
    outputTokens: number;
 +  /**
@@ -887,7 +887,7 @@ index e7f86a39..cf7689fc 100644
 +    const profileArn = resolveKiroProfileArn(parsed._kiroAuthContext);
 ```
 
-이 hunk는 #439 적용 후 `src/adapters/kiro.ts:1196-1216` 부근의 `build(parsed, ...)` 안으로 이동한다. #447의 `OcxParsedRequest._kiroAuthContext` 추가와 #439의 `OcxUsage.contextTotalTokens`가 모두 보존되는지 `src/types.ts`를 수동 대조한다. 보안 리뷰가 끝나기 전에는 이 WP에 cherry-pick/수동 결합하지 않는다.
+이 hunk는 #439 적용 후 `src/adapters/kiro.ts:1196-1216` 부근의 `build(parsed, ...)` 안으로 이동한다. #447의 `oprParsedRequest._kiroAuthContext` 추가와 #439의 `oprUsage.contextTotalTokens`가 모두 보존되는지 `src/types.ts`를 수동 대조한다. 보안 리뷰가 끝나기 전에는 이 WP에 cherry-pick/수동 결합하지 않는다.
 
 ## 검증
 
@@ -926,7 +926,7 @@ M tests/request-log.test.ts
 - [ ] 적용 직전 PR #439 head가 `e78e84636b799e37ac985e83781190bda6539e0c`와 정확히 일치한다.
 - [ ] 742줄 snapshot 전체가 verbatim 적용되고 snapshot 밖 production/test delta가 없다.
 - [ ] changed-file ledger가 위 여섯 MODIFY와 정확히 일치한다.
-- [ ] `OcxUsage.inputTokens/outputTokens`는 per-attempt semantics를 유지하고 `contextTotalTokens`만 absolute checkpoint다.
+- [ ] `oprUsage.inputTokens/outputTokens`는 per-attempt semantics를 유지하고 `contextTotalTokens`만 absolute checkpoint다.
 - [ ] initial stream과 non-stream parser가 동일한 `contextInputEstimate`를 받는다.
 - [ ] fallback second attempt는 최초 estimate가 아니라 rebuilt payload estimate를 사용한다.
 - [ ] fallback merge는 per-attempt 비용은 합산하되 absolute context는 중복 합산하지 않고 확실한 second output growth는 잃지 않는다.
@@ -943,3 +943,4 @@ M tests/request-log.test.ts
 ## 실행 영수증
 
 _(C/D 단계에서 작성)_
+

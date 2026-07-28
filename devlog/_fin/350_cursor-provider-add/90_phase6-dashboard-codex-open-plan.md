@@ -7,7 +7,7 @@ Expose the existing Cursor adapter scaffold in the user-facing openprovider flow
 model catalog, while preserving the existing safe boundary:
 
 - no Cursor binary execution
-- no live Cursor HTTP/2 smoke without `OPENCODEX_CURSOR_TEST_TOKEN`
+- no live Cursor HTTP/2 smoke without `OpenProvider_CURSOR_TEST_TOKEN`
 - no native read/write/delete/shell/MCP/fetch/screen/computer-use execution
 - Cursor requests continue to fail closed until the live transport is audited
 
@@ -126,3 +126,4 @@ Run without invoking `opr`, `codex`, `cursor`, or `cursor-agent`:
 - Cursor native tool execution.
 - Making Cursor the default provider automatically.
 - Running live `opr`, `codex`, `cursor`, or `cursor-agent`.
+

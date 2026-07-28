@@ -46,7 +46,7 @@
   R3#1)** 네 형식 키 전부로 등록(슬롯이 어느 형식을 저장했든 exact 매칭). 키 등록은
   **first-wins dedupe(R3#4)** — desktop3p 레지스트리와 동일 정책을 공유 헬퍼
   (`buildClaudeContextWindows`)에 고정, 충돌 테스트 포함. **(R3#2→R4#1)** cmdClaude의
-  GET 헤더는 기존 관리 호출 관례대로 **`OPENCODEX_API_AUTH_TOKEN` env 우선, config
+  GET 헤더는 기존 관리 호출 관례대로 **`@mdevs/openprovider_API_AUTH_TOKEN` env 우선, config
   apiKeys fallback**으로 구성. **(R3#3→R4#2)** 요청은 3초 bounded timeout(AbortSignal) —
   활성화 테스트는 3초 초과 지연 fetch fixture로 AbortError 분기를 결정적으로 관측 +
   무부여 단언. **(R4#3)** system-env의 in-process 조회도 동일 3초 bound를
@@ -98,3 +98,4 @@ bun x tsc --noEmit / bun test / gui build / docs-site build.
 - GPT-5.6+ prompt_cache_breakpoint/ttl 변환 (provider capability probe 필요 — 차기 유닛).
 - MAX_CONTEXT auto env 주입 (claude- 접두 별칭에 무효 확인 — 수동 옵션만 존치).
 - anthropic 라우팅 cache_control 보존 (verbatim relay는 claudedesktop 유닛에서 다룸).
+

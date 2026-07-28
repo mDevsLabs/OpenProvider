@@ -9,7 +9,7 @@ mock.module("../src/oauth", () => ({ ...oauthModule, getValidAccessToken: async 
 import { CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../src/oauth/anthropic";
 import { parseRequest } from "../src/responses/parser";
 import { handleManagementAPI } from "../src/server/management-api";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 import {
   describeImageAnthropic,
   parseAnthropicVisionSSE,
@@ -17,7 +17,7 @@ import {
 } from "../src/vision";
 
 const DATA_IMAGE = "data:image/png;base64,aGVsbG8=";
-const anthropicProvider: OcxProviderConfig = {
+const anthropicProvider: oprProviderConfig = {
   adapter: "anthropic",
   authMode: "oauth",
   baseUrl: "https://api.anthropic.test/v1/",
@@ -199,12 +199,12 @@ describe("Anthropic vision executor", () => {
 
 describe("Anthropic vision planning and management config", () => {
   test("explicit anthropic backend fails closed without a usable stored credential", async () => {
-    const routed: OcxProviderConfig = {
+    const routed: oprProviderConfig = {
       adapter: "openai-chat",
       baseUrl: "https://routed.test/v1",
       noVisionModels: ["blind"],
     };
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "routed",
       providers: {
@@ -225,7 +225,7 @@ describe("Anthropic vision planning and management config", () => {
     const previousHome = process.env.OPENPROVIDER_HOME;
     const isolatedHome = mkdtempSync(join(tmpdir(), "opr-vision-management-"));
     process.env.OPENPROVIDER_HOME = isolatedHome;
-    const config: OcxConfig = { port: 10100, defaultProvider: "none", providers: {} };
+    const config: oprConfig = { port: 10100, defaultProvider: "none", providers: {} };
     try {
       const put = await handleManagementAPI(
         new Request("http://localhost/api/sidecar-settings", {
@@ -319,7 +319,7 @@ describe("Anthropic vision planning and management config", () => {
     const previousHome = process.env.OPENPROVIDER_HOME;
     const isolatedHome = mkdtempSync(join(tmpdir(), "opr-vision-management-malformed-"));
     process.env.OPENPROVIDER_HOME = isolatedHome;
-    const config: OcxConfig = { port: 10100, defaultProvider: "none", providers: {} };
+    const config: oprConfig = { port: 10100, defaultProvider: "none", providers: {} };
     try {
       for (const raw of ["null", "[]", "\"str\"", "123",
         JSON.stringify({ vision: [] }), JSON.stringify({ vision: "bad" }),
@@ -345,3 +345,4 @@ describe("Anthropic vision planning and management config", () => {
     }
   });
 });
+

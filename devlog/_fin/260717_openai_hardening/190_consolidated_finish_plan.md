@@ -5,7 +5,7 @@
 > authority. `050_integration_verification.md` now owns final integration, maintained
 > SoT, isolated no-spend runtime proof, evidence privacy, and closeout. In particular,
 > do not restart the user's real proxy, make credential-gated live calls without
-> `OCX_ALLOW_LIVE_OPENAI_SMOKE=1`, modify archived `docs/`, or reopen the real user GUI
+> `opr_ALLOW_LIVE_OPENAI_SMOKE=1`, modify archived `docs/`, or reopen the real user GUI
 > solely because older text below says so.
 
 > Archive note: `_plan/260717_openai_hardening` paths in this audited execution order are
@@ -342,3 +342,4 @@ edits, not the unrelated pre-existing deletions elsewhere in the worktree.
   and missing credentials may skip only the paid live API sub-gate.
 - A full suite was not run during this planning audit. The fresh focused and build gates
   are green, but Cycle B owns the definitive full-suite result.
+

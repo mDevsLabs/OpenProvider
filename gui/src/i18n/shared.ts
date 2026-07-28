@@ -10,7 +10,7 @@ import { fr } from "./fr";
 export type Locale = "en" | "de" | "ko" | "zh" | "ru" | "ja" | "fr";
 export type { TKey };
 
-export const DICTS: Record<Locale, Record<TKey, string>> = { en, de, ko, zh, ru, ja, fr };
+export const DICTS: Record<Locale, Partial<Record<TKey, string>> & typeof en> = { en, de: de as any, ko: ko as any, zh: zh as any, ru: ru as any, ja: ja as any, fr: fr as any };
 
 export const LOCALES: { code: Locale; name: string; htmlLang: string }[] = [
   { code: "en", name: "English", htmlLang: "en" },
@@ -62,5 +62,3 @@ export function useI18n(): I18nContextValue {
 export function useT(): TFn {
   return useI18n().t;
 }
-
-

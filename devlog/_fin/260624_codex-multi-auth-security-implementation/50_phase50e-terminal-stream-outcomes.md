@@ -139,9 +139,9 @@ Add a narrowly-scoped helper:
 
 ```ts
 function codexForwardTerminalOutcomeRecorder(
-  config: OcxConfig,
+  config: oprConfig,
   authCtx: CodexAuthContext,
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
 ): ((status: ResponsesTerminalStatus) => void) | undefined {
   if (authCtx.kind !== "pool") return undefined;
   if (provider.authMode !== "forward" || provider.adapter !== "openai-responses") return undefined;
@@ -334,3 +334,4 @@ Privacy evidence:
 
 - Terminal callbacks receive only `completed`, `failed`, or `incomplete`.
 - The new server recorder maps status to numeric `200` or `502` and does not log account id, email, token, alias, or stream payload text.
+

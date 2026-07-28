@@ -10,7 +10,7 @@ import { clearAccountNeedsReauth, clearAccountQuota } from "../src/codex/auth-ap
 import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../src/codex/routing";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
@@ -93,7 +93,7 @@ function fakeLiveUpstream(captured: CapturedRequest[], status = 201, location = 
   return upstream;
 }
 
-function forwardConfig(): OcxConfig {
+function forwardConfig(): oprConfig {
   return {
     port: 0,
     defaultProvider: "openai",
@@ -106,7 +106,7 @@ function forwardConfig(): OcxConfig {
         codexAccountMode: "direct",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function multipartLiveBody(
@@ -189,7 +189,7 @@ test("POST /v1/live relays to an OpenAI API-key provider at /v1/realtime/calls",
         apiKey: "sk-test-live",
       },
     },
-  } as OcxConfig);
+  } as oprConfig);
 
   const server = startServer(0);
   try {
@@ -382,7 +382,7 @@ test("POST /v1/live without an OpenAI upstream returns 400", async () => {
     providers: {
       cursor: { adapter: "cursor", baseUrl: "https://api2.cursor.sh", apiKey: "cursor-token" },
     },
-  } as OcxConfig);
+  } as oprConfig);
 
   const server = startServer(0);
   try {
@@ -436,7 +436,7 @@ test("a routed pool account's token overrides the caller bearer on the live rela
       { id: "pool-a", email: "pool@example.test", isMain: false, chatgptAccountId: "acct-pool-a" },
     ],
     activeCodexAccountId: "pool-a",
-  } as OcxConfig);
+  } as oprConfig);
   saveCodexAccountCredential("pool-a", {
     accessToken: fakeChatGptJwt({ chatgpt_account_id: "acct-pool-a", email: "pool@example.test" }),
     refreshToken: "pool-refresh-token",
@@ -715,12 +715,12 @@ test("sideband relay preserves multibyte UTF-8 frames byte-identically in both d
   }
 });
 
-// The env-gated frame forensic log (OCX_LIVE_FRAME_LOG) records per-frame metadata and
+// The env-gated frame forensic log (opr_LIVE_FRAME_LOG) records per-frame metadata and
 // U+FFFD presence without writing full payloads — the attribution tool for multibyte
 // transcript corruption reports.
 test("sideband frame log records direction, kind, and U+FFFD context without full payloads", async () => {
   const frameLogPath = join(TEST_DIR, "frames.jsonl");
-  process.env.OCX_LIVE_FRAME_LOG = frameLogPath;
+  process.env.opr_LIVE_FRAME_LOG = frameLogPath;
   const FFFD_TEXT = "가볍게 ��기핼봐요";
 
   const upstream = Bun.serve({
@@ -807,9 +807,10 @@ test("sideband frame log records direction, kind, and U+FFFD context without ful
 
     client.close();
   } finally {
-    delete process.env.OCX_LIVE_FRAME_LOG;
+    delete process.env.opr_LIVE_FRAME_LOG;
     globalThis.WebSocket = RealWebSocket;
     await server.stop(true);
     await upstream.stop(true);
   }
 });
+

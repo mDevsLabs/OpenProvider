@@ -16,7 +16,7 @@ Codex session runs with `danger-full-access`, routed through openprovider to the
   `src/adapters/cursor/native-exec-fs.ts` — "…Set
   provider.unsafeAllowNativeLocalExec=true only for trusted local experiments…".
 - The knob is per-provider config (`src/types.ts:570`,
-  `OcxProviderConfig.unsafeAllowNativeLocalExec`), wired at
+  `oprProviderConfig.unsafeAllowNativeLocalExec`), wired at
   `src/adapters/cursor/live-transport.ts:334,359`.
 - User config `~/.openprovider/config.json` `providers.cursor` does NOT set the
   flag → all Cursor-routed models get policy denials for file ops. The Codex
@@ -88,3 +88,4 @@ untouched). Tests per 010, including adapter-level plumbing coverage.
 
 Non-blocking residuals folded: full before/after provider-object diff captured at
 flip time (finding 5); WP2 plumbing point named exactly in 010 (finding 6).
+

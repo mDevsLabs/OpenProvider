@@ -5,7 +5,7 @@
 CodeWhisperer's userInputMessage accepts an images array (proven by kiro-gateway:
 converters_core.py 641-704 + 1354-1362 + 1520-1562). openprovider's kiro adapter
 models userInputMessage as { content: string } only, so userContentText
-(kiro.ts 91-94) silently drops every OcxImageContent part. Images vanish.
+(kiro.ts 91-94) silently drops every oprImageContent part. Images vanish.
 
 ## Target wire shape (from gateway, native Kiro IDE format)
 
@@ -22,8 +22,8 @@ models userInputMessage as { content: string } only, so userContentText
 
 ## openprovider source shape
 
-OcxImageContent (types.ts 70-76): { type:"image"; imageUrl: data|https URL; detail? }.
-Carried on user/developer/toolResult messages as OcxContentPart[].
+oprImageContent (types.ts 70-76): { type:"image"; imageUrl: data|https URL; detail? }.
+Carried on user/developer/toolResult messages as oprContentPart[].
 
 ## Plan (diff-level)
 
@@ -38,7 +38,7 @@ Carried on user/developer/toolResult messages as OcxContentPart[].
        * Only handles `data:` URLs. Returns undefined for https (not fetchable).
        * Split on first ","; derive media subtype from the header; bytes = tail.
    - extractKiroImages(content): KiroImage[]
-       * Maps OcxContentPart[] image parts via parseDataUrlImage; drops https.
+       * Maps oprContentPart[] image parts via parseDataUrlImage; drops https.
 
 3. In buildKiroPayload user/developer branch (around line 233): after computing
    `text`, also compute images via extractKiroImages and attach to the entry's
@@ -83,3 +83,4 @@ toolResult image parts (kiro.ts:263, userContentText(tr.content)) are ALSO
 dropped today — e.g. Codex view_image output. That is pre-existing behavior, not
 a regression. Phase 10 scopes to user/developer messages only. toolResult image
 forwarding is deferred to Phase 11 (follow-up) to keep this slice atomic.
+

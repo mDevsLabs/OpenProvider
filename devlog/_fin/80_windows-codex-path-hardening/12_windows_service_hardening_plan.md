@@ -7,7 +7,7 @@ macOS uses launchd service semantics. Windows currently uses a generated `.cmd` 
 Current Windows service shape:
 
 - generated script: `~/.openprovider/openprovider-service.cmd`
-- sets `OCX_SERVICE`, `PATH`, optional `CODEX_HOME`
+- sets `opr_SERVICE`, `PATH`, optional `CODEX_HOME`
 - loops only when the child exits non-zero
 - Task Scheduler registration uses bare `/create /tn /tr /sc onlogon /rl highest /f`
 
@@ -96,3 +96,4 @@ On a real Windows host:
 5. Verify restart and log entry.
 6. Run `opr service stop` and verify no child remains.
 7. Run `opr service uninstall` and verify task/script removed and native Codex restored.
+

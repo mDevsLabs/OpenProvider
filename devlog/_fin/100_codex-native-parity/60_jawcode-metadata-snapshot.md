@@ -125,7 +125,7 @@ Current openprovider dependency baseline:
 Generate a small openprovider-owned metadata file, for example:
 
 ```ts
-export interface OcxModelMetadata {
+export interface oprModelMetadata {
   provider: string;
   id: string;
   contextWindow?: number;
@@ -253,7 +253,7 @@ openprovider currently has:
 Phase 100 implementation should extend openprovider response usage separately from catalog metadata:
 
 ```ts
-interface OcxUsage {
+interface oprUsage {
   inputTokens: number;
   outputTokens: number;
   cachedInputTokens?: number;
@@ -285,3 +285,4 @@ confused with Responses token usage.
 - direct runtime dependency is too heavy for the first pass.
 - stale generated snapshots need provenance and regeneration checks.
 - fast/service-tier fields must remain stripped for routed models.
+

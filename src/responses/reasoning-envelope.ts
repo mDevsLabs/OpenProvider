@@ -6,13 +6,13 @@
  * replay 400s ("Expected `thinking` or `redacted_thinking`, but found `tool_use`"). Codex round-trips
  * whatever `encrypted_content` a reasoning output item carries (include: reasoning.encrypted_content
  * is set whenever reasoning is on — codex-rs client.rs), so the proxy smuggles the real Anthropic
- * signature (and any redacted blocks) inside a transparent `ocxr1:` + base64(JSON) envelope.
+ * signature (and any redacted blocks) inside a transparent `oprr1:` + base64(JSON) envelope.
  *
- * Native OpenAI-encrypted blobs (no ocxr1 prefix) are left untouched by the decoder, and the
- * passthrough scrub strips ocxr1 envelopes before native forwarding.
+ * Native OpenAI-encrypted blobs (no oprr1 prefix) are left untouched by the decoder, and the
+ * passthrough scrub strips oprr1 envelopes before native forwarding.
  */
 
-export const OCX_REASONING_PREFIX = "ocxr1:";
+export const opr_REASONING_PREFIX = "oprr1:";
 
 export interface ReasoningEnvelope {
   /** Anthropic thinking-block signature (signature_delta), if captured. */
@@ -27,14 +27,14 @@ export interface ReasoningEnvelope {
 }
 
 export function encodeReasoningEnvelope(envelope: ReasoningEnvelope): string {
-  return OCX_REASONING_PREFIX + Buffer.from(JSON.stringify(envelope), "utf-8").toString("base64");
+  return opr_REASONING_PREFIX + Buffer.from(JSON.stringify(envelope), "utf-8").toString("base64");
 }
 
-/** Decode an ocxr1 envelope; returns null for native (OpenAI-encrypted) blobs or garbage. */
+/** Decode an oprr1 envelope; returns null for native (OpenAI-encrypted) blobs or garbage. */
 export function decodeReasoningEnvelope(encryptedContent: string): ReasoningEnvelope | null {
-  if (!encryptedContent.startsWith(OCX_REASONING_PREFIX)) return null;
+  if (!encryptedContent.startsWith(opr_REASONING_PREFIX)) return null;
   try {
-    const parsed: unknown = JSON.parse(Buffer.from(encryptedContent.slice(OCX_REASONING_PREFIX.length), "base64").toString("utf-8"));
+    const parsed: unknown = JSON.parse(Buffer.from(encryptedContent.slice(opr_REASONING_PREFIX.length), "base64").toString("utf-8"));
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
     const obj = parsed as { sig?: unknown; red?: unknown };
     const envelope: ReasoningEnvelope = {};
@@ -50,3 +50,4 @@ export function decodeReasoningEnvelope(encryptedContent: string): ReasoningEnve
     return null;
   }
 }
+

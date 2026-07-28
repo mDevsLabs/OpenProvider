@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
 import type {
-  OcxAssistantContentPart,
-  OcxContentPart,
-  OcxMessage,
-  OcxParsedRequest,
-  OcxToolCall,
-  OcxToolResultMessage,
+  oprAssistantContentPart,
+  oprContentPart,
+  oprMessage,
+  oprParsedRequest,
+  oprToolCall,
+  oprToolResultMessage,
 } from "../../types";
-import { isAllowedToolChoice, namespacedToolName, toolChoiceAliases, type OcxTool, type OcxToolChoice } from "../../types";
+import { isAllowedToolChoice, namespacedToolName, toolChoiceAliases, type oprTool, type oprToolChoice } from "../../types";
 import type { CursorRequestMessage, CursorRunRequest } from "./types";
 import { cursorWireModelSelection, type CursorRoutingLevel } from "./discovery";
 import { cursorEffortSuffix } from "./effort-map";
@@ -27,16 +27,16 @@ export const CURSOR_TOOL_COUNT_LIMIT = 330;
 export const CURSOR_TOOL_BYTES_LIMIT = 120_000;
 
 interface CursorToolBudgetResult {
-  tools: OcxTool[];
-  omitted: OcxTool[];
+  tools: oprTool[];
+  omitted: oprTool[];
 }
 
-function explicitlySelectedNames(choice: OcxToolChoice | undefined): Set<string> {
+function explicitlySelectedNames(choice: oprToolChoice | undefined): Set<string> {
   if (!choice || choice === "auto" || choice === "none" || choice === "required") return new Set();
   return new Set("name" in choice ? [choice.name] : isAllowedToolChoice(choice) ? choice.allowedTools : []);
 }
 
-function toolPriority(tool: OcxTool, selectedNames: ReadonlySet<string>): number {
+function toolPriority(tool: oprTool, selectedNames: ReadonlySet<string>): number {
   // Shell bridge and apply_patch outrank unrelated allowed_tools entries so a large
   // selected filler cannot starve the Codex execution path during truncation (#399).
   if (isBareCodexShellBridgeTool(tool)) return 0;
@@ -47,7 +47,7 @@ function toolPriority(tool: OcxTool, selectedNames: ReadonlySet<string>): number
   return 5;
 }
 
-function isPinnedCursorTool(tool: OcxTool, selectedNames: ReadonlySet<string>): boolean {
+function isPinnedCursorTool(tool: oprTool, selectedNames: ReadonlySet<string>): boolean {
   return toolPriority(tool, selectedNames) <= 2;
 }
 
@@ -57,8 +57,8 @@ function isPinnedCursorTool(tool: OcxTool, selectedNames: ReadonlySet<string>): 
  * names, provider identifiers, and schemas all count toward the byte ceiling.
  */
 export function applyCursorToolBudget(
-  tools: readonly OcxTool[] | undefined,
-  toolChoice: OcxToolChoice | undefined,
+  tools: readonly oprTool[] | undefined,
+  toolChoice: oprToolChoice | undefined,
 ): CursorToolBudgetResult {
   const catalog = tools ?? [];
   const eligible = catalog.filter(tool => cursorToolAllowedByChoice(tool, toolChoice, catalog));
@@ -71,11 +71,11 @@ export function applyCursorToolBudget(
   const candidates = eligible
     .map((tool, index) => ({ tool, index, priority: toolPriority(tool, selectedNames) }))
     .sort((a, b) => a.priority - b.priority || a.index - b.index);
-  const kept: OcxTool[] = [];
-  const keptSet = new Set<OcxTool>();
+  const kept: oprTool[] = [];
+  const keptSet = new Set<oprTool>();
   let keptBytes = 0;
 
-  const tryKeep = (tool: OcxTool): boolean => {
+  const tryKeep = (tool: oprTool): boolean => {
     if (keptSet.has(tool) || kept.length >= CURSOR_TOOL_COUNT_LIMIT) return keptSet.has(tool);
     // Repeated protobuf message fields serialize as concatenated tag/length/value entries,
     // so each one-entry wrapper size is the exact additive contribution to McpTools.
@@ -105,7 +105,7 @@ export function applyCursorToolBudget(
   };
 }
 
-function catalogLimitNote(kept: readonly OcxTool[], omitted: readonly OcxTool[]): string | undefined {
+function catalogLimitNote(kept: readonly oprTool[], omitted: readonly oprTool[]): string | undefined {
   if (omitted.length === 0) return undefined;
   const recoverable = kept.some(tool => tool.toolSearch || cursorToolWireName(tool) === "tool_search");
   const names = omitted.slice(0, 12).map(cursorToolWireName);
@@ -130,7 +130,7 @@ function normalizeCursorModelId(modelId: string, reasoning?: string): { modelId:
   return { ...selection, modelId: suffix ? `${id}-${suffix}` : id };
 }
 
-function contentPartToText(part: OcxContentPart | OcxAssistantContentPart): string | undefined {
+function contentPartToText(part: oprContentPart | oprAssistantContentPart): string | undefined {
   switch (part.type) {
     case "text":
       return part.text;
@@ -147,7 +147,7 @@ function contentPartToText(part: OcxContentPart | OcxAssistantContentPart): stri
   }
 }
 
-function toolResultToText(message: OcxToolResultMessage): string {
+function toolResultToText(message: oprToolResultMessage): string {
   return [
     "[tool_result]",
     `call_id: ${message.toolCallId}`,
@@ -158,7 +158,7 @@ function toolResultToText(message: OcxToolResultMessage): string {
   ].join("\n");
 }
 
-function contentToText(content: string | readonly (OcxContentPart | OcxAssistantContentPart)[]): string {
+function contentToText(content: string | readonly (oprContentPart | oprAssistantContentPart)[]): string {
   if (typeof content === "string") return content;
   return content
     .map(contentPartToText)
@@ -166,7 +166,7 @@ function contentToText(content: string | readonly (OcxContentPart | OcxAssistant
     .join("\n");
 }
 
-function requestMessage(message: OcxMessage): CursorRequestMessage | undefined {
+function requestMessage(message: oprMessage): CursorRequestMessage | undefined {
   switch (message.role) {
     case "user":
     case "developer":
@@ -204,7 +204,7 @@ export function cursorConversationIdFromClientThread(threadId: string, identityS
  * (cache-cohort fingerprint, not conversation ownership).
  */
 export function resolveCursorConversationId(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   _wireModelId: string,
   options: CreateCursorRequestOptions = {},
 ): string {
@@ -228,7 +228,7 @@ export interface CreateCursorRequestOptions {
 }
 
 export function createCursorRequest(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   options: CreateCursorRequestOptions = {},
 ): CursorRunRequest {
   const messages = parsed.context.messages
@@ -253,3 +253,4 @@ export function createCursorRequest(
     ...(parsed.options.parallelToolCalls !== undefined ? { parallelToolCalls: parsed.options.parallelToolCalls } : {}),
   };
 }
+

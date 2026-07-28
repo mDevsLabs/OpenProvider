@@ -4,7 +4,7 @@ import { injectCodexConfig } from "../codex/inject";
 import { classifyOpenAiTierBackup, getConfigPath, getDefaultConfig, isValidProviderName, saveConfig } from "../config";
 import { enrichProviderFromCatalog } from "../oauth/key-providers";
 import { deriveInitProviders } from "../providers/derive";
-import type { OcxConfig, OcxProviderConfig } from "../types";
+import type { oprConfig, oprProviderConfig } from "../types";
 
 function createPrompt(): { ask(question: string): Promise<string>; close(): void } {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -92,7 +92,7 @@ export async function runInit(): Promise<void> {
   const idx = parseInt(choice, 10) - 1;
 
   let providerName: string;
-  let providerConfig: OcxProviderConfig;
+  let providerConfig: oprProviderConfig;
   let oauthHint = false;
 
   if (idx >= 0 && idx < providers.length) {
@@ -156,7 +156,7 @@ export async function runInit(): Promise<void> {
   const portStr = await prompt.ask("\nProxy port [10100]: ");
   const port = parseInt(portStr, 10) || 10100;
 
-  const config: OcxConfig = {
+  const config: oprConfig = {
     ...getDefaultConfig(),
     port,
     providers: { [providerName]: providerConfig },
@@ -195,3 +195,4 @@ export async function runInit(): Promise<void> {
   console.log(`\n🚀 Setup complete! Run 'opr start' to start the proxy.`);
   prompt.close();
 }
+

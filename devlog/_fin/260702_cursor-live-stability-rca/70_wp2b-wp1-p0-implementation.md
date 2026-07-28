@@ -77,7 +77,7 @@ the backstop. providerIdentifier shortening skipped (migration risk, cosmetic).
 - **Verification**: `tests/cursor-blob.test.ts` + native-exec suites green.
 - The primary contamination suspect (Cursor server-side `ResumeAction` state
   keyed by conversationId) remains monitored: no recurrence in runs 3-12;
-  OCX_DEBUG_FRAMES now dumps per-frame cases for any future incident, and the
+  opr_DEBUG_FRAMES now dumps per-frame cases for any future incident, and the
   conversationId-per-request decision stays open pending a captured recurrence.
 
 ## Gate
@@ -107,3 +107,4 @@ the backstop. providerIdentifier shortening skipped (migration risk, cosmetic).
 - OPEN (user decisions): WP3 native-write policy; webSearchRequestQuery
   approve-vs-reject default; main-instance restart timing (fixes are inactive
   on :10100 until restart).
+

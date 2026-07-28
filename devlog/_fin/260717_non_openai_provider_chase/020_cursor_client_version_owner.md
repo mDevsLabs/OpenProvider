@@ -30,7 +30,7 @@ Probe both currently observed values, newest safe installed Cursor CLI value if 
 ```bash
 bun test tests/cursor-hardening.test.ts tests/cursor-live-transport.test.ts tests/cursor-live-smoke-gate.test.ts
 bun run typecheck
-OPENCODEX_CURSOR_TEST_TOKEN=... OPENCODEX_CURSOR_LIVE=1 bun test tests/cursor-live-smoke-gate.test.ts
+@mdevs/openprovider_CURSOR_TEST_TOKEN=... @mdevs/openprovider_CURSOR_LIVE=1 bun test tests/cursor-live-smoke-gate.test.ts
 ```
 
 ## Terminal outcomes
@@ -39,3 +39,4 @@ OPENCODEX_CURSOR_TEST_TOKEN=... OPENCODEX_CURSOR_LIVE=1 bun test tests/cursor-li
 - `NOOP`: server contracts genuinely require different versions; document and test the split.
 - `NEEDS_HUMAN`: no Cursor credential is available for the value decision.
 - `UNSAFE`: a probe would expose credentials or require disabling TLS validation.
+

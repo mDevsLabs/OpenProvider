@@ -91,7 +91,7 @@ pin it with a guard + a test so a future "tag all gemini as estimated" change ca
   `cachedInputTokens` from `usageMetadata` and does NOT set `estimated: true` — both correct.
   Field mapping it already does:
 
-| Vertex field | OcxUsage | Status |
+| Vertex field | oprUsage | Status |
 |---|---|---|
 | `promptTokenCount` | `inputTokens` | already mapped |
 | `candidatesTokenCount` | `outputTokens` | already mapped |
@@ -200,3 +200,4 @@ truncation error; 503→200 token-exchange retry.
 - `src/lib/gcp-adc.ts` `postForToken` — per-attempt 15s timeout + bounded retry (429/5xx/network),
   status-only error (no body leak). Usage stays `reported` (no estimated tag for google-vertex).
 - Tests: `tests/google-vertex-stream.test.ts` + retry cases in `tests/gcp-adc.test.ts`. Suite 1023/0.
+

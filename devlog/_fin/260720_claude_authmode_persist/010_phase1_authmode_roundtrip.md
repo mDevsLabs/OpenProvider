@@ -17,7 +17,7 @@ authMode: config.claudeCode?.authMode === "proxy" ? "proxy" : "subscription",
 ```ts
 if (body.authMode !== undefined) {
   // "proxy" stores the key; "subscription" (the default) deletes it —
-  // OcxClaudeCodeConfig.authMode is typed `"proxy"` only (src/types.ts:291).
+  // oprClaudeCodeConfig.authMode is typed `"proxy"` only (src/types.ts:291).
   if (body.authMode !== "proxy" && body.authMode !== "subscription") {
     return jsonResponse({ error: 'authMode must be "proxy" or "subscription"' }, 400);
   }
@@ -147,3 +147,4 @@ spy가 유효한지 확인. bun 모듈 캐시상 안 되면 시스템-env쪽 단
 
 - `bun test tests/claude-management-api.test.ts tests/system-env.test.ts`
 - `bunx tsc --noEmit`
+

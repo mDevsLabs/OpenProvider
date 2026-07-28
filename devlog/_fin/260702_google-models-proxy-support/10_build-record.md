@@ -49,7 +49,7 @@
 - **Impact**: `opr login google` key validation.
 - **Verification**: tsc + suite (no dedicated test; probe mirrors the tested request shape).
 
-### src/types.ts + src/config.ts — `OcxConfig.proxy` + `applyProxyEnv`
+### src/types.ts + src/config.ts — `oprConfig.proxy` + `applyProxyEnv`
 - **Changes**: `proxy?: string` (passthrough schema keeps it); `applyProxyEnv` mirrors into
   HTTP(S)_PROXY when unset (user env wins), appends `localhost,127.0.0.1` to NO_PROXY,
   resolves `${VAR}` references via `resolveEnvValue`.
@@ -69,7 +69,7 @@
 - `bun x tsc --noEmit` — zero errors.
 - `bun test ./tests/` — **1237 pass / 0 fail** (126 files), including 11 new tests.
 - **E2E smoke (real server, stub proxy, no real network)** — PASS: started `opr` with a temp
-  `OPENCODEX_HOME` whose config sets only `proxy` + a google provider on a fake host; the
+  `@mdevs/openprovider_HOME` whose config sets only `proxy` + a google provider on a fake host; the
   models request arrived at the stub proxy in absolute-form
   (`http://google-stub.test/v1beta/models?pageSize=1000`, `x-goog-api-key` sent), proving
   `applyProxyEnv` ran at `startServer`; `/v1/models` listed `gemini-3-pro` and filtered the
@@ -96,3 +96,5 @@ cursor work first or hunk-level staging. Deferred to the user (no proactive git 
 - `nextPageToken` loop unnecessary today (pageSize cap 1000 ≥ total models).
 - PR #55: supersede with credit once merged; issue #54: config `proxy` + cooldown answer
   both reported symptoms.
+
+

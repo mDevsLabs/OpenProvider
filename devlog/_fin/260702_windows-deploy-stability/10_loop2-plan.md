@@ -38,7 +38,7 @@ resolving localhost→::1 first hit refusal/wrong-server/timeouts.**
 - New exported pure helper `loopbackBindHostnames(callbackHostname, bindHostname): string[]`
   for tests; `#createServer` returns the listener array.
 
-**R14 — `src/config.ts` + `src/codex-paths.ts`: `OPENCODEX_HOME`/`CODEX_HOME` don't expand
+**R14 — `src/config.ts` + `src/codex-paths.ts`: `@mdevs/openprovider_HOME`/`CODEX_HOME` don't expand
 `~`.**
 - New exported `expandUserPath(raw: string): string` in `config.ts`: `~` alone or leading
   `~/`/`~\` → `homedir()` + rest; all else unchanged (no `%VAR%`/`$VAR` expansion — shells
@@ -66,7 +66,7 @@ users.**
 - new `tests/oauth-callback-binds.test.ts`: `loopbackBindHostnames` matrix (localhost+127 →
   both; explicit redirectUri unchanged; non-loopback bind → single).
 - `tests/config*.test.ts` or new: `expandUserPath` (`~`, `~/x`, `~\x`, `~user` untouched,
-  absolute untouched); `getConfigDir()` honors `OPENCODEX_HOME=~/…`.
+  absolute untouched); `getConfigDir()` honors `@mdevs/openprovider_HOME=~/…`.
 - `tests/codex-shim.test.ts` (extend): source-scan for bare-`codex` probing +
   forward-slash unix shim on win32; `gitBashPath` conversions via generated shim content
   (buildUnixCodexShim with `C:/...` inputs execs quoted forward-slash paths).
@@ -76,7 +76,7 @@ users.**
 
 ## A verdict — FAIL, corrections applied
 
-1. R4: adopted the repo `shell:true` convention (src/update.ts, bin/ocx.mjs) instead of a
+1. R4: adopted the repo `shell:true` convention (src/update.ts, bin/opr.mjs) instead of a
    hand-built cmd.exe wrapper; the command path is pre-quoted since shell:true joins argv
    verbatim and npm paths commonly contain spaces.
 2. R11: both single-server assumptions updated — `login()` finally stops the full listener
@@ -94,3 +94,5 @@ users.**
 4. Existing tests exact-matching `execFileSync(command, args...)` call shape in
    codex-catalog (grep tests for `debug models --bundled` / execFileSync stubs whose
    expectations would change).
+
+

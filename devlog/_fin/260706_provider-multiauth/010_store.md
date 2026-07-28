@@ -49,5 +49,6 @@ Cases: legacy→new normalize round-trip; save new identity appends + activates;
 save same identity replaces; setActiveAccount switches getCredential; removeAccount
 of active promotes next; last removal deletes provider; needsReauth flag persists;
 invalid entries dropped.
-Use `OPENCODEX_CONFIG_DIR`-style temp dir (see existing store/config tests for the
+Use `@mdevs/openprovider_CONFIG_DIR`-style temp dir (see existing store/config tests for the
 env override used by getConfigDir; mirror tests/chatgpt-oauth.test.ts setup).
+

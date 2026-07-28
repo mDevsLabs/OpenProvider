@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { handleResponses } from "../src/server/responses";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const config = {
   port: 0,
@@ -12,7 +12,7 @@ const config = {
       apiKey: "sk-test",
     },
   },
-} as unknown as OcxConfig;
+} as unknown as oprConfig;
 
 function anthropicSse(body: string): Response {
   return new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } });
@@ -79,3 +79,4 @@ describe("server terminal guard integration", () => {
   });
 
 });
+

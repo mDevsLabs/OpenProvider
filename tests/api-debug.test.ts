@@ -9,14 +9,14 @@ import { debugProviderDiagnostic } from "../src/lib/debug";
 import { getInjectionDebugLogEntries, injectionDebugLog, resetInjectionDebugLogBufferForTests } from "../src/lib/injection-debug-log";
 import { startServer } from "../src/server";
 import { appendUsageDebug } from "../src/usage/debug";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 let testDir = "";
 let previousHome: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
-function baseConfig(): OcxConfig {
+function baseConfig(): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -28,7 +28,7 @@ function baseConfig(): OcxConfig {
         authMode: "forward",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function loopbackOrigin(server: { port: number }): string {
@@ -44,7 +44,7 @@ beforeEach(() => {
   resetDebugLogBufferForTests();
   resetInjectionDebugLogBufferForTests();
   clearDebugSettings();
-  delete process.env.OCX_DEBUG;
+  delete process.env.opr_DEBUG;
   delete process.env.OPENPROVIDER_USAGE_DEBUG;
 });
 
@@ -312,3 +312,4 @@ describe("management API /api/debug/usage-logs", () => {
     }
   });
 });
+

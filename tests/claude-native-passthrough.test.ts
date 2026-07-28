@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 let testDir = "";
@@ -50,7 +50,7 @@ function mockAnthropicUpstream(captured: Captured[]) {
   });
 }
 
-function cfg(anthropicBaseUrl: string, extraClaude?: Record<string, unknown>): OcxConfig {
+function cfg(anthropicBaseUrl: string, extraClaude?: Record<string, unknown>): oprConfig {
   return {
     port: 0,
     defaultProvider: "mock",
@@ -59,7 +59,7 @@ function cfg(anthropicBaseUrl: string, extraClaude?: Record<string, unknown>): O
     },
     connectTimeoutMs: 250,
     claudeCode: { anthropicBaseUrl, ...extraClaude },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 const OAUTH_HEADERS = {
@@ -140,6 +140,40 @@ test("unmapped claude model + sk-ant credential passes through verbatim", async 
     };
     expect(codexUsage.surface).toBe("codex");
     expect(codexUsage.summary.requests).toBe(0);
+  } finally {
+    server.stop(true);
+    upstream.stop(true);
+  }
+});
+
+test("native passthrough persists conversationId from metadata.user_id", async () => {
+  const { createHash } = await import("node:crypto");
+  const { clearRequestLogsForTests } = await import("../src/server/request-log");
+  clearRequestLogsForTests();
+  const captured: Captured[] = [];
+  const upstream = mockAnthropicUpstream(captured);
+  saveConfig(cfg(upstream.url.toString().replace(/\/$/, "")));
+  const server = startServer(0);
+  try {
+    const userId = "user_session_opaque_abc";
+    const res = await fetch(new URL("/v1/messages?beta=true", server.url), {
+      method: "POST",
+      headers: OAUTH_HEADERS,
+      body: JSON.stringify({
+        ...claudeBody(),
+        metadata: { user_id: userId },
+      }),
+    });
+    expect(res.status).toBe(200);
+    await res.text();
+
+    const logs = await (await fetch(new URL("/api/logs?tail=1", server.url))).json() as Array<{
+      provider?: string;
+      conversationId?: string;
+    }>;
+    expect(logs).toHaveLength(1);
+    expect(logs[0]?.provider).toBe("anthropic-native");
+    expect(logs[0]?.conversationId).toBe(createHash("sha256").update(userId).digest("hex").slice(0, 32));
   } finally {
     server.stop(true);
     upstream.stop(true);
@@ -364,3 +398,4 @@ test("P5: Files API image source passes through untouched", async () => {
     upstream.stop(true);
   }
 });
+

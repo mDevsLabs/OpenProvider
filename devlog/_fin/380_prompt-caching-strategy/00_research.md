@@ -119,7 +119,7 @@ Relevant LiteLLM behavior:
 - Usage is normalized into OpenAI-style `prompt_tokens_details.cached_tokens`, while Anthropic write tokens are also surfaced.
 - It recommends checking usage fields because below-minimum prompts silently skip caching.
 
-Comparison: openprovider already maps cached token usage across OpenAI-compatible, Anthropic, and Google adapters into `OcxUsage.cachedInputTokens`, then serializes that into Responses `input_tokens_details.cached_tokens`. That part is strong. What openprovider lacks is LiteLLM-style request-side cache policy and support discovery.
+Comparison: openprovider already maps cached token usage across OpenAI-compatible, Anthropic, and Google adapters into `oprUsage.cachedInputTokens`, then serializes that into Responses `input_tokens_details.cached_tokens`. That part is strong. What openprovider lacks is LiteLLM-style request-side cache policy and support discovery.
 
 ### Vercel AI Gateway
 
@@ -188,7 +188,7 @@ For the ChatGPT/OpenAI Responses passthrough adapter, the raw body is stringifie
 
 1. No first-class prompt cache strategy config.
 
-There is no `promptCache` config block in `OcxConfig` and no user-facing CLI/status docs for cache policy.
+There is no `promptCache` config block in `oprConfig` and no user-facing CLI/status docs for cache policy.
 
 2. No explicit preservation test for Codex's `prompt_cache_key`.
 
@@ -398,3 +398,4 @@ Research before code.
 openprovider is not "bad" on caching. It already preserves provider cache usage and has model/catalog cache layers. The key codex-rs finding is that Codex already sends `prompt_cache_key = thread_id`, so openprovider should not treat key synthesis as the default first move. The best next optimization is preservation proof, stable prefix discipline, `prompt_cache_key`/retention regression tests, and observability.
 
 The highest-confidence first implementation is passthrough regression tests plus cache telemetry. Do not auto-inject Anthropic/Gemini cache markers yet. That should wait until we have hit-rate telemetry and official Anthropic docs re-fetched, because explicit caching can add write cost and can silently no-op under token minimums.
+

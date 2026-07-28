@@ -19,7 +19,7 @@ OpenProvider CLI は `opr` です。最上位の使い方は `opr help`（また
 
 プロキシサーバーを起動します（優先ポート `10100`）。そのポートが既に使われていると OpenProvider が別の空き
 ポートを選び、記録します。PID とランタイムポート状態を保存し、生きている 2 つ目のインスタンスは起動しません。起動時に各プロバイダーのモデルを Codex カタログに同期します。管理型サービス
-（`OCX_SERVICE=1`）として実行した場合を除き、終了時にネイティブ Codex を復元します。
+（`opr_SERVICE=1`）として実行した場合を除き、終了時にネイティブ Codex を復元します。
 
 ```bash
 opr start
@@ -340,7 +340,7 @@ opr login xai
 
 OpenProvider をログイン管理型のバックグラウンドサービス（macOS **launchd**、Linux **systemd user unit**、
 Windows **Task Scheduler**）として実行します。ログイン時に自動的に起動し、異常終了時に再
-開始します。サービス実行は `OCX_SERVICE=1` を設定するため、再起動時に Codex 設定を繰り返し
+開始します。サービス実行は `opr_SERVICE=1` を設定するため、再起動時に Codex 設定を繰り返し
 変えません。
 
 | Subcommand | Action |
@@ -411,8 +411,8 @@ opr debug usage logs [-f|--follow]
 ```
 
 スコープを指定しないと `opr debug` が使い方を出力します。プロキシが止まっているときは次回起動時に
-適用される環境変数のデフォルト値も示します。プロバイダーデバッグのデフォルトは `OCX_DEBUG=1` で既存の
-`OCX_DEBUG_FRAMES=1` もサポートします。使用量デバッグのデフォルトは `OpenProvider_USAGE_DEBUG=1` です。
+適用される環境変数のデフォルト値も示します。プロバイダーデバッグのデフォルトは `opr_DEBUG=1` で既存の
+`opr_DEBUG_FRAMES=1` もサポートします。使用量デバッグのデフォルトは `OpenProvider_USAGE_DEBUG=1` です。
 
 ## アップデート
 
@@ -452,5 +452,6 @@ opr update --tag preview
 プロセスで更新通知キャッシュを更新します。
 `__gui-update-worker <job-id> [latest|preview] [restart]` はダッシュボードの更新ジョブを実行します。
 実装の詳細であり安定したユーザーコマンドではありません。
+
 
 

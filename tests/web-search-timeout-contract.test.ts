@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import type { AdapterFetchContext, ProviderAdapter } from "../src/adapters/base";
 import { parseRequest } from "../src/responses/parser";
 import { responseWithDeferredRequestLog, type RequestLogEntry } from "../src/server";
-import type { AdapterEvent, OcxProviderConfig } from "../src/types";
+import type { AdapterEvent, oprProviderConfig } from "../src/types";
 import { runWithWebSearch } from "../src/web-search/loop";
 
 const originalFetch = globalThis.fetch;
@@ -11,7 +11,7 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
 });
 
-const forwardProvider: OcxProviderConfig = {
+const forwardProvider: oprProviderConfig = {
   adapter: "openai-responses",
   baseUrl: "https://chatgpt.test/v1",
   authMode: "forward",
@@ -397,3 +397,4 @@ describe("web-search timeout runtime contracts", () => {
     });
   }, 1_000);
 });
+

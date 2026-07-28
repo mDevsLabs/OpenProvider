@@ -96,7 +96,7 @@ Real Anthropic upstream REQUIRES replayed thinking blocks byte-exact incl.
 `signature` (400 on modification). Our inbound DROPS inbound thinking/redacted_
 thinking blocks before replay to routed providers — safe, because we never send
 them to Anthropic-the-company; the routed provider gets Responses-shaped history
-where reasoning lives in `reasoning` items/ocxr1 envelopes instead. Emitting
+where reasoning lives in `reasoning` items/oprr1 envelopes instead. Emitting
 unsigned `thinking` blocks outbound is display-only for Claude Code. (040
 workstream 1 remains the anthropic-family fidelity path.)
 
@@ -140,3 +140,4 @@ codeCommand.ts, createEnvVariables.ts, server.ts), CCR issues #504/#575/#744.
    "Claude ON" in ALL locales) above the language selector; dedicated nav tab
    under API ("Claude"), page = Claude settings (slots, modelMap, discovery
    status, launcher hint). Replaces the earlier "section on Models page" default.
+

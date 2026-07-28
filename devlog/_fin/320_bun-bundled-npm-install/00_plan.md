@@ -22,10 +22,10 @@ Release-surface change → C4-level care on the publish/verify gate.
 npm install -g @mdevs/openprovider
   → installs `bun` dep + @oven/bun-<platform> (~60MB) via optionalDependencies
   → bun postinstall (node install.js) places binary at node_modules/bun/bin/bun.exe
-  → npm links bin: opr → bin/ocx.mjs  (#!/usr/bin/env node)
+  → npm links bin: opr → bin/opr.mjs  (#!/usr/bin/env node)
 
 opr start
-  → bin/ocx.mjs resolves bundled bun (bun/package.json → bin/bun.exe)
+  → bin/opr.mjs resolves bundled bun (bun/package.json → bin/bun.exe)
   → guards: missing / 0-byte → run install.js once
   → spawnSync(bunBin, [src/cli.ts, ...args], {stdio:'inherit'})
   → process.execPath inside cli.ts == bun binary (service/shim keep working)
@@ -35,7 +35,7 @@ opr start
 
 | Phase | Scope | Deliverable |
 |-------|-------|-------------|
-| **Phase 1** | Launcher + packaging | `bin/ocx.mjs`, `package.json` (dep, bin, files, trustedDependencies, engines) |
+| **Phase 1** | Launcher + packaging | `bin/opr.mjs`, `package.json` (dep, bin, files, trustedDependencies, engines) |
 | **Phase 2** | Shared bundled-bun resolver | `src/bun-runtime.ts`; wire `service.ts` + `codex-shim.ts` to bake bundled bun |
 | **Phase 3** | Update advisory + CI smoke | `update.ts` repair advisory; npm-global CI job |
 | **Phase 4** | Docs | README + docs-site: drop "install bun first" for npm users |
@@ -44,7 +44,7 @@ opr start
 
 ## Phase 1 — Launcher + Packaging
 
-### 1.1 NEW `bin/ocx.mjs`
+### 1.1 NEW `bin/opr.mjs`
 
 Node launcher. Resolves bundled bun, lazy-installs if missing, execs cli.ts,
 propagates signal/exit code (C11).
@@ -102,7 +102,7 @@ process.exit(res.status ?? 1);
 ```jsonc
 {
   // bin → Node launcher (was ./src/cli.ts)
-  "bin": { "openprovider": "./bin/ocx.mjs", "opr": "./bin/ocx.mjs" },
+  "bin": { "openprovider": "./bin/opr.mjs", "opr": "./bin/opr.mjs" },
 
   // ship the launcher (C5)
   "files": ["bin", "src", "gui/dist", "README.md", "LICENSE"],
@@ -260,7 +260,7 @@ npm install path.
 
 | Action | File | Change |
 |--------|------|--------|
-| NEW | `bin/ocx.mjs` | Node launcher → bundled bun → cli.ts |
+| NEW | `bin/opr.mjs` | Node launcher → bundled bun → cli.ts |
 | NEW | `src/bun-runtime.ts` | `bundledBunPath()` / `durableBunPath()` |
 | MODIFY | `package.json` | bin, files, dependencies(bun), trustedDependencies, engines |
 | MODIFY | `src/service.ts` | bake `durableBunPath()` |
@@ -294,4 +294,5 @@ npm install path.
    shell (PATH stripped of bun) → `opr help` / `opr status` succeed
 4. CI npm-global-smoke job green on ubuntu + windows
 5. Only after all green: version bump + publish (existing release.ts gate)
+
 

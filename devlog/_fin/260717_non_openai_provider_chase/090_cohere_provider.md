@@ -22,7 +22,7 @@ Add Cohere through its official OpenAI Compatibility API without importing Coher
 
 ## Activation scenarios
 
-- Standard text stream terminates cleanly and usage maps to OCX totals.
+- Standard text stream terminates cleanly and usage maps to opr totals.
 - A function call round trip preserves tool id/name/JSON arguments and tool result role.
 - An unsupported parameter fixture proves the exact field removed; unrelated providers retain it.
 - A model-list failure falls back to the audited seed without inventing capabilities.
@@ -40,3 +40,4 @@ bun run typecheck
 - `NOOP`: current custom-provider flow is chosen intentionally and a first-class preset has no product value; requires user approval.
 - `NEEDS_HUMAN`: no Cohere API key.
 - `BLOCKED`: compatibility API lacks the tool/stream behavior required by Codex.
+

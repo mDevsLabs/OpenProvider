@@ -38,13 +38,13 @@ import { getConfigPath, readConfigDiagnostics, saveConfig } from "../src/config"
 import { routeModel } from "../src/router";
 import { handleManagementAPI } from "../src/server/management-api";
 import { handleResponses } from "../src/server/responses";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { syncCatalogModels } from "../src/codex/catalog";
 import { injectClaudeAgentDefs } from "../src/claude/agents-inject";
 
 const VALID_COMBO = { targets: [{ provider: "a", model: "m1" }] };
 
-function baseConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function baseConfig(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     defaultProvider: "a",
@@ -66,7 +66,7 @@ function baseConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
   };
 }
 
-function rrConfig(stickyLimit: number, weights: number[]): OcxConfig {
+function rrConfig(stickyLimit: number, weights: number[]): oprConfig {
   const providers = baseConfig().providers;
   const names = ["a", "b", "c"];
   return baseConfig({
@@ -85,7 +85,7 @@ function rrConfig(stickyLimit: number, weights: number[]): OcxConfig {
   });
 }
 
-function successfulPicks(config: OcxConfig, count: number): string[] {
+function successfulPicks(config: oprConfig, count: number): string[] {
   const combo = getCombo(config, "free")!;
   return Array.from({ length: count }, () => {
     const pick = pickComboTarget(config, "free")!;
@@ -116,7 +116,7 @@ function writeRawConfig(config: unknown): void {
 }
 
 async function comboApi(
-  config: OcxConfig,
+  config: oprConfig,
   method: string,
   path: string,
   body?: unknown,
@@ -132,7 +132,7 @@ async function comboApi(
   });
 }
 
-async function comboApiRaw(config: OcxConfig, method: string, path: string, body: string): Promise<Response | null> {
+async function comboApiRaw(config: oprConfig, method: string, path: string, body: string): Promise<Response | null> {
   const req = new Request(`http://localhost${path}`, {
     method,
     headers: { "content-type": "application/json" },
@@ -433,7 +433,7 @@ describe("combo validation and normalization", () => {
     const cases: Array<{
       id?: string;
       raw: unknown;
-      providers?: OcxConfig["providers"];
+      providers?: oprConfig["providers"];
       options?: { requireEnabledTarget?: boolean };
       path: Array<string | number>;
       message: string;
@@ -512,7 +512,7 @@ describe("combo validation and normalization", () => {
     expect(comboDefaultEffort(baseConfig({
       combos: { free: { defaultEffort: "xhigh", targets: [{ provider: "a", model: "m1" }] } },
     }), "free")).toBe("xhigh");
-    const corrupt = baseConfig() as OcxConfig & { combos: Record<string, { defaultEffort: string; targets: [] }> };
+    const corrupt = baseConfig() as oprConfig & { combos: Record<string, { defaultEffort: string; targets: [] }> };
     corrupt.combos.free!.defaultEffort = "turbo";
     expect(comboDefaultEffort(corrupt, "free")).toBeNull();
   });
@@ -528,7 +528,7 @@ describe("combo validation and normalization", () => {
   });
 
   test("preserves a physical provider named combo while no combos are configured", () => {
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "combo",
       providers: {
@@ -539,7 +539,7 @@ describe("combo validation and normalization", () => {
     expect(preservesPhysicalComboProvider({ ...config, combos: {} })).toBeTrue();
     expect(preservesPhysicalComboProvider({ providers: {}, combos: {} })).toBeFalse();
     expect(preservesPhysicalComboProvider({ ...config, combos: { free: VALID_COMBO } })).toBeFalse();
-    const inheritedProviders = Object.create({ combo: config.providers.combo }) as OcxConfig["providers"];
+    const inheritedProviders = Object.create({ combo: config.providers.combo }) as oprConfig["providers"];
     expect(preservesPhysicalComboProvider({ providers: inheritedProviders, combos: {} })).toBeFalse();
     expect(routeModel(config, "combo/model")).toMatchObject({
       providerName: "combo",
@@ -560,7 +560,7 @@ describe("persisted combo config parity", () => {
         error: expect.stringContaining("combos must be an object"),
       });
 
-      const rows: Array<{ id: string; combo: unknown; providers?: OcxConfig["providers"] }> = [
+      const rows: Array<{ id: string; combo: unknown; providers?: oprConfig["providers"] }> = [
         { id: "free", combo: { ...VALID_COMBO, strategy: "random" } },
         { id: "free", combo: { ...VALID_COMBO, stickyLimit: 0 } },
         { id: "free", combo: { ...VALID_COMBO, defaultEffort: "turbo" } },
@@ -641,3 +641,4 @@ describe("persisted combo config parity", () => {
     });
   });
 });
+

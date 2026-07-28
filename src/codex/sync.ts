@@ -2,7 +2,7 @@ import { currentExternalCodexModelProvider, injectCodexConfig } from "./inject";
 import { printProjectCodexConfigWarnings, groupProjectCodexConfigWarningsByPath, type ProjectCodexConfigWarning } from "./project-config-warnings";
 import { refreshCodexModelCatalog } from "./refresh";
 import { applyProxyEnv, loadConfig } from "../config";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { collectOrcaCodexHomeDiagnostic } from "./home";
 
 export interface CodexSyncResult {
@@ -44,7 +44,7 @@ function reportCodexHomeTarget(
 
 export async function syncModelsToCodex(
   port?: number,
-  config: OcxConfig = loadConfig(),
+  config: oprConfig = loadConfig(),
   log: Pick<Console, "log" | "error"> | null = console,
   deps: CodexSyncDeps = defaultDeps,
 ): Promise<CodexSyncResult> {

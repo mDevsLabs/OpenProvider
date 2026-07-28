@@ -37,7 +37,7 @@
 ## 라운드 4 (Curie, FAIL, 블로커 4)
 | # | Sev | 요지 | 처분 |
 |---|-----|------|------|
-| 1 | High | 인증 헤더가 config apiKeys만 — env-token-only 구성 401 | 수용 — OPENCODEX_API_AUTH_TOKEN env 우선 + config fallback |
+| 1 | High | 인증 헤더가 config apiKeys만 — env-token-only 구성 401 | 수용 — @mdevs/openprovider_API_AUTH_TOKEN env 우선 + config fallback |
 | 2 | Med | 타임아웃 분기 테스트 비결정적 | 수용 — 3초 초과 지연 fixture + AbortError 관측 단언 |
 | 3 | Med | system-env in-process 조회 8초 무제한 | 수용 — 동일 3초 bound Promise.race 공유 헬퍼 |
 | 4 | Med | effectiveTierEnv 키 범위 불명 | 수용 — effectiveModelEnv 6키 명시 + manualEnv 렌더 단언 |
@@ -46,3 +46,4 @@
 | # | Sev | 요지 | 처분 |
 |---|-----|------|------|
 | 1 | Med | 011에 R4 합성표 누락 | 수용 — 본 표 추가로 즉시 해소 (문서 동기화) |
+

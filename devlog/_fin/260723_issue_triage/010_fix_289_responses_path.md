@@ -58,13 +58,13 @@ asset changes in this PR.
 
 ### 1. MODIFY `src/types.ts`
 
-Current anchor: `OcxProviderConfig` begins at current-tree line 638; `baseUrl` is line 640.
+Current anchor: `oprProviderConfig` begins at current-tree line 638; `baseUrl` is line 640.
 Place the field directly after `baseUrl` because both fields define the upstream URL contract.
 
 Before:
 
 ```ts
-export interface OcxProviderConfig {
+export interface oprProviderConfig {
   adapter: string;
   baseUrl: string;
   /**
@@ -77,7 +77,7 @@ export interface OcxProviderConfig {
 After:
 
 ```ts
-export interface OcxProviderConfig {
+export interface oprProviderConfig {
   adapter: string;
   baseUrl: string;
   /**
@@ -719,7 +719,7 @@ must not be smuggled into this adapter bug-fix PR.
 
 ## Acceptance checklist
 
-- [ ] `OcxProviderConfig.responsesPath?: string` exists with relative-path semantics.
+- [ ] `oprProviderConfig.responsesPath?: string` exists with relative-path semantics.
 - [ ] Config accepts `/responses` and rejects no-leading-slash, scheme, query, and fragment values.
 - [ ] Absent field executes the current `/v1/responses` expression unchanged.
 - [ ] Present field concatenates one-trailing-slash-trimmed `baseUrl` and validated path.
@@ -732,3 +732,4 @@ must not be smuggled into this adapter bug-fix PR.
 
 None. The field name, validation contract, key-auth-only consumption, fallback semantics, docs
 scope, and follow-up boundary are fixed by this design.
+

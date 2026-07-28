@@ -37,7 +37,7 @@ call it from startup and lazily before routing when the active is unknown.
 ```ts
 let primeInFlight: Promise<void> | null = null;
 
-export async function primeCodexPoolQuotas(config: OcxConfig, reason: string): Promise<void> {
+export async function primeCodexPoolQuotas(config: oprConfig, reason: string): Promise<void> {
   // Single-flight: concurrent callers (startup + first route) share one pass
   // instead of stampeding N WHAM fetches per caller.
   if (primeInFlight) return primeInFlight;
@@ -59,7 +59,7 @@ export async function primeCodexPoolQuotas(config: OcxConfig, reason: string): P
     } catch {
       // Priming is best-effort; a blocked WSL network must not crash startup.
     }
-    if (process.env.OPENCODEX_DEBUG_QUOTA === "1") {
+    if (process.env.@mdevs/openprovider_DEBUG_QUOTA === "1") {
       console.warn(`[codex-quota] prime done (reason=${reason}, pool=${pool.length}, refreshed=${stale.length})`);
     }
   })().finally(() => { primeInFlight = null; });
@@ -161,7 +161,7 @@ and assert against `getAccountQuota` / `listAccountQuotas`.
 - Risk: a blocked WHAM endpoint (WSL NAT/proxy, MOC root cause #2) means priming
   silently does nothing and accounts stay unknown. That is acceptable for this
   phase: Phase 10 still rotates among unknowns, and Phase 30 surfaces the
-  reachability problem. The `OPENCODEX_DEBUG_QUOTA` warn is the breadcrumb.
+  reachability problem. The `@mdevs/openprovider_DEBUG_QUOTA` warn is the breadcrumb.
 - Risk: startup network at boot. Bounded by the existing 8s per-call timeout and
   fire-and-forget dispatch, so the listener is never delayed.
 - Risk: import shape. Use the dynamic `import("./codex-auth-api")` already
@@ -174,3 +174,5 @@ and assert against `getAccountQuota` / `listAccountQuotas`.
 - `bun run privacy:scan` -> clean (debug warn logs counts and a reason string,
   never emails or tokens; account-level WHAM responses stay inside the existing
   masked DTO path).
+
+

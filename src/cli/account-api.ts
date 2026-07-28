@@ -7,7 +7,7 @@ import { findLiveProxy, probeHostname } from "../server/proxy-liveness";
 import { runningProxyUpdateHeaders } from "../oauth/login-cli";
 import { isPublicOAuthProvider } from "../oauth/index";
 import { getProviderRegistryEntry, providerCodexAccountMode } from "../providers/registry";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 
 export type AccountType = "codex" | "oauth" | "api-key";
 
@@ -32,12 +32,12 @@ export interface AccountDeps {
   /** Test injection: skip findLiveProxy and call the API at this base URL. */
   baseUrl?: string;
   fetchImpl?: typeof fetch;
-  loadConfigImpl?: () => OcxConfig;
+  loadConfigImpl?: () => oprConfig;
   stdinImpl?: AccountStdin;
   stdinTimeoutMs?: number;
 }
 
-export function classifyAccount(config: OcxConfig, name: string): ClassifyResult {
+export function classifyAccount(config: oprConfig, name: string): ClassifyResult {
   const provider = config.providers?.[name];
   if (providerCodexAccountMode(name, provider)) return { type: "codex" };
   const entry = getProviderRegistryEntry(name);
@@ -266,3 +266,4 @@ export async function fetchProviderQuotaReport(
   const reports = Array.isArray(res.json.reports) ? res.json.reports as ProviderQuotaReportDto[] : [];
   return { status: 200, report: reports.find(report => report?.provider === name) ?? null };
 }
+

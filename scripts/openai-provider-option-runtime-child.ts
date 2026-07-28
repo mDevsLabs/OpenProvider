@@ -63,7 +63,7 @@ function lifecycle(body: Record<string, unknown>): string {
     type: "message",
     status: "completed",
     role: "assistant",
-    content: [{ type: "output_text", text: "OCX_PROBE_OK", annotations: [] }],
+    content: [{ type: "output_text", text: "opr_PROBE_OK", annotations: [] }],
   };
   const response = {
     id: "resp_runtime_fixture",
@@ -77,8 +77,8 @@ function lifecycle(body: Record<string, unknown>): string {
     { type: "response.created", response: { ...response, status: "in_progress", output: [] } },
     { type: "response.output_item.added", output_index: 0, item: { ...item, status: "in_progress", content: [] } },
     { type: "response.content_part.added", item_id: item.id, output_index: 0, content_index: 0, part: { type: "output_text", text: "", annotations: [] } },
-    { type: "response.output_text.delta", item_id: item.id, output_index: 0, content_index: 0, delta: "OCX_PROBE_OK" },
-    { type: "response.output_text.done", item_id: item.id, output_index: 0, content_index: 0, text: "OCX_PROBE_OK" },
+    { type: "response.output_text.delta", item_id: item.id, output_index: 0, content_index: 0, delta: "opr_PROBE_OK" },
+    { type: "response.output_text.done", item_id: item.id, output_index: 0, content_index: 0, text: "opr_PROBE_OK" },
     { type: "response.content_part.done", item_id: item.id, output_index: 0, content_index: 0, part: item.content[0] },
     { type: "response.output_item.done", output_index: 0, item },
     { type: "response.completed", response },
@@ -227,3 +227,4 @@ try {
   globalThis.fetch = savedFetch;
   if (server && !stopping) await server.stop(true).catch(() => undefined);
 }
+

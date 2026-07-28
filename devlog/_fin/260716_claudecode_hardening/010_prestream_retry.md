@@ -16,7 +16,7 @@ ChatGPT passthrough에서 SSE first byte 이전에 받은 transient 5xx 응답�
 ```ts
 /** Upstream statuses treated as transient: gateway errors and Cloudflare 52x.
  *  500 is included per the OpenAI SDK default (auto-retries >=500, Tier-2 proven in
- *  devlog/260716_ocx_claude_sol_502_midstream/02). 507 was observed in the 48h ledger
+ *  devlog/260716_opr_claude_sol_502_midstream/02). 507 was observed in the 48h ledger
  *  but is deliberately excluded (storage-class, not gateway-transient). */
 export function isTransientUpstreamStatus(status: number): boolean {
   return status === 500 || status === 502 || status === 503 || status === 504
@@ -125,3 +125,4 @@ else-분기(responses.ts:755)가 그대로 기록 → 현행 failover 민감도 
      `slowAttemptMs?: number`를 `ResetRetryOptions` 확장으로 추가하는 방식으로 확정
      (재감사 Low #2 — Date.now 스텁 대신 명시적 seam).
 - 기존 `tests/claude-native-passthrough.test.ts` 등 전체 green.
+

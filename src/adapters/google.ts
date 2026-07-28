@@ -1,15 +1,16 @@
 import type { AdapterFetchContext, AdapterRequest, ProviderAdapter } from "./base";
 import { debugDroppedFrame } from "../lib/debug";
 import { createHash } from "node:crypto";
+import { createImageBudget, materializeInlineImage, MAX_ENCODED_BYTES_PER_IMAGE, artifactHttpUrl } from "../images/artifacts";
 import type {
   AdapterEvent,
-  OcxAssistantMessage,
-  OcxContentPart,
-  OcxParsedRequest,
-  OcxProviderConfig,
-  OcxTextContent,
-  OcxToolCall,
-  OcxUsage,
+  oprAssistantMessage,
+  oprContentPart,
+  oprParsedRequest,
+  oprProviderConfig,
+  oprTextContent,
+  oprToolCall,
+  oprUsage,
 } from "../types";
 import { isAllowedToolChoice, namespacedToolName, toolAllowedByChoice } from "../types";
 import { contentPartsToText, parseDataUrl } from "./image";
@@ -76,7 +77,7 @@ function geminiToolCallId(rawId: string | undefined): string | undefined {
  * can be inlined; a remote URL has no mime type we can supply, so it is skipped here (the textual
  * result already carries an "[image]" marker via contentPartsToText).
  */
-function toolResultImageParts(content: string | OcxContentPart[]): unknown[] {
+function toolResultImageParts(content: string | oprContentPart[]): unknown[] {
   if (typeof content === "string") return [];
   const parts: unknown[] = [];
   for (const p of content) {
@@ -110,13 +111,13 @@ function geminiTextPart(text: unknown): { text: string } | undefined {
  * actually carry (`toolResultImageParts` adds none). Fall back to the placeholder unless the content
  * has something representable.
  */
-function geminiToolResultText(content: string | OcxContentPart[]): string {
+function geminiToolResultText(content: string | oprContentPart[]): string {
   if (typeof content === "string") return content || GEMINI_EMPTY_TOOL_OUTPUT_PLACEHOLDER;
   const hasContent = content.some(p => p.type === "image" || (typeof p.text === "string" && p.text.length > 0));
   return hasContent ? contentPartsToText(content) : GEMINI_EMPTY_TOOL_OUTPUT_PLACEHOLDER;
 }
 
-function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?: unknown; contents: unknown[] } {
+function messagesToGeminiFormat(parsed: oprParsedRequest): { systemInstruction?: unknown; contents: unknown[] } {
   // Neutralize Codex's GPT-5 identity line (Gemini/Antigravity share this path) so a routed model
   // never misreports as GPT-5/OpenAI, and never leaks the proxy identity upstream.
   const toolCatalogNudge = buildNonOpenAIToolCatalogNudgeForTools(parsed.context.tools, parsed.options.toolChoice);
@@ -137,7 +138,7 @@ function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?:
           contents.push({ role: "user", parts: [{ text: msg.content || GEMINI_EMPTY_PLACEHOLDER }] });
         } else {
           const parts: unknown[] = [];
-          for (const p of msg.content as OcxContentPart[]) {
+          for (const p of msg.content as oprContentPart[]) {
             if (p.type === "image") {
               const data = parseDataUrl(p.imageUrl);
               // Gemini takes base64 via inline_data; a remote URL needs a mime type we don't have, so
@@ -154,14 +155,14 @@ function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?:
         break;
       }
       case "assistant": {
-        const aMsg = msg as OcxAssistantMessage;
+        const aMsg = msg as oprAssistantMessage;
         const parts: unknown[] = [];
         for (const p of aMsg.content) {
           if (p.type === "text") {
-            const textPart = geminiTextPart((p as OcxTextContent).text);
+            const textPart = geminiTextPart((p as oprTextContent).text);
             if (textPart) parts.push(textPart);
           } else if (p.type === "toolCall") {
-            const tc = p as OcxToolCall;
+            const tc = p as oprToolCall;
             // Preserve the thought signature on the function-call part so Antigravity/Gemini-3
             // reasoning continuity survives history-driven (stateless) turns, not just same-process
             // streaming covered by the replay cache. Only forward a REAL upstream signature — the
@@ -205,7 +206,7 @@ function messagesToGeminiFormat(parsed: OcxParsedRequest): { systemInstruction?:
   return { systemInstruction, contents };
 }
 
-function toolsToGeminiFormat(parsed: OcxParsedRequest): unknown[] | undefined {
+function toolsToGeminiFormat(parsed: oprParsedRequest): unknown[] | undefined {
   if (!parsed.context.tools?.length) return undefined;
   const allowed = isAllowedToolChoice(parsed.options.toolChoice)
     ? new Set(parsed.options.toolChoice.allowedTools)
@@ -223,7 +224,7 @@ function toolsToGeminiFormat(parsed: OcxParsedRequest): unknown[] | undefined {
   }];
 }
 
-function usageFromGemini(usage: Record<string, number> | undefined): OcxUsage | undefined {
+function usageFromGemini(usage: Record<string, number> | undefined): oprUsage | undefined {
   if (!usage) return undefined;
   return {
     inputTokens: usage.promptTokenCount ?? 0,
@@ -233,7 +234,39 @@ function usageFromGemini(usage: Record<string, number> | undefined): OcxUsage | 
   };
 }
 
-export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapter {
+/**
+ * Cap on the buffered non-streaming response body (100 MiB), matching
+ * IMAGES_RESPONSE_MAX_BYTES in src/server/images.ts. Enforced by streaming the
+ * body with a hard byte cap before JSON.parse — Content-Length alone is not
+ * trusted (missing/lying headers must still reject oversized payloads).
+ * Streaming SSE responses also cap each data frame before JSON.parse.
+ */
+const MAX_RESPONSE_BYTES = 100 * 1024 * 1024;
+const MAX_SSE_FRAME_BYTES = MAX_RESPONSE_BYTES;
+
+// Note: imagen-* models use a different API surface (prediction/image-generation
+// schema) and must NOT be treated as responseModalities-capable Gemini models.
+// Explicit allowlist only — never `/gemini/ && /image/` (resurrects media-gen IDs).
+const IMAGE_CAPABLE_MODELS = new Set([
+  "gemini-3.1-flash-image",
+  "gemini-2.0-flash-preview-image-generation",
+  "gemini-3-pro-image-preview",
+]);
+
+function isImageCapableModel(modelId: string): boolean {
+  return IMAGE_CAPABLE_MODELS.has(modelId);
+}
+
+/**
+ * Model-visible markdown link for a materialized artifact. Uses the authenticated
+ * opaque HTTP route so remote/container clients can fetch the image without host
+ * filesystem paths leaking into the transcript.
+ */
+function artifactMarkdownUrl(filePath: string): string {
+  return artifactHttpUrl(filePath).replace(/([()])/g, "\\$1");
+}
+
+export function createGoogleAdapter(provider: oprProviderConfig): ProviderAdapter {
   // Per-request closure: resolveAdapter builds a fresh adapter per request (server.ts), so buildRequest
   // can stash the CCA model/session for parseStream's reasoning-replay observation.
   let antigravityModel: string | undefined;
@@ -253,7 +286,7 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
         }
       : {}),
 
-    async buildRequest(parsed: OcxParsedRequest) {
+    async buildRequest(parsed: oprParsedRequest) {
       const { systemInstruction, contents } = messagesToGeminiFormat(parsed);
       const tools = toolsToGeminiFormat(parsed);
 
@@ -272,6 +305,9 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
         ? mapReasoningEffort(provider, parsed.modelId, parsed.options.reasoning)
         : undefined;
       if (directFlashThinking) generationConfig.thinkingConfig = { thinkingLevel: directFlashThinking };
+      if (!generationConfig.thinkingConfig && isImageCapableModel(parsed.modelId)) {
+        generationConfig.responseModalities = ["TEXT", "IMAGE"];
+      }
       if (Object.keys(generationConfig).length > 0) body.generationConfig = generationConfig;
 
       const method = parsed.stream ? "streamGenerateContent" : "generateContent";
@@ -377,19 +413,27 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
         yield { type: "error", message: "No response body" };
         return;
       }
+      // Streaming responses are processed incrementally (SSE chunks), so the full body
+      // is never buffered — no Content-Length pre-check is needed here. Per-image size
+      // protection is enforced on each chunk via MAX_ENCODED_BYTES_PER_IMAGE before
+      // materializeInlineImage is called (see the inline.data check below).
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
-      let pendingUsage: OcxUsage | undefined;
+      let pendingUsage: oprUsage | undefined;
       let toolCallsStarted = 0;
       let lastFinishReason: string | undefined;
       let sawAnyFrame = false;
       let sawTerminalSignal = false;
 
-      const handleDataLine = function* (line: string): Generator<AdapterEvent, "continue" | "content" | "terminate"> {
+      const handleDataLine = async function* (line: string): AsyncGenerator<AdapterEvent, "continue" | "content" | "terminate"> {
         const payload = line.slice(5).trim();
         if (!payload) return "continue";
+        if (payload.length > MAX_SSE_FRAME_BYTES) {
+          yield { type: "error", message: `upstream SSE data frame exceeds ${MAX_SSE_FRAME_BYTES} bytes` };
+          return "terminate";
+        }
         let emittedContentEvent = false;
 
         let chunk: Record<string, unknown>;
@@ -452,6 +496,21 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
               emittedContentEvent = true;
               yield { type: "text_delta", text: part.text };
             }
+            const inline = (part as { inlineData?: { mimeType?: string; data?: string } }).inlineData;
+            if (inline && typeof inline.data === "string") {
+              if (inline.data.length > MAX_ENCODED_BYTES_PER_IMAGE) {
+                yield { type: "error", message: "inline image exceeds per-image size cap" };
+              } else {
+                try {
+                  const filePath = await materializeInlineImage(inline.data, imageBudget);
+                  const escapedPath = artifactMarkdownUrl(filePath);
+                  emittedContentEvent = true;
+                  yield { type: "text_delta", text: `\n![image](${escapedPath})\n` };
+                } catch {
+                  yield { type: "error", message: "failed to materialize inline image" };
+                }
+              }
+            }
             if (part.functionCall) {
               const id = `call_${crypto.randomUUID().slice(0, 8)}`;
               toolCallsStarted++;
@@ -464,12 +523,20 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
         }
         return emittedContentEvent ? "content" : "continue";
       };
+      const imageBudget = createImageBudget();
 
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
+          // Cap incomplete frames before waiting for a newline — otherwise a single
+          // unterminated data: payload can grow without bound.
+          if (buffer.length > MAX_SSE_FRAME_BYTES) {
+            yield { type: "error", message: `upstream SSE data frame exceeds ${MAX_SSE_FRAME_BYTES} bytes` };
+            try { await reader.cancel(); } catch { /* ignore */ }
+            return;
+          }
 
           const lines = buffer.split("\n");
           buffer = lines.pop() ?? "";
@@ -526,7 +593,51 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
     },
 
     async parseResponse(response: Response): Promise<AdapterEvent[]> {
-      const raw = await response.json() as Record<string, unknown>;
+      // Reject oversized responses before JSON parse. Prefer Content-Length when
+      // present and truthful; always stream-read with a hard byte cap so a missing
+      // or lying Content-Length cannot force a full in-memory buffer + parse.
+      const contentLength = Number(response.headers.get("content-length"));
+      if (Number.isFinite(contentLength) && contentLength > MAX_RESPONSE_BYTES) {
+        try { await response.body?.cancel(); } catch { /* ignore */ }
+        return [{ type: "error", message: `google response too large (content-length ${contentLength} exceeds ${MAX_RESPONSE_BYTES} bytes)` }];
+      }
+      let rawText: string;
+      try {
+        const reader = response.body?.getReader();
+        if (!reader) return [{ type: "error", message: "google response had no body" }];
+        const chunks: Uint8Array[] = [];
+        let total = 0;
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            total += value.byteLength;
+            if (total > MAX_RESPONSE_BYTES) {
+              await reader.cancel().catch(() => {});
+              return [{ type: "error", message: `google response too large (exceeded ${MAX_RESPONSE_BYTES} bytes)` }];
+            }
+            chunks.push(value);
+          }
+        } finally {
+          try { await reader.cancel(); } catch { /* ignore */ }
+          reader.releaseLock();
+        }
+        const bytes = new Uint8Array(total);
+        let offset = 0;
+        for (const chunk of chunks) {
+          bytes.set(chunk, offset);
+          offset += chunk.byteLength;
+        }
+        rawText = new TextDecoder().decode(bytes);
+      } catch (err) {
+        return [{ type: "error", message: err instanceof Error ? err.message : "failed to read google response body" }];
+      }
+      let raw: Record<string, unknown>;
+      try {
+        raw = JSON.parse(rawText) as Record<string, unknown>;
+      } catch {
+        return [{ type: "error", message: "google response was not valid JSON" }];
+      }
       if (raw.error) {
         const err = raw.error as { message?: string };
         return [{ type: "error", message: err.message ?? "upstream error" }];
@@ -547,6 +658,7 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
         return [{ type: "error", message: "google response contained no candidates" }];
       }
       let toolCallsStarted = 0;
+      const imageBudget = createImageBudget();
       if (candidates?.[0]?.content?.parts) {
         // Non-streaming CCA: observe thoughtSignatures for the next turn, same as the stream path.
         if (provider.googleMode === "cloud-code-assist" && antigravityModel && antigravitySession) {
@@ -554,6 +666,20 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
         }
         for (const part of candidates[0].content.parts) {
           if (part.text) events.push({ type: "text_delta", text: part.text });
+          const inline = (part as { inlineData?: { mimeType?: string; data?: string } }).inlineData;
+          if (inline && typeof inline.data === "string") {
+            if (inline.data.length > MAX_ENCODED_BYTES_PER_IMAGE) {
+              events.push({ type: "error", message: "inline image exceeds per-image size cap" });
+            } else {
+              try {
+                const filePath = await materializeInlineImage(inline.data, imageBudget);
+                const escapedPath = artifactMarkdownUrl(filePath);
+                events.push({ type: "text_delta", text: `\n![image](${escapedPath})\n` });
+              } catch {
+                events.push({ type: "error", message: "failed to materialize inline image" });
+              }
+            }
+          }
           if (part.functionCall) {
             const id = `call_${crypto.randomUUID().slice(0, 8)}`;
             toolCallsStarted++;
@@ -580,3 +706,4 @@ export function createGoogleAdapter(provider: OcxProviderConfig): ProviderAdapte
     },
   };
 }
+

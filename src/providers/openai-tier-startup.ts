@@ -1,11 +1,11 @@
 import { backupConfigBeforeOpenAiTierMigration, saveConfig } from "../config";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { projectOpenAiTierMigration } from "./openai-tiers";
 
 export interface OpenAiTierStartupDeps {
   project: typeof projectOpenAiTierMigration;
   backup: () => void;
-  save: (config: OcxConfig) => void;
+  save: (config: oprConfig) => void;
 }
 
 const DEFAULT_DEPS: OpenAiTierStartupDeps = {
@@ -15,9 +15,9 @@ const DEFAULT_DEPS: OpenAiTierStartupDeps = {
 };
 
 export function runOpenAiTierStartupMigration(
-  config: OcxConfig,
+  config: oprConfig,
   deps: OpenAiTierStartupDeps = DEFAULT_DEPS,
-): OcxConfig {
+): oprConfig {
   const projection = deps.project(config);
   if (!projection.changed) return projection.config;
   deps.backup();
@@ -25,3 +25,4 @@ export function runOpenAiTierStartupMigration(
   for (const warning of projection.warnings) console.warn(`[openai-provider-migration] ${warning}`);
   return projection.config;
 }
+

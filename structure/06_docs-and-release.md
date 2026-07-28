@@ -80,13 +80,13 @@ enforcement.
 ## Package runtime (bundled Bun)
 
 The source runs on Bun, but the published package does **not** require a user-installed Bun.
-`package.json` `bin` points at `bin/ocx.mjs` (a Node shim), and the Bun runtime ships as the `bun`
+`package.json` `bin` points at `bin/opr.mjs` (a Node shim), and the Bun runtime ships as the `bun`
 npm dependency (esbuild-style: a tiny main package plus platform-specific `@oven/bun-*`
 `optionalDependencies`, finalized by the dependency's own `postinstall: node install.js`).
 
 Invariants:
 
-- `bin/ocx.mjs` resolves the bundled binary via `require.resolve("bun/package.json")` and a size gate
+- `bin/opr.mjs` resolves the bundled binary via `require.resolve("bun/package.json")` and a size gate
   (`>= 1 MB`) that rejects the ~450-byte placeholder stub left by `--ignore-scripts`/pnpm; it then
   lazy-runs `install.js` and execs `src/cli/index.ts` under Bun, propagating exit code and signal.
 - `package.json` carries `"trustedDependencies": ["bun"]` so `bun install` runs the dependency's
@@ -167,4 +167,5 @@ The Release workflow remains manual and publish-focused. Before any dry-run or p
 checks that the exact release commit (`GITHUB_SHA`) already has a successful Cross-platform CI run.
 This keeps release runs short and makes release a deployment of a verified commit rather than a
 second CI pipeline.
+
 

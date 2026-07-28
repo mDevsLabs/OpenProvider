@@ -3,10 +3,10 @@ title: サブエージェントサーフェス(v1 / base / v2)
 description: すべてのモデルの Codex サブエージェント生成・管理方式をグローバルに制御します。
 ---
 
-OpenProvider ではカタログの全モデルが使うマルチエージェントコラボサーフェスを選択できます。ダッシュボードとモデルページの **サブエージェント** トグルがこの値をグローバルに制御します。
+opencodex ではカタログの全モデルが使うマルチエージェントコラボサーフェスを選択できます。ダッシュボードとモデルページの **サブエージェント** トグルがこの値をグローバルに制御します。
 
 :::note
-v2 サーフェス(`multi_agent_v2`)のサブエージェントは**デフォルトで**親モデルを継承します。`fork_turns` のデフォルトが `all` で、全体履歴 fork がオーバーライドを拒否するためです。v2.7.2 から OpenProvider が継承を破る方法をガイドとして注入します。`fork_turns` を `"none"`(または `"3"` のような部分 fork)に指定した `spawn_agent` 呼び出しは `model` / `reasoning_effort` 引数を渡せ、公開されたツールスキーマにこの引数が見えなくても Codex ランタイムはパースして適用します。既知の転送制限:**ネイティブ**の親が**非ネイティブ**(ルーティング)プロバイダーの子をスポーンすると、Codex クライアントは `NEW_TASK` ペイロードをバックエンド暗号化の `encrypted_content` でのみ送ることがあります([#92](https://github.com/mDevsLabs/OpenProvider/issues/92))。OpenProvider は読み取れないタスクを外部プロバイダーへ転送しません。直接ルートは HTTP 400 とコード `unreadable_encrypted_agent_task` で失敗し、コンボは復号できないターゲットを除外して、可能なら正規のネイティブ ChatGPT ターゲットを選択します。異種プロバイダー委任には v1 を使うか、ネイティブ ChatGPT の子を選ぶか、タスクを平文の v2 `agent_message` コンテンツとして送り直してください。
+v2 サーフェス(`multi_agent_v2`)のサブエージェントは**デフォルトで**親モデルを継承します。`fork_turns` のデフォルトが `all` で、全体履歴 fork がオーバーライドを拒否するためです。v2.7.2 から opencodex が継承を破る方法をガイドとして注入します。`fork_turns` を `"none"`(または `"3"` のような部分 fork)に指定した `spawn_agent` 呼び出しは `model` / `reasoning_effort` 引数を渡せ、公開されたツールスキーマにこの引数が見えなくても Codex ランタイムはパースして適用します。既知の転送制限:**ネイティブ**の親が**非ネイティブ**(ルーティング)プロバイダーの子をスポーンすると、Codex クライアントは `NEW_TASK` ペイロードをバックエンド暗号化の `encrypted_content` でのみ送ることがあります([#92](https://github.com/lidge-jun/opencodex/issues/92))。opencodex は読み取れないタスクを外部プロバイダーへ転送しません。直接ルートは HTTP 400 とコード `unreadable_encrypted_agent_task` で失敗し、コンボは復号できないターゲットを除外して、可能なら正規のネイティブ ChatGPT ターゲットを選択します。異種プロバイダー委任には v1 を使うか、ネイティブ ChatGPT の子を選ぶか、タスクを平文の v2 `agent_message` コンテンツとして送り直してください。
 :::
 
 ## モード
@@ -15,11 +15,11 @@ v2 サーフェス(`multi_agent_v2`)のサブエージェントは**デフォル
  --- | --- | --- |
 | **v1** | `multi_agent_v1` | 名前空間方式のクラシックエージェントツールと `send_input` / `close_agent` / `resume_agent` を使います。`spawn_agent` モデルオーバーライドで別モデルのサブエージェントを起動できます。 |
 | **base**(デフォルト) | 上流 pin | 上流モデル pin を復元します。gpt-5.6-sol と gpt-5.6-terra は v2、gpt-5.6-luna は v1 を使い、pin のないモデルは Codex `multi_agent_v2` 機能フラグに従います。実際のスポーン動作は各モデルに決定されたサーフェスに従います。 |
-| **v2** | `multi_agent_v2` | フラット `spawn_agent` ツールと同時セッション、`send_message` / `followup_task` / `wait_agent` / `interrupt_agent` を使います。全体履歴 fork では子が親モデルを継承し、`fork_turns: "none"`(または部分 fork)では `model` / `reasoning_effort` オーバーライドが適用されます。ネイティブ→ルーティングの子がバックエンド暗号化のタスク内容しか受け取れない場合、外部ルートは `unreadable_encrypted_agent_task` を返し、混成コンボは復号可能なネイティブターゲットを優先します([#92](https://github.com/mDevsLabs/OpenProvider/issues/92))。 |
+| **v2** | `multi_agent_v2` | フラット `spawn_agent` ツールと同時セッション、`send_message` / `followup_task` / `wait_agent` / `interrupt_agent` を使います。全体履歴 fork では子が親モデルを継承し、`fork_turns: "none"`(または部分 fork)では `model` / `reasoning_effort` オーバーライドが適用されます。ネイティブ→ルーティングの子がバックエンド暗号化のタスク内容しか受け取れない場合、外部ルートは `unreadable_encrypted_agent_task` を返し、混成コンボは復号可能なネイティブターゲットを優先します([#92](https://github.com/lidge-jun/opencodex/issues/92))。 |
 
 ### 暗号化 v2 タスクの配信
 
-ネイティブ ChatGPT バックエンドだけが自身の暗号化タスクペイロードを読めます。読み取れない v2 `agent_message` に対して OpenProvider はプロバイダーへのディスパッチ前に次の規則を適用します。
+ネイティブ ChatGPT バックエンドだけが自身の暗号化タスクペイロードを読めます。読み取れない v2 `agent_message` に対して opencodex はプロバイダーへのディスパッチ前に次の規則を適用します。
 
 - 非ネイティブの直接ルートは HTTP 400 と `error.code = "unreadable_encrypted_agent_task"` を返します。応答に暗号化ペイロードを含めません。
 - コンボはリトライを含め、そのタスクに正規のネイティブ ChatGPT ターゲットだけを考慮します。復号可能なターゲットがなければ、外部プロバイダーへ空のタスクを送る代わりに同じ 400 応答を返します。
@@ -39,7 +39,9 @@ v2 サーフェス(`multi_agent_v2`)のサブエージェントは**デフォル
 
 ### 委任モデルと推論強度
 
-ダッシュボードの **サブエージェント委任** セレクターは `injectionModel` とオプションの `injectionEffort` を保存します。この値は委任ガイドを作る設定であり、プロキシがスポーンリクエストを別モデルに再ルーティングする設定ではありません。`injectionPrompt` を指定すると内蔵ガイド文言全体を希望テキストに差し替えできます。
+ダッシュボードの **サブエージェント委任** セレクターは `injectionModel` とオプションの `injectionEffort` を保存します。選択値は OpenCodex が作成する委任ガイダンスで使われ、そのガイダンスは `multiAgentGuidanceEnabled` で別に制御されます。これらはプロキシがスポーンリクエストを別モデルに再ルーティングする規則ではありません。`injectionPrompt` を指定すると内蔵ガイド文言全体を希望テキストに差し替えできます。
+
+`syncCodexSubagentDefaults` を明示的に有効にすると、OpenCodex が有効な Codex ルーティングを管理している場合、次回の sync または restart で選択したモデルと effort が Codex ネイティブの `[agents]` サブエージェント既定値として適用されます。外部のユーザー管理 provider 設定は変更しません。この既定値は新しく作成される Codex タスクだけに適用され、設定自体が委任を発生させることはありません。既存のユーザー所有 `[agents]` 既定値は上書きせず保持するため、要求した既定値と実際の Codex 既定値が異なる場合があります。
 
 `multiAgentGuidanceText` はリクエストに入ってきたツール一覧でサーフェスを判定します。Codex Desktop の WebSocket 経路(`responses_lite`)のようにツールがリクエストの `tools` 配列ではなく `additional_tools` input 項目として届く場合も認識します。
 
@@ -56,15 +58,15 @@ v2 サーフェス(`multi_agent_v2`)のサブエージェントは**デフォル
 - **ダッシュボード** → 最初のスタットセルで **v1**、**base**、**v2** を選択します。
 - **モデル** ページ → 上部セグメントコントロールで選択します。
 - 両ページとも **?** ボタンを押すとこのドキュメントに繋がるヘルプモーダルが開きます。
-- **ダッシュボード** → **サブエージェント委任** で推奨モデルとオプションの推論強度を選びます。v2 では注入ガイドが `fork_turns: "none"` スポーンを指示しモデルオーバーライドを適用させます — ただしネイティブ→ルーティング子はタスク本文が暗号化状態で到着する可能性があります([#92](https://github.com/mDevsLabs/OpenProvider/issues/92))。
+- **ダッシュボード** → **サブエージェント委任** で推奨モデルとオプションの推論強度を選びます。**ネイティブ Codex サブエージェント既定値として使用**を有効にすると、OpenCodex が有効な Codex ルーティングを管理している場合、次回の sync または restart から新しい Codex タスクにも同じ選択値が適用されます。外部のユーザー管理 provider 設定は変更しません。このトグルは委任ガイダンスのトグルとは独立しています。v2 では注入ガイドが `fork_turns: "none"` スポーンを指示しモデルオーバーライドを適用させます — ただしネイティブ→ルーティング子はタスク本文が暗号化状態で到着する可能性があります([#92](https://github.com/lidge-jun/opencodex/issues/92))。
 
 ### CLI
 
 ```bash
-opr v2 mode v1       # 全モデルを v1 に強制
-opr v2 mode default  # 上流 pin を復元
-opr v2 mode v2       # 全モデルを v2 に強制
-opr v2 status        # 現在のモード + Codex 機能フラグを確認
+ocx v2 mode v1       # 全モデルを v1 に強制
+ocx v2 mode default  # 上流 pin を復元
+ocx v2 mode v2       # 全モデルを v2 に強制
+ocx v2 status        # 現在のモード + Codex 機能フラグを確認
 ```
 
 ### API
@@ -92,6 +94,11 @@ curl -X PUT http://localhost:10100/api/injection-model \
   -H 'Content-Type: application/json' \
   -d '{"model": "anthropic/claude-sonnet-5", "effort": "xhigh"}'
 
+# 選択値を Codex ネイティブのサブエージェント既定値へ同期するよう設定（モデルが必要）
+curl -X PUT http://localhost:10100/api/injection-model \
+  -H 'Content-Type: application/json' \
+  -d '{"model": "anthropic/claude-sonnet-5", "syncCodexSubagentDefaults": true}'
+
 # カスタムガイドプロンプトを設定({{model}}/{{effort}}/{{roster}} プレースホルダ)
 curl -X PUT http://localhost:10100/api/injection-model \
   -H 'Content-Type: application/json' \
@@ -103,13 +110,13 @@ curl -X PUT http://localhost:10100/api/injection-model \
   -d '{"model": null}'
 ```
 
-`GET /api/injection-model` は `model`、`effort`、`prompt`、グローバル `efforts` 段階、有効化されたネイティブ・ルーティングモデルである `available` を返します。PUT で `effort` や `prompt` を省略すると既存値を維持し、`null` なら消去します。`model` を消去すると推論強度も常に一緒に消去されます。API はグローバル Codex 段階に合う推論強度か検証し、Codex はスポーン時に対象カタログ項目がその強度をサポートするか再検証します。
+`GET /api/injection-model` は `model`、`effort`、`prompt`、`multiAgentGuidanceEnabled`、`syncCodexSubagentDefaults`、グローバル `efforts` 段階、有効化されたネイティブ・ルーティングモデルである `available` を返します。PUT は部分更新です。`effort` や `prompt` を省略すると既存値を維持し、`null` なら消去します。`syncCodexSubagentDefaults: true` には選択済みモデルが必要で、`model` を消去すると推論強度の消去とネイティブ既定値の同期解除も行われます。API はグローバル Codex 段階に合う推論強度か検証し、Codex はスポーン時に対象カタログ項目がその強度をサポートするか再検証します。
 
 ## 推論強度
 
-サブエージェント推論強度は `injectionEffort` に保存され注入モデルがあるときのみ意味を持ちます。この値は注入 v2 ガイドに `reasoning_effort` 指示を追加し、親セッションの推論強度は変えません。オーバーライドが許可される fork では `spawn_agent` に渡された `reasoning_effort` を Codex がそのまま適用します。
+サブエージェント推論強度は `injectionEffort` に保存され注入モデルがあるときのみ意味を持ちます。この値は注入 v2 ガイドに `reasoning_effort` 指示を追加し、親セッションの推論強度は変えません。`syncCodexSubagentDefaults` が有効で OpenCodex が有効な Codex ルーティングを管理している場合は、次回の sync または restart から新しい Codex タスクのネイティブなサブエージェント既定 effort としても使われます。オーバーライドが許可される fork では `spawn_agent` に渡された `reasoning_effort` を Codex がそのまま適用します。
 
-`ultra` は Codex カタログで `max` より高い段階で自動委任の意味が加わりますが、プロバイダー wire に `ultra` という値がそのまま渡るわけではありません。Codex がクライアント境界で `ultra` を `max` に変え、OpenProvider がプロバイダーに合う有効な値に調整します。
+`ultra` は Codex カタログで `max` より高い段階で自動委任の意味が加わりますが、プロバイダー wire に `ultra` という値がそのまま渡るわけではありません。Codex がクライアント境界で `ultra` を `max` に変え、opencodex がプロバイダーに合う有効な値に調整します。
 
 | モデル | wire の `max` | `ultra` 選択時の wire 値 |
  --- | --- | --- |
@@ -125,5 +132,3 @@ curl -X PUT http://localhost:10100/api/injection-model \
 グローバルコンテキスト上限値のデフォルトは 350k です。上限をオンにしたルーティングプロバイダーの `context_window` のみ制限し、ネイティブ OpenAI モデルは実際のコンテキストウィンドウをそのまま使います。
 
 モデルページで値や全体プロバイダー設定を変えるか、各プロバイダーグループヘッダーの隣で上限を個別にオン/オフできます。
-
-

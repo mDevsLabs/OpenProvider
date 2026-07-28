@@ -42,7 +42,7 @@ compacted history disappears from the routed model's context.
 ## Fix plan (proxy-side, no Codex changes)
 1. Parser: recognize `compaction_trigger` -> flag `_compactionRequest` on the
    parsed request; recognize `compaction`/`compaction_summary` input items ->
-   if `encrypted_content` starts with our marker (`ocx1:`), base64-decode into a
+   if `encrypted_content` starts with our marker (`opr1:`), base64-decode into a
    plain user message "[conversation summary]" for routed models; if it is a
    real OpenAI-encrypted blob, degrade to a short "[earlier history was
    compacted]" note (we cannot decrypt it).
@@ -51,7 +51,7 @@ compacted history disappears from the routed model's context.
    compact prompt), run the routed model normally, collect the text, and emit a
    synthetic SSE stream containing exactly one
    `response.output_item.done` item `{type:"compaction", encrypted_content:
-   "ocx1:"+base64(summary)}` plus `response.completed`. Codex then stores it and
+   "opr1:"+base64(summary)}` plus `response.completed`. Codex then stores it and
    replays it; our parser (step 1) decodes it on later turns.
 3. Forward path: untouched (native compaction).
 4. Tests: parser flag + decode paths, routed compaction end-to-end via mock
@@ -60,3 +60,4 @@ compacted history disappears from the routed model's context.
 ## Status: investigation complete, implementation NOT started (user asked for
 ## investigation). All file/line references verified 2026-07-06 against
 ## /Users/jun/Developer/codex/121_openai-codex and current openprovider tree.
+

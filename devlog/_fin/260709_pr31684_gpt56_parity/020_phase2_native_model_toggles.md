@@ -45,7 +45,7 @@ survive, and re-enabling restores `"list"` deterministically on the next sync.
 - i18n: `models.subtitle` copy also updated to mention native GPT toggles (en/ko/zh).
 
 ### 1. `src/codex/catalog.ts` (MODIFY)
-- NEW `export function disabledNativeSlugs(config: Pick<OcxConfig,"disabledModels">): Set<string>`
+- NEW `export function disabledNativeSlugs(config: Pick<oprConfig,"disabledModels">): Set<string>`
   = bare (slash-free) entries of `disabledModels`.
 - `mergeCatalogEntriesForSync`: new optional param `disabledNative: Set<string>`
   (default empty).
@@ -115,3 +115,4 @@ GUI-facing doc lines (docs-site models guide) if they enumerate the Models page.
    observation recorded in D summary (C3: narrative note; screenshot persisted to this
    unit).
 5. Docs synced same cycle.
+

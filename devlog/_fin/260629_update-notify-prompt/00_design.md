@@ -55,7 +55,7 @@ Files under `~/Developer/codex/121_openai-codex/codex-rs/tui/src/`:
   - `runUpdate()` performs the global install (`stdio:"inherit"`, 180s timeout)
     and afterwards repairs the codex shim / advises service refresh.
 - `src/star-prompt.ts` - the precedent for an interactive-only prompt:
-  - Triple guard `process.env.OCX_SERVICE || !process.stdin.isTTY ||
+  - Triple guard `process.env.opr_SERVICE || !process.stdin.isTTY ||
     !process.stdout.isTTY` (star-prompt.ts:32).
   - Marker file under `getConfigDir()` (star-prompt.ts:33).
   - `createInterface` + try/finally `rl.close()`, whole body wrapped so it
@@ -65,15 +65,15 @@ Files under `~/Developer/codex/121_openai-codex/codex-rs/tui/src/`:
     `startServer(port)` (cli.ts:138), then `writePid` / `writeRuntimePort`
     (cli.ts:142-147), and only later calls `maybeShowStarPrompt()` (cli.ts:193)
     before blocking forever.
-  - `handleEnsure()` spawns a child `start` with `OCX_SERVICE:"1"`
+  - `handleEnsure()` spawns a child `start` with `opr_SERVICE:"1"`
     (cli.ts:216), so the child start is correctly treated as a service.
-  - `gui` spawns `start` with the parent env (no `OCX_SERVICE`) but
+  - `gui` spawns `start` with the parent env (no `opr_SERVICE`) but
     `stdio:"ignore"` (cli.ts:416), i.e. not a TTY.
 - `src/config.ts`
-  - `getConfigDir()` resolves `~/.openprovider` (or `OPENCODEX_HOME`), hardened to
+  - `getConfigDir()` resolves `~/.openprovider` (or `@mdevs/openprovider_HOME`), hardened to
     `0700`; already holds pid, runtime-port, accounts, usage, service state.
   - `atomicWriteFile` (config.ts:13) for temp+rename writes.
-- `src/service.ts` - service-spawned `start` also sets `OCX_SERVICE=1`.
+- `src/service.ts` - service-spawned `start` also sets `opr_SERVICE=1`.
 
 ## Subagent design review - decisions
 
@@ -90,7 +90,7 @@ while a daemon holds the port and PID. Order becomes: parse args -> reconcile
 runs `runUpdate()` then `process.exit`, advising re-run of `opr start`.
 
 `opr ensure` does NOT show the prompt. The child it spawns already carries
-`OCX_SERVICE:"1"` and is filtered out, but `ensure` itself is also the
+`opr_SERVICE:"1"` and is filtered out, but `ensure` itself is also the
 codex-shim autostart hot path, not a sit-and-watch session. Notifications are
 restricted to foreground `opr start`, matching codex-rs's "once at TUI start".
 
@@ -162,7 +162,7 @@ PID/port entirely.
 - npm missing / network failure: best-effort, never dirty the cache; do not
   advance `last_checked_at` on failure.
 - Non-TTY entry points: use the full star-prompt triple guard, not just
-  `OCX_SERVICE`. The `gui`-spawned start lacks `OCX_SERVICE` but is
+  `opr_SERVICE`. The `gui`-spawned start lacks `opr_SERVICE` but is
   `stdio:"ignore"`, so the `!isTTY` checks catch it.
 - readline hygiene: `createInterface` + try/finally `rl.close()`, whole body in
   try/catch so nothing blocks startup (mirror star-prompt).
@@ -206,9 +206,9 @@ PID/port entirely.
 
 - `bun x tsc --noEmit`.
 - New `tests/update-notify.test.ts`: channel-aware `isNewer` (stable vs
-  preview), dismiss suppression, source-build skip, non-TTY/`OCX_SERVICE`
+  preview), dismiss suppression, source-build skip, non-TTY/`opr_SERVICE`
   guard, stale-cache trigger, cache tag mismatch invalidation.
-- Manual: confirm no prompt under `OCX_SERVICE=1`, piped stdout, `opr ensure`,
+- Manual: confirm no prompt under `opr_SERVICE=1`, piped stdout, `opr ensure`,
   and `gui`-spawned start; confirm prompt under a real interactive `opr start`
   with a stubbed cache.
 
@@ -219,3 +219,5 @@ PID/port entirely.
   `gui`, service, or any non-TTY run).
 - No change to the actual upgrade mechanics in `runUpdate()` beyond sharing
   channel/command helpers.
+
+

@@ -105,12 +105,12 @@ describe("antigravity refresh", () => {
 
 describe("antigravity credential persistence (projectId survives the store)", () => {
   const origHome = process.env.HOME;
-  const origOcxHome = process.env.OPENPROVIDER_HOME;
+  const origoprHome = process.env.OPENPROVIDER_HOME;
   let tmp: string;
 
   afterEach(() => {
     if (origHome === undefined) delete process.env.HOME; else process.env.HOME = origHome;
-    if (origOcxHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = origOcxHome;
+    if (origoprHome === undefined) delete process.env.OPENPROVIDER_HOME; else process.env.OPENPROVIDER_HOME = origoprHome;
     if (tmp) rmSync(tmp, { recursive: true, force: true });
   });
 
@@ -123,3 +123,4 @@ describe("antigravity credential persistence (projectId survives the store)", ()
     expect(getCredential("google-antigravity")?.projectId).toBe("proj-persist");
   });
 });
+

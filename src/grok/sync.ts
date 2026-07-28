@@ -7,15 +7,15 @@
  * Deps are injectable (mirrors src/codex/sync.ts) so tests can run without a live proxy.
  */
 import { visibleNativeSlugs, filterCatalogVisibleModels, nativeOpenAiContextWindow, type CatalogModel } from "../codex/catalog";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { injectGrokConfig, type GrokInjectModel, type GrokInjectResult } from "./inject";
 
 export interface GrokSyncDeps {
-  fetchAllModels: (config: OcxConfig) => Promise<CatalogModel[]>;
+  fetchAllModels: (config: oprConfig) => Promise<CatalogModel[]>;
   injectGrokConfig: typeof injectGrokConfig;
 }
 
-async function defaultFetchAllModels(config: OcxConfig): Promise<CatalogModel[]> {
+async function defaultFetchAllModels(config: oprConfig): Promise<CatalogModel[]> {
   const { fetchAllModels } = await import("../server/management-api");
   return fetchAllModels(config);
 }
@@ -28,7 +28,7 @@ async function defaultFetchAllModels(config: OcxConfig): Promise<CatalogModel[]>
  */
 export async function syncGrokConfig(
   port: number,
-  config: OcxConfig,
+  config: oprConfig,
   opts: { hostname?: string; grokHome?: string } = {},
   deps: GrokSyncDeps = { fetchAllModels: defaultFetchAllModels, injectGrokConfig },
 ): Promise<GrokInjectResult> {
@@ -64,3 +64,4 @@ export async function syncGrokConfig(
     excluded: new Set(config.grokExcludedModels ?? []),
   });
 }
+

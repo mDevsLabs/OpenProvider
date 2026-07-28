@@ -56,7 +56,7 @@ if (accountId) {
 // resolveCodexAccountForThread 에 auto-switch 추가:
 function resolveCodexAccountForThread(
   threadId: string | null,
-  config: OcxConfig,
+  config: oprConfig,
 ): string | null {
   if (threadId && threadAccountMap.has(threadId)) {
     return threadAccountMap.get(threadId)!;
@@ -102,3 +102,4 @@ function resolveCodexAccountForThread(
 feat: capture quota from passthrough response headers
 feat: implement auto-switch at usage threshold
 ```
+

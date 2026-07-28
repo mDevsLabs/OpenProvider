@@ -32,7 +32,7 @@ import {
 import { formatCodexProviderForLog } from "../codex/routing";
 import { signalWithTimeout } from "../lib/abort";
 import { sidecarEnter } from "../lib/sidecar-tracker";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { resolveFirstUsableOpenAiSidecar, selectOpenAiImagesProvider } from "../providers/openai-sidecar";
 import { ForwardAdmissionCredentialError, validateForwardAdmissionCredential } from "./auth-cors";
 import type { RequestLogContext } from "./request-log";
@@ -74,13 +74,13 @@ export const LIVE_CLIENT_PROTOCOL_HEADERS = [
 /**
  * Env-gated sideband frame forensics (diagnostic for multibyte transcript corruption).
  *
- * When `OCX_LIVE_FRAME_LOG` is set to a file path, every relayed sideband frame appends one
+ * When `opr_LIVE_FRAME_LOG` is set to a file path, every relayed sideband frame appends one
  * JSONL record: direction, frame kind, byte length, and whether the payload contains U+FFFD.
  * Privacy: full frame payloads are never written — only when U+FFFD is present, a short
  * excerpt around the first replacement character is included so the corruption point can be
  * attributed (upstream vs relay vs client). Disabled entirely when the env var is unset.
  */
-export const LIVE_FRAME_LOG_ENV = "OCX_LIVE_FRAME_LOG";
+export const LIVE_FRAME_LOG_ENV = "opr_LIVE_FRAME_LOG";
 const LIVE_FRAME_LOG_CONTEXT_CHARS = 24;
 
 function fffdContext(text: string): string | undefined {
@@ -357,7 +357,7 @@ async function readRequestBodyCapped(req: Request, maxBytes: number): Promise<Ar
  */
 export async function resolveLiveRelay(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
 ): Promise<LiveRelayTarget | Response> {
   try {
@@ -454,7 +454,7 @@ export async function resolveLiveRelay(
 
 export async function handleLive(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
 ): Promise<Response> {
   const inboundContentType = req.headers.get("content-type") ?? "application/octet-stream";
@@ -534,7 +534,7 @@ export async function handleLive(
 /** Resolve sideband upstream WebSocket URL + headers for an accepted upgrade. */
 export async function resolveLiveSidebandUpgrade(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
   target: LiveSidebandTarget,
 ): Promise<{ headers: Record<string, string>; upstreamWsUrl: string; recordOutcome?: LiveRelayTarget["recordOutcome"] } | Response> {
@@ -546,3 +546,4 @@ export async function resolveLiveSidebandUpgrade(
     recordOutcome: relay.recordOutcome,
   };
 }
+

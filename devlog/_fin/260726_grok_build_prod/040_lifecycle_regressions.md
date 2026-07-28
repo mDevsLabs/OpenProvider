@@ -73,7 +73,7 @@ export function installIsolatedGrokHome(prefix: string): { path: string; restore
    (분기별로 정확한 호스트 출처를 고정 — 뒤바뀌면 잘못된 base_url을 쓴다).
 3. `handleStop`에서 `stripGrokConfig()` 호출이 소유권 게이트 **안쪽**에 있다
    (`ownershipBlocked` 검사가 strip보다 앞선다).
-4. `syncCleanup`의 `OCX_SERVICE` 배제가 유지된다.
+4. `syncCleanup`의 `opr_SERVICE` 배제가 유지된다.
 
 ### 그룹 2 — 실제 동작 (스타일 B/C)
 
@@ -97,3 +97,4 @@ export function installIsolatedGrokHome(prefix: string): { path: string; restore
 ## 게이트
 
 `bun test tests/grok-lifecycle.test.ts tests/service.test.ts` → 전체 `bun run test`.
+

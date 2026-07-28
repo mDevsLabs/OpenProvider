@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { startServer } from "../src/server";
 import { getRequestLogEntries } from "../src/server/request-log";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 let testDir = "";
@@ -27,14 +27,14 @@ afterEach(() => {
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
-function nativeConfig(baseUrl: string): OcxConfig {
+function nativeConfig(baseUrl: string): oprConfig {
   return {
     port: 0,
     defaultProvider: "native",
     providers: {
       native: { adapter: "openai-responses", baseUrl, authMode: "forward", allowPrivateNetwork: true },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function messagesBody(): string {
@@ -132,3 +132,4 @@ test("non-transient upstream 400 stays 400 invalid_request_error; no retry", asy
     upstream.stop(true);
   }
 });
+

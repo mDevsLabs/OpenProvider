@@ -15,7 +15,7 @@ because `maybeElideSkillText` basenames the skill directory with a POSIX-only sp
 ```diff
 -  const base = dir.split("/").filter(Boolean).pop()?.toLowerCase() ?? "";
 +  // Windows clients send `C:\Users\...\claude-api`; normalize separators before
-+  // basenaming (repo precedent: src/codex/inject.ts isOpencodexCatalogPath).
++  // basenaming (repo precedent: src/codex/inject.ts is@mdevs/openproviderCatalogPath).
 +  const base = dir.replace(/\\/g, "/").split("/").filter(Boolean).pop()?.toLowerCase() ?? "";
 ```
 
@@ -77,3 +77,4 @@ test("text-block carrier: drive-relative dir (no separator) stays pass-through",
 
 - The tool_result carrier path (`blockedSkillCallIds`) — skill-name based, no paths.
 - Native Anthropic passthrough (intentionally never elides).
+

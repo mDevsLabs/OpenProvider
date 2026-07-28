@@ -1,4 +1,4 @@
-import type { OcxProviderConfig } from "./types";
+import type { oprProviderConfig } from "./types";
 import { modelInList } from "./types";
 
 // Descriptions mirror the upstream bundled models.json canonical wording (openai/codex PR #31684).
@@ -55,7 +55,7 @@ export function sanitizeCodexReasoningEfforts(efforts: readonly string[] | undef
  * Provider/model configured reasoning levels for the Codex catalog. `undefined` means “no override”,
  * while an empty array means “intentionally expose no effort control for this model”.
  */
-export function configuredReasoningEfforts(provider: OcxProviderConfig, modelId: string): string[] | undefined {
+export function configuredReasoningEfforts(provider: oprProviderConfig, modelId: string): string[] | undefined {
   if (modelInList(provider.noReasoningModels, modelId)) return [];
   const modelEfforts = modelRecordValue(provider.modelReasoningEfforts, modelId);
   if (modelEfforts !== undefined) return healMappedTiers(provider, modelId, sanitizeCodexReasoningEfforts(modelEfforts) ?? []);
@@ -69,7 +69,7 @@ export function configuredReasoningEfforts(provider: OcxProviderConfig, modelId:
  * tiers appear without rewriting the user's config. Non-Codex values such as enabled/disabled
  * and Kimi's none sentinel are ignored here; they remain request-only wire aliases.
  */
-function healMappedTiers(provider: OcxProviderConfig, modelId: string, efforts: string[]): string[] {
+function healMappedTiers(provider: oprProviderConfig, modelId: string, efforts: string[]): string[] {
   if (efforts.length === 0) return efforts;
   const wireMap = reasoningEffortMapFor(provider, modelId);
   if (!wireMap) return efforts;
@@ -104,7 +104,7 @@ function clampToSupportedCodexEffort(requested: string, supported: readonly stri
   return best;
 }
 
-export function reasoningEffortMapFor(provider: OcxProviderConfig, modelId: string): Record<string, string> | undefined {
+export function reasoningEffortMapFor(provider: oprProviderConfig, modelId: string): Record<string, string> | undefined {
   return modelRecordValue(provider.modelReasoningEffortMap, modelId) ?? provider.reasoningEffortMap;
 }
 
@@ -112,7 +112,7 @@ export function reasoningEffortMapFor(provider: OcxProviderConfig, modelId: stri
  * Translate Codex's reasoning label into the provider's real wire value. Prefer identity labels
  * (`xhigh` stays `xhigh`, `max` stays `max`); provider maps are only for real upstream aliases.
  */
-export function mapReasoningEffort(provider: OcxProviderConfig, modelId: string, requested: string | undefined): string | undefined {
+export function mapReasoningEffort(provider: oprProviderConfig, modelId: string, requested: string | undefined): string | undefined {
   if (!requested) return undefined;
   if (modelInList(provider.noReasoningModels, modelId)) return undefined;
 
@@ -133,3 +133,4 @@ export function mapReasoningEffort(provider: OcxProviderConfig, modelId: string,
   if (wireMap && Object.prototype.hasOwnProperty.call(wireMap, wire)) return wireMap[wire];
   return wire;
 }
+

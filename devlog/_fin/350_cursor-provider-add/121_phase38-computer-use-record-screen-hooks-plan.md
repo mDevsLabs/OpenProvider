@@ -124,7 +124,7 @@ config field name (`desktopExecutor.computerUseCommand`):
 
 (c) No behavior change for `listMcpResources`/`readMcpResource` (owned by WP37).
 
-### MODIFY: `src/types.ts` — add `desktopExecutor` to `OcxProviderConfig`
+### MODIFY: `src/types.ts` — add `desktopExecutor` to `oprProviderConfig`
 
 ```ts
 +  /**
@@ -226,3 +226,4 @@ WP37 with no cycle.
 - Spawn pattern reference: `src/adapters/cursor/native-exec-shell.ts`, `native-exec-network.ts`
 - Inject site / execContext: `src/adapters/cursor/live-transport.ts` (WP37)
 - Result schemas: ComputerUseResult (`gen/agent_pb.ts:4945`), RecordScreenResult (`:9586`)
+

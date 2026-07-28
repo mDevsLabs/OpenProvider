@@ -75,7 +75,7 @@ If any claim fails verification, amend D6 here BEFORE building the alias layer.
 - Ensure proxy: reuse `handleEnsure` flow (`findLiveProxy` -> detached spawn of
   `start` -> wait loop). Respect `codexAutoStartEnabled`.
 - Env injection: `ANTHROPIC_BASE_URL=http://127.0.0.1:<live.port>`,
-  `ANTHROPIC_AUTH_TOKEN` (= `OPENCODEX_API_AUTH_TOKEN` if set, else placeholder),
+  `ANTHROPIC_AUTH_TOKEN` (= `@mdevs/openprovider_API_AUTH_TOKEN` if set, else placeholder),
   `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1`,
   `ANTHROPIC_MODEL` / `ANTHROPIC_SMALL_FAST_MODEL` from `config.claudeCode`
   (values may be aliases or raw routed ids — both resolve inbound).
@@ -122,3 +122,4 @@ If any claim fails verification, amend D6 here BEFORE building the alias layer.
   document `ANTHROPIC_CUSTOM_MODEL_OPTION` fallback in help.
 - Alias leakage into logs/usage: request-log records the RESOLVED provider/model
   (Phase 1 behavior), alias only appears as requestedModel — verify in smoke.
+

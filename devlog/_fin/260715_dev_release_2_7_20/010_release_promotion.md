@@ -54,7 +54,7 @@ OUT:
 
 - Static/package: `bun install --frozen-lockfile`; `bun x tsc --noEmit`; `bun run privacy:scan`; `bun run build:gui`.
 - Tests: affected GUI/local regression tests, then `bun test --isolate tests`.
-- GUI: `cd gui && bun run lint && bun run build`; start the integrated GUI only with a loopback target, `OPENCODEX_PROXY_TARGET=http://127.0.0.1:<port> bun run dev --host 127.0.0.1`; inspect console and screenshots at 1440, 1024, 768, 390, and 320 px; check light/dark, navigation drawer, dashboard, models, providers/add-provider, logs, usage, focus-visible, reduced motion, clipping, and touch targets.
+- GUI: `cd gui && bun run lint && bun run build`; start the integrated GUI only with a loopback target, `@mdevs/openprovider_PROXY_TARGET=http://127.0.0.1:<port> bun run dev --host 127.0.0.1`; inspect console and screenshots at 1440, 1024, 768, 390, and 320 px; check light/dark, navigation drawer, dashboard, models, providers/add-provider, logs, usage, focus-visible, reduced motion, clipping, and touch targets.
 - Token contract: run the design-system contribution scans and classify each remaining literal as token definition or algorithmic/layout exception.
 - CI: Cross-platform CI success for exact `dev`, promoted `main`, and release commit SHAs; relevant docs/service workflows reported but not substituted for runtime CI.
 - Public artifact: `npm view @mdevs/openprovider@2.7.20 version dist-tags --json`; `git ls-remote origin refs/tags/v2.7.20`; `gh release view v2.7.20`; compare all SHAs.
@@ -70,4 +70,5 @@ OUT:
 - `main`, `dev`, and `preview` all contain the exact 2.7.20 release commit after publication.
 - npm `latest` resolves to 2.7.20; Git tag and GitHub Release exist at the same commit; fresh install smoke exits 0.
 - Working tree is clean and the PABCD evidence ledger is closed in D.
+
 

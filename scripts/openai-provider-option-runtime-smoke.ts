@@ -105,7 +105,7 @@ async function checkLiveKey(): Promise<void> {
     key = resolveConfiguredKey(raw.providers?.["openai-apikey"]?.apiKey);
   }
 
-  const authorized = process.env.OCX_ALLOW_LIVE_OPENAI_SMOKE === "1";
+  const authorized = process.env.opr_ALLOW_LIVE_OPENAI_SMOKE === "1";
   const outcomes: LiveOutcome[] = [];
   if (key && authorized) {
     for (const [selectedId, resolvedId, reasoning] of [
@@ -155,12 +155,12 @@ if (Bun.argv.includes("--check-live-key")) {
   }
 
   const liveBefore = listenerIdentity10100();
-  const realOcxHome = process.env.OPENPROVIDER_HOME?.trim() || join(homedir(), ".openprovider");
+  const realoprHome = process.env.OPENPROVIDER_HOME?.trim() || join(homedir(), ".openprovider");
   const realCodexHome = process.env.CODEX_HOME?.trim() || join(homedir(), ".codex");
   const realState = [
-    ["openprovider-config", join(realOcxHome, "config.json")],
-    ["openprovider-oauth", join(realOcxHome, "auth.json")],
-    ["openprovider-codex-accounts", join(realOcxHome, "codex-accounts.json")],
+    ["openprovider-config", join(realoprHome, "config.json")],
+    ["openprovider-oauth", join(realoprHome, "auth.json")],
+    ["openprovider-codex-accounts", join(realoprHome, "codex-accounts.json")],
     ["codex-config", join(realCodexHome, "config.toml")],
     ["codex-auth", join(realCodexHome, "auth.json")],
   ] as const;
@@ -236,7 +236,7 @@ if (Bun.argv.includes("--check-live-key")) {
       body: JSON.stringify({ model, input: "runtime fixture", stream: true }),
     });
     const text = await response.text();
-    if (!response.ok || !text.includes("OCX_PROBE_OK")) {
+    if (!response.ok || !text.includes("opr_PROBE_OK")) {
       throw new Error(`runtime ${model} probe failed with status ${response.status}`);
     }
   }
@@ -259,7 +259,7 @@ if (Bun.argv.includes("--check-live-key")) {
       .replaceAll(root, "<temp>")
       .replaceAll("fixture-api-key", "<redacted>")
       .replaceAll("fixture-codex-access", "<redacted>")
-      .replaceAll("Reply exactly OCX_PROBE_OK", "<probe-prompt>")
+      .replaceAll("Reply exactly opr_PROBE_OK", "<probe-prompt>")
       .replace(/Bearer\s+\S+/gi, "Bearer <redacted>")
       .slice(0, 500);
   }
@@ -275,7 +275,7 @@ if (Bun.argv.includes("--check-live-key")) {
       "-C", workdir,
       "--model", "openai-apikey/gpt-5.6-sol-pro",
       "--sandbox", "read-only", "--json",
-      "Reply exactly OCX_PROBE_OK",
+      "Reply exactly opr_PROBE_OK",
     ], { cwd: workdir, env, stdout: "pipe", stderr: "pipe" });
     let timedOut = false;
     const timeout = setTimeout(() => {
@@ -288,7 +288,7 @@ if (Bun.argv.includes("--check-live-key")) {
       codex.exited,
     ]);
     clearTimeout(timeout);
-    if (exitCode === 0 && stdout.includes("OCX_PROBE_OK")) return { ok: true, version: codexVersion };
+    if (exitCode === 0 && stdout.includes("opr_PROBE_OK")) return { ok: true, version: codexVersion };
     return {
       ok: false,
       version: codexVersion,
@@ -484,4 +484,5 @@ if (Bun.argv.includes("--check-live-key")) {
     }
   }
 }
+
 

@@ -143,8 +143,8 @@ tier rests on.
 Delivered across multiple heuristic PABCD cycles. Verification: `npx tsc --noEmit` exit 0;
 `bun test tests/*.test.ts` = 1354 pass / 0 fail; `tests/token-guardian.test.ts` = 6 pass.
 
-- **Phase 1 — policy metadata.** `src/types.ts`: added `RefreshPolicy`, `OcxTokenGuardianConfig`,
-  `OcxConfig.tokenGuardian`, `OcxProviderConfig.refreshPolicy`. `src/oauth/index.ts`: added
+- **Phase 1 — policy metadata.** `src/types.ts`: added `RefreshPolicy`, `oprTokenGuardianConfig`,
+  `oprConfig.tokenGuardian`, `oprProviderConfig.refreshPolicy`. `src/oauth/index.ts`: added
   `defaultRefreshPolicy` to `OAuthProviderDef` (anthropic → `"disabled"`; others fall back to
   `"lazy-only"`) + exported `resolveRefreshPolicy(provider, config)`.
   (config schema untouched — `providerConfigSchema`/`configSchema` are `.passthrough()`, so new
@@ -162,3 +162,4 @@ Delivered across multiple heuristic PABCD cycles. Verification: `npx tsc --noEmi
 Defaults keep a stock install byte-for-byte identical to today (guardian off, Anthropic disabled).
 The Codex-pool survival fix activates with: `tokenGuardian.enabled=true` + the chatgpt provider's
 `refreshPolicy="proactive"`.
+

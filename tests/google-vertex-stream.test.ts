@@ -2,21 +2,21 @@ import { describe, expect, test } from "bun:test";
 import { createGoogleAdapter } from "../src/adapters/google";
 import { isVertexTruncationReason, vertexTruncationErrorMessage } from "../src/adapters/google-truncation";
 import { bridgeToResponsesSSE } from "../src/bridge";
-import type { AdapterEvent, OcxProviderConfig } from "../src/types";
+import type { AdapterEvent, oprProviderConfig } from "../src/types";
 
 function sseResponse(chunks: unknown[]): Response {
   const body = chunks.map(c => `data: ${JSON.stringify(c)}\n`).join("\n") + "\n";
   return new Response(body, { status: 200, headers: { "content-type": "text/event-stream" } });
 }
 
-async function collect(provider: OcxProviderConfig, chunks: unknown[]): Promise<AdapterEvent[]> {
+async function collect(provider: oprProviderConfig, chunks: unknown[]): Promise<AdapterEvent[]> {
   const adapter = createGoogleAdapter(provider);
   const events: AdapterEvent[] = [];
   for await (const ev of adapter.parseStream(sseResponse(chunks))) events.push(ev);
   return events;
 }
 
-const vertexProvider = { adapter: "google", baseUrl: "https://x", googleMode: "vertex" } as OcxProviderConfig;
+const vertexProvider = { adapter: "google", baseUrl: "https://x", googleMode: "vertex" } as oprProviderConfig;
 
 describe("vertex truncation helpers", () => {
   test("classifies cut-off finish reasons", () => {
@@ -113,3 +113,4 @@ describe("usage status for google-vertex stays reported", () => {
     expect(usageForFinalLog("kiro", usage)?.estimated).toBe(true);
   });
 });
+

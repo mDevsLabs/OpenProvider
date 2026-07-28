@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { loadConfig, saveConfig } from "../src/config";
 import { startServer } from "../src/server";
 import * as systemEnv from "../src/server/system-env";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 // Full-suite Windows load: startServer + multi-PUT management flows often exceed bun's
@@ -41,7 +41,7 @@ beforeEach(() => {
     providers: {
       mock: { adapter: "openai-chat", baseUrl: "http://127.0.0.1:1/v1", apiKey: "k", allowPrivateNetwork: true, liveModels: false, models: ["test-model"] },
     },
-  } as OcxConfig);
+  } as oprConfig);
 });
 
 afterEach(() => {
@@ -569,7 +569,7 @@ test("GET /api/claude-code reports Auto-connect unsupported outside Darwin", asy
   saveConfig({
     ...loadConfig(),
     claudeCode: { systemEnv: true },
-  } as OcxConfig);
+  } as oprConfig);
   setPlatform("linux");
   const server = startServer(0);
   try {
@@ -669,3 +669,4 @@ test("Claude Desktop PUT retains but cannot move an unavailable route", async ()
     server.stop(true);
   }
 });
+

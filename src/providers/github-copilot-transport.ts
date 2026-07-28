@@ -1,11 +1,11 @@
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 import {
   GITHUB_COPILOT_DEFAULT_API_BASE,
   GITHUB_COPILOT_EDITOR_HEADERS,
   validateCopilotApiBaseUrl,
 } from "../oauth/github-copilot";
 
-export type OcxProviderTransport = OcxProviderConfig & {
+export type oprProviderTransport = oprProviderConfig & {
   fetch?: typeof globalThis.fetch;
 };
 
@@ -32,9 +32,9 @@ function withoutUserOverridden(
  * User-configured headers always win.
  */
 export function resolveGithubCopilotTransport(
-  provider: OcxProviderTransport,
+  provider: oprProviderTransport,
   apiBaseUrl?: string,
-): OcxProviderTransport {
+): oprProviderTransport {
   const stableDefaults = withoutUserOverridden(GITHUB_COPILOT_EDITOR_HEADERS, provider.headers);
   const headers = {
     ...stableDefaults,
@@ -54,4 +54,5 @@ export function resolveGithubCopilotTransport(
     headers,
   };
 }
+
 

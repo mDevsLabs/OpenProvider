@@ -1,5 +1,5 @@
 /**
- * `opr doctor` - read-only environment diagnostics.
+ * `ocx doctor` - read-only environment diagnostics.
  *
  * Explains WHY ChatGPT quota may never populate (and thus why account
  * auto-switch can appear stuck), especially on WSL2 where outbound fetch to
@@ -17,7 +17,7 @@ import { loadServiceTokenFromFile } from "../lib/service-secrets";
 import { readCodexTokens } from "../codex/auth-collision";
 import { collectOrcaCodexHomeDiagnostic, resolveCodexHomeDir as resolveCodexHomeDirImpl, isWslRuntime, listWslWindowsCodexHomes, wslAutomountRoot, type CodexHomeDeps } from "../codex/home";
 import { findCodexOnPath, isWindowsInteropDir } from "../codex/shim";
-import { countPendingOpenproviderHistory } from "../codex/history-provider";
+import { countPendingOpencodexHistory } from "../codex/history-provider";
 import { collectProjectCodexConfigWarnings, formatProjectCodexConfigWarningsForDoctor } from "../codex/project-config-warnings";
 import { collectStartupHealth, startupHealthSummary } from "../codex/autostart-health";
 import {
@@ -78,12 +78,12 @@ function actionForDoctorEntry(entry: OAuthHealthEntry): string {
     return CODEX_REAUTH_ACTION;
   }
   if (entry.health.status === "warning" && entry.health.reason === "stale_credentials") {
-    return `run \`opr login ${entry.provider}\``;
+    return `run \`ocx login ${entry.provider}\``;
   }
   if (entry.health.status === "warning" && entry.health.reason === "metadata_mismatch") {
-    return `run \`opr login ${entry.provider}\` to refresh credentials`;
+    return `run \`ocx login ${entry.provider}\` to refresh credentials`;
   }
-  return `run \`opr doctor\` again after fixing OAuth state for ${entry.provider}`;
+  return `run \`ocx doctor\` again after fixing OAuth state for ${entry.provider}`;
 }
 
 function describeDoctorHealth(entry: OAuthHealthEntry): string {
@@ -111,7 +111,7 @@ function describeDoctorHealth(entry: OAuthHealthEntry): string {
 }
 
 /**
- * OAuth reliability checks for `opr doctor`. Observe-only: never mutates
+ * OAuth reliability checks for `ocx doctor`. Observe-only: never mutates
  * credentials, locks, or networking. Every WARN includes a recovery Action.
  */
 export async function collectOAuthDoctorChecks(
@@ -126,7 +126,7 @@ export async function collectOAuthDoctorChecks(
     checks.push({
       level: "WARN",
       message:
-        "OAuth credential storage directory is not writable. Action: fix permissions on OPENPROVIDER_HOME so opr can create temp files and rename auth.json",
+        "OAuth credential storage directory is not writable. Action: fix permissions on OPENCODEX_HOME so ocx can create temp files and rename auth.json",
     });
   }
 
@@ -136,7 +136,7 @@ export async function collectOAuthDoctorChecks(
     checks.push({
       level: "WARN",
       message:
-        "Token refresh single-flight is unavailable. Action: fix permissions on OPENPROVIDER_HOME so opr can create refresh lock files",
+        "Token refresh single-flight is unavailable. Action: fix permissions on OPENCODEX_HOME so ocx can create refresh lock files",
     });
   }
 
@@ -145,7 +145,7 @@ export async function collectOAuthDoctorChecks(
     checks.push({
       level: "WARN",
       message:
-        "Codex account health unavailable (proxy not running). Action: start the proxy and re-run `opr doctor` to inspect live cooldown/reauth",
+        "Codex account health unavailable (proxy not running). Action: start the proxy and re-run `ocx doctor` to inspect live cooldown/reauth",
     });
   }
   for (const entry of report.entries) {
@@ -173,12 +173,12 @@ export type PathRow = { label: string; path: string; exists: boolean };
 
 export function collectPaths(): PathRow[] {
   const codexHome = resolveCodexHomeDirImpl();
-  const openproviderHome = getConfigDir();
+  const opencodexHome = getConfigDir();
   return [
     { label: "CODEX_HOME", path: codexHome, exists: existsSync(codexHome) },
     { label: "CODEX_HOME/auth.json", path: join(codexHome, "auth.json"), exists: existsSync(join(codexHome, "auth.json")) },
-    { label: "OPENPROVIDER_HOME", path: openproviderHome, exists: existsSync(openproviderHome) },
-    { label: "OPENPROVIDER_HOME/config.json", path: getConfigPath(), exists: existsSync(getConfigPath()) },
+    { label: "OPENCODEX_HOME", path: opencodexHome, exists: existsSync(opencodexHome) },
+    { label: "OPENCODEX_HOME/config.json", path: getConfigPath(), exists: existsSync(getConfigPath()) },
   ];
 }
 
@@ -389,7 +389,7 @@ function readProcessEnviron(pid: number): string | null {
 
 /*
  * [Decision Log]
- * - Purpose: Make `opr doctor` distinguish the current shell env from the already-running proxy process env.
+ * - Purpose: Make `ocx doctor` distinguish the current shell env from the already-running proxy process env.
  * - Alternatives: Rename the old section only; parse service-manager env for each OS; read the recorded proxy PID's env presence.
  * - Rationale: PID env presence is the narrowest useful diagnostic on Linux/WSL, avoids secret value output, and keeps unsupported platforms explicit.
  */
@@ -480,10 +480,14 @@ export type ServiceMemoryData = {
   platform: string;
   rss: number;
   heapUsed: number;
+  external: number;
+  arrayBuffers: number;
+  observedBytes?: number;
+  observedMetric?: MemoryMetric;
   jscHeap: { heapSize: number } | null;
   streamMode: string;
   eagerRelay: { useEagerRelay: boolean; reason: string } | null;
-  watchdog: { warnThresholdBytes: number; lastWarnAt: number | null } | null;
+  watchdog: { warnThresholdBytes: number; lastWarnAt: number | null; observedBytes?: number; observedMetric?: MemoryMetric } | null;
 };
 
 export type ServiceMemoryReport =
@@ -493,6 +497,19 @@ export type ServiceMemoryReport =
 
 const SERVICE_MEMORY_TIMEOUT_MS = 2000;
 const DEFAULT_MEMORY_THRESHOLD_BYTES = 4 * 1024 ** 3;
+type MemoryMetric = "rss" | "external" | "arrayBuffers";
+
+function observedMemory(data: { rss: number; external?: number; arrayBuffers?: number }): {
+  bytes: number;
+  metric: MemoryMetric;
+} {
+  const values: Array<{ metric: MemoryMetric; bytes: number }> = [
+    { metric: "rss", bytes: data.rss },
+    { metric: "external", bytes: data.external ?? 0 },
+    { metric: "arrayBuffers", bytes: data.arrayBuffers ?? 0 },
+  ];
+  return values.reduce((best, next) => next.bytes > best.bytes ? next : best, values[0]);
+}
 
 export async function fetchServiceMemory(
   host: string,
@@ -502,7 +519,7 @@ export async function fetchServiceMemory(
 ): Promise<ServiceMemoryReport> {
   try {
     const res = await fetchImpl(`http://${host}:${port}/api/system/memory`, {
-      headers: token ? { "x-openprovider-api-key": token } : {},
+      headers: token ? { "x-opencodex-api-key": token } : {},
       signal: AbortSignal.timeout(SERVICE_MEMORY_TIMEOUT_MS),
     });
     if (res.status === 401 || res.status === 403) return { status: "unauthorized" };
@@ -519,13 +536,26 @@ export async function fetchServiceMemory(
         platform: typeof body.platform === "string" ? body.platform : "unknown",
         rss: body.rss,
         heapUsed: typeof body.heapUsed === "number" ? body.heapUsed : 0,
+        external: typeof body.external === "number" ? body.external : 0,
+        arrayBuffers: typeof body.arrayBuffers === "number" ? body.arrayBuffers : 0,
+        observedBytes: typeof body.observedBytes === "number" ? body.observedBytes : undefined,
+        observedMetric: body.observedMetric === "rss" || body.observedMetric === "external" || body.observedMetric === "arrayBuffers"
+          ? body.observedMetric
+          : undefined,
         jscHeap: body.jscHeap && typeof body.jscHeap.heapSize === "number" ? { heapSize: body.jscHeap.heapSize } : null,
         streamMode: typeof body.streamMode === "string" ? body.streamMode : "auto",
         eagerRelay: body.eagerRelay && typeof body.eagerRelay.reason === "string"
           ? { useEagerRelay: body.eagerRelay.useEagerRelay === true, reason: body.eagerRelay.reason }
           : null,
         watchdog: body.watchdog && typeof body.watchdog.warnThresholdBytes === "number"
-          ? { warnThresholdBytes: body.watchdog.warnThresholdBytes, lastWarnAt: body.watchdog.lastWarnAt ?? null }
+          ? {
+            warnThresholdBytes: body.watchdog.warnThresholdBytes,
+            lastWarnAt: body.watchdog.lastWarnAt ?? null,
+            observedBytes: typeof body.watchdog.observedBytes === "number" ? body.watchdog.observedBytes : undefined,
+            observedMetric: body.watchdog.observedMetric === "rss" || body.watchdog.observedMetric === "external" || body.watchdog.observedMetric === "arrayBuffers"
+              ? body.watchdog.observedMetric
+              : undefined,
+          }
           : null,
       },
     };
@@ -541,7 +571,7 @@ export function formatServiceMemoryLines(report: ServiceMemoryReport): string[] 
   const lines: string[] = [];
   lines.push(`  --     doctor process Bun ${Bun.version} (this is NOT the service process)`);
   if (report.status === "unauthorized") {
-    lines.push("  --     proxy reachable but rejected the request — set OPENPROVIDER_API_AUTH_TOKEN to match the service");
+    lines.push("  --     proxy reachable but rejected the request — set OPENCODEX_API_AUTH_TOKEN to match the service");
     return lines;
   }
   if (report.status === "unreachable") {
@@ -550,30 +580,37 @@ export function formatServiceMemoryLines(report: ServiceMemoryReport): string[] 
   }
   const d = report.data;
   lines.push(`  ok     service pid ${d.pid}: Bun ${d.bunVersion} on ${d.platform}`);
-  lines.push(`         rss=${mb(d.rss)}, heapUsed=${mb(d.heapUsed)}${d.jscHeap ? `, jscHeap=${mb(d.jscHeap.heapSize)}` : ""}`);
+  const observed = observedMemory(d);
+  const observedBytes = d.observedBytes ?? d.watchdog?.observedBytes ?? observed.bytes;
+  const observedMetric = d.observedMetric ?? d.watchdog?.observedMetric ?? observed.metric;
+  lines.push(`         rss=${mb(d.rss)}, external=${mb(d.external)}, arrayBuffers=${mb(d.arrayBuffers)}, heapUsed=${mb(d.heapUsed)}${d.jscHeap ? `, jscHeap=${mb(d.jscHeap.heapSize)}` : ""}`);
+  lines.push(`         observed=${mb(observedBytes)} (${observedMetric})`);
   lines.push(`         streamMode=${d.streamMode}${d.eagerRelay ? ` (eager relay: ${d.eagerRelay.useEagerRelay ? "on" : "off"}, ${d.eagerRelay.reason})` : ""}`);
   if (d.watchdog) {
     lines.push(`         watchdog threshold=${mb(d.watchdog.warnThresholdBytes)}${d.watchdog.lastWarnAt ? `, last warn ${new Date(d.watchdog.lastWarnAt).toISOString()}` : ", no warnings"}`);
   }
-  // Interpretation rule (devlog 040): reuse the watchdog's own threshold so
-  // doctor and watchdog never disagree about "high"; jsShare discriminates
-  // JS-heap growth from native runtime growth (the #314 shape).
+  // Interpretation rule: reuse the watchdog threshold and the same max-of
+  // observed memory counters, so doctor and watchdog never disagree about
+  // "high". RSS/working-set can under-report committed retention on Windows, and
+  // Bun 1.3.14 heap counters are not standalone leak proof.
   const threshold = d.watchdog?.warnThresholdBytes ?? DEFAULT_MEMORY_THRESHOLD_BYTES;
   const jsShare = d.rss > 0 ? Math.max(d.heapUsed, d.jscHeap?.heapSize ?? 0) / d.rss : 0;
-  if (d.rss < threshold) {
+  if (observedBytes < threshold) {
     lines.push("         memory usage looks normal");
+  } else if (observedMetric !== "rss") {
+    lines.push(`  !!     high observed memory via ${observedMetric}; Windows RSS/working-set counters may be blind. See docs: troubleshooting/windows-memory`);
   } else if (jsShare < 0.25) {
     lines.push("  !!     high RSS with a small JS heap — native-side growth (Bun runtime buffers/handles). See docs: troubleshooting/windows-memory");
   } else if (jsShare >= 0.5) {
-    lines.push("  !!     high RSS dominated by the JS heap — likely an openprovider bug; please report it");
+    lines.push("  !!     high RSS with large JS/JSC counters — possible JS-side retention; compare responseState/external samples before filing an app leak");
   } else {
     lines.push("  !!     high RSS, indeterminate split — capture two doctor runs over time to see the trend");
   }
   // Version-claiming (never binary-claiming): the endpoint cannot distinguish
-  // the bundled binary from an OPENPROVIDER_BUN_PATH override of the same version.
+  // the bundled binary from an OPENCODEX_BUN_PATH override of the same version.
   if (d.platform === "win32" && d.eagerRelay?.reason === "auto-known-bad") {
     lines.push(`         service is running Bun ${d.bunVersion} on Windows — a version affected by the upstream Bun memory issue.`);
-    lines.push("         Options: wait for a bundled runtime update, or set OPENPROVIDER_BUN_PATH to a runtime you trust (unvalidated — own risk),");
+    lines.push("         Options: wait for a bundled runtime update, or set OPENCODEX_BUN_PATH to a runtime you trust (unvalidated — own risk),");
     lines.push("         or opt into streamMode \"eager-relay\" via PUT /api/settings (crash risk on this runtime; see docs).");
   }
   return lines;
@@ -591,9 +628,9 @@ export function proxyDownRestartHint(input: {
 }): string | null {
   if (input.proxyRunning) return null;
   const restart = input.serviceViable
-    ? "Restart it with 'opr service start' (service installed) or 'opr start'."
-    : "Restart it with 'opr start', or install the persistent service: 'opr service install'.";
-  return `The opr proxy is not running. Codex/Claude clients pinned to 127.0.0.1:${input.port} fail with errors like "error sending request for url (http://127.0.0.1:${input.port}/v1/responses)". ${restart}`;
+    ? "Restart it with 'ocx service start' (service installed) or 'ocx start'."
+    : "Restart it with 'ocx start', or install the persistent service: 'ocx service install'.";
+  return `The ocx proxy is not running. Codex/Claude clients pinned to 127.0.0.1:${input.port} fail with errors like "error sending request for url (http://127.0.0.1:${input.port}/v1/responses)". ${restart}`;
 }
 
 export async function runDoctor(args: string[] = []): Promise<void> {
@@ -608,7 +645,7 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     if (resolved.runtime.source === "environment") {
       console.log("CODEX_CLI_PATH currently overrides configured runtimes.");
       console.log(`Unset or update CODEX_CLI_PATH to use ${displayCodexRuntimePath(resolved.newerAvailable.command)} (${resolved.newerAvailable.version ?? "unknown"}).`);
-      console.log("Then run opr sync.");
+      console.log("Then run ocx sync.");
       return;
     }
     persistCodexRuntime({
@@ -617,11 +654,11 @@ export async function runDoctor(args: string[] = []): Promise<void> {
       source: "configured",
     });
     console.log(`Updated Codex runtime to ${displayCodexRuntimePath(resolved.newerAvailable.command)} (${resolved.newerAvailable.version ?? "unknown"}).`);
-    console.log("Run opr sync to refresh the catalog against this runtime.");
+    console.log("Run ocx sync to refresh the catalog against this runtime.");
     return;
   }
 
-  console.log("openprovider doctor\n");
+  console.log("opencodex doctor\n");
 
   // Ordering note: the memory/runtime section renders after "Running proxy
   // process proxy env" below; helpers live above runDoctor for testability.
@@ -671,13 +708,13 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     if (resolved.newerAvailable) {
       console.log(`  !!  Multiple Codex installations found.`);
       console.log(`  ok  Newer usable runtime found: ${displayCodexRuntimePath(resolved.newerAvailable.command)} (${resolved.newerAvailable.version ?? "unknown"})`);
-      console.log("       Suggested: set CODEX_CLI_PATH to the desired binary and run opr sync.");
-      console.log("       Optional: opr doctor --fix-codex-runtime");
+      console.log("       Suggested: set CODEX_CLI_PATH to the desired binary and run ocx sync.");
+      console.log("       Optional: ocx doctor --fix-codex-runtime");
     }
     const lastClamp = loadLastEffortClamp();
     if (lastClamp && lastClamp.removedEfforts.length > 0) {
       console.log(`  !!  ${lastClamp.removedEfforts.join(" and ")} were removed during catalog sync.`);
-      console.log("       Suggested: set CODEX_CLI_PATH to a newer Codex binary and run opr sync.");
+      console.log("       Suggested: set CODEX_CLI_PATH to a newer Codex binary and run ocx sync.");
     }
   }
 
@@ -695,7 +732,7 @@ export async function runDoctor(args: string[] = []): Promise<void> {
 
   console.log("\nRunning proxy process proxy env (presence only)");
   if (runningProxyEnv.status === "not_running") {
-    console.log("  --     no running opr proxy process found");
+    console.log("  --     no running ocx proxy process found");
   } else if (runningProxyEnv.status === "unavailable") {
     console.log(`  --     pid ${runningProxyEnv.pid}: ${runningProxyEnv.reason}`);
   } else {
@@ -717,9 +754,9 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     const runtime = liveRuntime;
     if (!runtime) {
       console.log(`  --     doctor process Bun ${Bun.version} (this is NOT the service process)`);
-      console.log("  --     no running opr proxy found (no live pid/runtime record)");
+      console.log("  --     no running ocx proxy found (no live pid/runtime record)");
     } else {
-      const token = process.env.OPENPROVIDER_API_AUTH_TOKEN ?? loadServiceTokenFromFile(process.env);
+      const token = process.env.OPENCODEX_API_AUTH_TOKEN ?? loadServiceTokenFromFile(process.env);
       const report = await fetchServiceMemory(gracefulStopHost(runtime.hostname), runtime.port, token);
       for (const line of formatServiceMemoryLines(report)) console.log(line);
     }
@@ -731,17 +768,17 @@ export async function runDoctor(args: string[] = []): Promise<void> {
   console.log(`  ${probe.ok ? "ok " : "-- "} ${WHAM_USAGE_URL}`);
   console.log(`       ${detail}, ${probe.durationMs}ms, ${probe.authenticated ? "authenticated" : "unauthenticated"}`);
 
-  // Design B upgrade visibility: threads still tagged openprovider are invisible to the native
+  // Design B upgrade visibility: threads still tagged opencodex are invisible to the native
   // Codex app until the one-time migration lands. Read-only probe (readonly sqlite, 100ms
   // busy timeout) — reports state, never mutates.
   console.log("\nCodex history migration");
-  const pending = countPendingOpenproviderHistory();
+  const pending = countPendingOpencodexHistory();
   if (pending.failed) {
     console.log("  --     state DB locked or unreadable (Codex app open?) — migration state unknown");
   } else if (pending.pendingRows === 0 && pending.backupEntries === 0) {
-    console.log("  ok     no legacy openprovider-tagged threads pending");
+    console.log("  ok     no legacy opencodex-tagged threads pending");
   } else {
-    console.log(`  --     ${pending.pendingRows} thread(s) still tagged openprovider, ${pending.backupEntries} backup manifest entr${pending.backupEntries === 1 ? "y" : "ies"}`);
+    console.log(`  --     ${pending.pendingRows} thread(s) still tagged opencodex, ${pending.backupEntries} backup manifest entr${pending.backupEntries === 1 ? "y" : "ies"}`);
   }
 
   console.log("\nProject Codex configs");
@@ -796,19 +833,19 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     if (probe.classification === "timeout" || probe.classification === "connect_error") {
       hints.push("WHAM probe could not reach chatgpt.com. On WSL2 this is often NAT/DNS/VPN. Quota cannot prime, so auto-switch stays on unknown scores.");
       if (noProxy) {
-        hints.push("No proxy is visible to this doctor process and config.proxy is unset or unresolved. If Windows uses a proxy/VPN, set config.proxy or start opr from a shell with HTTP(S)_PROXY.");
+        hints.push("No proxy is visible to this doctor process and config.proxy is unset or unresolved. If Windows uses a proxy/VPN, set config.proxy or start ocx from a shell with HTTP(S)_PROXY.");
       }
     }
   }
   if (pending.failed || pending.pendingRows > 0 || pending.backupEntries > 0) {
-    hints.push("Legacy chat threads are still tagged openprovider (or the DB was locked). The running proxy retries the migration automatically; to force it now, close the Codex app and run 'opr sync'.");
+    hints.push("Legacy chat threads are still tagged opencodex (or the DB was locked). The running proxy retries the migration automatically; to force it now, close the Codex app and run 'ocx sync'.");
   }
   if (dual.dualInstall && !dual.effectiveIsWindowsMount) {
-    hints.push(`Codex is installed on BOTH WSL and Windows. Each side keeps its own ~/.codex (logins, config, catalog are separate); opr here manages the Linux one. To share a single home, set CODEX_HOME=${dual.windowsCodexHomes[0] ?? `${dual.automountRoot}/c/Users/<you>/.codex`} in WSL (drvfs file locking is less reliable).`);
+    hints.push(`Codex is installed on BOTH WSL and Windows. Each side keeps its own ~/.codex (logins, config, catalog are separate); ocx here manages the Linux one. To share a single home, set CODEX_HOME=${dual.windowsCodexHomes[0] ?? `${dual.automountRoot}/c/Users/<you>/.codex`} in WSL (drvfs file locking is less reliable).`);
     hints.push("localhost is one-way in WSL2 NAT mode: Windows-side codex reaches this WSL proxy via localhost (localhostForwarding, on by default), but a Windows-side proxy is NOT reachable from WSL via localhost — use networkingMode=mirrored in .wslconfig for both directions.");
   }
   if (dual.interopCodexOnPath) {
-    hints.push("The `codex` found on PATH is the Windows launcher reached through WSL interop; opr will not shim it (a WSL shim breaks Windows invocations). Install codex inside WSL (npm i -g @openai/codex) or run 'opr ensure' from Windows.");
+    hints.push("The `codex` found on PATH is the Windows launcher reached through WSL interop; ocx will not shim it (a WSL shim breaks Windows invocations). Install codex inside WSL (npm i -g @openai/codex) or run 'ocx ensure' from Windows.");
   }
   if (hints.length > 0) {
     console.log("\nHints");

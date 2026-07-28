@@ -52,5 +52,6 @@ All facts below were opened from primary provider documentation on 2026-07-17. L
 ## Vertex AI
 
 - Google recommends ADC and documents `gcloud auth application-default login` for local user credentials.
-- OCX already implements the authorized-user refresh flow in `src/lib/gcp-adc.ts` with cloud-platform scope.
+- opr already implements the authorized-user refresh flow in `src/lib/gcp-adc.ts` with cloud-platform scope.
 - The roadmap productizes setup and diagnostics; it does not add a second embedded OAuth client unless a later P proves a real gap and a safe client-registration boundary.
+

@@ -183,7 +183,7 @@ if (workspaceView) {
 
    ```bash
    bun run dev
-   OPENCODEX_PROXY_TARGET=http://127.0.0.1:10199 bun run dev:gui
+   OpenProvider_PROXY_TARGET=http://127.0.0.1:10199 bun run dev:gui
    agbrowse start --headless
    agbrowse navigate 'http://127.0.0.1:5173/#subagents'
    agbrowse wait 2000
@@ -237,3 +237,4 @@ if (workspaceView) {
 - #441의 기능을 제거하는 diff 모양만 보고 revert로 오해할 수 있다. 커밋 메시지와
   완료 기록에는 “두 구현 중 Classic 선택”이라는 판단 근거를 그대로 남긴다
   (`000_plan.md:67-68`).
+

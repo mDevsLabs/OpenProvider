@@ -9,7 +9,7 @@ import {
   saveConfig,
   saveConfigPreservingClaudeCode,
 } from "../src/config";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * A user hand-edits `config.json` while the proxy runs. `saveConfig` serializes the
@@ -38,7 +38,7 @@ beforeEach(() => {
     defaultProvider: "test",
     providers: { test: { adapter: "openai-chat", baseUrl: "http://127.0.0.1:1/v1", apiKey: "k", allowPrivateNetwork: true } },
     claudeCode: { authMode: "subscription" },
-  } as unknown as OcxConfig);
+  } as unknown as oprConfig);
 });
 
 afterEach(() => {
@@ -181,3 +181,4 @@ test("a providers hand edit is NOT preserved", () => {
   saveConfigPreservingClaudeCode(live);
   expect(Object.keys(diskConfig().providers as Record<string, unknown>)).toEqual(["test"]);
 });
+

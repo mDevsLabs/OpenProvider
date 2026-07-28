@@ -16,7 +16,7 @@ import { handleCursorNativeExec } from "../src/adapters/cursor/native-exec";
 import { resolveMcpServers } from "../src/adapters/cursor/mcp-config";
 import { CursorMcpManager } from "../src/adapters/cursor/mcp-manager";
 import { buildMcpToolDefinitions, mcpDepsFromManager } from "../src/adapters/cursor/native-exec-mcp";
-import type { OcxProviderConfig } from "../src/types";
+import type { oprProviderConfig } from "../src/types";
 
 const textEncoder = new TextEncoder();
 
@@ -95,7 +95,7 @@ describe("Cursor MCP manager", () => {
         disabled: { command: "node", enabled: false },
         empty: {},
       },
-    } as unknown as OcxProviderConfig;
+    } as unknown as oprProviderConfig;
     const names = resolveMcpServers(provider).map(s => s.serverName).sort();
     expect(names).toEqual(["ok", "remote"]);
   });
@@ -264,3 +264,4 @@ describe("Cursor MCP deps via native-exec dispatcher", () => {
     }
   });
 });
+

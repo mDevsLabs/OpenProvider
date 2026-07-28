@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { formatErrorResponse } from "../bridge";
 import {
+  apiKeyTransportConfigError,
   booleanRecordConfigError,
   modelAdapterRecordConfigError,
   codexAutoStartEnabled,
@@ -8,15 +9,17 @@ import {
   positiveIntegerRecordConfigError,
   providerBaseUrlConfigError,
   providerHeadersConfigError,
+  reasoningSummaryDeliveryRecordConfigError,
 } from "../config";
 import { providerDestinationConfigError } from "../lib/destination-policy";
 import { getProviderRegistryEntry, providerCodexAccountMode } from "../providers/registry";
 import { providerConfigSeed } from "../providers/derive";
-import type { OcxConfig, OcxProviderConfig } from "../types";
+import type { oprConfig, oprProviderConfig } from "../types";
 import { openRouterRoutingConfigError } from "../providers/openrouter-routing";
 
 let _corsOrigin = "http://localhost:10100";
 export function setCorsOrigin(port: number): void { _corsOrigin = `http://localhost:${port}`; }
+/** The proxy's own listening port. No admission check uses it: both loopback predicates key on hostname alone. */
 export function configuredPort(): string {
   try { return new URL(_corsOrigin).port; } catch { return "10100"; }
 }
@@ -34,8 +37,18 @@ export function parseHttpHost(value: string | null): { hostname: string; port: s
 export function isLoopbackRequestHost(value: string | null): boolean {
   const parsed = parseHttpHost(value);
   if (!parsed) return true;
-  if (!isLoopbackHostname(parsed.hostname)) return false;
-  return parsed.port === "" || parsed.port === configuredPort();
+  // Loopback is a trust boundary by hostname, not by port. `ssh -L 20100:localhost:10100`
+  // legitimately arrives as `Host: localhost:20100`, and refusing it took the whole /v1/*
+  // data plane down with it, not just CORS. The sibling isLoopbackOriginValue() dropped its
+  // own port check for the same reason in e4e06125b ("same-trust-boundary"). Port equality
+  // was never the rebinding defense: a rebinding browser connects to the real port and sends
+  // it verbatim, so the hostname check below is what rejected it then and now.
+  //
+  // Scope of that guarantee: it holds for Hosts `parseHttpHost` can parse. An unparseable
+  // Host still returns true above — pre-existing behavior, not browser-reachable (a browser
+  // composes Host from its own connection), and pinned by a characterization test in
+  // tests/server-loopback-host-gate.test.ts. Tightening it is separate work.
+  return isLoopbackHostname(parsed.hostname);
 }
 
 export function isLoopbackOriginValue(value: string): boolean {
@@ -56,8 +69,8 @@ export function isSameOriginAsRequest(req: Request, origin: string): boolean {
   }
 }
 
-export function isAllowedRequestOrigin(req: Request, config: OcxConfig): boolean {
-  function isExtraAllowedOrigin(origin: string, cfg: OcxConfig): boolean {
+export function isAllowedRequestOrigin(req: Request, config: oprConfig): boolean {
+  function isExtraAllowedOrigin(origin: string, cfg: oprConfig): boolean {
     if (!cfg.corsAllowOrigins?.length) return false;
     return cfg.corsAllowOrigins.some(allowed => {
       try {
@@ -75,7 +88,7 @@ export function isAllowedRequestOrigin(req: Request, config: OcxConfig): boolean
   return !origin || isLoopbackOriginValue(origin) || isSameOriginAsRequest(req, origin) || isExtraAllowedOrigin(origin, config);
 }
 
-export function corsHeaders(req?: Request, config?: OcxConfig): Record<string, string> {
+export function corsHeaders(req?: Request, config?: oprConfig): Record<string, string> {
   const origin = req?.headers.get("Origin");
   const allowOrigin = origin && req && config && isAllowedRequestOrigin(req, config) ? origin : _corsOrigin;
   return {
@@ -89,7 +102,7 @@ export function corsHeaders(req?: Request, config?: OcxConfig): Record<string, s
   };
 }
 
-export function withCors(response: Response, req: Request, config: OcxConfig): Response {
+export function withCors(response: Response, req: Request, config: oprConfig): Response {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(corsHeaders(req, config))) {
     headers.set(name, value);
@@ -101,35 +114,37 @@ export function withCors(response: Response, req: Request, config: OcxConfig): R
   });
 }
 
-export function jsonResponse(data: unknown, status = 200, req?: Request, config?: OcxConfig): Response {
+export function jsonResponse(data: unknown, status = 200, req?: Request, config?: oprConfig): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: { "Content-Type": "application/json", ...corsHeaders(req, config) },
   });
 }
 
-export function configuredApiAuthToken(_config: OcxConfig): string | undefined {
+export function configuredApiAuthToken(_config: oprConfig): string | undefined {
   const token = process.env.OPENPROVIDER_API_AUTH_TOKEN?.trim();
   return token || undefined;
 }
 
 export function isLoopbackHostname(hostname: string | undefined): boolean {
-  const normalized = (hostname ?? "127.0.0.1").trim().toLowerCase();
+  // A fully-qualified "localhost." is the same host as "localhost": curl and some clients
+  // send the trailing dot verbatim, and refusing it 403s a legitimate loopback caller.
+  const normalized = (hostname ?? "127.0.0.1").trim().toLowerCase().replace(/\.$/, "");
   return normalized === "" || normalized === "localhost" || normalized === "127.0.0.1" || normalized === "::1" || normalized === "[::1]";
 }
 
-export function isApiAuthRequired(config: OcxConfig): boolean {
+export function isApiAuthRequired(config: oprConfig): boolean {
   return !isLoopbackHostname(config.hostname);
 }
 
-export function assertServerAuthConfig(config: OcxConfig): void {
+export function assertServerAuthConfig(config: oprConfig): void {
   if (isApiAuthRequired(config) && !configuredApiAuthToken(config)) {
     throw new Error("OPENPROVIDER_API_AUTH_TOKEN is required when binding openprovider to a non-loopback hostname");
   }
 }
 
 /** Whether `token` is one of the proxy's own admission secrets (env token or config API keys). */
-export function isProxyAdmissionSecret(token: string, config: OcxConfig): boolean {
+export function isProxyAdmissionSecret(token: string, config: oprConfig): boolean {
   const actual = token.trim();
   if (!actual) return false;
   const enc = new TextEncoder();
@@ -155,12 +170,12 @@ export class ForwardAdmissionCredentialError extends Error {
   }
 }
 
-export function validateForwardAdmissionCredential(headers: Headers, config: OcxConfig): void {
+export function validateForwardAdmissionCredential(headers: Headers, config: oprConfig): void {
   const bearer = headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
   if (bearer && isProxyAdmissionSecret(bearer, config)) throw new ForwardAdmissionCredentialError();
 }
 
-export function hasValidApiAuth(req: Request, config: OcxConfig): boolean {
+export function hasValidApiAuth(req: Request, config: oprConfig): boolean {
   if (!isApiAuthRequired(config)) return true;
   const actual = req.headers.get("X-OpenProvider-API-Key")?.trim()
     || req.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim()
@@ -170,7 +185,7 @@ export function hasValidApiAuth(req: Request, config: OcxConfig): boolean {
   return isProxyAdmissionSecret(actual, config);
 }
 
-export function requireApiAuth(req: Request, config: OcxConfig, kind: "management" | "data-plane"): Response | null {
+export function requireApiAuth(req: Request, config: oprConfig, kind: "management" | "data-plane"): Response | null {
   if (hasValidApiAuth(req, config)) return null;
   if (kind === "management") return jsonResponse({ error: "openprovider API key required" }, 401);
   return formatErrorResponse(401, "authentication_error", "openprovider API key required");
@@ -181,7 +196,7 @@ export function requireApiAuth(req: Request, config: OcxConfig, kind: "managemen
  * Codex Direct. Remote binds must use the dedicated proxy header so the two bearer
  * domains can never be confused.
  */
-export function requireResponsesApiAuth(req: Request, config: OcxConfig): Response | null {
+export function requireResponsesApiAuth(req: Request, config: oprConfig): Response | null {
   if (!isApiAuthRequired(config)) return null;
   const actual = req.headers.get("X-OpenProvider-API-Key")?.trim();
   if (actual && isProxyAdmissionSecret(actual, config)) return null;
@@ -193,7 +208,7 @@ const FORBIDDEN_PROVIDER_RUNTIME_FIELDS = [
   "sidecarOutcomeRecorder", "_codexAccountOverride", "_codexAccountRequired",
 ] as const;
 
-function sameCanonicalProviderSeed(actual: Record<string, unknown>, expected: OcxProviderConfig): boolean {
+function sameCanonicalProviderSeed(actual: Record<string, unknown>, expected: oprProviderConfig): boolean {
   const actualKeys = Object.keys(actual).sort();
   const expectedKeys = Object.keys(expected).sort();
   if (actualKeys.length !== expectedKeys.length || actualKeys.some((key, i) => key !== expectedKeys[i])) return false;
@@ -224,17 +239,24 @@ export function providerManagementConfigError(name: unknown, provider: unknown):
   } else if (Object.hasOwn(raw, "codexAccountMode")) {
     return `provider ${name} must not include codexAccountMode`;
   }
-  const typed = provider as unknown as OcxProviderConfig;
+  const typed = provider as unknown as oprProviderConfig;
   const baseUrlError = providerBaseUrlConfigError(typed.baseUrl);
   if (baseUrlError) return `provider ${name} ${baseUrlError}`;
   const destinationError = providerDestinationConfigError(name, typed);
   if (destinationError) return `provider ${name} ${destinationError}`;
   const headersError = providerHeadersConfigError(typed.headers);
   if (headersError) return `provider ${name} ${headersError}`;
+  const apiKeyTransportError = apiKeyTransportConfigError(typed);
+  if (apiKeyTransportError) return `provider ${name} ${apiKeyTransportError}`;
   const maxInputError = positiveIntegerRecordConfigError(raw.modelMaxInputTokens, "modelMaxInputTokens");
   if (maxInputError) return `provider ${name} ${maxInputError}`;
   const reasoningSummariesError = booleanRecordConfigError(raw.modelSupportsReasoningSummaries, "modelSupportsReasoningSummaries");
   if (reasoningSummariesError) return `provider ${name} ${reasoningSummariesError}`;
+  const reasoningSummaryDeliveryError = reasoningSummaryDeliveryRecordConfigError(
+    raw.modelReasoningSummaryDelivery,
+    raw.modelSupportsReasoningSummaries,
+  );
+  if (reasoningSummaryDeliveryError) return `provider ${name} ${reasoningSummaryDeliveryError}`;
   const modelAdaptersError = modelAdapterRecordConfigError(raw.modelAdapters, "modelAdapters", name, typed);
   if (modelAdaptersError) return `provider ${name} ${modelAdaptersError}`;
   const defaultMaxOutputError = positiveIntegerConfigError(raw.defaultMaxOutputTokens, "defaultMaxOutputTokens");
@@ -278,16 +300,16 @@ export function publicProviderBaseUrl(baseUrl: string): string {
   }
 }
 
-export function copyIfDefined<K extends keyof OcxProviderConfig>(
+export function copyIfDefined<K extends keyof oprProviderConfig>(
   out: Record<string, unknown>,
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
   key: K,
 ): void {
   const value = provider[key];
   if (value !== undefined) out[key as string] = value as unknown;
 }
 
-export function safeConfigDTO(config: OcxConfig): unknown {
+export function safeConfigDTO(config: oprConfig): unknown {
   const providers: Record<string, Record<string, unknown>> = {};
   for (const [name, provider] of Object.entries(config.providers)) {
     const dto: Record<string, unknown> = {
@@ -301,6 +323,7 @@ export function safeConfigDTO(config: OcxConfig): unknown {
       "disabled",
       "allowPrivateNetwork",
       "authMode",
+      "apiKeyTransport",
       "keyOptional",
       "freeTier",
       "liveModels",
@@ -339,4 +362,5 @@ export function safeConfigDTO(config: OcxConfig): unknown {
     providers,
   };
 }
+
 

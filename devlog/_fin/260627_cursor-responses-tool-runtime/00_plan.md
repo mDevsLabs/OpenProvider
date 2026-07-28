@@ -33,7 +33,7 @@
 - Assert injected base URL/profile uses `127.0.0.1`.
 
 ### NO CHANGE `src/server.ts`
-- Do not keep the debug-only `OPENCODEX_DEBUG_RESPONSES` logging patch from stash; it is useful locally but not production code.
+- Do not keep the debug-only `@mdevs/openprovider_DEBUG_RESPONSES` logging patch from stash; it is useful locally but not production code.
 
 ## Verification
 - Focused unit/contract tests:
@@ -48,3 +48,4 @@
 ## Risk Notes
 - If real Codex exec still stalls after these contract fixes, next investigation should capture the exact Codex request tool surface and compare Cursor behavior with a reduced tool list, without dropping support for tools globally.
 - Do not run destructive Cursor native file/write/delete live tests.
+

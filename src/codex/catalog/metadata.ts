@@ -6,7 +6,7 @@ import { atomicWriteFile, expandUserPath, getConfigDir, websocketsEnabled } from
 import { CODEX_CONFIG_PATH, CODEX_MODELS_CACHE_PATH, DEFAULT_CATALOG_PATH, readRootTomlString, resolveCodexConfigPath } from "../paths";
 import { clearModelCache, DEFAULT_MODEL_CACHE_TTL_MS, getFreshCached, getStaleCached, isModelsFetchCoolingDown, markModelsFetchFailure, setCached } from "../model-cache";
 import { buildModelsRequest, resolveModelsAuthToken } from "../../oauth";
-import type { OcxConfig, OcxProviderConfig } from "../../types";
+import type { oprConfig, oprProviderConfig } from "../../types";
 import { modelInList } from "../../types";
 import { CODEX_REASONING_LEVELS, codexEffortRank, configuredReasoningEfforts, modelRecordValue, sanitizeCodexReasoningEfforts } from "../../reasoning-effort";
 import { getJawcodeModelMetadata, getJawcodeModelMetadataCaseInsensitive, listJawcodeModelMetadata, resolveJawcodeProvider } from "../../generated/jawcode-model-metadata";
@@ -114,16 +114,16 @@ export function hasComboTargets(config: { combos?: Record<string, { targets?: un
   return Object.values(combos).some(c => Array.isArray(c?.targets) && c!.targets!.length > 0);
 }
 
-export function disabledNativeSlugs(config: Pick<OcxConfig, "disabledModels">): Set<string> {
+export function disabledNativeSlugs(config: Pick<oprConfig, "disabledModels">): Set<string> {
   return new Set((config.disabledModels ?? []).filter(id => !id.includes("/")));
 }
 
-export function visibleNativeSlugs(config: Pick<OcxConfig, "disabledModels">): string[] {
+export function visibleNativeSlugs(config: Pick<oprConfig, "disabledModels">): string[] {
   const disabled = disabledNativeSlugs(config);
   return nativeOpenAiSlugs().filter(slug => !disabled.has(slug));
 }
 
-export function nativeModelRows(config: Pick<OcxConfig, "disabledModels">): Array<{ slug: string; disabled: boolean; contextWindow?: number }> {
+export function nativeModelRows(config: Pick<oprConfig, "disabledModels">): Array<{ slug: string; disabled: boolean; contextWindow?: number }> {
   const disabled = disabledNativeSlugs(config);
   return NATIVE_OPENAI_MODELS.map(slug => {
     const contextWindow = nativeOpenAiContextWindow(slug);
@@ -174,3 +174,4 @@ export function listCatalogNativeSlugs(): string[] {
   // predates the slug — mirrors nativeOpenAiSlugs() which already merges them for /v1/models.
   return unique([...live, ...DOCUMENTED_NATIVE_OPENAI_ADDITIONS]);
 }
+

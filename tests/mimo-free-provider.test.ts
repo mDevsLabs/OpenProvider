@@ -11,9 +11,9 @@ import {
   MIMO_CHAT_URL,
   createMimoFreeAdapter,
 } from "../src/adapters/mimo-free";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
-function minimalRequest(model = "mimo-auto"): OcxParsedRequest {
+function minimalRequest(model = "mimo-auto"): oprParsedRequest {
   return {
     modelId: model,
     stream: false,
@@ -229,7 +229,7 @@ describe("mimo-free auth retry predicate", () => {
   });
 
   function adapterForRetry(): ReturnType<typeof createMimoFreeAdapter> {
-    const provider: OcxProviderConfig = providerConfigSeed(PROVIDER_REGISTRY.find(e => e.id === "mimo-free")!);
+    const provider: oprProviderConfig = providerConfigSeed(PROVIDER_REGISTRY.find(e => e.id === "mimo-free")!);
     return createMimoFreeAdapter(provider);
   }
 
@@ -295,9 +295,11 @@ describe("mimo-free adapter request building", () => {
     const originalFetch = globalThis.fetch;
     globalThis.fetch = mock(async () => new Response(JSON.stringify({ jwt: fakeJwt }), { status: 200 }));
     try {
-      const provider: OcxProviderConfig = providerConfigSeed(PROVIDER_REGISTRY.find(e => e.id === "mimo-free")!);
+      const provider: oprProviderConfig = providerConfigSeed(PROVIDER_REGISTRY.find(e => e.id === "mimo-free")!);
       const adapter = createMimoFreeAdapter(provider);
-      const req = await adapter.buildRequest(minimalRequest());
+      const parsed = minimalRequest();
+      parsed.options.reasoning = "high";
+      const req = await adapter.buildRequest(parsed);
       const headers = req.headers as Record<string, string>;
 
       expect(req.url).toBe(MIMO_CHAT_URL);
@@ -308,6 +310,11 @@ describe("mimo-free adapter request building", () => {
       const body = JSON.parse(req.body as string) as { messages: { role: string; content: string }[] };
       expect(body.messages[0]?.role).toBe("system");
       expect(body.messages[0]?.content).toBe(MIMO_SYSTEM_MARKER);
+      expect(req.reasoningLog).toEqual({
+        effectiveEffort: "high",
+        wireField: "reasoning_effort",
+        wireValue: "high",
+      });
     } finally {
       globalThis.fetch = originalFetch;
       resetMimoJwtCache();
@@ -325,3 +332,4 @@ describe("mimo-free GUI preset", () => {
     expect(preset.note).toMatch(/no key needed/i);
   });
 });
+

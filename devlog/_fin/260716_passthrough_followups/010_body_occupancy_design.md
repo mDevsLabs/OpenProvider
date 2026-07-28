@@ -42,7 +42,7 @@ shape: silence kills, any non-empty chunk re-arms
 
 ## 3. Config surface (survey §7)
 
-Add to `OcxClaudeCodeConfig` (`src/types.ts:247-260`), beside `nativePassthrough`
+Add to `oprClaudeCodeConfig` (`src/types.ts:247-260`), beside `nativePassthrough`
 and `anthropicBaseUrl`:
 
 ```diff
@@ -211,3 +211,4 @@ any future regression toward a total-duration cap.
 
 Estimated class: C3 (public behavior change on a production surface, cross-file,
 durable audit needed).
+

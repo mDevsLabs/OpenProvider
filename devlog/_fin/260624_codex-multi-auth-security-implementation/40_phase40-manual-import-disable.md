@@ -31,7 +31,7 @@ External reference checked:
 - `POST /api/codex-auth/accounts` returns a clear 403 by default before writing any credential or config metadata.
 - Disabled manual import still parses no credentials and creates no `codex-accounts.json` token record.
 - An explicit env escape hatch exists only for local migration/debug work:
-  - `OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT=1`;
+  - `@mdevs/openprovider_ENABLE_UNVERIFIED_CODEX_IMPORT=1`;
   - still rejects an existing local alias before credential write;
   - still rejects oversized tokens and invalid account id format;
   - still runs current account-id collision checks.
@@ -74,7 +74,7 @@ Blast radius:
 Add helpers near `ACCOUNT_ID_RE`:
 
 ```ts
-const MANUAL_IMPORT_ENV = "OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT";
+const MANUAL_IMPORT_ENV = "@mdevs/openprovider_ENABLE_UNVERIFIED_CODEX_IMPORT";
 
 export function isUnverifiedCodexImportEnabled(): boolean {
   return process.env[MANUAL_IMPORT_ENV] === "1";
@@ -135,10 +135,10 @@ Keep existing import strings for now if other historical code references them; n
 Add helpers:
 
 ```ts
-const MANUAL_IMPORT_ENV = "OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT";
+const MANUAL_IMPORT_ENV = "@mdevs/openprovider_ENABLE_UNVERIFIED_CODEX_IMPORT";
 
 function seedPoolAccount(
-  config: OcxConfig,
+  config: oprConfig,
   account: { id: string; email: string; plan?: string; accessToken?: string; refreshToken?: string; chatgptAccountId?: string; expiresAt?: number },
 ): void {
   config.codexAccounts = [...(config.codexAccounts ?? []), {
@@ -158,7 +158,7 @@ function seedPoolAccount(
 
 Update environment cleanup:
 
-- save/restore previous `OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT`;
+- save/restore previous `@mdevs/openprovider_ENABLE_UNVERIFIED_CODEX_IMPORT`;
 - delete it in `beforeEach`.
 
 Add tests:
@@ -202,7 +202,7 @@ Stop using manual import as a duplicate/collision fixture.
 Use direct setup:
 
 ```ts
-function seedAccount(id: string, email: string, chatgptAccountId: string): OcxConfig {
+function seedAccount(id: string, email: string, chatgptAccountId: string): oprConfig {
   const config = { port: 10100, providers: {}, defaultProvider: "openai", codexAccounts: [{ id, email, isMain: false }] };
   saveConfig(config);
   saveCodexAccountCredential(id, { accessToken, refreshToken, expiresAt, chatgptAccountId });
@@ -261,7 +261,7 @@ Independent verification:
 Changed files:
 
 - `src/codex-auth-api.ts`
-  - Added `OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT=1` escape hatch.
+  - Added `@mdevs/openprovider_ENABLE_UNVERIFIED_CODEX_IMPORT=1` escape hatch.
   - `POST /api/codex-auth/accounts` now returns `403 { code: "manual_import_disabled" }` by default before JSON parsing or credential writes.
   - Env-enabled manual import rejects existing runtime-config aliases and existing credential aliases before saving.
   - OAuth login path remains unchanged except the old “Try importing manually” recovery text now asks the user to retry OAuth login.
@@ -318,3 +318,5 @@ Confirmed:
 - UI reveal/masked-email follow-up;
 - outcome taxonomy and quota freshness work from later Patch 5;
 - devlog PII scrubbing from later Patch 6.
+
+

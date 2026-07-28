@@ -125,7 +125,7 @@ completes a streamed tool-use turn against a routed provider.
   same scaffold as `/v1/responses`).
 - `src/server/auth-cors.ts`: `hasValidApiAuth` also reads `x-api-key`;
   CORS allow-headers += `X-Api-Key, Anthropic-Version, Anthropic-Beta`.
-- `src/types.ts`: `OcxConfig.claudeCode?: { model?, smallFastModel?, modelMap? }`
+- `src/types.ts`: `oprConfig.claudeCode?: { model?, smallFastModel?, modelMap? }`
   (type only; consumed in Phase 2 — config schema is `.passthrough()`).
 
 ## Out of scope
@@ -166,3 +166,4 @@ completes a streamed tool-use turn against a routed provider.
 - Native ChatGPT passthrough via claude inbound (model routes to native gpt):
   works through the same SSE translation; non-stream native path is untested ->
   document as known edge, Claude Code always streams.
+

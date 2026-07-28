@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import { installApiAuthFetch, resetApiAuthFetchForTests } from "../src/api";
 
-const LEGACY_TOKEN_KEY = "OpenProvider-api-token";
+const LEGACY_TOKEN_KEY = "openprovider-api-token";
 const globals = ["document", "window", "navigator", "sessionStorage", "fetch"] as const;
 let previousGlobals: Record<(typeof globals)[number], unknown>;
 let testWindow: Window;
@@ -143,4 +143,5 @@ test("cross-origin /v1/* requests do not receive the API key or token prompt", a
   expect(seenHeaders).toEqual([null]);
   expect(promptCalls).toBe(beforeCrossPrompts);
 });
+
 

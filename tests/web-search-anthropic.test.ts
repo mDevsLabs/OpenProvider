@@ -13,13 +13,13 @@ import {
 } from "../src/web-search";
 import { parseAnthropicSidecarSSE, runAnthropicWebSearch } from "../src/web-search/anthropic-executor";
 import { CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../src/oauth/anthropic";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
-const routedProvider: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "routed-key" };
-const forwardProvider: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.test/v1", authMode: "forward" };
-const anthropicProvider: OcxProviderConfig = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", authMode: "oauth" };
+const routedProvider: oprProviderConfig = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "routed-key" };
+const forwardProvider: oprProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.test/v1", authMode: "forward" };
+const anthropicProvider: oprProviderConfig = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", authMode: "oauth" };
 
-function config(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function config(overrides: Partial<oprConfig> = {}): oprConfig {
   return { port: 10100, defaultProvider: "routed", providers: { routed: routedProvider, chatgpt: forwardProvider }, ...overrides };
 }
 
@@ -207,3 +207,4 @@ describe("runAnthropicWebSearch request shape", () => {
     expect(tools[0]).toEqual({ type: "web_search_20250305", name: "web_search", max_uses: 3 });
   });
 });
+

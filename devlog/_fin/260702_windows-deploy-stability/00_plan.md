@@ -12,9 +12,9 @@
 
 | # | Severity | OS | Defect | Evidence |
 |---|----------|----|--------|----------|
-| F1 | high | win | `spawnSync("npm.cmd")` without `shell:true` → EINVAL on Node ≥18.20/20.12 (CVE-2024-27980 hardening). `opr update` dies for npm installs. | `bin/ocx.mjs:73,87` |
+| F1 | high | win | `spawnSync("npm.cmd")` without `shell:true` → EINVAL on Node ≥18.20/20.12 (CVE-2024-27980 hardening). `opr update` dies for npm installs. | `bin/opr.mjs:73,87` |
 | F2 | high | win | `.cmd` wrappers written UTF-8; cmd.exe parses batch in OEM codepage (CP949/GBK). Non-ASCII profile paths (Korean/Chinese usernames) → mojibake → shim/service silently broken. `.ps1` shim without BOM → same misread in Windows PowerShell 5.1. | `src/codex-shim.ts:217-229`, `src/service.ts:381` |
-| F3 | high | win | No graceful stop path: `killProxy` goes straight to `taskkill /F`; launcher signal "forwarding" is a hard TerminateProcess. Drain/cleanup (`cli.ts:159-199`) never runs → stale pid/runtime-port, injected config left behind on service restart/console close. `/api/stop` (graceful drain + restore, `server.ts:1904-1914`) exists but is unused by CLI stop. | `src/process-control.ts:22-36`, `bin/ocx.mjs:170-203` |
+| F3 | high | win | No graceful stop path: `killProxy` goes straight to `taskkill /F`; launcher signal "forwarding" is a hard TerminateProcess. Drain/cleanup (`cli.ts:159-199`) never runs → stale pid/runtime-port, injected config left behind on service restart/console close. `/api/stop` (graceful drain + restore, `server.ts:1904-1914`) exists but is unused by CLI stop. | `src/process-control.ts:22-36`, `bin/opr.mjs:170-203` |
 | F4 | med-high | win | Injected `base_url = http://localhost:<port>/v1` vs server binding IPv4 `127.0.0.1` only. Windows resolves `localhost` → `::1` first → refusal/latency depending on stack. Reverse bug too: configured `::1` collapses to `localhost`. | `src/codex-inject.ts:33-38,51` vs `src/server.ts:1562,1960` |
 | F5 | med | win | `timeout /t 5 /nobreak` in service wrapper fails without console stdin ("Input redirection is not supported") → hot restart loop. | `src/service.ts:298` |
 | F6 | high | linux | `openUrl` spawn has no `error` listener → ENOENT (`xdg-open` missing on headless) = unhandled 'error' event → process crash during OAuth login/GUI open. | `src/open-url.ts:20` |
@@ -26,10 +26,10 @@
 
 ### Part 2 — diff-level changes
 
-**MODIFY `bin/ocx.mjs`** (F1)
+**MODIFY `bin/opr.mjs`** (F1)
 - `runNpmSelfUpdate()`: both `spawnSync(npm, ...)` calls gain
   `shell: process.platform === "win32"`.
-- `updateTag()` (`bin/ocx.mjs:43-47`): raw `--tag` argv value flows unvalidated into the
+- `updateTag()` (`bin/opr.mjs:43-47`): raw `--tag` argv value flows unvalidated into the
   spawn args (audit item 9) — allowlist to `preview`/`latest` (mirror `src/update.ts:26-30`)
   BEFORE it reaches any shell-joined spawn.
 
@@ -41,13 +41,13 @@
   `%APPDATA%`, `%USERPROFILE%` prefixes (longest match, case-insensitive compare of
   resolved values from `process.env`) with the literal env token so cmd expands the
   non-ASCII profile prefix natively at runtime. Apply to embedded values
-  (`OCX_BUN`, `OCX_CLI`, `OCX_API_TOKEN_FILE`, `OCX_SERVICE_LOG`, `CODEX_HOME`,
-  `OPENCODEX_HOME`) in the batch builder. Batch expansion of `set "X=%APPDATA%\..."`
+  (`opr_BUN`, `opr_CLI`, `opr_API_TOKEN_FILE`, `opr_SERVICE_LOG`, `CODEX_HOME`,
+  `@mdevs/openprovider_HOME`) in the batch builder. Batch expansion of `set "X=%APPDATA%\..."`
   happens at parse time in the correct codepage — defense in depth alongside chcp.
 
 **MODIFY `src/codex-shim.ts`** (F2)
-- `buildWindowsCodexShim()`: apply the same env-indirection to `OCX_REAL_CODEX`,
-  `OCX_BUN`, `OCX_CLI`, `OCX_API_TOKEN_FILE` (import helper from service.ts or a small
+- `buildWindowsCodexShim()`: apply the same env-indirection to `opr_REAL_CODEX`,
+  `opr_BUN`, `opr_CLI`, `opr_API_TOKEN_FILE` (import helper from service.ts or a small
   shared module `src/win-paths.ts` — NEW, ~30 lines, to avoid a service.ts↔codex-shim.ts
   cycle). No `chcp` in the codex.cmd shim (it runs in the USER's console; changing the
   codepage there would leak).
@@ -61,7 +61,7 @@
 - New async `stopProxyGracefully(pid, opts)` (in `process-control.ts`): resolve port via
   `readRuntimePort(pid)` (port is guaranteed recoverable; hostname is NOT — always POST to
   `http://127.0.0.1:<port>/api/stop`, timeout ~2s); include
-  `x-openprovider-api-key: $OPENCODEX_API_AUTH_TOKEN` header when the env var is set (non-
+  `x-openprovider-api-key: $@mdevs/openprovider_API_AUTH_TOKEN` header when the env var is set (non-
   loopback binds require management auth — `server.ts:1456-1479`); on 200,
   `waitForExit(pid, shutdownTimeout+2000)`. Return boolean. Fallback: existing
   `killProxy(pid)`.
@@ -116,7 +116,7 @@
 - NEW `tests/process-control-graceful.test.ts`: `stopProxyGracefully` with injected fetch +
   runtime-port reader (dependency-injected); asserts API-first ordering and fallback.
 - NEW `tests/opr-launcher-source.test.ts`: source-scan regression — npm spawnSync sites in
-  `bin/ocx.mjs` carry `shell:`; guards F1 from regressing (launcher is not importable).
+  `bin/opr.mjs` carry `shell:`; guards F1 from regressing (launcher is not importable).
 
 ### Verification gate (C)
 `bun x tsc --noEmit` + full `bun test ./tests/` (baseline: 1237 pass / 0 fail).
@@ -129,3 +129,5 @@
 3. `shell:true` on Windows joins args — verify no user-controlled values enter those argv
    arrays (`--tag` value is argv-forwarded: validate/allowlist before join). (F1/F7)
 4. handleStop async conversion: confirm all call sites await it. (F3)
+
+

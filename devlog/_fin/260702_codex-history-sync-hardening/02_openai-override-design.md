@@ -12,8 +12,8 @@
 
 | Area | Finding | Impact under B |
 |---|---|---|
-| Inject writer | `codex-inject.ts` is the ONLY writer of the provider id: root `model_provider = "openprovider"` (:121-127, :231), `[model_providers.openprovider]` table (:48-64), `[profiles.openprovider]` profile file (buildProfileFile). Table already sets `requires_openai_auth = true` + `wire_api = "responses"` + optional `env_http_headers` for `OPENCODEX_API_AUTH_TOKEN`. | Rewrite to emit `[model_providers.openai]` and DROP the root `model_provider` line entirely (default id is already `openai`). Auth semantics unchanged — Codex already attaches OpenAI/ChatGPT auth to the proxy today. |
-| Detect/strip/restore | Detection & removal key on `OCX_SECTION_MARKER` comment + literal table header (:262, :312-340). Journal (`codex-journal.ts`) stores the ORIGINAL config verbatim (base64) and restore prefers it. | Marker comment stays the primary detector. Strip must remove the marker-adjacent `[model_providers.openai]` table WITHOUT touching a user's own pre-existing openai override elsewhere (journal restore already handles the exact-bytes case). Must ALSO keep stripping the legacy `openprovider` table + root line for upgrades. |
+| Inject writer | `codex-inject.ts` is the ONLY writer of the provider id: root `model_provider = "openprovider"` (:121-127, :231), `[model_providers.openprovider]` table (:48-64), `[profiles.openprovider]` profile file (buildProfileFile). Table already sets `requires_openai_auth = true` + `wire_api = "responses"` + optional `env_http_headers` for `@mdevs/openprovider_API_AUTH_TOKEN`. | Rewrite to emit `[model_providers.openai]` and DROP the root `model_provider` line entirely (default id is already `openai`). Auth semantics unchanged — Codex already attaches OpenAI/ChatGPT auth to the proxy today. |
+| Detect/strip/restore | Detection & removal key on `opr_SECTION_MARKER` comment + literal table header (:262, :312-340). Journal (`codex-journal.ts`) stores the ORIGINAL config verbatim (base64) and restore prefers it. | Marker comment stays the primary detector. Strip must remove the marker-adjacent `[model_providers.openai]` table WITHOUT touching a user's own pre-existing openai override elsewhere (journal restore already handles the exact-bytes case). Must ALSO keep stripping the legacy `openprovider` table + root line for upgrades. |
 | Server/routing | Proxy routes by model slug (`<provider>/<model>` namespaced in the catalog, bare gpt slugs passthrough — codex-catalog.ts:544-560). The codex-side provider id never reaches routing. | No change. |
 | Usage/quota | Attribution uses opr's own provider names (usage folds ChatGPT pool + OpenAI passthrough into one `openai` row already). | No change. |
 | Catalog | `model_catalog_json` entries carry no codex provider id. | No change. |
@@ -56,3 +56,5 @@ Verdict line expected: "override viable: yes/no/partial".
   proxy override left behind if journal also lost. Mitigation: keep marker comment format
   identical so even old strips that key on the marker line remove the block. VERIFY old
   strip behavior before shipping.
+
+

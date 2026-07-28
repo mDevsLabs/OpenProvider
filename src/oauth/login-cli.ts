@@ -2,19 +2,19 @@ import * as readline from "node:readline";
 import { openUrl } from "../lib/open-url";
 import { loadConfig, saveConfig } from "../config";
 import { findLiveProxy, probeHostname } from "../server/proxy-liveness";
-import { isPublicOAuthProvider, listOAuthProviders, OAUTH_PROVIDERS, runLogin } from "./index";
+import { isPublicOAuthProvider, listOAuthProviders, runLogin } from "./index";
 import { KEY_LOGIN_PROVIDERS, isKeyLoginProvider, validateApiKey, type KeyLoginProvider } from "./key-providers";
 import type { OcxProviderConfig } from "../types";
 
 export function runningProxyUpdateHeaders(): Headers {
   const headers = new Headers({ "Content-Type": "application/json" });
-  const apiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN?.trim();
-  if (apiToken) headers.set("X-OpenProvider-API-Key", apiToken);
+  const apiToken = process.env.OPENCODEX_API_AUTH_TOKEN?.trim();
+  if (apiToken) headers.set("X-OpenCodex-API-Key", apiToken);
   return headers;
 }
 
 /** Push the new provider into a running proxy's live config so it routes without a restart. */
-async function notifyRunningProxy(name: string, provider: unknown): Promise<void> {
+export async function notifyRunningProxy(name: string, provider: unknown): Promise<void> {
   // Identity-checked runtime-port lookup: reaches a fallback-port proxy and avoids
   // posting credentials-adjacent config to whatever else answers on config.port.
   const live = await findLiveProxy();
@@ -30,12 +30,25 @@ async function notifyRunningProxy(name: string, provider: unknown): Promise<void
   }
 }
 
+/**
+ * After `runLogin()` has persisted the merged provider (including preserved apiKey /
+ * apiKeyPool / authMode), push that on-disk entry into a running proxy.
+ *
+ * Must not send `OAUTH_PROVIDERS[name].providerConfig`: POST /api/providers replaces the
+ * live entry and saves it, which would drop the preserved key billing state.
+ */
+export async function notifyRunningProxyAfterOAuthLogin(name: string): Promise<void> {
+  const provider = loadConfig().providers[name];
+  if (!provider) return;
+  await notifyRunningProxy(name, provider);
+}
+
 export async function handleLogin(provider?: string): Promise<void> {
   const name = (provider ?? "").trim().toLowerCase();
   if (isPublicOAuthProvider(name)) return handleOAuthLogin(name);
   if (isKeyLoginProvider(name)) return handleKeyLogin(name);
   console.error(
-    `Usage: opr login <provider>\n` +
+    `Usage: ocx login <provider>\n` +
       `  OAuth login:   ${listOAuthProviders().join(", ")}\n` +
       `  API-key login: ${Object.keys(KEY_LOGIN_PROVIDERS).join(", ")}`,
   );
@@ -58,8 +71,8 @@ async function handleOAuthLogin(name: string): Promise<void> {
   } finally {
     rl.close();
   }
-  await notifyRunningProxy(name, OAUTH_PROVIDERS[name].providerConfig);
-  console.log(`\n✅ Logged in to ${name}. Try: opr sync`);
+  await notifyRunningProxyAfterOAuthLogin(name);
+  console.log(`\n✅ Logged in to ${name}. Try: ocx sync`);
 }
 
 export function providerConfigFromKeyLoginProvider(def: KeyLoginProvider, key: string, baseUrlOverride?: string): OcxProviderConfig {
@@ -67,6 +80,7 @@ export function providerConfigFromKeyLoginProvider(def: KeyLoginProvider, key: s
     adapter: def.adapter,
     baseUrl: baseUrlOverride ?? def.baseUrl,
     apiKey: key,
+    ...(def.apiKeyTransport !== undefined ? { apiKeyTransport: def.apiKeyTransport } : {}),
     ...(def.defaultModel ? { defaultModel: def.defaultModel } : {}),
     ...(def.models ? { models: [...def.models] } : {}),
     ...(def.contextWindow !== undefined ? { contextWindow: def.contextWindow } : {}),
@@ -124,7 +138,7 @@ async function handleKeyLogin(name: string): Promise<void> {
   config.providers[name] = provider;
   saveConfig(config);
   await notifyRunningProxy(name, provider);
-  console.log(`✅ ${def.label} added. Try: opr sync`);
+  console.log(`✅ ${def.label} added. Try: ocx sync`);
 }
 
 function cloneRecordOfArrays(input: Record<string, string[]>): Record<string, string[]> {
@@ -134,4 +148,3 @@ function cloneRecordOfArrays(input: Record<string, string[]>): Record<string, st
 function cloneNestedRecord(input: Record<string, Record<string, string>>): Record<string, Record<string, string>> {
   return Object.fromEntries(Object.entries(input).map(([key, value]) => [key, { ...value }]));
 }
-

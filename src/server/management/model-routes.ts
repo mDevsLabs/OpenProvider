@@ -35,7 +35,6 @@ import { clearThreadAccountMap } from "../../codex/routing";
 import { primeCodexPoolQuotas } from "../../codex/auth-api";
 import { DEFAULT_PROVIDER_CONTEXT_CAP, globalContextCapValue, providerContextCap, providerContextCaps, setAllProviderContextCaps, setGlobalContextCapValue, setProviderContextCap } from "../../providers/context-cap";
 import { resolveCodexHomeDir } from "../../codex/home";
-import { scanStorage } from "../../storage/scanner";
 import { readUsageEntries } from "../../usage/log";
 import { getUsageDebugLogEntries } from "../../usage/debug";
 import { parseRange, parseUsageSurface, summarizeUsage } from "../../usage/summary";
@@ -50,7 +49,7 @@ import {
   setDebugSettings,
   type DebugFlag,
 } from "../../lib/debug-settings";
-import type { OcxClaudeCodeConfig, OcxConfig, OcxCustomModel, OcxProviderConfig } from "../../types";
+import type { oprClaudeCodeConfig, oprConfig, oprCustomModel, oprProviderConfig } from "../../types";
 import { drainAndShutdown } from "../lifecycle";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "../request-log";
 import { estimateComboCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
@@ -251,7 +250,7 @@ export async function handleModelRoutes(ctx: ManagementContext): Promise<Respons
     if (existing.some(cm => routedSlug(cm.provider, cm.modelId) === newSlug)) {
       return jsonResponse({ error: "duplicate model" }, 409);
     }
-    const entry: OcxCustomModel = {
+    const entry: oprCustomModel = {
       id: randomUUID(),
       provider,
       modelId,
@@ -357,3 +356,4 @@ export async function handleModelRoutes(ctx: ManagementContext): Promise<Respons
   }
   return null;
 }
+

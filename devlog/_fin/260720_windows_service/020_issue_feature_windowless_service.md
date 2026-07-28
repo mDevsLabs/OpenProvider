@@ -24,7 +24,7 @@ Windows에서 `opr service install`은 Task Scheduler 태스크를 `InteractiveT
 - 로컬 계정 / Microsoft 계정(passwordless)에서 `schtasks /create /xml` 등록 성공 여부 — 현재 XML에는 명시적 `<UserId>`가 없어 단순 문자열 교체의 안정성이 미검증
 - 실행 계정에 `Log on as a batch job` 권한이 기본 부여되는지 (일반 사용자 / 기업 GPO 환경)
 - S4U는 네트워크 자격증명·EFS 접근이 없음 — 래퍼의 `%USERPROFILE%`/`%APPDATA%` 환경 간접화, ACL hardened token 파일 읽기, 서비스 로그 쓰기가 S4U 세션에서 정상 동작하는지
-- EFS 암호화 홈, UNC/custom `OPENCODEX_HOME`, 기업 인증 프록시 환경
+- EFS 암호화 홈, UNC/custom `OpenProvider_HOME`, 기업 인증 프록시 환경
 - **엔드투엔드 확인**: S4U로 기동된 프록시에 실제 라우팅된 모델 요청을 보내 응답까지 확인 (파일/환경 체크만으로는 프록시의 핵심 아웃바운드 요청 경로가 증명되지 않음)
 
 **옵션 B — WinSW 기반 네이티브 Windows 서비스 등록 (구조적 해법)**
@@ -35,7 +35,7 @@ WinSW로 프록시를 진짜 SCM 서비스로 등록하면 창 문제와 프로�
 
 - 서비스 설치 후 사용자 세션에 콘솔 창이 보이지 않음
 - 사용자가 프로세스를 강제 종료해도 서비스 매니저가 자동 재시작 (Bug 이슈의 RestartOnFailure 실측 포함)
-- `opr service install/start/stop/status/uninstall` 계약 유지, `OCX_SERVICE=1` 재주입 계약 유지
+- `opr service install/start/stop/status/uninstall` 계약 유지, `opr_SERVICE=1` 재주입 계약 유지
 - 중복 인스턴스 방지 유지 (현행 `MultipleInstancesPolicy=IgnoreNew` 상당)
 - README 서비스 시맨틱 정정(채택 옵션에 맞게): S4U 채택 시 logon 트리거 유지를 명시, WinSW 채택 시 boot 시작 여부를 실제 구성에 맞게 서술 — 어느 쪽이든 현행 "starts on boot" 일괄 서술은 Windows에 대해 정정
 - `docs/codex-path-investigation.md` Windows 서비스 절 동기화
@@ -54,3 +54,4 @@ WinSW로 프록시를 진짜 SCM 서비스로 등록하면 창 문제와 프로�
 - https://learn.microsoft.com/en-us/windows/win32/taskschd/security-contexts-for-running-tasks
 - https://github.com/winsw/winsw / https://github.com/winsw/winsw/releases
 - https://www.nssm.cc/download
+

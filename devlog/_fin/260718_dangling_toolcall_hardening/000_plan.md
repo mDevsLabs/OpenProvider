@@ -100,7 +100,7 @@ Sol 독립 감사 결과 eager flush(끼어든 메시지 전에 합성 결과를
   - 루프 종료: 잔여 pending 합성 flush → deferred 해제.
 - 사고 시나리오 wire: assistant(call) → tool(진짜 결과) → developer 메시지 (Sol의
   canonical 순서와 일치).
-- id 하드닝: assistant tool_call의 id가 비어있으면 `call_ocx_minted_<n>`을 발급(기존 id와
+- id 하드닝: assistant tool_call의 id가 비어있으면 `call_opr_minted_<n>`을 발급(기존 id와
   충돌 검사). 결과 매칭은 occurrence 큐에서 선형 탐색.
 - 합성 결과 문구(실행 상태 미상을 명시, 사용자 의도 사칭 금지):
   `[opr] no tool result was recorded for "<name>"; execution status unknown — do not treat this as success, failure, or user-provided input.`
@@ -125,3 +125,4 @@ Sol 독립 감사 결과 eager flush(끼어든 메시지 전에 합성 결과를
 - developer→system role 매핑의 의미론(지시 우선순위) 변경 — 별도 계약 변경이라 본 유닛
   범위 밖.
 - OpenAI/xAI/DeepSeek/게이트웨이별 live conformance probe — 후속 유닛 후보.
+

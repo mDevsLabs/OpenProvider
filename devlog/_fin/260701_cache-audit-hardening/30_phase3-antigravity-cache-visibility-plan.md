@@ -7,7 +7,7 @@ Investigate the user report that Google Antigravity caching appears not to work,
 - Local `/Users/jun/.openprovider/usage.jsonl` contains 222 `google-antigravity-*` rows.
 - 149 rows include numeric `usage.cachedInputTokens`; recent examples include `inputTokens=159132`, `cachedInputTokens=154663`.
 - Recent failed Antigravity rows are 429/502 rate/upstream failures and one Claude-on-Antigravity 400, not missing cache parsing.
-- `src/adapters/google.ts` maps Gemini/Antigravity `usageMetadata.cachedContentTokenCount` to `OcxUsage.cachedInputTokens` for both streaming and non-streaming paths.
+- `src/adapters/google.ts` maps Gemini/Antigravity `usageMetadata.cachedContentTokenCount` to `oprUsage.cachedInputTokens` for both streaming and non-streaming paths.
 - `gui/src/pages/Logs.tsx` currently shows only total tokens in the visible table cell; cached tokens are only in `title`, so the UI can look like caching is absent.
 
 ## Official-source baseline
@@ -45,3 +45,4 @@ MODIFY: `devlog/_plan/260701_cache-audit-hardening/01_cache-surface-audit.md`
 - `bun x tsc --noEmit`
 - `bun run --cwd gui build`
 - Independent read-only verifier confirms Antigravity cache parsing and dashboard display evidence.
+

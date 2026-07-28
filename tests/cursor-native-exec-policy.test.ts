@@ -19,7 +19,7 @@ import {
 import { handleCursorNativeExec } from "../src/adapters/cursor/native-exec";
 import type { CursorTransportFactoryInput } from "../src/adapters/cursor/transport";
 import { parseRequest } from "../src/responses/parser";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
 const fullAccessDeclaration = "`sandbox_mode` is `danger-full-access`";
 
@@ -41,12 +41,12 @@ function stringify(value: unknown): string {
   return JSON.stringify(value, (_key, entry) => (typeof entry === "bigint" ? entry.toString() : entry));
 }
 
-const baseProvider: OcxProviderConfig = {
+const baseProvider: oprProviderConfig = {
   adapter: "cursor",
   baseUrl: "https://api2.cursor.sh",
 };
 
-const baseParsed: OcxParsedRequest = {
+const baseParsed: oprParsedRequest = {
   modelId: "cursor/auto",
   context: { messages: [] },
   stream: false,
@@ -263,7 +263,7 @@ describe("Cursor native exec sandbox policy", () => {
     const path = join(dir, "grounding.txt");
     const content = "C-ACTIVATION-GROUNDING-01 allowed content";
     writeFileSync(path, content);
-    const provider = { ...baseProvider, nativeLocalExec: "on" } satisfies OcxProviderConfig;
+    const provider = { ...baseProvider, nativeLocalExec: "on" } satisfies oprProviderConfig;
     const readArgs = execMessage({ case: "readArgs", value: create(ReadArgsSchema, { path }) });
 
     const allowed = decode((await handleCursorNativeExec(readArgs, {
@@ -276,7 +276,7 @@ describe("Cursor native exec sandbox policy", () => {
 
   test("runTurn passes the developer declaration decision to the transport factory", async () => {
     const captured: CursorTransportFactoryInput[] = [];
-    const provider = { ...baseProvider, nativeLocalExec: "codex-sandbox" } satisfies OcxProviderConfig;
+    const provider = { ...baseProvider, nativeLocalExec: "codex-sandbox" } satisfies oprProviderConfig;
     const adapter = createCursorAdapter(provider, {
       createTransport(input) {
         captured.push(input);
@@ -304,4 +304,5 @@ describe("Cursor native exec sandbox policy", () => {
   // LiveCursorTransport construction is credential/network-heavy in this suite. The context rule is
   // covered by the effective-policy truth table and the adapter factory-input capture above.
 });
+
 

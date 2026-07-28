@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { filterCatalogVisibleModels, type CatalogModel } from "../src/codex/catalog";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
 function m(provider: string, id: string): CatalogModel {
   return { provider, id, owned_by: provider };
 }
 
-function cfg(providers: Record<string, Partial<OcxProviderConfig>>, disabledModels?: string[]): Pick<OcxConfig, "disabledModels" | "providers"> {
-  const full: Record<string, OcxProviderConfig> = {};
+function cfg(providers: Record<string, Partial<oprProviderConfig>>, disabledModels?: string[]): Pick<oprConfig, "disabledModels" | "providers"> {
+  const full: Record<string, oprProviderConfig> = {};
   for (const [name, p] of Object.entries(providers)) full[name] = { adapter: "openai-chat", baseUrl: "https://x", ...p };
   return { providers: full, ...(disabledModels ? { disabledModels } : {}) };
 }
@@ -47,3 +47,4 @@ describe("filterCatalogVisibleModels — per-provider allowlist", () => {
     expect(out.map(x => x.id).sort()).toEqual(["model-1999", "model-7"]);
   });
 });
+

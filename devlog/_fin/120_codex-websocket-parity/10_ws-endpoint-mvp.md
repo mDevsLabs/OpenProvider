@@ -123,7 +123,7 @@ type CoreResult =
   | { kind: "error"; status: number; type: string; message: string };
 
 async function handleResponsesCore(
-  body: unknown, headers: Headers, config: OcxConfig, logCtx: { model: string; provider: string },
+  body: unknown, headers: Headers, config: oprConfig, logCtx: { model: string; provider: string },
 ): Promise<CoreResult> {
   // The current handleResponses body moves here verbatim (parse/route/oauth/vision/web-search/
   // adapter/bridge), with each `return` rewritten 1:1 by current line:
@@ -136,7 +136,7 @@ async function handleResponsesCore(
 }
 
 // HTTP keeps today's behavior:
-async function handleResponses(req: Request, config: OcxConfig, logCtx: { model: string; provider: string }): Promise<Response> {
+async function handleResponses(req: Request, config: oprConfig, logCtx: { model: string; provider: string }): Promise<Response> {
   let body: unknown;
   try { body = await req.json(); } catch { return formatErrorResponse(400, "invalid_request_error", "Invalid JSON body"); }
   const r = await handleResponsesCore(body, req.headers, config, logCtx);
@@ -247,3 +247,4 @@ typecheck clean
 - Native upstream WS (`11_`).
 - Real WS `Ping` keep-alive (the re-framed `response.heartbeat` already re-arms the timer; Ping
   is an optional optimization noted in `01_§8`).
+

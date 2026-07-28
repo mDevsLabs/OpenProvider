@@ -553,7 +553,7 @@ describe("OpenAI provider-option integration spine", () => {
       }
 
       expect(captures.every(capture => upstreamTuples.has(`${capture.method} ${capture.url}`))).toBe(true);
-      const evidenceDir = process.env.OCX_EVIDENCE_DIR;
+      const evidenceDir = process.env.opr_EVIDENCE_DIR;
       if (evidenceDir) {
         mkdirSync(evidenceDir, { recursive: true, mode: 0o700 });
         writeFileSync(join(evidenceDir, "030_e2e.json"), JSON.stringify({
@@ -586,3 +586,4 @@ describe("OpenAI provider-option integration spine", () => {
     }
   }, 30_000);
 });
+

@@ -1,4 +1,4 @@
-import type { OcxConfig } from "../../types";
+import type { oprConfig } from "../../types";
 import type { StartupInstallAction } from "../startup-action-control";
 
 export interface ManagementApiDeps {
@@ -6,7 +6,7 @@ export interface ManagementApiDeps {
   refreshCodexCatalog?: () => Promise<void>;
   clearThreadAccountMap?: () => void;
   clearProviderQuotaCache?: () => void;
-  primeCodexPoolQuotas?: (config: OcxConfig, reason: string) => Promise<void> | void;
+  primeCodexPoolQuotas?: (config: oprConfig, reason: string) => Promise<void> | void;
   runStartupInstallAction?: (action: StartupInstallAction) => Promise<{ message: string }>;
 }
 
@@ -14,8 +14,9 @@ export interface ManagementApiDeps {
 export interface ManagementContext {
   req: Request;
   url: URL;
-  config: OcxConfig;
+  config: oprConfig;
   deps: ManagementApiDeps;
   refreshCodexCatalogBestEffort: () => Promise<void>;
   syncClaudeAgentDefsBestEffort: () => Promise<void>;
 }
+

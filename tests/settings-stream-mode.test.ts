@@ -13,12 +13,12 @@ import { join } from "node:path";
 import { getConfigPath, loadConfig, saveConfig } from "../src/config";
 import { handleManagementAPI } from "../src/server/management-api";
 import { invalidateStartupHealthCache } from "../src/server/startup-health-cache";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 let TEST_DIR = "";
 const previousHome = process.env.OPENPROVIDER_HOME;
 
-function baseConfig(): OcxConfig {
+function baseConfig(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "openai",
@@ -33,7 +33,7 @@ function baseConfig(): OcxConfig {
   };
 }
 
-function putSettings(config: OcxConfig, body: unknown): Promise<Response | null> {
+function putSettings(config: oprConfig, body: unknown): Promise<Response | null> {
   const req = new Request("http://127.0.0.1:10100/api/settings", {
     method: "PUT",
     headers: { "content-type": "application/json" },
@@ -42,7 +42,7 @@ function putSettings(config: OcxConfig, body: unknown): Promise<Response | null>
   return handleManagementAPI(req, new URL(req.url), config);
 }
 
-function getSettings(config: OcxConfig): Promise<Response | null> {
+function getSettings(config: oprConfig): Promise<Response | null> {
   const req = new Request("http://127.0.0.1:10100/api/settings");
   return handleManagementAPI(req, new URL(req.url), config);
 }
@@ -216,3 +216,4 @@ describe("config.json schema resilience", () => {
     expect(loadConfig().streamMode).toBe("legacy-tee");
   });
 });
+

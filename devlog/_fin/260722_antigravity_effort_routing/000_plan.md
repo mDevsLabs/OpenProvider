@@ -19,7 +19,7 @@
 
 ## Problem
 
-The CCA (Cloud Code Assist) backend does not accept `thinkingConfig` — it encodes thinking level in the wire model ID (`gemini-3.6-flash-low`, `-medium`, `-high`). OCX currently exposes these as separate picker entries, which is noisy and confusing. The direct Google AI path already collapses `gemini-3.6-flash` into one entry and passes `thinkingConfig: { thinkingLevel }` in `generationConfig`, but this path is explicitly disabled for `cloud-code-assist` mode (google.ts:229-233).
+The CCA (Cloud Code Assist) backend does not accept `thinkingConfig` — it encodes thinking level in the wire model ID (`gemini-3.6-flash-low`, `-medium`, `-high`). opr currently exposes these as separate picker entries, which is noisy and confusing. The direct Google AI path already collapses `gemini-3.6-flash` into one entry and passes `thinkingConfig: { thinkingLevel }` in `generationConfig`, but this path is explicitly disabled for `cloud-code-assist` mode (google.ts:229-233).
 
 ## Direction locked by the user
 
@@ -64,3 +64,4 @@ The CCA (Cloud Code Assist) backend does not accept `thinkingConfig` — it enco
 - Inbound aliases survive picker retirement unless a separate migration contract exists.
 - Replay cache keys use the resolved wire model ID, not the picker alias.
 - No credential or token response body is logged.
+

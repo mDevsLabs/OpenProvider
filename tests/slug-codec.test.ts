@@ -16,7 +16,7 @@ import { buildCatalogEntries, resetCatalogRuntimeStateForTests } from "../src/co
 import { clearModelCache } from "../src/codex/model-cache";
 import { getJawcodeModelMetadata } from "../src/generated/jawcode-model-metadata";
 import type { RawEntry } from "../src/codex/catalog";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 beforeEach(() => {
   clearModelCache();
@@ -26,7 +26,7 @@ afterEach(() => {
   clearModelCache();
 });
 
-function zenmuxConfig(): OcxConfig {
+function zenmuxConfig(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "zenmux",
@@ -104,7 +104,7 @@ describe("routeModel decode (proxy layer)", () => {
   });
 
   test("registry model-keyed hint maps seed the decode union (nvidia, no static models list)", () => {
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "nvidia",
       providers: {
@@ -118,7 +118,7 @@ describe("routeModel decode (proxy layer)", () => {
   });
 
   test("defaultModel encoded fallback routes to the native id", () => {
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "other",
       providers: {
@@ -131,7 +131,7 @@ describe("routeModel decode (proxy layer)", () => {
   });
 
   test("models-list encoded fallback routes to the native id", () => {
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "other",
       providers: {
@@ -212,3 +212,4 @@ describe("catalog emission (Codex-facing)", () => {
     expect(encodedFeatured.find(e => e.slug === "zenmux/moonshotai-kimi-k3")?.priority).toBe(0);
   });
 });
+

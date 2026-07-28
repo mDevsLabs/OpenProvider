@@ -30,7 +30,7 @@
   시그널로 죽는 경로와 무관하게 `opr service stop`은 기존 drain
   (`stopTrackedProxyForServiceCommand`)을 계속 수행. WinSW가 먼저 자식을 죽이는
   경우의 이중 안전.
-- **토큰**: 래퍼 배치를 쓰지 않으므로 앱이 직접 읽는다 — `OCX_API_TOKEN_FILE`
+- **토큰**: 래퍼 배치를 쓰지 않으므로 앱이 직접 읽는다 — `opr_API_TOKEN_FILE`
   환경변수를 앱 차원에서 소비(아래 diff). 시크릿을 WinSW XML에 넣지 않는다.
 
 ## Diff-level 변경
@@ -43,8 +43,8 @@
      `winswXmlPath()` (= `winswDir()/openprovider-proxy.xml`; WinSW는 exe와 동명
      XML을 요구하므로 exe를 `openprovider-proxy.exe`로 저장)
    - `buildWinswXml(entry): string` — `<service>` id `openprovider-proxy-native`,
-     `<executable>`=bun, `<arguments>`=cli start, `<env name="OCX_SERVICE" value="1"/>`,
-     `<env name="OCX_API_TOKEN_FILE" .../>`, CODEX_HOME/OPENCODEX_HOME 절대경로,
+     `<executable>`=bun, `<arguments>`=cli start, `<env name="opr_SERVICE" value="1"/>`,
+     `<env name="opr_API_TOKEN_FILE" .../>`, CODEX_HOME/OpenProvider_HOME 절대경로,
      **`<env name="PATH" value="<현재 PATH, XML 이스케이프>"/>`** (감사 WARN 7 —
      Scheduler/launchd/systemd 전부 PATH를 bake하는 기존 계약과 동일; SCM 서비스
      환경에는 사용자 대화형 PATH가 없어 provider 실행파일이 깨질 수 있음),
@@ -84,9 +84,9 @@
    전달하고 `serviceCommand`가 `[sub, ...flags]`를 파싱. `normalizeServiceSubcommand`
    는 플래그가 아닌 첫 토큰을 sub로 취급.
 4. **MODIFY** `src/cli/index.ts` `handleStart()` 초입(:106, `startServer()` 호출
-   전) — **감사 blocker 6 확정 지점**: `OPENCODEX_API_AUTH_TOKEN`이 비어 있고
-   `OCX_API_TOKEN_FILE`이 설정돼 있으면 파일에서 읽어 `process.env.
-   OPENCODEX_API_AUTH_TOKEN`에 주입(서버 인증은 src/server/index.ts:145에서 env를
+   전) — **감사 blocker 6 확정 지점**: `OpenProvider_API_AUTH_TOKEN`이 비어 있고
+   `opr_API_TOKEN_FILE`이 설정돼 있으면 파일에서 읽어 `process.env.
+   OpenProvider_API_AUTH_TOKEN`에 주입(서버 인증은 src/server/index.ts:145에서 env를
    읽으므로 이 시점 주입으로 충분). 구현은 `src/lib/service-secrets.ts`의 순수 함수
    `loadServiceTokenFromFile(env: Record<string,string|undefined>): string | null`
    (파일 읽기 성공 시 트림된 토큰 반환, 그 외 null — **env를 직접 변형하지 않고
@@ -97,7 +97,7 @@
 ## 테스트 (tests/service.test.ts + NEW tests/winsw.test.ts)
 
 - `buildWinswXml`: serviceaccount/allowservicelogon 존재, LocalSystem 부재,
-  OCX_SERVICE=1 env, **PATH env 존재+이스케이프**, stoptimeout, onfailure restart,
+  opr_SERVICE=1 env, **PATH env 존재+이스케이프**, stoptimeout, onfailure restart,
   XML 이스케이프(경로에 `&`), 시크릿(토큰 값) 미포함, **v2 스키마 형식
   (domain/user, username 요소 부재)**.
 - `ensureWinswBinary` 해시 불일치 fail-closed(mock fetch/fs).
@@ -112,3 +112,4 @@
 
 UAC/자격증명 프롬프트 흐름, passwordless MS 계정 실패 메시지, SCM stop graceful
 drain(Bun이 Ctrl+C 수신하는지), 부팅 시작, ACL hardened 토큰 파일 읽기.
+

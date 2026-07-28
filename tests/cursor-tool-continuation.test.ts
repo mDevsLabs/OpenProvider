@@ -7,7 +7,7 @@ import {
   GetBlobArgsSchema,
   KvServerMessageSchema,
 } from "../src/adapters/cursor/gen/agent_pb";
-import type { OcxMessage } from "../src/types";
+import type { oprMessage } from "../src/types";
 
 function blobData(blobId: Uint8Array): Uint8Array {
   const reply = fromBinary(AgentClientMessageSchema, handleCursorNativeKv(create(KvServerMessageSchema, {
@@ -28,7 +28,7 @@ function decodeRoots(bytes: Uint8Array): unknown[] {
 }
 
 describe("363-B: tool result reaches the model via rootPromptMessagesJson", () => {
-  const rawMessages: OcxMessage[] = [
+  const rawMessages: oprMessage[] = [
     { role: "user", content: "read a file", timestamp: 1 },
     {
       role: "assistant",
@@ -239,3 +239,4 @@ describe("363-A: turn-1 termination for Responses client tool via exec mcpArgs",
     expect(finalizeAfterDrain(state).map(e => e.type)).toEqual(["done"]);
   });
 });
+

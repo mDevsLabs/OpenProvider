@@ -183,13 +183,13 @@ Extend schema:
 Add helpers; keep existing exports working.
 
 ```ts
-export function globalContextCapValue(config: Pick<OcxConfig, "contextCapValue">): number {
+export function globalContextCapValue(config: Pick<oprConfig, "contextCapValue">): number {
   const v = config.contextCapValue;
   return typeof v === "number" && Number.isFinite(v) && v > 0 ? v : DEFAULT_PROVIDER_CONTEXT_CAP;
 }
 
 // enable now writes the active global value rather than the constant.
-export function setProviderContextCap(config: OcxConfig, provider: string, enabled: boolean): void {
+export function setProviderContextCap(config: oprConfig, provider: string, enabled: boolean): void {
   const next = providerContextCaps(config);
   if (enabled) next[provider] = globalContextCapValue(config);
   else delete next[provider];
@@ -198,7 +198,7 @@ export function setProviderContextCap(config: OcxConfig, provider: string, enabl
 }
 
 // set the global value and re-point every already-enabled provider to it.
-export function setGlobalContextCapValue(config: OcxConfig, value: number): void {
+export function setGlobalContextCapValue(config: oprConfig, value: number): void {
   const v = Math.floor(value);
   config.contextCapValue = v;
   const caps = providerContextCaps(config);
@@ -207,7 +207,7 @@ export function setGlobalContextCapValue(config: OcxConfig, value: number): void
 }
 
 // enable/clear cap for every provider in `providerNames` at the current value.
-export function setAllProviderContextCaps(config: OcxConfig, providerNames: string[], enabled: boolean): void {
+export function setAllProviderContextCaps(config: oprConfig, providerNames: string[], enabled: boolean): void {
   if (!enabled) { delete config.providerContextCaps; return; }
   const value = globalContextCapValue(config);
   const next: Record<string, number> = {};
@@ -385,3 +385,4 @@ Commits:
 - `feat(models): global context cap value + set-all backend`
 - `feat(models): cap value dropdown + single set-all toggle UI`
 - `test(models): cover global cap value and set-all toggles`
+

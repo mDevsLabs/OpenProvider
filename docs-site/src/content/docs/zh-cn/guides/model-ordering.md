@@ -95,8 +95,9 @@ subagentModels = [
 自定义开头模型顺序的唯一受支持方式是重新排列 `subagentModels`。你可以在仪表盘的
 **Sub-agents** 页面或 OpenProvider 配置中修改它。该列表最多接受五个模型，其数组顺序有实际意义。
 
-目前 `OcxConfig` 中没有通用的 `modelOrder`、`providerOrder` 或 priority map 设置。受支持的排序
+目前 `oprConfig` 中没有通用的 `modelOrder`、`providerOrder` 或 priority map 设置。受支持的排序
 字段是 `subagentModels`（`src/types.ts:238-246`）；`disabledModels` 和各 provider 的
 `selectedModels` 都是可见性字段（`src/types.ts:276-282`、`src/types.ts:439-446`）。因此，要更改
 选择器其余部分的顺序，需要修改代码行为，而不是调整配置。
+
 

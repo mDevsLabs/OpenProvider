@@ -80,7 +80,7 @@ Pass it to `describeImage(...)`.
 Add a small helper near `handleResponses()`:
 
 ```ts
-function sidecarOutcomeRecorder(config: OcxConfig, authCtx: CodexAuthContext) {
+function sidecarOutcomeRecorder(config: oprConfig, authCtx: CodexAuthContext) {
   return authCtx.kind === "pool"
     ? (outcome: CodexUpstreamOutcome) => recordCodexUpstreamOutcome(config, authCtx.accountId, outcome)
     : undefined;
@@ -171,3 +171,4 @@ bun test tests/sidecar-abort.test.ts tests/web-search.test.ts tests/codex-routin
 - 429 cooldown windows with `Retry-After`.
 - Time-bounded failure streak expiry.
 - Terminal SSE/WebSocket `response.failed` / `response.incomplete` account outcome recording.
+

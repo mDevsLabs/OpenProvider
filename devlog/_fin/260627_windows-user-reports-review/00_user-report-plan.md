@@ -20,7 +20,7 @@ Potential relationship to current fix:
 - It may not explain spontaneous runtime stops while using the proxy.
 - Suspect areas to review:
   - Windows Task Scheduler `.cmd` loop only restarts on non-zero exit; clean exits may end the loop.
-  - `opr start` shutdown handlers restore native Codex when not `OCX_SERVICE`, but service/shim paths set `OCX_SERVICE=1`; verify Windows scheduled task and shim paths consistently set it.
+  - `opr start` shutdown handlers restore native Codex when not `opr_SERVICE`, but service/shim paths set `opr_SERVICE=1`; verify Windows scheduled task and shim paths consistently set it.
   - PID identity/readPid behavior on Windows may remove pid when command-line inspection is unavailable or transient.
   - Bun/Windows signal/process tree behavior may differ from macOS/Linux.
   - Service log path and user-visible diagnostics may be insufficient for Windows incident reports.
@@ -68,3 +68,4 @@ Ask GPT Pro to review `origin/dev` at commit `929d756`, the above community repo
 - Windows frequent stop/disconnect diagnosis and likely fixes.
 - Clone/dev GUI documentation and runtime fallback improvements.
 - Which fixes should be release-blocking versus docs-only.
+

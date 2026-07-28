@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { createOpenAIChatAdapter } from "../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
-function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
+function provider(overrides: Partial<oprProviderConfig> = {}): oprProviderConfig {
   return {
     adapter: "openai-chat",
     baseUrl: "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
@@ -14,7 +14,7 @@ function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig
   };
 }
 
-function parsedWithThinkingHistory(): OcxParsedRequest {
+function parsedWithThinkingHistory(): oprParsedRequest {
   return {
     modelId: "qwen3.8-max-preview",
     context: {
@@ -109,3 +109,4 @@ describe("Qwen 3.8 reasoning_content preservation", () => {
     expect(alibaba!.preserveReasoningContentModels).toContain("qwen3.8-max-preview");
   });
 });
+

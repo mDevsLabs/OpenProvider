@@ -26,7 +26,7 @@ Triage 6 community PRs, absorb valuable ones onto dev with blocker fixes, close 
 |----|-------|-------|------------|
 | WP0 | This triage doc (docs-only) | devlog/ | — |
 | WP1 | #197 qwen3.8 reasoning | registry.ts, openai-chat.ts, tests/ | WP0 |
-| WP2 | #193 port pinning | bin/ocx.mjs, src/cli/*.ts, src/server/ports.ts | WP0 |
+| WP2 | #193 port pinning | bin/opr.mjs, src/cli/*.ts, src/server/ports.ts | WP0 |
 | WP3 | #195 GUI request logs | src/server/request-log.ts, src/usage/log.ts, src/server/index.ts | WP0 |
 | WP4 | #191 Cloudflare Workers AI | registry.ts, src/cli/init.ts, src/oauth/login-cli.ts, gui/ | WP1 (registry.ts) |
 | WP5 | #194 close | — (comment only) | WP0 |
@@ -35,3 +35,4 @@ Triage 6 community PRs, absorb valuable ones onto dev with blocker fixes, close 
 ## Accept criteria
 1. Each ABSORB PR: commit on dev, tests pass, pushed, PR closed with credit
 2. Each CLOSE PR: PR closed with explanation and recognition of concept value
+

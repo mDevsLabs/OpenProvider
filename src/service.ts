@@ -1,7 +1,7 @@
 /**
  * `opr service` — run the proxy as a background service that auto-starts on login and
  * auto-restarts on crash. macOS → launchd; Windows → Task Scheduler; Linux → systemd user unit.
- * The service sets OCX_SERVICE=1 so the proxy's shutdown handler does NOT restore native
+ * The service sets opr_SERVICE=1 so the proxy's shutdown handler does NOT restore native
  * Codex on a service-managed restart (the restarted instance re-injects); explicit stop/uninstall
  * restore it via the command.
  */
@@ -20,7 +20,7 @@ import { serviceApiTokenFilePath } from "./lib/service-secrets";
 import { randomUUID } from "node:crypto";
 import {
   ELEVATION_REQUEST_TIMEOUT_MS,
-  OCX_ELEVATED_PROTOCOL_FAILED,
+  opr_ELEVATED_PROTOCOL_FAILED,
   raceWithTimeout,
   resolveTrustedWindowsSchtasksExe,
   startElevatedSchtasksCreateAndRun,
@@ -269,7 +269,7 @@ export function buildPlist(): string {
   const codexHome = process.env.CODEX_HOME?.trim();
   const openproviderHome = process.env.OPENPROVIDER_HOME?.trim();
   const envLines = [
-    `    <key>OCX_SERVICE</key><string>1</string>`,
+    `    <key>opr_SERVICE</key><string>1</string>`,
     `    <key>PATH</key><string>${plistString(path)}</string>`,
     codexHome ? `    <key>CODEX_HOME</key><string>${plistString(codexHome)}</string>` : null,
     openproviderHome ? `    <key>OPENPROVIDER_HOME</key><string>${plistString(openproviderHome)}</string>` : null,
@@ -305,7 +305,7 @@ function shellQuote(value: string): string {
 
 /**
  * Listen port baked into service wrappers / WinSW XML.
- * Priority: explicit override → OCX_BAKE_PORT (update restart) → config.port → 10100.
+ * Priority: explicit override → opr_BAKE_PORT (update restart) → config.port → 10100.
  * `config.port === 0` means ephemeral for interactive start; services need a stable pin,
  * so treat 0 / invalid like unset (default 10100) instead of baking `--port 0`.
  */
@@ -313,7 +313,7 @@ export function resolveServiceListenPort(override?: number): number {
   if (typeof override === "number" && Number.isFinite(override) && override > 0 && override <= 65535) {
     return Math.trunc(override);
   }
-  const baked = process.env.OCX_BAKE_PORT?.trim();
+  const baked = process.env.opr_BAKE_PORT?.trim();
   if (baked && /^\d+$/.test(baked)) {
     const n = Number(baked);
     if (n > 0 && n <= 65535) return n;
@@ -767,7 +767,7 @@ export async function finalizeWindowsSchedulerServiceRegistration(
     // Signal after Start-Process may leave an elevated child; reconcile conservatively.
     if (error instanceof WindowsElevationError && error.reason === "terminated") {
       try {
-        await reconcileUnknownElevatedOutcome(OCX_ELEVATED_PROTOCOL_FAILED);
+        await reconcileUnknownElevatedOutcome(opr_ELEVATED_PROTOCOL_FAILED);
       } catch (reconcileError) {
         // Prefer the reconciliation detail (partial install / cleanup guidance) over the
         // generic signal message so callers can block retries when a task remains.
@@ -796,7 +796,7 @@ export async function finalizeWindowsSchedulerServiceRegistration(
       }
       if (error instanceof WindowsElevationError && error.reason === "terminated") {
         try {
-          await reconcileUnknownElevatedOutcome(OCX_ELEVATED_PROTOCOL_FAILED);
+          await reconcileUnknownElevatedOutcome(opr_ELEVATED_PROTOCOL_FAILED);
           return "released";
         } catch (reconcileError) {
           return isPartialInstallError(reconcileError) ? "blocked-partial" : "released";
@@ -902,28 +902,28 @@ export function buildWindowsServiceScript(entry = cliEntry(), port = resolveServ
     // The wrapper console is hidden by the wscript launcher (window style 0), so switching
     // it to UTF-8 is safe (no leak into user shells) and lets cmd parse UTF-8 remnants.
     "chcp 65001 >nul",
-    windowsBatchSet("OCX_SERVICE", "1"),
+    windowsBatchSet("opr_SERVICE", "1"),
     windowsBatchSet("PATH", path, "pathList"),
     windowsBatchSet("CODEX_HOME", process.env.CODEX_HOME?.trim(), "path"),
     windowsBatchSet("OPENPROVIDER_HOME", process.env.OPENPROVIDER_HOME?.trim(), "path"),
-    windowsBatchSet("OCX_API_TOKEN_FILE", serviceApiTokenFilePath(), "path"),
-    windowsBatchSet("OCX_SERVICE_LOG", serviceLogPath(), "path"),
-    windowsBatchSet("OCX_BUN", bun, "path"),
-    windowsBatchSet("OCX_CLI", cli, "path"),
-    'if exist "%OCX_API_TOKEN_FILE%" (',
-    '  set /p OPENPROVIDER_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"',
+    windowsBatchSet("opr_API_TOKEN_FILE", serviceApiTokenFilePath(), "path"),
+    windowsBatchSet("opr_SERVICE_LOG", serviceLogPath(), "path"),
+    windowsBatchSet("opr_BUN", bun, "path"),
+    windowsBatchSet("opr_CLI", cli, "path"),
+    'if exist "%opr_API_TOKEN_FILE%" (',
+    '  set /p OPENPROVIDER_API_AUTH_TOKEN=<"%opr_API_TOKEN_FILE%"',
     ")",
     ":loop",
-    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] openprovider service wrapper start',
-    '>>"%OCX_SERVICE_LOG%" echo bun="%OCX_BUN%"',
-    `>>"%OCX_SERVICE_LOG%" echo bun_source="${bunRuntime.source}"`,
-    '>>"%OCX_SERVICE_LOG%" echo cli="%OCX_CLI%"',
-    '>>"%OCX_SERVICE_LOG%" echo openprovider_home="%OPENPROVIDER_HOME%"',
-    '>>"%OCX_SERVICE_LOG%" echo codex_home="%CODEX_HOME%"',
-    '>>"%OCX_SERVICE_LOG%" echo token_file="%OCX_API_TOKEN_FILE%"',
-    `"%OCX_BUN%" "%OCX_CLI%" start --port ${port} >>"%OCX_SERVICE_LOG%" 2>&1`,
+    '>>"%opr_SERVICE_LOG%" echo [%DATE% %TIME%] openprovider service wrapper start',
+    '>>"%opr_SERVICE_LOG%" echo bun="%opr_BUN%"',
+    `>>"%opr_SERVICE_LOG%" echo bun_source="${bunRuntime.source}"`,
+    '>>"%opr_SERVICE_LOG%" echo cli="%opr_CLI%"',
+    '>>"%opr_SERVICE_LOG%" echo openprovider_home="%OPENPROVIDER_HOME%"',
+    '>>"%opr_SERVICE_LOG%" echo codex_home="%CODEX_HOME%"',
+    '>>"%opr_SERVICE_LOG%" echo token_file="%opr_API_TOKEN_FILE%"',
+    `"%opr_BUN%" "%opr_CLI%" start --port ${port} >>"%opr_SERVICE_LOG%" 2>&1`,
     "if %ERRORLEVEL% NEQ 0 (",
-    '  >>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] child exited with code %ERRORLEVEL%; restarting in 5s',
+    '  >>"%opr_SERVICE_LOG%" echo [%DATE% %TIME%] child exited with code %ERRORLEVEL%; restarting in 5s',
     // `timeout` needs console stdin and dies with "Input redirection is not supported"
     // under Task Scheduler, turning the 5s cooldown into a hot restart loop; ping doesn't.
     "  ping -n 6 127.0.0.1 >nul",
@@ -1260,7 +1260,7 @@ export function buildUnit(): string {
   const codexHome = systemdEnvironmentAssignment("CODEX_HOME", process.env.CODEX_HOME?.trim());
   const openproviderHome = systemdEnvironmentAssignment("OPENPROVIDER_HOME", process.env.OPENPROVIDER_HOME?.trim());
   const envLines = [
-    systemdEnvironmentAssignment("OCX_SERVICE", "1"),
+    systemdEnvironmentAssignment("opr_SERVICE", "1"),
     systemdEnvironmentAssignment("PATH", path),
     codexHome,
     openproviderHome,
@@ -1742,5 +1742,6 @@ export async function serviceCommand(...args: (string | undefined)[]): Promise<v
       process.exit(1);
   }
 }
+
 
 

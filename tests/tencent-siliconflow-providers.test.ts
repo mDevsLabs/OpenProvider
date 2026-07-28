@@ -3,7 +3,7 @@ import { KEY_LOGIN_PROVIDERS } from "../src/oauth/key-providers";
 import { deriveProviderPresets } from "../src/providers/derive";
 import { PROVIDER_REGISTRY } from "../src/providers/registry";
 import { routeModel } from "../src/router";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { formatProviderDisplayName, isCatalogProviderId } from "../gui/src/provider-icons";
 
 describe("Tencent Cloud Coding Plan provider", () => {
@@ -41,7 +41,7 @@ describe("Tencent Cloud Coding Plan provider", () => {
       defaultModel: "tc-code-latest",
     });
 
-    const config: OcxConfig = {
+    const config: oprConfig = {
       port: 10100,
       defaultProvider: "tencent-coding-plan",
       providers: {
@@ -89,3 +89,4 @@ describe("SiliconFlow provider", () => {
     expect(isCatalogProviderId("tencent-coding-plan")).toBe(true);
   });
 });
+

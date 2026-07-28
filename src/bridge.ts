@@ -1,5 +1,5 @@
-import type { AdapterEvent, OcxMessagePhase, OcxProviderContinuationState, OcxUsage } from "./types";
-import { adapterFailureFromMessage, classifyError, CYBER_POLICY_ERROR_CODE, isCyberPolicyCode, type OcxErrorPayload } from "./lib/errors";
+import type { AdapterEvent, oprMessagePhase, oprProviderContinuationState, oprUsage } from "./types";
+import { adapterFailureFromMessage, classifyError, CYBER_POLICY_ERROR_CODE, isCyberPolicyCode, type oprErrorPayload } from "./lib/errors";
 import { encodeCompactionSummary } from "./responses/compaction";
 import { encodeReasoningEnvelope, type ReasoningEnvelope } from "./responses/reasoning-envelope";
 import { resolveStallTimeoutSec } from "./stall-timeout";
@@ -13,7 +13,7 @@ function sseEvent(name: string, data: Record<string, unknown>): string {
   return `event: ${name}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
-function responsesUsage(usage: OcxUsage | undefined): Record<string, unknown> {
+function responsesUsage(usage: oprUsage | undefined): Record<string, unknown> {
   // input_tokens_details / output_tokens_details are ALWAYS emitted (zero defaults):
   // strict Responses clients deserialize them as required fields — grok-build's pinned
   // async-openai fork (rev 95b52ebd, response_usage.rs) has non-Option InputTokenDetails/
@@ -59,11 +59,11 @@ function responsesUsage(usage: OcxUsage | undefined): Record<string, unknown> {
   return out;
 }
 
-function responseError(status: number, type: string, message: string): OcxErrorPayload {
+function responseError(status: number, type: string, message: string): oprErrorPayload {
   return classifyError(status, type, message);
 }
 
-function adapterFailureFromEvent(event: Extract<AdapterEvent, { type: "error" }>): { httpStatus: number; error: OcxErrorPayload } {
+function adapterFailureFromEvent(event: Extract<AdapterEvent, { type: "error" }>): { httpStatus: number; error: oprErrorPayload } {
   if (event.status === undefined && event.errorType === undefined && event.code === undefined) {
     return adapterFailureFromMessage(event.message);
   }
@@ -116,14 +116,14 @@ export function bridgeToResponsesSSE(
     hideThinkingSummary?: boolean;
     /**
      * Remote compaction v2 turn: accumulate all assistant text and, on done, emit ONE synthetic
-     * `{type:"compaction", encrypted_content:"ocx1:"+base64(text)}` output item before
+     * `{type:"compaction", encrypted_content:"opr1:"+base64(text)}` output item before
      * response.completed — codex-rs collect_compaction_output requires exactly one.
      */
     compaction?: boolean;
     /** One-shot: first non-empty text/thinking/raw-reasoning delta observed (WP4 TTFT). */
     onFirstOutput?: () => void;
     onTerminal?: (status: ResponsesTerminalStatus) => void;
-    onCompletedResponse?: (response: Record<string, unknown>, providerState?: OcxProviderContinuationState) => void;
+    onCompletedResponse?: (response: Record<string, unknown>, providerState?: oprProviderContinuationState) => void;
     /**
      * Raw adapter-reported usage at the terminal event, BEFORE wire normalization.
      * responsesUsage() always emits token-detail objects with zero defaults for strict
@@ -132,9 +132,19 @@ export function bridgeToResponsesSSE(
      * (cache_detail_missing would be silently suppressed). Callers set logCtx.usage
      * from this callback instead of re-parsing the bridged SSE.
      */
-    onUsage?: (usage: OcxUsage | undefined) => void;
+    onUsage?: (usage: oprUsage | undefined) => void;
+    /**
+     * Test seam for the wire/stall beat loop. Production omits this and uses the
+     * global timers; injecting here must not change scheduling semantics.
+     */
+    timers?: {
+      setInterval: (handler: () => void, ms: number) => unknown;
+      clearInterval: (id: unknown) => void;
+    };
   },
 ): ReadableStream<Uint8Array> {
+  const setBeatInterval = options?.timers?.setInterval ?? ((handler: () => void, ms: number) => setInterval(handler, ms));
+  const clearBeatInterval = options?.timers?.clearInterval ?? ((id: unknown) => clearInterval(id as ReturnType<typeof setInterval>));
   // Freeform/custom tools (apply_patch) carry their body in `input`; the model is given a
   // function with `{input:string}`, so unwrap it here when relaying back as a custom_tool_call.
   const freeformInput = (args: string): string => {
@@ -189,17 +199,19 @@ export function bridgeToResponsesSSE(
   };
   // RC3 keep-alive: Codex's idle timer is timeout(idle_timeout, stream.next()) over an
   // eventsource_stream; ANY received event re-arms it, while an unknown type is ignored
-  // (responses.rs `_ => Ok(None)`). We emit a real, parser-ignored `response.heartbeat` only during
-  // upstream silence so a stalled routed provider never trips "idle timeout waiting for SSE".
-  let activity = false;
-  let beat: ReturnType<typeof setInterval> | undefined;
+  // (responses.rs `_ => Ok(None)`). Emit a parser-ignored `response.heartbeat` whenever the
+  // *wire* has been silent, even if invisible adapter heartbeats are still flowing (web-search
+  // buffering + raw-byte progress). Upstream activity only resets the stall watchdog.
+  let upstreamActivity = false;
+  let wireActivity = false;
+  let beat: unknown;
   let controller: ReadableStreamDefaultController<Uint8Array>;
   let emittedFrames = 0;
   let gated = false;
   let stepping = false;
   const emit = (name: string, data: Record<string, unknown>) => {
         if (closed) return;
-        activity = true;
+        wireActivity = true;
         try {
           controller.enqueue(encoder.encode(sseEvent(name, { type: name, sequence_number: seq++, ...data })));
           emittedFrames++;
@@ -232,12 +244,12 @@ export function bridgeToResponsesSSE(
       const stallSec = resolveStallTimeoutSec(options?.stallTimeoutSec);
       const maxStallTicks = Math.ceil((stallSec * 1000) / heartbeatMs);
 
-      let currentMsg: { itemId: string; outputIndex: number; text: string; phase?: OcxMessagePhase } | null = null;
+      let currentMsg: { itemId: string; outputIndex: number; text: string; phase?: oprMessagePhase } | null = null;
       let currentReasoning: { itemId: string; outputIndex: number; text: string } | null = null;
       let currentRawReasoning: { itemId: string; outputIndex: number; text: string } | null = null;
       // Anthropic extended-thinking round-trip state: the signature signs the CURRENT thinking
       // block; redacted blocks are opaque payloads replayed verbatim. Attached to the reasoning
-      // item as an ocxr1 encrypted_content envelope on close. hiddenThinkingText collects the
+      // item as an oprr1 encrypted_content envelope on close. hiddenThinkingText collects the
       // suppressed text under hideThinkingSummary so the signed text still round-trips.
       let pendingSignature: string | undefined;
       let pendingRedacted: string[] = [];
@@ -267,7 +279,7 @@ export function bridgeToResponsesSSE(
       };
       // hideThinkingSummary for RAW reasoning (openai-chat reasoning_content, kiro tags): no
       // visible reasoning item is emitted — the app renders nothing, so tool cells keep grouping
-      // like native models — but the text still round-trips in a txt-only ocxr1 envelope so
+      // like native models — but the text still round-trips in a txt-only oprr1 envelope so
       // preserveReasoningContentModels replay (GLM interleaved thinking) keeps working. Direct
       // encodeReasoningEnvelope: takeReasoningEnvelope's sig/red guard would drop txt-only.
       let hiddenRawReasoningText = "";
@@ -302,8 +314,12 @@ export function bridgeToResponsesSSE(
         return anns;
       };
 
-      const closeCurrentMessage = () => {
+      const closeCurrentMessage = (inferredPhase?: oprMessagePhase) => {
         if (!currentMsg) return;
+        // Chat Completions has no message-phase field. Keep its live item provisional, then
+        // classify it only when the next adapter event proves whether this text led into more
+        // work or completed the turn. Explicit adapter phases always outrank this inference.
+        const phase = currentMsg.phase ?? inferredPhase;
         // Bind any pending web-search citations to this assistant message (then they clear).
         const annotations = takeWebAnnotations();
         // Finalize the text part (Responses protocol). Without these .done events Codex never
@@ -318,7 +334,7 @@ export function bridgeToResponsesSSE(
         const item = {
           type: "message", id: currentMsg.itemId, status: "completed", role: "assistant",
           content: [{ type: "output_text", text: currentMsg.text, annotations }],
-          ...(currentMsg.phase ? { phase: currentMsg.phase } : {}),
+          ...(phase ? { phase } : {}),
         };
         emit("response.output_item.done", { output_index: currentMsg.outputIndex, item });
         finishedItems.push(item as OutputItem);
@@ -478,7 +494,9 @@ export function bridgeToResponsesSSE(
           if (next.done) { upstreamDone = true; break; }
           const event = next.value;
           let terminalEvent = false;
-          activity = true;
+          // Invisible adapter heartbeats (and buffered web-search progress) count as upstream
+          // liveness only — they must not suppress wire keepalives that re-arm Codex idle timers.
+          upstreamActivity = true;
           stallTicks = 0;
           reportFirstOutput(event);
           // Compaction turns emit ONLY the synthetic compaction item + response.completed. The
@@ -494,7 +512,7 @@ export function bridgeToResponsesSSE(
             case "assistant_boundary": {
               // A guarded continuation starts a fresh assistant output item while keeping the
               // intermediate, suspicious text in the same Responses turn.
-              if (currentMsg) closeCurrentMessage();
+              if (currentMsg) closeCurrentMessage("commentary");
               if (currentReasoning) closeCurrentReasoning();
               if (currentRawReasoning) closeCurrentRawReasoning();
               flushHiddenRawReasoning();
@@ -507,7 +525,11 @@ export function bridgeToResponsesSSE(
               if (currentRawReasoning) closeCurrentRawReasoning();
               flushHiddenRawReasoning();
               if (currentToolCall) closeCurrentToolCall();
-              if (currentMsg && currentMsg.phase !== event.phase) closeCurrentMessage();
+              // Only flush on an explicit phase change. A later delta that omits `phase` must
+              // keep appending to the current message rather than wiping the earlier phase.
+              if (currentMsg && event.phase !== undefined && currentMsg.phase !== event.phase) {
+                closeCurrentMessage("commentary");
+              }
               if (!currentMsg) {
                 const itemId = `msg_${uuid()}`;
                 const item = {
@@ -531,7 +553,7 @@ export function bridgeToResponsesSSE(
             }
             case "thinking_delta": {
               if (options?.hideThinkingSummary) { hiddenThinkingText += event.thinking; break; }
-              if (currentMsg) closeCurrentMessage();
+              if (currentMsg) closeCurrentMessage("commentary");
               if (currentRawReasoning) closeCurrentRawReasoning();
               flushHiddenRawReasoning();
               if (currentToolCall) closeCurrentToolCall();
@@ -566,7 +588,7 @@ export function bridgeToResponsesSSE(
             }
             case "reasoning_raw_delta": {
               if (options?.hideThinkingSummary) { hiddenRawReasoningText += event.text; break; }
-              if (currentMsg) closeCurrentMessage();
+              if (currentMsg) closeCurrentMessage("commentary");
               if (currentReasoning) closeCurrentReasoning();
               if (currentToolCall) closeCurrentToolCall();
               if (!currentRawReasoning) {
@@ -583,7 +605,7 @@ export function bridgeToResponsesSSE(
               break;
             }
             case "tool_call_start": {
-              if (currentMsg) closeCurrentMessage();
+              if (currentMsg) closeCurrentMessage("commentary");
               if (currentReasoning) closeCurrentReasoning();
               if (currentRawReasoning) closeCurrentRawReasoning();
               flushHiddenRawReasoning();
@@ -638,7 +660,7 @@ export function bridgeToResponsesSSE(
               // Open the native search cell so Codex shows the "Searching the web" spinner WHILE the
               // sidecar runs. Close any other open item first, allocate this item's output index, and
               // hold it open until the matching `web_search_call_end` (or a terminal close).
-              if (currentMsg) closeCurrentMessage();
+              if (currentMsg) closeCurrentMessage("commentary");
               if (currentReasoning) closeCurrentReasoning();
               if (currentRawReasoning) closeCurrentRawReasoning();
               flushHiddenRawReasoning();
@@ -675,7 +697,7 @@ export function bridgeToResponsesSSE(
               break;
             }
             case "done": {
-              if (currentMsg) closeCurrentMessage();
+              if (currentMsg) closeCurrentMessage(event.stopReason ? undefined : "final_answer");
               if (currentReasoning) closeCurrentReasoning();
               if (currentRawReasoning) closeCurrentRawReasoning();
               flushHiddenRawReasoning();
@@ -801,7 +823,7 @@ export function bridgeToResponsesSSE(
         stepping = false;
         return;
       }
-      if (beat) { clearInterval(beat); beat = undefined; }
+      if (beat !== undefined) { clearBeatInterval(beat); beat = undefined; }
 
       if (!terminated) {
         // The adapter generator ended without an explicit done/error event. Mark as incomplete
@@ -840,10 +862,12 @@ export function bridgeToResponsesSSE(
         // The default ReadableStream strategy has HWM=1. Once one event's frames fill that
         // queue, pull stepping pauses; no custom FIFO or queuing strategy is layered on top.
         gated = true;
-        beat = setInterval(() => {
+        beat = setBeatInterval(() => {
           if (closed || gated) return;
-          if (activity) { activity = false; stallTicks = 0; return; }
-          if (++stallTicks >= maxStallTicks) {
+          if (upstreamActivity) {
+            upstreamActivity = false;
+            stallTicks = 0;
+          } else if (++stallTicks >= maxStallTicks) {
             if (currentMsg) closeCurrentMessage();
             if (currentReasoning) closeCurrentReasoning();
             if (currentRawReasoning) closeCurrentRawReasoning();
@@ -861,10 +885,15 @@ export function bridgeToResponsesSSE(
             terminated = true;
             returnIterator();
             emitDone();
-            if (beat) clearInterval(beat);
+            if (beat !== undefined) clearBeatInterval(beat);
             beat = undefined;
             try { controller.close(); } catch { /* already closed */ }
             closed = true;
+            return;
+          }
+          // Wire silence is independent of upstream adapter heartbeats.
+          if (wireActivity) {
+            wireActivity = false;
             return;
           }
           try {
@@ -887,14 +916,14 @@ export function bridgeToResponsesSSE(
     cancel() {
       // Client (Codex) disconnected. Stop emitting and let the caller abort the upstream fetch so a
       // cancelled turn does not leak the upstream stream or keep draining tokens (RC2).
-      clientCancelled = true;
-      closed = true;
-      if (beat) clearInterval(beat);
-      onCancel?.();
-      returnIterator();
-    },
-  });
-}
+        clientCancelled = true;
+        closed = true;
+        if (beat !== undefined) clearBeatInterval(beat);
+        onCancel?.();
+        returnIterator();
+      },
+    });
+  }
 
 export function buildResponseJSON(
   events: AdapterEvent[],
@@ -906,22 +935,23 @@ export function buildResponseJSON(
     toolSearchToolNames?: Set<string>;
     /** Remote compaction v2 turn — append one synthetic compaction output item (see bridgeToResponsesSSE). */
     compaction?: boolean;
-    onProviderState?: (state: OcxProviderContinuationState) => void;
+    onProviderState?: (state: oprProviderContinuationState) => void;
     /** Raw adapter-reported usage before wire normalization (see bridgeToResponsesSSE onUsage). */
-    onUsage?: (usage: OcxUsage | undefined) => void;
+    onUsage?: (usage: oprUsage | undefined) => void;
   },
 ): Record<string, unknown> {
   const responseId = `resp_${uuid()}`;
   const output: OutputItem[] = [];
-  let usage: OcxUsage | undefined;
+  let usage: oprUsage | undefined;
   let errorEvent: Extract<AdapterEvent, { type: "error" }> | undefined;
   let incompleteEvent: Extract<AdapterEvent, { type: "incomplete" }> | undefined;
   let endTurn: boolean | undefined;
   let stopReason: string | undefined;
+  let cleanDone = false;
   let compactionText = "";
 
   let currentText = "";
-  let currentTextPhase: OcxMessagePhase | undefined;
+  let currentTextPhase: oprMessagePhase | undefined;
   let currentSummaryReasoning = "";
   let currentRawReasoning = "";
   // Anthropic extended-thinking round-trip (batch): see bridgeToResponsesSSE counterpart.
@@ -941,8 +971,9 @@ export function buildResponseJSON(
     try { const o = JSON.parse(args); return o && typeof o === "object" ? o : {}; } catch { return {}; }
   };
 
-  const flushText = () => {
+  const flushText = (inferredPhase?: oprMessagePhase) => {
     if (!currentText) return;
+    const phase = currentTextPhase ?? inferredPhase;
     const annotations = pendingWebSources.map(s => ({
       type: "url_citation", url: s.url, ...(s.title ? { title: s.title } : {}), start_index: 0, end_index: 0,
     }));
@@ -950,7 +981,7 @@ export function buildResponseJSON(
     output.push({
       type: "message", id: `msg_${uuid()}`, role: "assistant", status: "completed",
       content: [{ type: "output_text", text: currentText, annotations }],
-      ...(currentTextPhase ? { phase: currentTextPhase } : {}),
+      ...(phase ? { phase } : {}),
     });
     currentText = "";
     currentTextPhase = undefined;
@@ -1025,13 +1056,15 @@ export function buildResponseJSON(
   for (const e of events) {
     switch (e.type) {
       case "assistant_boundary":
-        flushText();
+        flushText("commentary");
         flushSummaryReasoning();
         flushRawReasoning();
         flushToolCall();
         break;
       case "text_delta":
-        if (currentText && currentTextPhase !== e.phase) flushText();
+        // Only flush on an explicit phase change. A later delta that omits `phase` must keep
+        // appending under the previously established phase.
+        if (currentText && e.phase !== undefined && currentTextPhase !== e.phase) flushText("commentary");
         if (currentSummaryReasoning) flushSummaryReasoning();
         if (currentRawReasoning) flushRawReasoning();
         if (currentToolCallId) flushToolCall();
@@ -1039,12 +1072,12 @@ export function buildResponseJSON(
         // bridgeToResponsesSSE); it ships only inside the synthetic compaction item below.
         if (options?.compaction) compactionText += e.text;
         else {
-          currentTextPhase = e.phase;
+          if (e.phase !== undefined) currentTextPhase = e.phase;
           currentText += e.text;
         }
         break;
       case "thinking_delta":
-        if (currentText) flushText();
+        if (currentText) flushText("commentary");
         if (currentRawReasoning) flushRawReasoning();
         if (currentToolCallId) flushToolCall();
         currentSummaryReasoning += e.thinking;
@@ -1059,13 +1092,13 @@ export function buildResponseJSON(
         batchRedacted.push(e.data);
         break;
       case "reasoning_raw_delta":
-        if (currentText) flushText();
+        if (currentText) flushText("commentary");
         if (currentSummaryReasoning) flushSummaryReasoning();
         if (currentToolCallId) flushToolCall();
         currentRawReasoning += e.text;
         break;
       case "tool_call_start":
-        if (currentText) flushText();
+        if (currentText) flushText("commentary");
         if (currentSummaryReasoning) flushSummaryReasoning();
         if (currentRawReasoning) flushRawReasoning();
         flushToolCall();
@@ -1084,7 +1117,7 @@ export function buildResponseJSON(
         // single finalized item, emitted on `end`. Begin is a no-op here.
         break;
       case "web_search_call_end":
-        if (currentText) flushText();
+        if (currentText) flushText("commentary");
         if (currentSummaryReasoning) flushSummaryReasoning();
         if (currentRawReasoning) flushRawReasoning();
         flushToolCall();
@@ -1112,25 +1145,33 @@ export function buildResponseJSON(
       case "done":
         usage = e.usage;
         endTurn = e.endTurn;
+        cleanDone = e.stopReason === undefined;
         if (e.providerState) options?.onProviderState?.(e.providerState);
-        if (e.stopReason === "max_tokens") stopReason = "max_tokens";
+        // Match streaming: max_tokens and content_filter both terminate as incomplete.
+        if (e.stopReason === "max_tokens" || e.stopReason === "content_filter") stopReason = e.stopReason;
         break;
     }
   }
-  flushText();
+  flushText(cleanDone && !errorEvent && !incompleteEvent ? "final_answer" : undefined);
   flushSummaryReasoning();
   flushRawReasoning();
   flushToolCall();
   // A truncated turn must never be installed as replacement history: emit the
   // compaction item only when the turn actually completed (#422).
-  if (options?.compaction && !errorEvent && !incompleteEvent && stopReason !== "max_tokens") {
+  if (
+    options?.compaction
+    && !errorEvent
+    && !incompleteEvent
+    && stopReason !== "max_tokens"
+    && stopReason !== "content_filter"
+  ) {
     output.push({ type: "compaction", id: `cmp_${uuid()}`, encrypted_content: encodeCompactionSummary(compactionText) });
   }
 
   const failure = errorEvent ? adapterFailureFromEvent(errorEvent) : undefined;
   const status = errorEvent
     ? "failed"
-    : incompleteEvent || stopReason === "max_tokens"
+    : incompleteEvent || stopReason === "max_tokens" || stopReason === "content_filter"
       ? "incomplete"
       : "completed";
   options?.onUsage?.(incompleteEvent?.usage ?? usage);
@@ -1150,6 +1191,8 @@ export function buildResponseJSON(
       },
     } : stopReason === "max_tokens" ? {
       incomplete_details: { reason: "max_output_tokens" },
+    } : stopReason === "content_filter" ? {
+      incomplete_details: { reason: "content_filter" },
     } : {}),
     usage: responsesUsage(incompleteEvent?.usage ?? usage),
   };
@@ -1159,7 +1202,7 @@ export function formatErrorResponse(
   status: number,
   type: string,
   message: string,
-  options?: { code?: string | null },
+  options?: { code?: string | null; retryAfter?: string | null },
 ): Response {
   const error = classifyError(status, type, message);
   if (isCyberPolicyCode(options?.code)) {
@@ -1167,8 +1210,14 @@ export function formatErrorResponse(
     error.type = "invalid_request_error";
   }
   const finalStatus = error.code === CYBER_POLICY_ERROR_CODE ? 400 : status;
+  const headers = new Headers({ "Content-Type": "application/json" });
+  const retryAfter = options?.retryAfter?.trim();
+  if (retryAfter && retryAfter.length > 0 && retryAfter.length <= 128) {
+    headers.set("Retry-After", retryAfter);
+  }
   return new Response(JSON.stringify({ error }), {
     status: finalStatus,
-    headers: { "Content-Type": "application/json" },
+    headers,
   });
 }
+

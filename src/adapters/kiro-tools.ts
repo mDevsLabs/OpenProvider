@@ -1,4 +1,4 @@
-import type { OcxParsedRequest } from "../types";
+import type { oprParsedRequest } from "../types";
 import { namespacedToolName } from "../types";
 import { normalizeKiroModelId } from "../providers/kiro-models";
 import { createKiroToolNameRegistry, type KiroToolNameRegistry } from "./kiro-wire";
@@ -148,7 +148,7 @@ function truncateDescription(description: string, limit: number): string {
 }
 
 export function convertKiroToolContext(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   registry: KiroToolNameRegistry = createKiroToolNameRegistry(),
 ): { tools: unknown[]; systemAdditions: string[]; nameMap: Map<string, string>; registry: KiroToolNameRegistry } {
   const tools = parsed.context.tools ?? [];
@@ -179,6 +179,7 @@ export function convertKiroToolContext(
   };
 }
 
-export function convertKiroTools(parsed: OcxParsedRequest): unknown[] {
+export function convertKiroTools(parsed: oprParsedRequest): unknown[] {
   return convertKiroToolContext(parsed).tools;
 }
+

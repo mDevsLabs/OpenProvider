@@ -22,7 +22,7 @@ Add AI21's documented Jamba Chat Completions endpoint as a keyed OpenAI-chat-com
 
 ## Activation scenarios
 
-- Stream chunks ending with `data: [DONE]` produce one OCX terminal event and final usage.
+- Stream chunks ending with `data: [DONE]` produce one opr terminal event and final usage.
 - A tool call is emitted and replayed with AI21's documented function schema.
 - `stream:true,n>1` is normalized or rejected according to the audited policy without changing non-AI21 providers.
 - 401/403/422 bodies surface safe classifications without raw body leakage.
@@ -40,3 +40,4 @@ bun run typecheck
 - `NOOP`: official API no longer supports the required compatibility shape at implementation time.
 - `NEEDS_HUMAN`: no AI21 key.
 - `BLOCKED`: tool use cannot support a Codex round trip.
+

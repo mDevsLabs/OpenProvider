@@ -7,7 +7,7 @@ import { syncModelsToCodex } from "../codex/sync";
 import { hasOwnProvider, isValidProviderName, loadConfig, saveConfig } from "../config";
 import { routedSlug } from "../providers/slug-codec";
 import { findLiveProxy } from "../server/proxy-liveness";
-import type { OcxConfig, OcxCustomModel } from "../types";
+import type { oprConfig, oprCustomModel } from "../types";
 
 const ADD_USAGE = "Usage: opr models add <provider> <modelId> [--display-name <name>] [--context-window <tokens>] [--modalities text,image,audio]";
 const REMOVE_USAGE = "Usage: opr models remove <customId|provider/modelId> [--yes]";
@@ -23,7 +23,7 @@ interface ModelEntry {
   reasoningEfforts: string[] | null;
 }
 
-function collectModels(config: OcxConfig, providerFilter?: string): ModelEntry[] {
+function collectModels(config: oprConfig, providerFilter?: string): ModelEntry[] {
   const entries: ModelEntry[] = [];
   const providers = providerFilter
     ? { [providerFilter]: config.providers[providerFilter] }
@@ -152,7 +152,7 @@ async function handleCustomAdd(args: string[]): Promise<void> {
     fail(`custom model "${slug}" already exists`);
   }
 
-  const entry: OcxCustomModel = {
+  const entry: oprCustomModel = {
     id: randomUUID(),
     provider,
     modelId,
@@ -167,7 +167,7 @@ async function handleCustomAdd(args: string[]): Promise<void> {
   console.log(`Added custom model ${slug} (${entry.id}).`);
 }
 
-async function confirmCustomRemoval(model: OcxCustomModel): Promise<boolean> {
+async function confirmCustomRemoval(model: oprCustomModel): Promise<boolean> {
   if (!process.stdin.isTTY || !process.stdout.isTTY) {
     fail("remove requires --yes in non-interactive mode");
   }
@@ -207,7 +207,7 @@ async function handleCustomRemove(args: string[]): Promise<void> {
   console.log(`Removed custom model ${routedSlug(model.provider, model.modelId)}.`);
 }
 
-function customModelCells(model: OcxCustomModel): string[] {
+function customModelCells(model: oprCustomModel): string[] {
   return [
     model.id.slice(0, 8),
     model.modelId,
@@ -217,7 +217,7 @@ function customModelCells(model: OcxCustomModel): string[] {
   ];
 }
 
-function printCustomModelGroup(provider: string, models: OcxCustomModel[]): void {
+function printCustomModelGroup(provider: string, models: oprCustomModel[]): void {
   const rows = models.map(customModelCells);
   const headers = ["ID", "MODEL", "DISPLAY NAME", "CONTEXT", "MODALITIES"];
   const widths = headers.map((header, column) => Math.max(header.length, ...rows.map(row => row[column].length)));
@@ -241,7 +241,7 @@ function handleCustomList(args: string[]): void {
     console.log("No custom models registered.");
     return;
   }
-  const byProvider = new Map<string, OcxCustomModel[]>();
+  const byProvider = new Map<string, oprCustomModel[]>();
   for (const model of models) {
     const group = byProvider.get(model.provider) ?? [];
     group.push(model);
@@ -312,26 +312,26 @@ function handleConfiguredModels(args: string[]): void {
   console.log("Note: providers with liveModels may have additional models at runtime.");
 }
 
-function runCustomCommand(command: Promise<void>): void {
-  command.catch(error => {
-    console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
-    process.exitCode = 1;
-  });
-}
-
-export function handleModels(args: string[]): void {
+export async function handleModels(args: string[]): Promise<void> {
   const [subcommand, ...rest] = args;
   if (subcommand === "add") {
-    runCustomCommand(handleCustomAdd(rest));
+    await handleCustomAdd(rest);
     return;
   }
   if (subcommand === "remove") {
-    runCustomCommand(handleCustomRemove(rest));
+    await handleCustomRemove(rest);
     return;
   }
   if (subcommand === "list-custom") {
     handleCustomList(rest);
     return;
   }
+  if (["live", "edit", "enable", "disable", "provider", "selected", "context", "shadow"].includes(subcommand ?? "")) {
+    const { handleModelsRuntimeCommand } = await import("./models-runtime");
+    const code = await handleModelsRuntimeCommand(subcommand!, rest);
+    if (code !== null) process.exitCode = code;
+    return;
+  }
   handleConfiguredModels(subcommand === "list" ? rest : args);
 }
+

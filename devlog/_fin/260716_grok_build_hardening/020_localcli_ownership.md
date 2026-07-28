@@ -67,7 +67,7 @@ Generation authority is monotonic and is based on fixed token lifetime, not refr
 
 No config surface is added.
 
-- `LocalTokenImportMode = "off" | "fallback" | "only"` is an internal flow type, not an `OcxConfig` field (`src/oauth/types.ts:38-43`).
+- `LocalTokenImportMode = "off" | "fallback" | "only"` is an internal flow type, not an `oprConfig` field (`src/oauth/types.ts:38-43`).
 - xAI login currently maps `forceLogin: true` to `importLocal: "off"`; otherwise it uses `"fallback"` (`src/oauth/index.ts:21,49-55`).
 - `runLogin()` persists the flow's source and defaults source-less browser credentials to `"oauth"` (`src/oauth/index.ts:349-359`).
 - Preserve that wiring: `forceLogin` remains the explicit browser-login/detach path. Do not expose `importLocal` in `src/config.ts`.
@@ -450,7 +450,7 @@ Exact test names:
    - two calls for the same account;
    - assert the existing singleflight produces one token POST and both callers receive the same access token.
 
-Test hygiene: restore `console.warn`, `fetch`, `HOME`, and `OPENCODEX_HOME` in `afterEach`; delete the temp tree. No live xAI traffic.
+Test hygiene: restore `console.warn`, `fetch`, `HOME`, and `@mdevs/openprovider_HOME` in `afterEach`; delete the temp tree. No live xAI traffic.
 
 ## Acceptance criteria and activation scenarios
 
@@ -507,3 +507,5 @@ The commands follow `package.json` scripts: `test = bun test --isolate ./tests/`
 - Implemented the audited local-CLI reconciliation, identity/generation helpers, successful-refresh detach warning/source transition, and six temp-HOME regressions in the phase file map.
 - Deviation: `detectGrokCliToken()` resolves `process.env.HOME` before `homedir()` so each invocation observes temp-HOME fixtures (and runtime HOME changes); the Grok store remains strictly read-only. No other design deviation.
 - Verification: focused OAuth refresh suite `11 pass, 0 fail`; full suite `2602 pass, 0 fail`; `bun run typecheck` exited 0.
+
+

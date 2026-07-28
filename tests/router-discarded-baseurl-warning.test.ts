@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { routeModel } from "../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
 /**
  * A pinned registry entry outranks a saved `baseUrl`. That behavior is intentional and is
@@ -14,7 +14,7 @@ import type { OcxConfig, OcxProviderConfig } from "../src/types";
 const PINNED_PROVIDER = "anthropic";
 const PINNED_REGISTRY_BASE_URL = "https://api.anthropic.com";
 
-function configFor(providerName: string, provider: OcxProviderConfig): OcxConfig {
+function configFor(providerName: string, provider: oprProviderConfig): oprConfig {
   return {
     port: 10100,
     defaultProvider: providerName,
@@ -23,7 +23,7 @@ function configFor(providerName: string, provider: OcxProviderConfig): OcxConfig
 }
 
 /** Route once, capturing anything the router writes to `console.warn`. */
-function routeCapturingWarnings(config: OcxConfig, model: string, times = 1): string[] {
+function routeCapturingWarnings(config: oprConfig, model: string, times = 1): string[] {
   const warnings: string[] = [];
   const originalWarn = console.warn;
   console.warn = (...args: unknown[]) => { warnings.push(args.map(String).join(" ")); };
@@ -37,7 +37,7 @@ function routeCapturingWarnings(config: OcxConfig, model: string, times = 1): st
 
 function routePinned(baseUrl: unknown, times = 1): string[] {
   return routeCapturingWarnings(
-    configFor(PINNED_PROVIDER, { adapter: "anthropic", baseUrl } as OcxProviderConfig),
+    configFor(PINNED_PROVIDER, { adapter: "anthropic", baseUrl } as oprProviderConfig),
     `${PINNED_PROVIDER}/claude-sonnet-5`,
     times,
   );
@@ -214,10 +214,11 @@ for (const { label, id, adapter, baseUrl } of [
   },
 ] as const) {
   test(`stays silent for ${label}, whose baseUrl is honored`, () => {
-    const config = configFor(id, { adapter, baseUrl } as OcxProviderConfig);
+    const config = configFor(id, { adapter, baseUrl } as oprProviderConfig);
     const warnings = routeCapturingWarnings(config, `${id}/model`);
 
     expect(warnings).toEqual([]);
     expect(routeModel(config, `${id}/model`).provider.baseUrl).toBe(baseUrl);
   });
 }
+

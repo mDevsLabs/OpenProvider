@@ -52,7 +52,7 @@ stallTimeoutSec: webSearchStallTimeoutSec(
 ),
 ```
 
-(Check `OcxConfig` has both fields — `stallTimeoutSec` at src/types.ts:262, `connectTimeoutMs`
+(Check `oprConfig` has both fields — `stallTimeoutSec` at src/types.ts:262, `connectTimeoutMs`
 nearby; both optional.)
 
 ## 2. MODIFY `src/web-search/loop.ts`
@@ -137,3 +137,4 @@ Gates: `bun test ./tests/` exit 0; `bun x tsc --noEmit` exit 0.
 
 IN: the five files above. OUT: bridge.ts, adapters, GUI, sidecar defaults, parallelization,
 codex-rs.
+

@@ -118,7 +118,7 @@ baseUrl에 `authMode:"forward"`를 쓸 수 있고(`src/config.ts`의 provider �
 다행히 이미 정확한 판정자가 있다. `src/providers/openai-tiers.ts:32`:
 
 ```ts
-export function isCanonicalOpenAiForwardProvider(provider: OcxProviderConfig): boolean {
+export function isCanonicalOpenAiForwardProvider(provider: oprProviderConfig): boolean {
   return provider.adapter === "openai-responses"
     && provider.authMode === "forward"
     && normalizedBaseUrl(provider.baseUrl) === CODEX_FORWARD_BASE_URL;
@@ -278,3 +278,4 @@ bun test tests/responses-compaction-routing.test.ts tests/responses-compaction.t
          tests/openai-responses-passthrough.test.ts
 bun run typecheck
 ```
+

@@ -6,7 +6,7 @@ import { atomicWriteFile, expandUserPath, getConfigDir, websocketsEnabled } from
 import { CODEX_CONFIG_PATH, CODEX_MODELS_CACHE_PATH, DEFAULT_CATALOG_PATH, readRootTomlString, resolveCodexConfigPath } from "../paths";
 import { clearModelCache, DEFAULT_MODEL_CACHE_TTL_MS, getFreshCached, getStaleCached, isModelsFetchCoolingDown, markModelsFetchFailure, setCached } from "../model-cache";
 import { buildModelsRequest, resolveModelsAuthToken } from "../../oauth";
-import type { OcxConfig, OcxProviderConfig } from "../../types";
+import type { oprConfig, oprProviderConfig } from "../../types";
 import { modelInList } from "../../types";
 import { CODEX_REASONING_LEVELS, codexEffortRank, configuredReasoningEfforts, modelRecordValue, sanitizeCodexReasoningEfforts } from "../../reasoning-effort";
 import { getJawcodeModelMetadata, getJawcodeModelMetadataCaseInsensitive, listJawcodeModelMetadata, resolveJawcodeProvider } from "../../generated/jawcode-model-metadata";
@@ -105,7 +105,7 @@ export interface CatalogModel {
   contextCap?: number;
   contextCapped?: boolean;
   inputModalities?: string[];
-  /** Provider opted into parallel tool calls (OcxProviderConfig.parallelToolCalls). */
+  /** Provider opted into parallel tool calls (oprProviderConfig.parallelToolCalls). */
   parallelToolCalls?: boolean;
   /** Whether Codex may send Responses text.verbosity for this routed model. */
   supportsVerbosity?: boolean;
@@ -141,9 +141,24 @@ export function isMediaGenerationModelId(id: string): boolean {
   return MEDIA_GEN_ID_RE.test(id);
 }
 
+/**
+ * Gemini image-capable chat models produce inline images within text responses
+ * via the Responses API. Explicit allowlist only — a broad `/gemini/ && /image/`
+ * heuristic resurrects standalone media-gen IDs (e.g. gemini-3-pro-image).
+ */
+const GEMINI_IMAGE_CHAT_MODEL_IDS = new Set([
+  "gemini-3.1-flash-image",
+  "gemini-2.0-flash-preview-image-generation",
+  "gemini-3-pro-image-preview",
+]);
+
+function isGeminiImageChatModel(id: string): boolean {
+  return GEMINI_IMAGE_CHAT_MODEL_IDS.has(id);
+}
+
 export function shouldExposeRoutedModel(model: CatalogModel): boolean {
   if (isRoutedModelCompatibilityExcluded(`${model.provider}/${model.id}`)) return false;
-  if (model.provider === "cursor" && model.id === "gemini-3-pro-image-preview") return true;
+  if (isGeminiImageChatModel(model.id)) return true;
   return !isMediaGenerationModelId(model.id);
 }
 
@@ -322,7 +337,7 @@ export function normalizeRoutedCatalogEntry(entry: RawEntry, parallelToolCalls =
   }
   // Cursor's transport already serializes overlapping tool calls into atomic Responses tool events.
   // Advertising parallel calls lets Codex send the same native capability bit it sends for OpenAI.
-  // Opt-in providers (OcxProviderConfig.parallelToolCalls, e.g. xAI) advertise it too: the
+  // Opt-in providers (oprProviderConfig.parallelToolCalls, e.g. xAI) advertise it too: the
   // openai-chat adapter stops forcing parallel_tool_calls:false and the buffered stream parser
   // assembles multi-call turns (devlog/_plan/260709_parallel_tool_calls).
   entry.supports_parallel_tool_calls = isCursorEntry || parallelToolCalls === true;
@@ -414,3 +429,4 @@ export function readNativeBaseline(catalogPath: string): Map<string, number> {
   }
   return out;
 }
+

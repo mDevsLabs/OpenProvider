@@ -22,7 +22,7 @@
 
 - generator 입력/출력과 현행 6칸 tuple: `scripts/generate-jawcode-metadata.ts:7-19`, `:41-53`, `:56-67`, `:94-103`.
 - generated exact lookup은 `row[0] === modelId`: `src/generated/jawcode-model-metadata.ts:45-52`.
-- `OcxUsage.inputTokens`는 cache read/write 포함 총 prompt이며 total은 input+output:
+- `oprUsage.inputTokens`는 cache read/write 포함 총 prompt이며 total은 input+output:
   `src/types.ts:227-244`.
 - Anthropic adapter는 raw input에 read/write를 더해 inclusive `inputTokens`를 만든다:
   `src/adapters/anthropic.ts:292-307`.
@@ -225,7 +225,7 @@ import {
   getJawcodeModelMetadata,
   resolveJawcodeProvider,
 } from "../generated/jawcode-model-metadata";
-import type { OcxUsage } from "../types";
+import type { oprUsage } from "../types";
 import type { PersistedUsageAttempt, UsageStatus } from "./log";
 import {
   findExpectedPriceOverlay,
@@ -295,7 +295,7 @@ function hasNonZeroCost(cost: Cost4): boolean {
     || cost.cacheRead !== 0 || cost.cacheWrite !== 0;
 }
 
-export function normalizeCostTokens(usage: OcxUsage): CostTokens | null {
+export function normalizeCostTokens(usage: oprUsage): CostTokens | null {
   const input = usage.inputTokens;
   const output = usage.outputTokens;
   const cacheWrite = usage.cacheCreationInputTokens ?? 0;
@@ -366,7 +366,7 @@ export function resolveMatchedPrice(
   };
 }
 
-function isEstimated(usage: OcxUsage, usageStatus: UsageStatus, priceStatus: ExpectedPriceStatus): boolean {
+function isEstimated(usage: oprUsage, usageStatus: UsageStatus, priceStatus: ExpectedPriceStatus): boolean {
   return usage.estimated === true || usageStatus === "estimated" || priceStatus === "verified-derived";
 }
 
@@ -428,7 +428,7 @@ export function estimateUsageCost(
   input: {
     provider: string;
     model: string;
-    usage?: OcxUsage;
+    usage?: oprUsage;
     usageStatus: UsageStatus;
     attempts?: readonly PersistedUsageAttempt[];
   },
@@ -541,3 +541,4 @@ bun test --isolate tests/usage-cost.test.ts
 4. all-zero를 `$0`으로 처리하거나 combo 부분합을 반환하면 사용자에게 실제 총비용처럼 보인다.
 5. 003에서 검증 못 한 price는 **overlay 배열에 넣지 않는다** — 003 §5 백로그에만 기록하고,
    verified 승격 후에 등재한다. source/verifiedAt을 꾸며내지 않는다.
+

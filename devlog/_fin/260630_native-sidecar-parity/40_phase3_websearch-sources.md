@@ -24,8 +24,8 @@ TUI is unaffected; the desktop app reads the annotations to draw the Sources chi
 
 ## Change map (IN scope)
 
-1. `src/types.ts`: add `OcxUrlCitation { url; title? }` and carry it on the search-end
-   event: `web_search_call_end.sources?: OcxUrlCitation[]`.
+1. `src/types.ts`: add `oprUrlCitation { url; title? }` and carry it on the search-end
+   event: `web_search_call_end.sources?: oprUrlCitation[]`.
 2. `src/web-search/loop.ts runSearchCall`: dedupe `outcome.sources` across the batch's
    queries and attach them to the `web_search_call_end` event.
 3. `src/bridge.ts` (streaming): keep `pendingWebSources` accumulated from
@@ -46,3 +46,4 @@ TUI is unaffected; the desktop app reads the annotations to draw the Sources chi
 - A turn with no search (or a failed/empty search with no sources) emits `annotations: []`
   exactly as before (no regression).
 - Sources bind to the FIRST assistant message after the search, then the buffer clears.
+

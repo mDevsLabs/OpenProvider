@@ -27,7 +27,7 @@ import {
 import { isInjectionDebugEnabled } from "../../lib/debug-settings";
 import { injectionDebugLog } from "../../lib/injection-debug-log";
 import { modelInList, namespacedToolName } from "../../types";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig, OcxProviderContinuationState, OcxUsage } from "../../types";
+import type { AdapterEvent, oprConfig, oprParsedRequest, oprProviderConfig, oprProviderContinuationState, oprUsage } from "../../types";
 import {
   forceRefreshOAuthAccessSnapshot,
   getOAuthCredentialApiBaseUrl,
@@ -99,7 +99,7 @@ import { hasResponsesItemIdRepair, relaySseWithResponsesItemIdRepair } from "../
 import type { EffectiveSubagentRoster, SpawnAgentSurface } from "../../codex/catalog";
 
 
-export function buildToolBridgeMaps(parsed: OcxParsedRequest): {
+export function buildToolBridgeMaps(parsed: oprParsedRequest): {
   toolNsMap: Map<string, { namespace: string; name: string }>;
   freeformToolNames: Set<string>;
   toolSearchToolNames: Set<string>;
@@ -125,13 +125,13 @@ export const PROACTIVE_MULTI_AGENT_MODE_TEXT = [
   "This mode remains active until a later multi-agent mode developer message changes it.",
 ].join(" ");
 
-export function isV1CollabSurface(parsed: OcxParsedRequest): boolean {
+export function isV1CollabSurface(parsed: oprParsedRequest): boolean {
   return collabSurface(parsed) === "v1";
 }
 
 
 
-export function collabSurface(parsed: OcxParsedRequest): "v1" | "v2" | null {
+export function collabSurface(parsed: oprParsedRequest): "v1" | "v2" | null {
   let namespacedSpawn = false;
   let flatSpawn = false;
   let v1Only = false;
@@ -187,7 +187,7 @@ export async function resolveEffectiveSubagentRoster(
 
 
 export async function multiAgentGuidanceText(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   options: MultiAgentGuidanceOptions = {},
   deps: MultiAgentGuidanceDeps = {},
 ): Promise<string | null> {
@@ -225,7 +225,7 @@ export async function multiAgentGuidanceText(
         .map(item => `${item.configured}:${item.reason}`)
         .join(", ")}`);
     }
-    const fallbackGuidance = subagentFallbackGuidanceText({ subagentModelFallback } as OcxConfig);
+    const fallbackGuidance = subagentFallbackGuidanceText({ subagentModelFallback } as oprConfig);
     if (!injectionModel && roster === "" && fallbackGuidance === "") return null;
     if (injectionPrompt) {
       return `<multi_agent_mode>${applyInjectionPlaceholders(injectionPrompt, injectionModel, injectionEffort, roster, fallbackGuidance)}</multi_agent_mode>`;
@@ -298,7 +298,7 @@ function isGeneratedDeveloperItem(item: unknown, text: string): boolean {
   return isRecord(part) && part.type === "input_text" && part.text === text;
 }
 
-export function injectDeveloperMessage(parsed: OcxParsedRequest, text: string): void {
+export function injectDeveloperMessage(parsed: oprParsedRequest, text: string): void {
   const raw = parsed._rawBody as { input?: unknown } | undefined;
   const devItem = { type: "message", role: "developer", content: [{ type: "input_text", text }] };
   if (raw && Array.isArray(raw.input)) {
@@ -320,3 +320,4 @@ export function injectDeveloperMessage(parsed: OcxParsedRequest, text: string): 
     }
   }
 }
+

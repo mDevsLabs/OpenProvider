@@ -84,7 +84,7 @@ constraint, and a whitelist is exactly what silently loses a new surface:
        `base_url = ${tomlString(baseUrl)}`,
        'api_backend = "chat_completions"',
        'api_key = "openprovider-loopback"',
-       `name = ${tomlString(model.name ?? `OCX ${model.id}`)}`,
+       `name = ${tomlString(model.name ?? `opr ${model.id}`)}`,
 +      // Best-effort attribution tag for the usage dashboard (upstream Grok sends
 +      // extra_headers verbatim on inference calls; 11-custom-models.md). This is NOT
 +      // a security boundary — any loopback client could send it.
@@ -154,3 +154,4 @@ if (req.headers.get("x-openprovider-grok") === "1") logCtx.surface = "grok";
 | `cd gui && bun test tests/usage-grok-filter.test.ts` | pass |
 | `bun test tests/grok-config-inject.test.ts tests/grok-sync.test.ts` | existing inject suites still green with the new line |
 | full gates | green |
+

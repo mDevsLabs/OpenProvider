@@ -22,7 +22,7 @@ existing `google` adapter's SSE parser and message conversion — adding only a 
 
 ## openprovider fit
 
-- **Config** (`src/types.ts` `OcxProviderConfig`): add `googleMode?: "ai-studio" | "vertex"`, `project?`, `location?`.
+- **Config** (`src/types.ts` `oprProviderConfig`): add `googleMode?: "ai-studio" | "vertex"`, `project?`, `location?`.
 - **Adapter** (`src/adapters/google.ts createGoogleAdapter`): branch `buildRequest` on `googleMode` (default `"ai-studio"` → backward compatible). Vertex branch builds the project/location URL + resolves the ADC Bearer (or `x-goog-api-key`). `parseStream` **unchanged** (mode-agnostic SSE, `google.ts:120-184`).
 - **Dispatch** (`src/server.ts:186 resolveAdapter`): **no new case** — stays `google`.
 - **Models:** seed ~13 Vertex Gemini ids in the registry.
@@ -52,3 +52,4 @@ Stream one prompt with ADC; compare SSE parts to a jawcode golden (`02:216`). AP
 
 - **Depends-on:** none (ships first).
 - **Enables:** the `googleMode` hook reused by Phase 20 (antigravity).
+

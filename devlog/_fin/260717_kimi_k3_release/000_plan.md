@@ -35,7 +35,7 @@ and `main` and publish npm `latest` as `2.7.23`.
 
 - No force-push, rebasing of published branches, or public tag rewrites.
 - Do not retry or alter the user's Kimi authentication state.
-- Run tests with isolated `OPENCODEX_HOME` and `CODEX_HOME` so local credentials
+- Run tests with isolated `@mdevs/openprovider_HOME` and `CODEX_HOME` so local credentials
   and the running proxy are not mutated.
 - The exact release SHA must pass Cross-platform CI before workflow dispatch.
 - Completion requires npm registry, npm `latest`, Git tag, GitHub Release,
@@ -63,4 +63,5 @@ and `main` and publish npm `latest` as `2.7.23`.
 - `UNSAFE`: completing the release would require rewriting published history.
 - `NEEDS_HUMAN`: npm, tag, or GitHub metadata is partially consumed in a way
   that cannot be safely bypassed with the next unused version.
+
 

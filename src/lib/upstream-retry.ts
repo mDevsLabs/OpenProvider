@@ -32,7 +32,7 @@ const TRANSIENT_RETRY_SLOW_ATTEMPT_MS = 15_000;
 /**
  * Upstream statuses treated as transient: gateway errors and Cloudflare 52x.
  * 500 is included per the OpenAI SDK default (auto-retries >=500; Tier-2 proven in
- * devlog/260716_ocx_claude_sol_502_midstream/02). 507 was observed in the 48h ledger
+ * devlog/260716_opr_claude_sol_502_midstream/02). 507 was observed in the 48h ledger
  * but is deliberately excluded (storage-class, not gateway-transient).
  */
 export function isTransientUpstreamStatus(status: number): boolean {
@@ -237,3 +237,4 @@ export async function fetchWithTransientRetry(
   }
   return res;
 }
+

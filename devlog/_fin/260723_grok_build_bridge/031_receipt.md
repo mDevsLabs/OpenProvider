@@ -16,11 +16,11 @@ Date: 2026-07-23 (KST), branch `codex/260723-grok-build-bridge`, commits `52dfb9
 
 1. 사용자 config(`[models] stream_tool_calls=false`) 존재 상태에서 `opr start` → `+ Grok Build config updated (28 models)` 로그, 펜스 블록 추가, `config.toml.bak-openprovider` 1회 생성, 사용자 블록 보존
 2. `grok models` → `opr-gpt-5-6-sol` 외 27개 노출
-3. 스모크: `opr-cursor-grok-4-5` exit 0 `OCX_WP3_OK`, `opr-gpt-5-4-mini` exit 0 `OCX_WP3_NATIVE_OK`
+3. 스모크: `opr-cursor-grok-4-5` exit 0 `opr_WP3_OK`, `opr-gpt-5-4-mini` exit 0 `opr_WP3_NATIVE_OK`
 4. daemon SIGTERM(graceful shutdown) → syncCleanup의 stripGrokConfig 동작, 펜스 블록 0개, 사용자 config 원문 복원
 5. 재시작 → 재주입 멱등 확인 (블록 1개 유지)
 
-주의: `opr stop` CLI는 이 테스트 환경에서 service-home mismatch로 stopServiceIfInstalled 단계에서 throw — 프로덕션 환경(동일 OPENCODEX_HOME)에서는 미해당이나, handleStop 내 strip 위치가 이 throw 뒤라 도달 못 하는 경로가 존재. 리뷰어 검토 항목.
+주의: `opr stop` CLI는 이 테스트 환경에서 service-home mismatch로 stopServiceIfInstalled 단계에서 throw — 프로덕션 환경(동일 OpenProvider_HOME)에서는 미해당이나, handleStop 내 strip 위치가 이 throw 뒤라 도달 못 하는 경로가 존재. 리뷰어 검토 항목.
 
 ## Verifier
 - typecheck pass, `tests/grok-config-inject.test.ts` 8 pass, privacy scan pass
@@ -35,8 +35,9 @@ R4 **PASS** (no remaining blockers).
 
 ## 최종 live round-trip (하드닝 반영 후)
 
-start → 28모델 주입 → `opr-cursor-grok-4-5` exit 0 `OCX_FINAL_OK` → stop (service-stop 경고에도 teardown 완주) → 펜스 제거·유저 config 원문 복원.
+start → 28모델 주입 → `opr-cursor-grok-4-5` exit 0 `opr_FINAL_OK` → stop (service-stop 경고에도 teardown 완주) → 펜스 제거·유저 config 원문 복원.
 
 최종: `tests/grok-config-inject.test.ts` 11 pass, typecheck clean, privacy scan pass, full suite 3716 pass / 1 기존 플레이크. 커밋 체인: 52dfb934 → ead5e715 → f75cc563 → 848cab37 → 7dfdc3f4.
 
 수용 잔여(리뷰어 동의): stale-read 락 없음(단일 라이터 가정), ensure live-proxy 분기의 grok 재주입 없음(기존 codex sync 동작과 일치), trailing-dash alias 미관.
+

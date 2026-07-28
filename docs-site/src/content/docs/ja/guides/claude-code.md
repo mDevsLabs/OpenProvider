@@ -77,6 +77,10 @@ Claude Code 2.1.129 以降は `GET /v1/models?limit=1000` でゲートウェイ�
 提供します。両系列は継続してデコードできるため、どちらの形式でも `settings.json` に保存したモデルは
 引き続き動作します。
 
+Claude Desktop のフッターピッカーで実行中の 3P 会話のモデルが切り替わらない場合は、その会話で
+`/model <id>` を使用してください。OpenProvider はピッカーの状態を直接参照できず、各リクエストに
+含まれるモデル ID をルーティングします。結果は **Logs → requestedModel** で確認できます。
+
 **エイリアス構文ルール:** provider には `/` や `--` を含められず `native` と同じでもいけません。model には
 `/` を含められません。読みやすい形式で表現できないルートはハッシュエイリアスに置き換えます。モデル
 ID には `--` を含め**られます**(解析時は最初の `--` だけを基準に分割します)。`--` を含む
@@ -308,7 +312,7 @@ role、`tool_use_id` のない `tool_result`、id/name のない `tool_use`、na
 
 ## デバッグキャプチャ
 
-`opr debug claude on|off|status|reset`、`OCX_CLAUDE_DEBUG=1` または
+`opr debug claude on|off|status|reset`、`opr_CLAUDE_DEBUG=1` または
 `PUT /api/debug {"claude": true}` で入力キャプチャを制御します。`GET /api/claude/inbound-debug` は
 `{enabled, entries}` を返します(最新項目から、20 件の循環バッファ)。
 
@@ -372,4 +376,5 @@ Anthropic バックエンドを明示すると意図的に失敗後停止しま�
 **サブエージェントが誤ったモデルにディスパッチされる** — ロスターエージェント(`opr-*`)は Agent ツールの `model`
 引数ではなく `<!-- opr-route: ... -->` ディレクティブを使います。ディレクティブが希望ルートと一致するか確認し、
 モデルプレースホルダとして `"haiku"` を渡してください。
+
 

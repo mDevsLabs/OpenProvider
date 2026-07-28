@@ -23,7 +23,7 @@ A table qualifies as an openprovider orphan when ALL of:
 orphans predate it, and requiring it would leave exactly the entries causing #511
 unadopted. It is accepted as an additional positive signal but never as the sole one.
 
-The `opr-` alias prefix and the `OCX ` name prefix are NOT part of the predicate (weak;
+The `opr-` alias prefix and the `opr ` name prefix are NOT part of the predicate (weak;
 a human could write either).
 
 ## New code
@@ -37,16 +37,16 @@ interface OrphanTable {
   end: number;
 }
 
-const OPENCODEX_API_KEY = "openprovider-loopback";
+const OpenProvider_API_KEY = "openprovider-loopback";
 
 function isLoopbackBaseUrl(value: string): boolean
 function tableBodyKeys(body: string): Map<string, string>   // bare `k = "v"` scan, quoted values unwrapped
-function findOpencodexOrphans(content: string, region: ManagedRegion | null): OrphanTable[]
+function findOpenProviderOrphans(content: string, region: ManagedRegion | null): OrphanTable[]
 function removeOrphanTables(content: string, orphans: OrphanTable[]): string  // splice back-to-front
 function rewriteAliasReferences(content: string, renames: Map<string, string>): string
 ```
 
-`findOpencodexOrphans` reuses `MODEL_TABLE_HEADER` and `canonicalKeySegment` so the scan
+`findOpenProviderOrphans` reuses `MODEL_TABLE_HEADER` and `canonicalKeySegment` so the scan
 that ADOPTS and the scan that RESERVES can never disagree about what an alias is. It
 records each match's span as header-start to next-header-start (or EOF), which is the
 F4 defence — the whole table moves, never a line range.
@@ -66,7 +66,7 @@ the normalized window (F6):
 
 ```
 read -> normalize EOL -> findManagedRegion -> orphaned-marker refusal
-     -> orphans = findOpencodexOrphans(content, region)
+     -> orphans = findOpenProviderOrphans(content, region)
      -> content = removeOrphanTables(content, orphans)          // aliases now free
      -> recompute region against the SHORTENED content           // offsets moved!
      -> buildGrokManagedBlock(..., userModelAliases(content, region), ...)
@@ -124,3 +124,4 @@ the orphan, plus a hand-written `[model.my-own]` and a `[[model.arr]]`.
 `stripGrokConfig` is untouched: `opr stop` removing the fence should not also delete
 adopted-but-not-yet-swept entries. Reformatting user content. Changing the alias
 allocator.
+

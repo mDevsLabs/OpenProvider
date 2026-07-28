@@ -237,10 +237,11 @@ Relevant paths:
 ## Phase 100 Recommendation
 
 1. Add provider/model-specific catalog metadata for context windows and truncation behavior.
-2. Extend `OcxUsage` and bridge output to include cached input tokens and reasoning output tokens.
+2. Extend `oprUsage` and bridge output to include cached input tokens and reasoning output tokens.
 3. Decide whether each provider's thinking stream should map to Codex reasoning summary or raw
    reasoning text.
 4. Enforce parsed `reasoning.summary = "none"` when building the stream.
 5. Either improve translated non-streaming parity or explicitly document it as lower fidelity.
 6. Synthesize or forward Codex-relevant headers where possible.
 7. Align translated `response.failed` shape with upstream parser expectations.
+

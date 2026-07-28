@@ -20,7 +20,7 @@ export interface TokenGuardianHandle { stop(): void }
 export function startTokenGuardian(): TokenGuardianHandle;
 ```
 
-Config (added to `OcxConfig`, `src/types.ts:223`, alongside `shutdownTimeoutMs` `:251`):
+Config (added to `oprConfig`, `src/types.ts:223`, alongside `shutdownTimeoutMs` `:251`):
 
 ```ts
 tokenGuardian?: {
@@ -108,3 +108,4 @@ concurrency semaphore; `stop()` only clears the timer, in-flight refreshes settl
 2. Single-account guardian loop (step A). New `src/oauth/token-guardian.ts`.
 3. Codex-pool guardian loop (step B) — the codex-lb parity piece.
 4. Lifecycle wiring + jitter/backoff + tests (`tests/`).
+

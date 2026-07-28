@@ -23,7 +23,7 @@ xai/grok-composer-2.5-fast [text,image]. 전량 1592/0, tsc 0. 프록시 무접�
 ## WP2 — 사이드이펙트 전면 감사 (DONE, 852ab04)
 
 gpt-5.5 xhigh 3명 병렬: Bohr(비전 경로 end-to-end), Nietzsche(웹서치 사이드카 + 최근
-하드닝/페일오버/compaction/ocxr1 상호작용), Pasteur(카탈로그 광고 vs 프록시 능력 전수 대조,
+하드닝/페일오버/compaction/oprr1 상호작용), Pasteur(카탈로그 광고 vs 프록시 능력 전수 대조,
 codex-rs 그라운드트루스 포함).
 
 P0 0건. P1 수정: 웹서치 루프 429 페일오버(deps.on429) + per-iteration 타임아웃, 비전
@@ -55,3 +55,4 @@ thinking에서 tool-use 400 위험 → extractIterationThinking으로 첫 콜의
 - WP1 실측: 수정 전 [text] → 힌트만 [text] → enrich 후 [text,image] (catalog json 직접 판독)
 - WP2: 감사 3건(각 file:line 인용), 수정 후 1596/0 + tsc 0, 카탈로그 재sync 실측
 - WP3: 리플레이 테스트로 [thinking, toolCall] 순서 실측, web-search 16/16
+

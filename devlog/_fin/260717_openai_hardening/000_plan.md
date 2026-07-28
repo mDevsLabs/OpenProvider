@@ -67,7 +67,7 @@ out-of-band fallback and must continue to participate in quota scoring and affin
 - `openai-apikey` means the platform API and never consumes ChatGPT/Codex credentials.
 - Bare native model ids remain Codex Direct catalog rows. Multi and API rows are routed,
   namespaced rows (`openai-multi/<model>`, `openai-apikey/<model>`).
-- The API provider exposes official GPT-5.6 family metadata and these OCX-owned virtual
+- The API provider exposes official GPT-5.6 family metadata and these opr-owned virtual
   picker ids only:
   - `gpt-5.6-sol-pro` -> upstream `gpt-5.6-sol` with `reasoning.mode: "pro"`
   - `gpt-5.6-terra-pro` -> upstream `gpt-5.6-terra` with `reasoning.mode: "pro"`
@@ -182,3 +182,4 @@ independent final audit is `051`, and the consolidation rationale is `190`.
 - Do not claim API live-smoke completion when no configured API key is available.
 - Do not collapse Direct and Multi back into one provider because they share an
   adapter or upstream URL.
+

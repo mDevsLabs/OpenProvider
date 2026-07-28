@@ -464,7 +464,7 @@ Related active plan:
 
 Use a small model/provider eval matrix:
 
-1. Shell command: "Run `echo OCX_TOOL_OK` and report stdout."
+1. Shell command: "Run `echo opr_TOOL_OK` and report stdout."
 2. File discovery: "Find where Cursor tool definitions are built."
 3. Read batching: "Inspect three files and summarize the call path."
 4. Edit: "Make a one-line text/doc change using the structured edit path."
@@ -564,3 +564,4 @@ large system block.
 - **Verification**: source anchors were checked with `rg`, `nl -ba`, `cursor-agent
   --help`, `cursor-agent --version`, and Cursor official docs fetches. File existence and
   git diff should be verified after creation.
+

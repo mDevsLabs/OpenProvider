@@ -4,7 +4,7 @@
  * openprovider ships the Bun runtime via the `bun` npm dependency (esbuild-style:
  * a tiny main package + platform-specific `@oven/bun-*` optionalDependencies,
  * finalized by the package's own postinstall `node install.js`). The npm `bin`
- * launcher (bin/ocx.mjs) and the durable service/shim integrations both need a
+ * launcher (bin/opr.mjs) and the durable service/shim integrations both need a
  * stable path to that binary. This module is the single source of truth.
  *
  * In a from-source dev checkout the `bun` dependency may be absent; callers fall
@@ -83,3 +83,4 @@ export function durableBunRuntime(): DurableBunRuntime {
 export function durableBunPath(): string {
   return durableBunRuntime().path;
 }
+

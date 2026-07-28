@@ -37,7 +37,7 @@ Reviewer (fork-context subagent Goodall), 8/9 PASS, 1 should-fix FAIL, 0 hard bl
    the TOTAL deadline. connectTimeoutMs is documented as the DNS/TCP/TLS/header-arrival
    budget (docs configuration.md:32); alpha/search is non-streaming, so headers arrive
    only at completion and a 10s connect budget kills every long search. Fix: dedicated
-   `config.search.timeoutMs` (default 200s) mirroring `OcxImagesConfig.timeoutMs`;
+   `config.search.timeoutMs` (default 200s) mirroring `oprImagesConfig.timeoutMs`;
    504 test moved to the new knob; added regression test proving a short
    connectTimeoutMs no longer cuts a slow search.
 3. Provider selection PASS — first-enabled-forward scan matches the images relay
@@ -62,3 +62,4 @@ WP1 landed the pending v2 effort-cap gating as `cec073b8`, including an audit-fo
 fix: the surface-only gate skipped child turns (which carry no collab tools), so
 `subagentEffortCap` never fired on its targets; `effortCapAppliesTo` now admits
 header-marked child turns and multiAgentMode "v1" disables caps entirely.
+

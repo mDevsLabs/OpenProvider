@@ -55,7 +55,7 @@ Rationale:
 Add helper near `withPromptCache`:
 
 ```ts
-function usesNativeAnthropicEndpoint(provider: OcxProviderConfig): boolean {
+function usesNativeAnthropicEndpoint(provider: oprProviderConfig): boolean {
   try {
     return new URL(provider.baseUrl).hostname === "api.anthropic.com";
   } catch {
@@ -154,3 +154,4 @@ Potential deliverables:
 - Dashboard display update for read/write distinction.
 
 This is intentionally not implemented in Cycle 2 because it changes public log shape and requires a separate contract decision.
+

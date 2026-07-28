@@ -190,14 +190,14 @@ Purpose: let Windows users bypass a bad bundled Bun by setting a validated overr
 Expected files:
 
 - MODIFY `src/bun-runtime.ts`
-- MODIFY `bin/ocx.mjs` if launcher override is needed before Bun starts
+- MODIFY `bin/opr.mjs` if launcher override is needed before Bun starts
 - MODIFY `src/service.ts`
 - MODIFY `tests/bun-runtime.test.ts`
 - MODIFY `tests/service.test.ts`
 
 Implementation notes:
 
-- Support `OPENCODEX_BUN_PATH` or a clearly named equivalent.
+- Support `@mdevs/openprovider_BUN_PATH` or a clearly named equivalent.
 - Reject invalid override paths loudly.
 - Log bundled vs override runtime selection.
 
@@ -281,3 +281,5 @@ After each source-changing cycle:
 4. Re-enter P for the next cycle.
 
 Do not push unless explicitly requested. Do not collapse multiple cycles into one broad commit.
+
+

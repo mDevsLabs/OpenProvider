@@ -6,7 +6,7 @@ import { clearAccountQuota } from "../src/codex/quota";
 import { saveCodexAccountCredential } from "../src/codex/account-store";
 import { saveCredential } from "../src/oauth/store";
 import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../src/providers/quota";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const originalFetch = globalThis.fetch;
 const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
@@ -15,7 +15,7 @@ const previousCodexHome = process.env.CODEX_HOME;
 let openproviderHome: string;
 let codexHome: string;
 
-function testConfig(): OcxConfig {
+function testConfig(): oprConfig {
   return {
     defaultProvider: "openai",
     providers: {
@@ -57,7 +57,7 @@ function testConfig(): OcxConfig {
         disabled: true,
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 beforeEach(() => {
@@ -184,8 +184,11 @@ describe("fetchProviderQuotaReports", () => {
     expect(byProvider.openai?.quota.weeklyPercent).toBe(34);
     expect(byProvider.xai?.quota.monthlyPercent).toBe(25);
     expect(byProvider.anthropic?.quota.weeklyPercent).toBe(72);
+    // Claude's 5-hour window is reported in the canonical fields (like the Codex login rows),
+    // so only the model-specific windows remain as custom entries.
+    expect(byProvider.anthropic?.quota.fiveHourPercent).toBe(41.5);
+    expect(byProvider.anthropic?.quota.fiveHourResetAt).toBe(Date.parse("2026-07-05T12:00:00Z"));
     expect(byProvider.anthropic?.quota.customWindows).toEqual([
-      { label: "5h", percent: 41.5, resetAt: Date.parse("2026-07-05T12:00:00Z") },
       { label: "Opus", percent: 88 },
       { label: "Sonnet", percent: 19 },
     ]);
@@ -227,11 +230,11 @@ describe("fetchProviderQuotaReports", () => {
     expect(seen.find(row => row.url === "https://api.kimi.com/coding/v1/usages")?.authorization).toBe("Bearer kimi-access-secret");
   });
 
-  function kimiOnlyConfig(baseUrl = "https://api.kimi.com/coding/v1"): OcxConfig {
+  function kimiOnlyConfig(baseUrl = "https://api.kimi.com/coding/v1"): oprConfig {
     return {
       defaultProvider: "kimi",
       providers: { kimi: { adapter: "openai-chat", authMode: "oauth", baseUrl } },
-    } as OcxConfig;
+    } as oprConfig;
   }
 
   test("Kimi quota never sends OAuth credentials to a non-canonical base URL", async () => {
@@ -360,7 +363,7 @@ describe("fetchProviderQuotaReports", () => {
           apiKey: "sk-kimi-quota-secret",
         },
       },
-    } as OcxConfig, true);
+    } as oprConfig, true);
 
     expect(result.reports).toHaveLength(1);
     expect(result.reports[0]?.provider).toBe("kimi-code");
@@ -389,7 +392,7 @@ describe("fetchProviderQuotaReports", () => {
           apiKey: "sk-kimi-quota-secret",
         },
       },
-    } as OcxConfig, true);
+    } as oprConfig, true);
 
     expect(result.reports).toEqual([]);
     expect(seen).toEqual([]);
@@ -409,11 +412,11 @@ describe("fetchProviderQuotaReports", () => {
           adapter: "openai-chat",
           authMode: "key",
           baseUrl: "https://api.kimi.com/coding/v1",
-          apiKey: "${OCX_TEST_MISSING_KIMI_KEY}",
+          apiKey: "${opr_TEST_MISSING_KIMI_KEY}",
           apiKeyPool: [{ key: "sk-pool-other-account" }],
         },
       },
-    } as OcxConfig, true);
+    } as oprConfig, true);
 
     // No probe at all: attributing the pool key's quota to the active slot would lie.
     expect(result.reports).toEqual([]);
@@ -436,7 +439,7 @@ describe("fetchProviderQuotaReports", () => {
           baseUrl: "https://api.kimi.com/coding/v1",
         },
       },
-    } as OcxConfig, true);
+    } as oprConfig, true);
 
     expect(result.reports).toEqual([]);
     expect(seen).toEqual([]);
@@ -534,14 +537,14 @@ describe("fetchProviderQuotaReports", () => {
           baseUrl: "https://api.anthropic.com/v1",
         },
       },
-    } as OcxConfig, true);
+    } as oprConfig, true);
 
     expect(result.reports).toEqual([]);
     expect(seen.some(url => url.includes("/v1/oauth/token"))).toBe(true);
     expect(seen.some(url => url.includes("/api/oauth/usage"))).toBe(false);
   });
 
-  function cursorOnlyConfig(): OcxConfig {
+  function cursorOnlyConfig(): oprConfig {
     return {
       defaultProvider: "cursor",
       providers: {
@@ -551,7 +554,7 @@ describe("fetchProviderQuotaReports", () => {
           baseUrl: "https://api2.cursor.sh",
         },
       },
-    } as OcxConfig;
+    } as oprConfig;
   }
 
   test("cursor falls back to usage-summary when period-usage fails", async () => {
@@ -704,7 +707,7 @@ describe("fetchProviderQuotaReports", () => {
     const configB = {
       defaultProvider: "xai",
       providers: { xai: { adapter: "openai-chat", authMode: "oauth", baseUrl: "https://api.x.ai/v1" } },
-    } as OcxConfig;
+    } as oprConfig;
 
     const a1 = fetchProviderQuotaReports(configA, false); // A inflight opens
     await fetchProviderQuotaReports(configB, false); // B must not evict A's inflight entry
@@ -795,8 +798,9 @@ describe("fetchProviderQuotaReports", () => {
     const disabledConfig = {
       ...cursorOnlyConfig(),
       providers: { cursor: { ...cursorOnlyConfig().providers.cursor, disabled: true } },
-    } as OcxConfig;
+    } as oprConfig;
     const pruned = await fetchProviderQuotaReports(disabledConfig, true);
     expect(pruned.reports).toEqual([]);
   });
 });
+

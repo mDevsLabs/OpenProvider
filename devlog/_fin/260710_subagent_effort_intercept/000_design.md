@@ -22,7 +22,7 @@ the effort of proxied turns at the request choke point.
 
 ## Mechanism
 
-Two `OcxConfig` fields, both Codex-ladder values, both "only lower, never raise":
+Two `oprConfig` fields, both Codex-ladder values, both "only lower, never raise":
 
 - `effortCap` — global ceiling for EVERY proxied turn (main + sub-agents). Ultra/max
   arrivals are indistinguishable (codex-rs converts ultra -> max client-side), so this is
@@ -52,7 +52,7 @@ ladder value -> set; anything else -> 400 (mirrors /api/injection-model).
 
 - `src/server/effort-policy.ts` — NEW: `isSubagentRequest`, `effortCapFor`, `applyEffortCap`.
 - `src/reasoning-effort.ts` — exported `codexEffortRank()`.
-- `src/types.ts` — `OcxConfig.effortCap?`, `OcxConfig.subagentEffortCap?`.
+- `src/types.ts` — `oprConfig.effortCap?`, `oprConfig.subagentEffortCap?`.
 - `src/server/responses.ts` — cap application in `handleResponses` (before mock-max clamp).
 - `src/adapters/openai-responses.ts` — `x-openai-subagent` added to FORWARD_HEADERS.
 - `src/server/management-api.ts` — GET/PUT `/api/effort-caps`.
@@ -82,3 +82,4 @@ follow-up (Dashboard delegation panel, same pattern as injectionEffort).
 - Remaining: live capture asserting the `x-openai-subagent` header on real Codex
   Desktop child traffic after the next release restart (source-backed at codex-rs
   6138909d; belt exists via x-codex-turn-metadata).
+

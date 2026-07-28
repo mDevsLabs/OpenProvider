@@ -29,7 +29,7 @@ the user can pick; the filter applies only at the CATALOG/client emission points
 
 ### Phase 1 — backend (this pass)
 
-1. `src/types.ts`: `OcxProviderConfig.selectedModels?: string[]`.
+1. `src/types.ts`: `oprProviderConfig.selectedModels?: string[]`.
 2. `src/codex-catalog.ts`: new exported `filterCatalogVisibleModels(models, config)` — one place that
    applies BOTH the `disabledModels` blocklist and the per-provider `selectedModels` allowlist.
    Replace the two existing disabled-only filters:
@@ -49,3 +49,4 @@ include; empty = all) wired to `/api/selected-models`; i18n strings (en/ko/zh).
 ## Verification
 
 `npx tsc --noEmit` green; `bun test ./tests/` green; new selected-models test green.
+

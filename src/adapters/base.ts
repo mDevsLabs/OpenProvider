@@ -1,4 +1,4 @@
-import type { AdapterEvent, OcxParsedRequest } from "../types";
+import type { AdapterEvent, oprParsedRequest } from "../types";
 
 /** Metadata about the caller's incoming request, for auth-forwarding adapters. */
 export interface IncomingMeta {
@@ -26,14 +26,14 @@ export interface ProviderAdapter {
    * (e.g. Vertex AI ADC token) return a Promise. Sync adapters return the object directly; callers
    * must `await` the result (awaiting a non-Promise is a no-op).
    */
-  buildRequest(parsed: OcxParsedRequest, incoming?: IncomingMeta): AdapterRequest | Promise<AdapterRequest>;
+  buildRequest(parsed: oprParsedRequest, incoming?: IncomingMeta): AdapterRequest | Promise<AdapterRequest>;
 
   fetchResponse?(request: AdapterRequest, ctx?: AdapterFetchContext): Promise<Response>;
 
   parseStream(response: Response): AsyncGenerator<AdapterEvent>;
   parseResponse?(response: Response): Promise<AdapterEvent[]>;
   runTurn?(
-    parsed: OcxParsedRequest,
+    parsed: oprParsedRequest,
     incoming: IncomingMeta,
     emit: (event: AdapterEvent) => void,
   ): Promise<void>;
@@ -44,6 +44,12 @@ export interface AdapterRequest {
     method: string;
     headers: Record<string, string>;
     body: string;
+    /** Exact reasoning parameter emitted by the adapter, for request-log diagnostics only. */
+    reasoningLog?: {
+      effectiveEffort: string;
+      wireField: "reasoning_effort" | "thinking_budget" | "thinking.type";
+      wireValue: string | number;
+    };
     usageLog?: {
       inputTokens?: number;
       estimated?: boolean;
@@ -60,3 +66,4 @@ export interface AdapterFetchContext {
   /** Whether the upstream response will be consumed as a stream; adapters may select low-latency transport settings. */
   stream?: boolean;
 }
+

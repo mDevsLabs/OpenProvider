@@ -20,7 +20,7 @@ Safe probe shape:
 
 ```bash
 bun run src/cli.ts <args>
-node bin/ocx.mjs <args>
+node bin/opr.mjs <args>
 ```
 
 Code surfaces inspected:
@@ -57,8 +57,8 @@ Important safety note: lifecycle commands can mutate local state. The matrix doe
 | `opr --version` | `Unknown command: --version`, then top-level help. | 1 | None. | Not documented. | Add one-line version output in a later low-risk patch. |
 | `opr -v` | `Unknown command: -v`, then top-level help. | 1 | None. | Not documented. | Add alias to one-line version output; do not copy agbrowse's help-like version behavior. |
 | `opr version` | `Unknown command: version`, then top-level help. | 1 | None. | Not documented. | Optional alias to the same one-line version output. |
-| `node bin/ocx.mjs --help` | Same top-level help as source CLI. | 0 | None. | Package bin path is implicit. | Keep parity with `opr --help`. |
-| `node bin/ocx.mjs --version` | Same unknown-command behavior as source CLI. | 1 | None. | Not documented. | Fix alongside `opr --version`. |
+| `node bin/opr.mjs --help` | Same top-level help as source CLI. | 0 | None. | Package bin path is implicit. | Keep parity with `opr --help`. |
+| `node bin/opr.mjs --version` | Same unknown-command behavior as source CLI. | 1 | None. | Not documented. | Fix alongside `opr --version`. |
 
 ## Subcommand Help Coverage
 
@@ -152,3 +152,4 @@ These rows are code-derived unless explicitly marked as `--help` probes. Direct 
 4. Diagnostics/JSON planning slice:
    - design `status --json` schema and possible `doctor` read-only aggregate;
    - ensure output excludes secrets and has stable exit behavior.
+

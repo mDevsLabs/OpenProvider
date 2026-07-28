@@ -4,24 +4,24 @@ import { planWebSearch, shouldResolveOpenAiWebSearchSidecar, webSearchStallTimeo
 import { runWithWebSearch } from "../src/web-search/loop";
 import { headersForCodexAuthContext } from "../src/codex/auth-context";
 import { listOpenAiForwardSidecarCandidates, resolveFirstUsableOpenAiSidecar } from "../src/providers/openai-sidecar";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../src/types";
+import type { AdapterEvent, oprConfig, oprProviderConfig } from "../src/types";
 import type { AdapterFetchContext, ProviderAdapter } from "../src/adapters/base";
-import type { OcxMessage, OcxParsedRequest } from "../src/types";
+import type { oprMessage, oprParsedRequest } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 
-const routedProvider: OcxProviderConfig = {
+const routedProvider: oprProviderConfig = {
   adapter: "openai-chat",
   baseUrl: "https://example.test/v1",
   apiKey: "routed-key",
 };
 
-const forwardProvider: OcxProviderConfig = {
+const forwardProvider: oprProviderConfig = {
   adapter: "openai-responses",
   baseUrl: "https://chatgpt.test/v1",
   authMode: "forward",
 };
 
-function config(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function config(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     defaultProvider: "routed",
@@ -47,7 +47,7 @@ function parsedWithWebSearch() {
 
 describe("web-search sidecar planning", () => {
   test("central Direct sidecar selection never treats a proxy admission bearer as Codex auth", async () => {
-    const cfg: OcxConfig = {
+    const cfg: oprConfig = {
       port: 10100,
       defaultProvider: "routed",
       providers: {
@@ -70,7 +70,7 @@ describe("web-search sidecar planning", () => {
   });
 
   test("central Direct sidecar selection requires a canonical ChatGPT account-bearing bearer", async () => {
-    const cfg: OcxConfig = {
+    const cfg: oprConfig = {
       port: 10100,
       defaultProvider: "routed",
       providers: {
@@ -102,7 +102,7 @@ describe("web-search sidecar planning", () => {
   });
 
   test("central Direct sidecar selection requires an explicit matching ChatGPT account header", async () => {
-    const cfg: OcxConfig = {
+    const cfg: oprConfig = {
       port: 10100,
       defaultProvider: "routed",
       providers: {
@@ -325,15 +325,26 @@ describe("BUG-R86 routed web-search timeout semantics", () => {
     expect(text).toContain("event: response.completed");
   });
 
-  test("routed iterations use upstream streaming and never call parseResponse", async () => {
+  test("routed iterations isolate diagnostic failures and never call parseResponse", async () => {
     const seenStream: boolean[] = [];
+    const reasoningLogs: unknown[] = [];
     let parseStreamCalls = 0;
     let parseResponseCalls = 0;
     const adapter: ProviderAdapter = {
       name: "stream-only",
       buildRequest(parsed) {
         seenStream.push(parsed.stream);
-        return { url: "https://routed.test/v1", method: "POST", headers: {}, body: "{}" };
+        return {
+          url: "https://routed.test/v1",
+          method: "POST",
+          headers: {},
+          body: "{}",
+          reasoningLog: {
+            effectiveEffort: "high",
+            wireField: "reasoning_effort",
+            wireValue: "high",
+          },
+        };
       },
       fetchResponse: async () => new Response("wire", { status: 200 }),
       async *parseStream() {
@@ -355,11 +366,20 @@ describe("BUG-R86 routed web-search timeout semantics", () => {
       selectedForwardHeaders: new Headers({ authorization: "Bearer token" }),
       settings: { model: "gpt-5.6-luna", reasoning: "low", timeoutMs: 30_000 },
       maxSearches: 1,
+      onRequestBuilt: request => {
+        reasoningLogs.push(request.reasoningLog);
+        throw new Error("diagnostic hook failure must not abort delivery");
+      },
     });
 
     expect(response.status).toBe(200);
     const frames = await collectSse(response.body!);
     expect(seenStream).toEqual([true]);
+    expect(reasoningLogs).toEqual([{
+      effectiveEffort: "high",
+      wireField: "reasoning_effort",
+      wireValue: "high",
+    }]);
     expect(parseStreamCalls).toBe(1);
     expect(parseResponseCalls).toBe(0);
     expect(frames.some(frame => frame.event === "response.completed")).toBe(true);
@@ -481,16 +501,37 @@ describe("web-search sidecar native web_search_call emission", () => {
     ))) as typeof fetch;
 
     // First adapter always 429s via fetchResponse; the rotated adapter answers.
+    const reasoningLogs: unknown[] = [];
     const firstAdapter: ProviderAdapter = {
       name: "mock-429",
-      buildRequest: () => ({ url: "https://routed.test/v1", method: "POST", headers: {}, body: "{}" }),
+      buildRequest: () => ({
+        url: "https://routed.test/v1",
+        method: "POST",
+        headers: {},
+        body: "{}",
+        reasoningLog: {
+          effectiveEffort: "low",
+          wireField: "reasoning_effort",
+          wireValue: "low",
+        },
+      }),
       fetchResponse: async () => new Response("rate limited", { status: 429, headers: { "retry-after": "30" } }),
       async *parseStream() { /* unused */ },
       async parseResponse() { return [{ type: "text_delta", text: "should not reach" }, { type: "done" }] as AdapterEvent[]; },
     };
     const rotatedAdapter: ProviderAdapter = {
       name: "mock-rotated",
-      buildRequest: () => ({ url: "https://routed.test/v1", method: "POST", headers: {}, body: "{}" }),
+      buildRequest: () => ({
+        url: "https://routed.test/v1",
+        method: "POST",
+        headers: {},
+        body: "{}",
+        reasoningLog: {
+          effectiveEffort: "high",
+          wireField: "reasoning_effort",
+          wireValue: "high",
+        },
+      }),
       fetchResponse: async () => new Response("{}", { status: 200 }),
       async *parseStream() {
         yield { type: "text_delta", text: "answer from rotated key" };
@@ -508,6 +549,7 @@ describe("web-search sidecar native web_search_call emission", () => {
       selectedForwardHeaders: new Headers({ authorization: "Bearer token" }),
       settings: { model: "gpt-5.4-mini", reasoning: "low", timeoutMs: 30_000 },
       maxSearches: 1,
+      onRequestBuilt: request => reasoningLogs.push(request.reasoningLog),
       on429: retryAfter => {
         rotations++;
         expect(retryAfter).toBe("30");
@@ -520,6 +562,18 @@ describe("web-search sidecar native web_search_call emission", () => {
     const output = completed.output as { type: string; content?: { text?: string }[] }[];
     expect(output.find(o => o.type === "message")?.content?.[0]?.text).toBe("answer from rotated key");
     expect(rotations).toBe(1);
+    expect(reasoningLogs).toEqual([
+      {
+        effectiveEffort: "low",
+        wireField: "reasoning_effort",
+        wireValue: "low",
+      },
+      {
+        effectiveEffort: "high",
+        wireField: "reasoning_effort",
+        wireValue: "high",
+      },
+    ]);
   });
 
   test("loop 429 with exhausted pool (on429 null) surfaces the provider error", async () => {
@@ -654,11 +708,11 @@ describe("web-search sidecar native web_search_call emission", () => {
       ));
     }) as typeof fetch;
 
-    const seenBodies: OcxMessage[][] = [];
+    const seenBodies: oprMessage[][] = [];
     let pass = 0;
     const adapter: ProviderAdapter = {
       name: "mock",
-      buildRequest: (p: OcxParsedRequest) => {
+      buildRequest: (p: oprParsedRequest) => {
         seenBodies.push(p.context.messages);
         return { url: "https://routed.test/v1/chat/completions", method: "POST", headers: {}, body: "{}" };
       },
@@ -772,12 +826,12 @@ describe("web-search sidecar native web_search_call emission", () => {
 });
 
 /** Adapter that records the messages handed to it on each pass (forced-answer nudge assertion). */
-function capturingAdapter(firstPass: AdapterEvent[]): { adapter: ProviderAdapter; messagesPerPass: OcxMessage[][] } {
-  const messagesPerPass: OcxMessage[][] = [];
+function capturingAdapter(firstPass: AdapterEvent[]): { adapter: ProviderAdapter; messagesPerPass: oprMessage[][] } {
+  const messagesPerPass: oprMessage[][] = [];
   let pass = 0;
   const adapter: ProviderAdapter = {
     name: "mock",
-    buildRequest: (parsed: OcxParsedRequest) => {
+    buildRequest: (parsed: oprParsedRequest) => {
       messagesPerPass.push(parsed.context.messages);
       return { url: "https://routed.test/v1/chat/completions", method: "POST", headers: {}, body: "{}" };
     },
@@ -1332,3 +1386,4 @@ describe("#398 sidecar failure degradation", () => {
     expect(raw.includes("LEAKMARKER_should_not_appear")).toBe(false);
   });
 });
+

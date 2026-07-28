@@ -39,7 +39,7 @@ below.)
 
 ### Live daemon log decode
 
-- claude-fable-5/opus rows showed effort "high" = the OCX-side default, NOT the user's
+- claude-fable-5/opus rows showed effort "high" = the opr-side default, NOT the user's
   /effort — inbound dropped `output_config.effort` on the floor, so `reasoning` was
   `{summary:"auto"}` with no effort and downstream defaults filled it.
 - gpt-5.6-sol rows "-" = adaptive requests (effort ignored); "low" rows = the
@@ -68,3 +68,4 @@ below.)
    No breakpoint change needed; evidence recorded here.
 3. GUI stale-bundle note: served bundle must be rebuilt after 7f80b05 for the c/w split
    to display truthfully.
+

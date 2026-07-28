@@ -85,7 +85,7 @@ the `reader`/`decoder`/`buffer` loop locals at `:124-126`):
 
 ```diff
        let buffer = "";
-+      let pendingUsage: OcxUsage | undefined;
++      let pendingUsage: oprUsage | undefined;
 ```
 
 Record usage instead of yielding an inline `done` (current 163-169):
@@ -110,7 +110,7 @@ Emit one terminal `done` with usage post-loop (current line 172):
 +        yield { type: "done", usage: pendingUsage };
 ```
 
-> Add `import type { OcxUsage } from "../types";` if `google.ts` does not already import it
+> Add `import type { oprUsage } from "../types";` if `google.ts` does not already import it
 > (verify the existing import block during implementation).
 
 ## Verification
@@ -143,3 +143,4 @@ full suite passes; typecheck clean; whitespace clean
 ```text
 [agent] fix: retain usage and content on combined and EOF-terminated streams
 ```
+

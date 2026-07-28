@@ -14,7 +14,7 @@ Scope: `/v1/images/generations`, `/v1/images/edits`
 ## Entrypoints and trust boundaries
 
 1. Codex or another local client sends an Images request to openprovider.
-2. When openprovider is bound non-loopback, the request crosses a remote-to-local data-plane boundary protected by `OPENCODEX_API_AUTH_TOKEN`/configured keys and origin policy.
+2. When openprovider is bound non-loopback, the request crosses a remote-to-local data-plane boundary protected by `@mdevs/openprovider_API_AUTH_TOKEN`/configured keys and origin policy.
 3. openprovider selects a trusted configured forward provider and a thread-affined credential.
 4. The bounded opaque body and approved headers cross from openprovider to the ChatGPT backend.
 5. The upstream response crosses back to the caller after header sanitization.
@@ -57,3 +57,4 @@ Scope: `/v1/images/generations`, `/v1/images/edits`
 - Public OpenAI edit requests are multipart while current Codex private edits are JSON. Opaque forwarding avoids corruption but does not promise that every public API client is compatible with the private ChatGPT backend.
 - A caller holding the local proxy key can spend the selected account's image quota. Rate limiting is not added because the normal Codex Responses data plane has the same trust model; adding an inconsistent limiter is outside this repair. Non-loopback deployments remain protected by their existing key and origin policy.
 - Buffering an allowed body still consumes up to 256 MiB. The repair keeps the repository's existing ceiling, rejects encoded bodies, and avoids duplicate copies until the final contiguous buffer, but does not redesign global data-plane streaming limits.
+

@@ -521,16 +521,16 @@ import {
   getAuthRefreshIntentLockPath, OAuthFileLockError, saveCredential,
 } from "../src/oauth/store";
 
-const oldHome = process.env.HOME, oldOcx = process.env.OPENCODEX_HOME, oldFetch = globalThis.fetch;
+const oldHome = process.env.HOME, oldopr = process.env.@mdevs/openprovider_HOME, oldFetch = globalThis.fetch;
 let root: string;
 beforeEach(() => {
   root = join(tmpdir(), `xai-lock-${crypto.randomUUID()}`);
-  process.env.HOME = root; process.env.OPENCODEX_HOME = join(root, "opr");
-  mkdirSync(process.env.OPENCODEX_HOME, { recursive: true });
+  process.env.HOME = root; process.env.@mdevs/openprovider_HOME = join(root, "opr");
+  mkdirSync(process.env.@mdevs/openprovider_HOME, { recursive: true });
 });
 afterEach(() => {
   if (oldHome === undefined) delete process.env.HOME; else process.env.HOME = oldHome;
-  if (oldOcx === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = oldOcx;
+  if (oldopr === undefined) delete process.env.@mdevs/openprovider_HOME; else process.env.@mdevs/openprovider_HOME = oldopr;
   globalThis.fetch = oldFetch; rmSync(root, { recursive: true, force: true });
 });
 async function seed(): Promise<string> {
@@ -772,3 +772,5 @@ git diff --check -- devlog/_plan/260716_grok_build_hardening/030_refresh_lock.md
 - Replaced wp2's pre-refresh xAI reconciliation block with `refreshXaiAccountWithLock`; the transaction calls the exported `shouldAdoptGrokGeneration` policy under the intent lock.
 - Added generation-guarded account merge/reauth mutations, fingerprint-scoped permanent-failure TTL, and bounded abort-safe xAI token retries.
 - Deviation: tests were written compactly in the two required new files, while retaining the audited behavioral assertions; no production design deviation.
+
+

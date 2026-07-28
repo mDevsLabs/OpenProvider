@@ -15,19 +15,19 @@ server-side. The sidecar handles this transparently.
 
 ## Architecture: web_search Sidecar
 
-### Flow (Claude Code -> OCX Proxy -> routed model)
+### Flow (Claude Code -> opr Proxy -> routed model)
 
 ```
 Claude Code sends:
   POST /v1/messages  (Anthropic Messages API)
     tools: [{ type: "web_search_20250305", ... }, ...]
 
-OCX Proxy (inbound.ts):
+opr Proxy (inbound.ts):
   1. toolsToResponses() detects type.startsWith("web_search")
   2. Converts to { type: "web_search" } in Responses format
   3. parser.ts extractHostedWebSearch() stashes the config
 
-OCX Proxy (responses.ts):
+opr Proxy (responses.ts):
   4. planWebSearch() checks conditions:
      - _webSearch exists (tool was requested)
      - NOT passthrough (non-OpenAI model)
@@ -89,7 +89,7 @@ The sidecar activates when ALL of these are true:
 When Claude Code runs via `opr claude`:
 
 1. Claude Code sends Anthropic Messages API requests
-2. OCX proxy translates to Responses API internally
+2. opr proxy translates to Responses API internally
 3. If model is routed to non-OpenAI (e.g., gpt-5.6-sol via OpenAI adapter):
    - web_search is handled by the sidecar loop
    - Model sees web_search as a regular function tool
@@ -102,7 +102,7 @@ When Claude Code runs via `opr claude`:
 
 When using native Anthropic models (claude-opus-4-8, claude-fable-5):
 - Anthropic API supports web_search_20250305 tool natively
-- When routed through OCX, inbound translator converts to Responses format
+- When routed through opr, inbound translator converts to Responses format
 - The sidecar loop handles it identically to other routed models
 - Native Anthropic web_search is NOT used; sidecar proxies via gpt-5.6-luna
 
@@ -130,7 +130,7 @@ When using native Anthropic models (claude-opus-4-8, claude-fable-5):
 1. Ensure ChatGPT/Codex login is active - Required for the sidecar
 2. Forward provider must exist
 3. web_search works automatically when conditions are met
-4. Check sidecar status in OCX dashboard logs
+4. Check sidecar status in opr dashboard logs
 
 ### Documentation Updates Needed
 1. Add web_search sidecar section to claude-code guide
@@ -142,3 +142,4 @@ When using native Anthropic models (claude-opus-4-8, claude-fable-5):
 1. Fallback to native Anthropic web_search when sidecar fails
 2. Dashboard visibility - show web_search sidecar status in logs
 3. Config validation - warn when web_search conditions are not met
+

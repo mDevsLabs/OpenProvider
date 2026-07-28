@@ -27,7 +27,7 @@
 >      verified-derived→`logs.detail.verification.derived`), unverified 계열 키 미구현.
 >    - (H2) `type CostEstimateReason = "usage_estimated" | "cache_detail_missing" |
 >      "expected_price_overlay"`를 명명 타입으로 추출해 `CostResult`와 helper가 공유한다.
->    - (M3) GUI `UsageBreakdown`에 `estimated?: boolean`을 추가한다(서버 OcxUsage spread와
+>    - (M3) GUI `UsageBreakdown`에 `estimated?: boolean`을 추가한다(서버 oprUsage spread와
 >      필드 일치).
 >    - (M4) attempt 소테이블의 target 셀 보조 줄(model 아래)에 cost.kind==="value"일 때
 >      `estimate.price`의 matched key(`jawcodeProvider ?? provider`/`modelId`)와
@@ -545,3 +545,4 @@ TTFT absent/present: checked | issue
 - [ ] combo attempt별 provider/model/duration/tok/s/~$/reason이 보인다.
 - [ ] 4 locale parity, typecheck, GUI build가 exit 0이다.
 - [ ] 성공/combo/estimated popup과 390/320 viewport 스크린샷, keyboard/Escape/copy 증거가 있다.
+

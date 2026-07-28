@@ -5,21 +5,21 @@ import {
   resolveRoutedModelStallTimeoutMs,
   webSearchStallTimeoutSec,
 } from "../src/web-search";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
-const routedProvider: OcxProviderConfig = {
+const routedProvider: oprProviderConfig = {
   adapter: "openai-chat",
   baseUrl: "https://routed.test/v1",
   apiKey: "routed-key",
 };
 
-const forwardProvider: OcxProviderConfig = {
+const forwardProvider: oprProviderConfig = {
   adapter: "openai-responses",
   baseUrl: "https://chatgpt.test/v1",
   authMode: "forward",
 };
 
-function config(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function config(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     defaultProvider: "routed",
@@ -28,7 +28,7 @@ function config(overrides: Partial<OcxConfig> = {}): OcxConfig {
   };
 }
 
-function plan(input: OcxConfig) {
+function plan(input: oprConfig) {
   const parsed = parseRequest({
     model: "routed/model",
     input: "Search current docs",
@@ -107,3 +107,4 @@ describe("routed-model web-search inactivity timeout", () => {
     });
   });
 });
+

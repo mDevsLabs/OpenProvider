@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
 import type {
-  OcxClaudeDesktopAssignment,
-  OcxClaudeDesktopFamily,
-  OcxClaudeDesktopProfile,
+  oprClaudeDesktopAssignment,
+  oprClaudeDesktopFamily,
+  oprClaudeDesktopProfile,
 } from "../types";
 
 export const DESKTOP_FAMILIES = ["opus", "fable", "sonnet", "haiku"] as const;
-export type DesktopFamily = OcxClaudeDesktopFamily;
-export type DesktopProfile = OcxClaudeDesktopProfile;
+export type DesktopFamily = oprClaudeDesktopFamily;
+export type DesktopProfile = oprClaudeDesktopProfile;
 
 export interface DesktopProfileModel {
   route: string;
@@ -110,7 +110,7 @@ export function parseDesktopProfile(value: unknown): DesktopProfile {
     throw new DesktopProfileError("must be a string", "profile.appliedAt");
   }
 
-  const assignments: Record<string, OcxClaudeDesktopAssignment> = {};
+  const assignments: Record<string, oprClaudeDesktopAssignment> = {};
   const aliases = new Set<string>();
   for (const [route, raw] of Object.entries(value.assignments)) {
     if (!route.trim() || !route.includes("/")) throw new DesktopProfileError("route must be provider/model", `profile.assignments.${route || "<empty>"}`);
@@ -261,3 +261,4 @@ export function renderDesktopProfile(
     };
   });
 }
+

@@ -12,7 +12,7 @@ Before B, P must state credential source, allowed AWS regions/accounts, network 
 
 | Action | Path | Before | After |
 |---|---|---|---|
-| NEW | `src/adapters/bedrock.ts` | no native adapter | build Converse/ConverseStream requests; map system/messages/images/tools/tool results/reasoning/usage/stop reasons into OCX events |
+| NEW | `src/adapters/bedrock.ts` | no native adapter | build Converse/ConverseStream requests; map system/messages/images/tools/tool results/reasoning/usage/stop reasons into opr events |
 | NEW | `src/adapters/bedrock-eventstream.ts` | no AWS event-stream decoder | bounded frame decoder with CRC/length validation, `contentBlockIndex` state, exception frames, abort, and terminal handling |
 | NEW | `src/aws/credentials.ts` | no direct AWS credential owner | only if SigV4 is approved: resolve env/shared config/container/metadata credentials with explicit precedence and no shelling out by default |
 | NEW | `src/aws/sigv4.ts` | no signer | only if approved: canonical request, signed headers, session token, region/service scope, clock-skew-safe tests |
@@ -36,7 +36,7 @@ Before B, P must state credential source, allowed AWS regions/accounts, network 
 
 ## Activation scenarios
 
-- Interleaved tool/text/reasoning event-stream blocks map to the correct OCX item ids and one terminal.
+- Interleaved tool/text/reasoning event-stream blocks map to the correct opr item ids and one terminal.
 - Corrupt CRC, oversized length, exception frame, and EOF-before-stop each produce a bounded error and release the reader.
 - Bearer mode sends only `Authorization: Bearer`; SigV4 mode, when enabled, sends canonical `Authorization`, date, payload hash, and session token without logging secrets.
 - A model unavailable on Mantle but available on Runtime proves the need for this lane.
@@ -58,3 +58,4 @@ bun run build:gui
 - `NEEDS_HUMAN`: no approved AWS account/model/region or SigV4 requirement decision.
 - `UNSAFE`: credential resolution/signing cannot meet secret, SSRF, or dependency policy.
 - `BLOCKED`: required model permission or region is unavailable.
+

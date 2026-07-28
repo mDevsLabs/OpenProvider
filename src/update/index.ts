@@ -60,12 +60,12 @@ function npmSpawnTarget(bin: string): { bin: string; shell: boolean } {
 }
 
 /**
- * The GUI update worker sets OCX_SERVICE=1 and has stdio ignored — inheriting that for
+ * The GUI update worker sets opr_SERVICE=1 and has stdio ignored — inheriting that for
  * `npm.cmd` (shell:true) opens stacked visible consoles on Windows. Pipe instead and
  * relay bounded output after the child exits. (Ported from PR #167.)
  */
 function updateChildStdio(): "inherit" | "pipe" {
-  if (process.env.OCX_SERVICE === "1") return "pipe";
+  if (process.env.opr_SERVICE === "1") return "pipe";
   if (typeof process.stdout.isTTY === "boolean" && !process.stdout.isTTY) return "pipe";
   return "inherit";
 }
@@ -287,14 +287,14 @@ export async function runUpdate(): Promise<void> {
         timeoutMs: 30_000,
         intervalMs: 100,
         scanIntervalMs: 500,
-        killOcxHolders: capturedListen.oldPid != null,
+        killoprHolders: capturedListen.oldPid != null,
         onlyKillPids: capturedListen.oldPid != null ? [capturedListen.oldPid] : [],
       });
       if (!freed) {
         console.warn(`⚠️  Port ${capturedListen.port} still busy after 30s; reinstalling service with pinned --port ${capturedListen.port} anyway (refusing to hop).`);
       }
-      const prevBake = process.env.OCX_BAKE_PORT;
-      process.env.OCX_BAKE_PORT = String(capturedListen.port);
+      const prevBake = process.env.opr_BAKE_PORT;
+      process.env.opr_BAKE_PORT = String(capturedListen.port);
       try {
         const svcStdio = updateChildStdio();
         const svc = spawnSync(process.execPath, [process.argv[1], ...serviceReinstallArgs()], {
@@ -315,7 +315,7 @@ export async function runUpdate(): Promise<void> {
             console.warn("⚠️  Service refresh failed — starting the proxy directly instead.");
             console.warn("   Run 'opr service install' as administrator to refresh the background service.");
             const env = { ...process.env };
-            delete env.OCX_SERVICE;
+            delete env.opr_SERVICE;
             const child = spawn(process.execPath, [process.argv[1], "start", "--port", String(capturedListen.port)], {
               detached: true,
               stdio: "ignore",
@@ -327,8 +327,8 @@ export async function runUpdate(): Promise<void> {
           }
         }
       } finally {
-        if (prevBake === undefined) delete process.env.OCX_BAKE_PORT;
-        else process.env.OCX_BAKE_PORT = prevBake;
+        if (prevBake === undefined) delete process.env.opr_BAKE_PORT;
+        else process.env.opr_BAKE_PORT = prevBake;
       }
     } else {
       console.log(`Restart the proxy:  opr start --port ${capturedListen.port}`);
@@ -344,4 +344,5 @@ export async function runUpdate(): Promise<void> {
     process.exit(1);
   }
 }
+
 

@@ -63,12 +63,12 @@ export interface CostEstimate {
   // tokens도 존재하나 GUI는 raw usage 및 cost breakdown을 별도로 사용한다.
 }
 
-export function normalizeCostTokens(usage: OcxUsage): CostTokens | null;
+export function normalizeCostTokens(usage: oprUsage): CostTokens | null;
 export function resolveMatchedPrice(provider: string, modelId: string): MatchedPrice | null;
 export function estimateUsageCost(input: {
   provider: string;
   model: string;
-  usage?: OcxUsage;
+  usage?: oprUsage;
   usageStatus: UsageStatus;
   attempts?: readonly PersistedUsageAttempt[];
 }): CostEstimate | null;
@@ -223,9 +223,9 @@ top-level combo에는 원본 `attempts`가 전달되어야 하고, attempt DTO�
 import { afterEach, describe, expect, test } from "bun:test";
 import { handleManagementAPI } from "../src/server/management-api";
 import { addRequestLog, clearRequestLogsForTests } from "../src/server/request-log";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
-const config = {} as OcxConfig;
+const config = {} as oprConfig;
 
 afterEach(() => clearRequestLogsForTests());
 
@@ -443,7 +443,7 @@ bun test --isolate tests/usage-cost* tests/management-api-logs-metrics.test.ts
    - success: 240 output / 2000ms, matched cost → `120`, `~$...`
    - estimated: 25 output / 2000ms → `~12.5`, `~$...`
    - unmatched: positive output, unknown provider/model → tok/s 숫자, 비용 `—`
-2. `OPENCODEX_PROXY_TARGET=http://127.0.0.1:<mock-port> bun run dev:gui`로 GUI를 띄운다. mock은 파일을 저장하지 않는 `bun -e 'Bun.serve(...)'` one-shot을 사용해도 된다.
+2. `OpenProvider_PROXY_TARGET=http://127.0.0.1:<mock-port> bun run dev:gui`로 GUI를 띄운다. mock은 파일을 저장하지 않는 `bun -e 'Bun.serve(...)'` one-shot을 사용해도 된다.
 3. native browser QA 도구로 Logs를 열고 1440×1000, 1024×768, 390×844, 320×700을 캡처한다.
 4. 각 캡처에서 열 순서, 숫자 우측 정렬, estimated 접두, 미매칭 `—`, sticky header, horizontal scroll을 확인한다. 390/320에서 model/request 글자가 세로 한 글자 단위로 찢어지면 실패다.
 5. 결과 경로를 구현 devlog에 아래 형식으로 기록한다.
@@ -463,3 +463,4 @@ narrow-horizontal-scroll (320): <path>
 - [ ] tok/s는 전체 duration 기준이고 estimated에만 `~`가 붙는다.
 - [ ] 4 locale key parity, root typecheck, cost/API tests, GUI build가 exit 0이다.
 - [ ] success/estimated/unmatched와 좁은 viewport 스크린샷이 실제 렌더를 증명한다.
+

@@ -14,9 +14,9 @@ existing pool engine intact for `pool`, and prove that `direct` returns before a
 
 ### `MODIFY src/types.ts`
 
-- Add `codexAccountMode?: CodexAccountMode` to `OcxProviderConfig` beside `authMode`; document that
+- Add `codexAccountMode?: CodexAccountMode` to `oprProviderConfig` beside `authMode`; document that
   it is valid only on the canonical built-in `openai` forward provider and defaults to `pool`.
-- Change `OcxConfig.openaiProviderTierVersion?: 1` to `?: 1 | 2`. Keep the property name for
+- Change `oprConfig.openaiProviderTierVersion?: 1` to `?: 1 | 2`. Keep the property name for
   on-disk backward compatibility; its comment becomes “OpenAI provider-contract migration marker.”
 - Change `OPENAI_PROVIDER_TIER_VERSION` from `1` to `2`.
 - Keep `CodexAccountMode = "direct" | "pool"`; do not add a third/fallback state.
@@ -57,7 +57,7 @@ the default.
 - Change `providerCodexAccountMode` to accept the actual provider config:
 
   ```ts
-  providerCodexAccountMode(id: string, provider?: OcxProviderConfig): CodexAccountMode | undefined
+  providerCodexAccountMode(id: string, provider?: oprProviderConfig): CodexAccountMode | undefined
   ```
 
   For `id === "openai"`, return a valid persisted value or `"pool"`; for other entries preserve
@@ -311,7 +311,7 @@ Owner: `tests/server-auth.test.ts`, backed by the account-ranking assertion in
 
 Fixture:
 
-- temporary `OPENCODEX_HOME` and `CODEX_HOME`;
+- temporary `OpenProvider_HOME` and `CODEX_HOME`;
 - canonical `providers.openai` with no `codexAccountMode` field;
 - usable main auth token and one usable added account credential;
 - main quota above `autoSwitchThreshold`, added account quota below it;
@@ -383,3 +383,4 @@ quota, cooldown, main-pool-token, or account-store resolution.
   absence preservation, and pre-save backup collision.
 
 Terminal status: **PASS**.
+

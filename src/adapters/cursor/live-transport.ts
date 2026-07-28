@@ -1,6 +1,6 @@
 import http2 from "node:http2";
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
-import { namespacedToolName, type OcxProviderConfig, type OcxUsage } from "../../types";
+import { namespacedToolName, type oprProviderConfig, type oprUsage } from "../../types";
 import { CONNECT_FLAG_END_STREAM, decodeAvailableConnectFrames, encodeConnectFrame } from "./framing";
 import { activePromptText, prepareCursorRunRequest } from "./protobuf-request";
 import {
@@ -40,7 +40,7 @@ import {
 import { debugProviderDiagnostic } from "../../lib/debug";
 import { classifyCursorError, isCursorBenignCancelError, safeCursorErrorMessage } from "./cursor-errors";
 import { mcpArgsFromToolCall } from "./protobuf-events";
-import { OCX_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
+import { opr_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
 import { handleCursorNativeExec, handleCursorNativeKv, type CursorNativeExecContext } from "./native-exec";
 import { effectiveCursorNativeExecAllow } from "./exec-policy";
 import { resolveMcpServers } from "./mcp-config";
@@ -133,7 +133,7 @@ export class CursorMissingCredentialError extends Error {
   }
 }
 
-export function resolveCursorToken(provider: OcxProviderConfig, headers?: Headers): string {
+export function resolveCursorToken(provider: oprProviderConfig, headers?: Headers): string {
   const providerKey = provider.apiKey?.trim();
   if (providerKey) return providerKey;
 
@@ -204,7 +204,7 @@ export function planMcpArgsHandling(
     return { handledByResponsesBridge: false, events: [], cancelCursorRun: false, finalizeWhenDrained: false };
   }
   const args = execMsg.message.value;
-  if (args.providerIdentifier !== OCX_RESPONSES_TOOL_PROVIDER) {
+  if (args.providerIdentifier !== opr_RESPONSES_TOOL_PROVIDER) {
     // A real MCP server tool: native exec handles it (executed locally, real mcpResult written).
     return { handledByResponsesBridge: false, events: [], cancelCursorRun: false, finalizeWhenDrained: false };
   }
@@ -890,7 +890,7 @@ class LiveCursorTransport implements CursorTransport {
  * Returns undefined when the stream died before ANY token signal (nothing meaningful to report).
  * Exported for unit testing.
  */
-export function partialUsageFromEventState(state: ReturnType<typeof createCursorProtobufEventState>): OcxUsage | undefined {
+export function partialUsageFromEventState(state: ReturnType<typeof createCursorProtobufEventState>): oprUsage | undefined {
   const out = state.usage.outputTokens;
   const hasCurrentCheckpoint = Number.isFinite(state.contextTokens) && (state.contextTokens ?? 0) > 0;
   const hasCurrentOutput = Number.isFinite(out) && out > 0;
@@ -909,7 +909,7 @@ export function partialUsageFromEventState(state: ReturnType<typeof createCursor
  */
 function attachPartialUsage(failure: Error, state: ReturnType<typeof createCursorProtobufEventState>): Error {
   const usage = partialUsageFromEventState(state);
-  if (usage) (failure as Error & { partialUsage?: OcxUsage }).partialUsage = usage;
+  if (usage) (failure as Error & { partialUsage?: oprUsage }).partialUsage = usage;
   return failure;
 }
 
@@ -1016,3 +1016,4 @@ function cursorConnectErrorCode(payload: Uint8Array): string | undefined {
 export function createLiveCursorTransport(input: CursorTransportFactoryInput): CursorTransport {
   return new LiveCursorTransport(input);
 }
+

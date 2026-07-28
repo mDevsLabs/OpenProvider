@@ -6,9 +6,9 @@ import {
   getRequestLogEntries,
   type RequestLogEntry,
 } from "../src/server/request-log";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
-const config = { providers: [] } as unknown as OcxConfig;
+const config = { providers: [] } as unknown as oprConfig;
 
 afterEach(() => clearRequestLogsForTests());
 
@@ -140,3 +140,4 @@ describe("GET /api/logs display metrics", () => {
     expect(dto!.displayMetrics.cost).toEqual({ kind: "unavailable", reason: "invalid_cache_breakdown" });
   });
 });
+

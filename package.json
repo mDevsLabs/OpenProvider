@@ -12,8 +12,8 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "opr": "./bin/ocx.mjs",
-    "openprv": "./bin/ocx.mjs"
+    "opr": "./bin/opr.mjs",
+    "openprv": "./bin/opr.mjs"
   },
   "files": [
     "bin",
@@ -102,3 +102,4 @@
   },
   "license": "MIT"
 }
+

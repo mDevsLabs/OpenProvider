@@ -22,7 +22,7 @@ Implemented per `10_implementation.md` with O1/O2/O3 as resolved in
 - `src/cli.ts`: call `maybeShowUpdatePrompt()` in `handleStart` BEFORE
   `chooseListenPort` / `startServer`; added the hidden `__refresh-version`
   subcommand. `handleEnsure` untouched (stays silent; child carries
-  `OCX_SERVICE=1`).
+  `opr_SERVICE=1`).
 - `tests/update-notify.test.ts` (new): 19 tests covering channel-aware
   `isNewer`, source-build gate, cache round-trip + stale-channel invalidation,
   dismiss suppression / re-surface, and the cli wiring order.
@@ -40,7 +40,7 @@ Implemented per `10_implementation.md` with O1/O2/O3 as resolved in
 
 ## Guard matrix (manual reasoning, from code)
 
-- `OCX_SERVICE=1` (service, ensure-spawned child, gui not applicable): silent
+- `opr_SERVICE=1` (service, ensure-spawned child, gui not applicable): silent
   via `interactiveGuardOk`.
 - piped / non-TTY stdin or stdout: silent.
 - `opr ensure` (parent): never calls the prompt.
@@ -80,3 +80,4 @@ Findings recorded (no code change; left as intended behavior):
 - Informational: by design the current run reads the pre-refresh cache and the
   freshly fetched version surfaces on the next start (codex-rs parity,
   non-blocking).
+

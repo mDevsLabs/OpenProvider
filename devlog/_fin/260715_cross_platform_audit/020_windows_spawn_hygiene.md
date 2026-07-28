@@ -172,7 +172,7 @@ on macOS/Linux, CMD on Windows. Effective Windows form for a quoted exe path:
 
 ## Out of scope
 
-- `bin/ocx.mjs` / `src/update/index.ts` npm spawns (fixed tokens, already shell-gated,
+- `bin/opr.mjs` / `src/update/index.ts` npm spawns (fixed tokens, already shell-gated,
   proven in the field); `codexExecInvocation()` callers inside catalog.ts (fixed tokens,
   documented convention) — not defects, left untouched.
 ## Implementation-P amendments (wp2, 2026-07-15)
@@ -216,3 +216,4 @@ doc left to the implementer:
   tests/cursor-desktop-exec.test.ts asserts `shellInvocation` shapes (win32 + posix)
   for BOTH command fixtures incl. quoted exe path + metachars, and the existing POSIX
   e2e tests prove the sh path stays byte-identical.
+

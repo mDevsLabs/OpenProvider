@@ -151,7 +151,7 @@ the complete set:
 
 | Symbol | `inject.ts` line | Needed by |
 |--------|------------------|-----------|
-| `OCX_SECTION_MARKER` | 10 | `hasInjectedOpenaiBaseUrl` |
+| `opr_SECTION_MARKER` | 10 | `hasInjectedOpenaiBaseUrl` |
 | `tomlStringPattern` | (helper) | `rootTomlString`, `providerTableString` |
 | `providerTableStart` | (helper) | `providerTableString` |
 | `isRootOpenaiBaseUrlLine` | (helper) | `hasInjectedOpenaiBaseUrl` |
@@ -164,7 +164,7 @@ All are exported from the new module. Its only external dependency is
 `parseTomlString` from `./paths`, which `journal.ts` already reaches — no cycle.
 
 `inject.ts` **imports** all eight rather than re-exporting only some, because it
-keeps using them internally: `OCX_SECTION_MARKER` at 97, 133, 140, 144, 159 and
+keeps using them internally: `opr_SECTION_MARKER` at 97, 133, 140, 144, 159 and
 636; `hasInjectedOpenaiBaseUrl` at 262 and 658; `rootTomlString` at 258 and 265;
 `providerTableString` at 268; and `providerTableStart` inside
 `classifyCodexRouting` at 267. It re-exports `hasInjectedCodexRouting` and
@@ -425,3 +425,4 @@ redesign. Recorded as residual risk rather than silently dropped.
   particular the three that call `writeJournal()` with no arguments
   (`:31`, `:154`, `:256`).
 - Full gates green.
+

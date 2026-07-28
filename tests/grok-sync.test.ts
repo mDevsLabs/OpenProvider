@@ -6,9 +6,9 @@ import { injectGrokConfig } from "../src/grok/inject";
 import { syncGrokConfig } from "../src/grok/sync";
 import { nativeOpenAiContextWindow, visibleNativeSlugs } from "../src/codex/catalog";
 import type { CatalogModel } from "../src/codex/catalog";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
-const baseConfig = { port: 10100, defaultProvider: "openai", providers: {} } as unknown as OcxConfig;
+const baseConfig = { port: 10100, defaultProvider: "openai", providers: {} } as unknown as oprConfig;
 
 function tempGrokHome(): { root: string; grokHome: string } {
   const root = mkdtempSync(join(tmpdir(), "opr-grok-sync-"));
@@ -142,3 +142,4 @@ describe("syncGrokConfig", () => {
     }
   });
 });
+

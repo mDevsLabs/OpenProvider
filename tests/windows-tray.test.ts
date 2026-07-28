@@ -14,7 +14,7 @@ import {
   type WindowsTrayEntry,
 } from "../src/tray/windows";
 import { handleManagementAPI } from "../src/server/management-api";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const entry: WindowsTrayEntry = {
   bun: "C:\\사용자 공간\\%TEMP% ! ^ ( ) & 검증\\bun.exe",
@@ -194,14 +194,14 @@ describe("Windows tray packaging and command safety", () => {
     const typescript = readFileSync(join(import.meta.dir, "..", "src", "tray", "windows.ts"), "utf8");
     const source = readFileSync(join(import.meta.dir, "..", "src", "tray", "windows-tray.ps1"), "utf8");
     expect(typescript).not.toContain("\u0000");
-    expect(typescript).toContain("OCX_TRAY_ENTRY_B64");
+    expect(typescript).toContain("opr_TRAY_ENTRY_B64");
     expect(typescript).toContain('detached: true');
     expect(source).toContain("System.Threading.Mutex");
     expect(source).toContain("System.Threading.EventWaitHandle");
     expect(source).toContain("GetFullPath");
     expect(source).toContain("GetPathRoot");
     expect(source).toContain("$heartbeat.hostPid = $HostPid");
-    expect(source).toContain('Start-OcxCommand @("__tray-restart")');
+    expect(source).toContain('Start-oprCommand @("__tray-restart")');
     expect(source).toContain('Load-TrayIcon "openprovider-tray-online.ico"');
     expect(source).toContain('Load-TrayIcon "openprovider-tray-warning.ico"');
     expect(source).toContain('Load-TrayIcon "openprovider-tray-offline.ico"');
@@ -232,7 +232,7 @@ describe("Windows tray packaging and command safety", () => {
     const responsePromise = handleManagementAPI(
       new Request(url),
       url,
-      { port: 10100, providers: {}, defaultProvider: "openai" } as OcxConfig,
+      { port: 10100, providers: {}, defaultProvider: "openai" } as oprConfig,
     );
     await Bun.sleep(50);
     expect(timerFired).toBe(true);
@@ -266,7 +266,7 @@ describe("Windows tray packaging and command safety", () => {
     const updateSources = [
       join(root, "src", "update", "index.ts"),
       join(root, "src", "update", "job.ts"),
-      join(root, "bin", "ocx.mjs"),
+      join(root, "bin", "opr.mjs"),
     ].map(path => readFileSync(path, "utf8"));
     for (const source of updateSources) {
       expect(source).toContain("tray");
@@ -275,4 +275,5 @@ describe("Windows tray packaging and command safety", () => {
     }
   });
 });
+
 

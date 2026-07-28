@@ -40,7 +40,7 @@
 
 1차 릴리스는 **A를 `E2E tok/s` 또는 tooltip의 "output tokens / request duration"으로 명시**해 기존/과거 로그까지 즉시 표시한다. 열 제목을 단순 `tok/s`로 고정할 경우 decode 속도로 오해될 가능성이 있으므로, B 데이터가 생긴 뒤에만 `tok/s`라는 짧은 제목을 쓰고 tooltip에 "first output 이후"를 명시하는 편이 낫다.
 
-동시에 2차로 **B를 권장 기준**으로 추가한다. `firstOutputMs`는 request start 기준 milliseconds이며, 분모가 0 이하이거나 output token이 없으면 값은 없게 한다. `reasoningOutputTokens`는 `outputTokens` 세부값으로 수집되므로 별도 가산하지 않는다; `OcxUsage`의 total은 `inputTokens + outputTokens`라는 규약이다. `src/types.ts:227-244`, `src/server/request-log.ts:214-263`.
+동시에 2차로 **B를 권장 기준**으로 추가한다. `firstOutputMs`는 request start 기준 milliseconds이며, 분모가 0 이하이거나 output token이 없으면 값은 없게 한다. `reasoningOutputTokens`는 `outputTokens` 세부값으로 수집되므로 별도 가산하지 않는다; `oprUsage`의 total은 `inputTokens + outputTokens`라는 규약이다. `src/types.ts:227-244`, `src/server/request-log.ts:214-263`.
 
 ## 3. TTFT / first-output 훅 후보와 경로별 정의
 
@@ -52,7 +52,7 @@
 | Adapter streaming | `adapter.parseStream()` → `bridgeToResponsesSSE()` 호출점은 `src/server/responses.ts:1522-1543`; bridge는 `text_delta`를 output-text SSE로, `thinking_delta`/`reasoning_raw_delta`를 reasoning SSE로 변환한다. `src/bridge.ts:428-505` | 비어 있지 않은 `text_delta`, `thinking_delta`, `reasoning_raw_delta` 중 첫 것. `heartbeat`, signature/redacted-only, tool-start는 제외한다. 숨긴 reasoning도 모델 출력으로 세려면 bridge switch 진입 전 event 자체에서 기록해야 한다; hide path는 출력 SSE를 생략한다. `src/bridge.ts:424-455`, `src/bridge.ts:489-505` | `bridgeToResponsesSSE` options에 one-shot callback을 추가해 event loop에서 호출하거나, `AdapterEvent`를 감싸는 wrapper가 적합하다. `src/bridge.ts:66-88`, `src/bridge.ts:407-428` |
 | Routed non-streaming / queue non-streaming | queue 경로는 `await runTurn(); await queue.collect()` 후 한 번에 JSON을 만든다. `src/server/responses.ts:1280-1299`. adapter non-streaming도 `await adapter.parseResponse()` 후 JSON을 만든다. `src/server/responses.ts:1546-1563` | client에 관측 가능한 first delta가 없으므로 TTFT **없음 (`—`)**. parse/collect 종료를 TTFT라고 부르지 않는다. | A만 표시. 별도 `firstOutputMs = durationMs`를 저장하면 B 분모 0 및 의미 왜곡을 만든다. |
 | tool-call만 있는 streaming 응답 | bridge는 `tool_call_start`에서 output item을 만들고 argument delta를 내보낸다. `src/bridge.ts:507-556` | 모델 "출력 이벤트"는 있으나 최종 `outputTokens`가 0일 수 있고, tool argument의 token 사용량이 별도 제공되지 않는다. tok/s의 first token은 **정의하지 않음**; `—`. | tool latency 지표가 필요하면 별도 `firstActivityMs`로 설계해야 하며 tok/s와 섞지 않는다. |
-| reasoning-only 응답 | bridge는 thinking/raw-reasoning delta를 reasoning SSE로 낸다. `src/bridge.ts:454-505`; Responses usage parser는 `reasoning_tokens`를 보존한다. `src/server/request-log.ts:214-263` | `reasoningOutputTokens > 0` 또는 최종 `outputTokens > 0`일 때 첫 non-empty reasoning delta를 first output으로 한다. visible summary 숨김이어도 adapter event 기준으로 잡는다. | provider usage에서 reasoning이 `outputTokens`에 포함되는 것은 local `OcxUsage` total 규약에 부합하지만, provider별 원시 usage 포함 관계의 전수 검증은 **미확인**이다. 이 경우 tooltip에 "output includes provider-reported reasoning where supplied"를 명시한다. |
+| reasoning-only 응답 | bridge는 thinking/raw-reasoning delta를 reasoning SSE로 낸다. `src/bridge.ts:454-505`; Responses usage parser는 `reasoning_tokens`를 보존한다. `src/server/request-log.ts:214-263` | `reasoningOutputTokens > 0` 또는 최종 `outputTokens > 0`일 때 첫 non-empty reasoning delta를 first output으로 한다. visible summary 숨김이어도 adapter event 기준으로 잡는다. | provider usage에서 reasoning이 `outputTokens`에 포함되는 것은 local `oprUsage` total 규약에 부합하지만, provider별 원시 usage 포함 관계의 전수 검증은 **미확인**이다. 이 경우 tooltip에 "output includes provider-reported reasoning where supplied"를 명시한다. |
 
 ## 4. 엣지케이스 표시 정책
 
@@ -102,3 +102,4 @@ jawcode는 DB에 `duration`과 nullable `ttft`를 별도로 저장한다. `jawco
 4. **GUI**: A를 과거/TTFT 없는 행의 fallback으로, B를 TTFT가 있는 행의 권장 표시로 계산한다. unreported/unsupported/0은 `—`, estimated 양수는 `~` 접두로 통일한다.
 
 이 순서는 현재 final log가 request/attempt usage와 duration을 한 곳에서 결합하고, `/api/logs`가 그 객체를 그대로 전달하며, GUI가 이미 usageStatus의 estimated 표시에 `~`를 쓰기 때문에 가장 적은 계약 확장으로 연결된다. `src/server/request-log.ts:399-468`, `src/server/management-api.ts:313-315`, `gui/src/pages/Logs.tsx:220-246`.
+

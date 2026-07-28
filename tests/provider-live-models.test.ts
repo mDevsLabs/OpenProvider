@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { gatherRoutedModels } from "../src/codex/catalog";
 import { clearModelCache } from "../src/codex/model-cache";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 // Phase 2 of devlog/model_update/260709_model_refresh: live /models discovery is the
 // authoritative lineup; static config lists are the fallback seed. These tests pin the
@@ -12,7 +12,7 @@ const HY3_PROVIDER = "opencode-go";
 const HY3_CONTROL_PROVIDER = "hy3-control-live-test";
 const OPENCODE_FREE_PROVIDER = "opencode-free";
 
-function config(): OcxConfig {
+function config(): oprConfig {
   return {
     providers: {
       [PROVIDER]: {
@@ -24,7 +24,7 @@ function config(): OcxConfig {
         modelContextWindows: { "grok-4.5": 500_000 },
       },
     },
-  } as unknown as OcxConfig;
+  } as unknown as oprConfig;
 }
 
 const originalFetch = globalThis.fetch;
@@ -102,7 +102,7 @@ describe("live provider model discovery (authority + fallback)", () => {
           apiKey: "sk-test",
         },
       },
-    } as unknown as OcxConfig);
+    } as unknown as oprConfig);
     const slugs = models.map(model => `${model.provider}/${model.id}`);
 
     expect(slugs).not.toContain("opencode-go/hy3-preview");
@@ -150,7 +150,7 @@ describe("live provider model discovery (authority + fallback)", () => {
           liveModels: true,
         },
       },
-    } as unknown as OcxConfig);
+    } as unknown as oprConfig);
 
     const ids = models.filter(m => m.provider === OPENCODE_FREE_PROVIDER).map(m => m.id).sort();
     expect(ids).toEqual(["big-pickle", "deepseek-v4-flash-free", "hy3-free", "mimo-v2.5-free", "north-mini-code-free"]);
@@ -185,7 +185,7 @@ describe("live provider model discovery (authority + fallback)", () => {
           defaultModel: "claude-sonnet-5",
         },
       },
-    } as unknown as OcxConfig);
+    } as unknown as oprConfig);
 
     const ids = models.filter(m => m.provider === oauthProvider).map(m => m.id).sort();
     expect(ids).toEqual(["claude-opus-4-8", "claude-sonnet-5"]);
@@ -193,3 +193,4 @@ describe("live provider model discovery (authority + fallback)", () => {
     clearModelCache(oauthProvider);
   });
 });
+

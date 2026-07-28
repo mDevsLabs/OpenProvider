@@ -27,7 +27,7 @@ import { ALIBABA_INTL_BASE_URL_CHOICES } from "./base-url-choices";
 import { providerConfigSeed } from "./derive";
 import { PROVIDER_REGISTRY } from "./registry";
 import { rewriteProviderReferences } from "./provider-id-rewrite";
-import type { OcxConfig, OcxProviderConfig } from "../types";
+import type { oprConfig, oprProviderConfig } from "../types";
 
 const BEIJING_ID = "alibaba-token-plan";
 const INTL_ID = "alibaba-token-plan-intl";
@@ -53,7 +53,7 @@ const INTL_ID = "alibaba-token-plan-intl";
 const USER_OWNED_FIELDS = ["apiKey", "apiKeyPool", "disabled", "baseUrl", "allowPrivateNetwork", "liveModels"] as const;
 
 export interface AlibabaRegionMigrationProjection {
-  config: OcxConfig;
+  config: oprConfig;
   changed: boolean;
   warnings: string[];
 }
@@ -75,13 +75,13 @@ function isInternationalEndpoint(baseUrl: string): boolean {
  * default model, model list, `liveModels: false`, context windows, modality maps
  * and reasoning metadata all come from the intl contract.
  */
-function buildIntlRow(source: OcxProviderConfig): OcxProviderConfig {
+function buildIntlRow(source: oprProviderConfig): oprProviderConfig {
   const entry = PROVIDER_REGISTRY.find(e => e.id === INTL_ID);
   // Fail fast rather than fabricate a row: a missing registry entry means the
   // destination this migration targets no longer exists.
   if (!entry) throw new Error(`registry entry "${INTL_ID}" not found; cannot migrate "${BEIJING_ID}"`);
   const seeded = providerConfigSeed(entry);
-  // `OcxProviderConfig` has no index signature, so the write goes through
+  // `oprProviderConfig` has no index signature, so the write goes through
   // `unknown` — a direct `as Record<string, unknown>` is TS2352 under strict.
   const writable = seeded as unknown as Record<string, unknown>;
   const readable = source as unknown as Record<string, unknown>;
@@ -112,7 +112,7 @@ function buildIntlRow(source: OcxProviderConfig): OcxProviderConfig {
 The projection itself:
 
 ```ts
-export function projectAlibabaRegionMigration(config: OcxConfig): AlibabaRegionMigrationProjection {
+export function projectAlibabaRegionMigration(config: oprConfig): AlibabaRegionMigrationProjection {
   const beijing = config.providers[BEIJING_ID];
   const savedBaseUrl = typeof beijing?.baseUrl === "string" ? beijing.baseUrl : "";
   if (!beijing || !savedBaseUrl || !isInternationalEndpoint(savedBaseUrl)) {
@@ -164,7 +164,7 @@ export function projectAlibabaRegionMigration(config: OcxConfig): AlibabaRegionM
 ### NEW `src/providers/alibaba-region-startup.ts`
 
 ```ts
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { saveConfig } from "../config";
 import { backupConfigBeforeAlibabaRegionMigration } from "./alibaba-region-backup";
 import { projectAlibabaRegionMigration } from "./alibaba-region-migration";
@@ -172,17 +172,17 @@ import { projectAlibabaRegionMigration } from "./alibaba-region-migration";
 export interface AlibabaRegionStartupDeps {
   project: typeof projectAlibabaRegionMigration;
   backup: () => void;
-  save: (config: OcxConfig) => void;
+  save: (config: oprConfig) => void;
 }
 
 export function runAlibabaRegionStartupMigration(
-  config: OcxConfig,
+  config: oprConfig,
   deps: AlibabaRegionStartupDeps = {
     project: projectAlibabaRegionMigration,
     backup: () => { backupConfigBeforeAlibabaRegionMigration(); },
     save: saveConfig,
   },
-): OcxConfig {
+): oprConfig {
   const projection = deps.project(config);
   // Warnings are emitted even on a no-op: the collision case IS the warning.
   for (const warning of projection.warnings) console.warn(`[alibaba-region-migration] ${warning}`);
@@ -446,23 +446,23 @@ import { join } from "node:path";
 import { loadConfig, saveConfig } from "../src/config";
 import { projectAlibabaRegionMigration } from "../src/providers/alibaba-region-migration";
 import { routeModel } from "../src/router";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const INTL_URL = "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1";
 
 /** A config exhibiting the #457 mismatch: Beijing id, international endpoint. */
-function migratableConfig(): OcxConfig {
+function migratableConfig(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "alibaba-token-plan",
     providers: {
       "alibaba-token-plan": { adapter: "openai-chat", apiKey: "sk-intl-key", baseUrl: INTL_URL },
     },
-  } as unknown as OcxConfig;
+  } as unknown as oprConfig;
 }
 
 /** The same mismatch, but the destination provider row already exists. */
-function collidingConfig(): OcxConfig {
+function collidingConfig(): oprConfig {
   const config = migratableConfig();
   config.providers["alibaba-token-plan-intl"] = { adapter: "openai-chat", apiKey: "sk-other" } as never;
   return config;
@@ -481,7 +481,7 @@ test("moves a Beijing entry holding an international endpoint", () => {
         defaultModel: "qwen3.8-max-preview",
       },
     },
-  } as unknown as OcxConfig);
+  } as unknown as oprConfig);
 
   expect(projection.changed).toBe(true);
   expect(projection.config.providers["alibaba-token-plan"]).toBeUndefined();
@@ -510,17 +510,17 @@ test("the migrated config survives a reload", () => {
       },
     },
     combos: { fast: { targets: [{ provider: "alibaba-token-plan", model: "qwen3.7-max" }] } },
-  } as unknown as OcxConfig);
+  } as unknown as oprConfig);
 
-  const prev = process.env.OPENCODEX_HOME;
-  process.env.OPENCODEX_HOME = home;
+  const prev = process.env.OpenProvider_HOME;
+  process.env.OpenProvider_HOME = home;
   try {
     saveConfig(projection.config);
     const reloaded = loadConfig();
     expect(reloaded.providers["alibaba-token-plan-intl"]?.apiKey).toBe("sk-intl-key");
     expect(reloaded.combos?.fast?.targets[0]?.provider).toBe("alibaba-token-plan-intl");
   } finally {
-    process.env.OPENCODEX_HOME = prev;
+    process.env.OpenProvider_HOME = prev;
     rmSync(home, { recursive: true, force: true });
   }
 });
@@ -531,7 +531,7 @@ test("a genuine Beijing config is untouched", () => {
       port: 10100,
       defaultProvider: "alibaba-token-plan",
       providers: { "alibaba-token-plan": { adapter: "openai-chat", apiKey: "sk-cn", ...(baseUrl ? { baseUrl } : {}) } },
-    } as unknown as OcxConfig;
+    } as unknown as oprConfig;
     const before = structuredClone(config);
     const projection = projectAlibabaRegionMigration(config);
     expect(projection.changed).toBe(false);
@@ -548,7 +548,7 @@ test("refuses to merge when the intl entry exists, and says why", () => {
       "alibaba-token-plan": { adapter: "openai-chat", apiKey: "sk-a", baseUrl: "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1" },
       "alibaba-token-plan-intl": { adapter: "openai-chat", apiKey: "sk-b" },
     },
-  } as unknown as OcxConfig;
+  } as unknown as oprConfig;
   const before = structuredClone(config);
   const projection = projectAlibabaRegionMigration(config);
   expect(projection.changed).toBe(false);
@@ -593,24 +593,24 @@ import { expect, test } from "bun:test";
 import { AlibabaBackupIntegrityError } from "../src/providers/alibaba-region-backup";
 import { projectAlibabaRegionMigration } from "../src/providers/alibaba-region-migration";
 import { runAlibabaRegionStartupMigration } from "../src/providers/alibaba-region-startup";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 // Same two fixtures as tests/alibaba-region-migration.test.ts; duplicated rather
 // than shared because tests/ is flat and a helper module for two callers is more
 // indirection than it saves.
 const INTL_URL = "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1";
 
-function migratableConfig(): OcxConfig {
+function migratableConfig(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "alibaba-token-plan",
     providers: {
       "alibaba-token-plan": { adapter: "openai-chat", apiKey: "sk-intl-key", baseUrl: INTL_URL },
     },
-  } as unknown as OcxConfig;
+  } as unknown as oprConfig;
 }
 
-function collidingConfig(): OcxConfig {
+function collidingConfig(): oprConfig {
   const config = migratableConfig();
   config.providers["alibaba-token-plan-intl"] = { adapter: "openai-chat", apiKey: "sk-other" } as never;
   return config;
@@ -618,7 +618,7 @@ function collidingConfig(): OcxConfig {
 
 test("backs up strictly before saving, exactly once, when the projection changed", () => {
   const order: string[] = [];
-  const saved: OcxConfig[] = [];
+  const saved: oprConfig[] = [];
   const result = runAlibabaRegionStartupMigration(migratableConfig(), {
     project: projectAlibabaRegionMigration,
     backup: () => { order.push("backup"); },
@@ -632,7 +632,7 @@ test("backs up strictly before saving, exactly once, when the projection changed
 
 test("a no-op never backs up or saves, but a collision still warns", () => {
   const order: string[] = [];
-  const saved: OcxConfig[] = [];
+  const saved: oprConfig[] = [];
   const warnings: string[] = [];
   const originalWarn = console.warn;
   console.warn = (...args: unknown[]) => { warnings.push(args.map(String).join(" ")); };
@@ -655,7 +655,7 @@ test("a backup failure prevents the migration from saving", () => {
   // The fail-closed posture: no rollback point, no credential rewrite. The throw
   // propagates out of startServer, which is the same stance the OpenAI tier
   // migration takes.
-  const saved: OcxConfig[] = [];
+  const saved: oprConfig[] = [];
   expect(() => runAlibabaRegionStartupMigration(migratableConfig(), {
     project: projectAlibabaRegionMigration,
     backup: () => { throw new AlibabaBackupIntegrityError("disk full"); },
@@ -705,3 +705,4 @@ that produced it.
 - The collision case changes nothing and emits exactly one actionable warning.
 - Backup strictly precedes save, and neither runs on a no-op.
 - Full gates green.
+

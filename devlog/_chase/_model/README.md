@@ -46,17 +46,18 @@
 |---|---|
 | `VERIFIED` | 현재 소스와 focused test로 확인됨 |
 | `PARTIAL` | 일부 경로는 있으나 upstream 계약 전체는 확인되지 않음 |
-| `OPEN` | 현재 OCX 소유 경로에 구현이 없음 |
-| `REJECT` | OCX 경계 밖이거나 의도적으로 가져오지 않음 |
+| `OPEN` | 현재 opr 소유 경로에 구현이 없음 |
+| `REJECT` | opr 경계 밖이거나 의도적으로 가져오지 않음 |
 
 구현 후보를 대조할 때는 위의 현재 상태와 별도로 다음 **결정**을 사용한다.
 
 | 결정 | 뜻 |
 |---|---|
-| `IMPORT` | 같은 계약을 OCX owner에 구현할 가치가 확인됨. 표에 적힌 gate를 통과한 뒤 작업한다. |
-| `ADAPT` | 목적은 유효하지만 jawcode 코드를 그대로 복사하지 않고 OCX 구조에 맞춘다. |
-| `NOOP` | OCX가 이미 같은 결과를 내거나 구조상 해당 문제가 발생하지 않는다. |
-| `REJECT` | 현재 OCX 제품/transport 경계에는 넣지 않는다. |
+| `IMPORT` | 같은 계약을 opr owner에 구현할 가치가 확인됨. 표에 적힌 gate를 통과한 뒤 작업한다. |
+| `ADAPT` | 목적은 유효하지만 jawcode 코드를 그대로 복사하지 않고 opr 구조에 맞춘다. |
+| `NOOP` | opr가 이미 같은 결과를 내거나 구조상 해당 문제가 발생하지 않는다. |
+| `REJECT` | 현재 opr 제품/transport 경계에는 넣지 않는다. |
 | `RESEARCH` | chase-only 또는 live-unverified라 구현 결정을 내릴 증거가 부족하다. |
 
 근거 종류는 `local-source`, `chase-only`, `live-unverified`로 표시한다. `chase-only`와 `live-unverified`는 이 문서만으로 `IMPORT`나 `ADAPT` 승인을 만들 수 없다.
+

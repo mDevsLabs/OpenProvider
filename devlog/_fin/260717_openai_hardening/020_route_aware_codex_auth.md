@@ -25,7 +25,7 @@ cycle may not close with any public tier still using route-blind auth.
 ### MODIFY `src/providers/derive.ts`
 
 Derive preset/init display metadata directly from `ProviderRegistryEntry`, including
-account mode, without cloning mode into `OcxProviderConfig` or `ProviderConfigSeed`.
+account mode, without cloning mode into `oprProviderConfig` or `ProviderConfigSeed`.
 Replace the blanket forward init label with registry labels. Safe public DTOs may
 derive mode from the registry; persisted provider rows never contain it.
 
@@ -152,9 +152,9 @@ Export:
 interface OpenAiTierStartupDeps {
   project: typeof projectOpenAiTierMigration;
   backup: () => void;
-  save: (config: OcxConfig) => void;
+  save: (config: oprConfig) => void;
 }
-runOpenAiTierStartupMigration(config: OcxConfig, deps?: OpenAiTierStartupDeps): OcxConfig;
+runOpenAiTierStartupMigration(config: oprConfig, deps?: OpenAiTierStartupDeps): oprConfig;
 ```
 
 Call order is project → backup → save only when changed. Return the projected clone,
@@ -306,7 +306,7 @@ providerManagementConfigError(name: unknown, provider: unknown): string | undefi
 ```
 
 It first requires a plain-record provider and inspects raw own-properties, then
-narrows to `OcxProviderConfig`. Full canonical-seed equality applies only to reserved
+narrows to `oprProviderConfig`. Full canonical-seed equality applies only to reserved
 forward tiers `openai` and `openai-multi`; existing `openai-apikey` and custom-provider
 admission rules remain unchanged, including supported capability metadata and safe
 headers. Sensitive custom headers continue returning 400.
@@ -320,7 +320,7 @@ Export:
 ```ts
 interface OpenAiForwardSidecarCandidate {
   providerName: "openai" | "openai-multi";
-  provider: OcxProviderConfig;
+  provider: oprProviderConfig;
   accountMode: CodexAccountMode;
 }
 interface ResolvedOpenAiForwardSidecar extends OpenAiForwardSidecarCandidate {
@@ -332,17 +332,17 @@ interface OpenAiImagesProviderSelection {
   forwardCandidates: OpenAiForwardSidecarCandidate[];
   keyed?: {
     providerName: "openai-apikey";
-    provider: OcxProviderConfig;
+    provider: oprProviderConfig;
     apiKey: string;
   };
 }
-listOpenAiForwardSidecarCandidates(config: OcxConfig): OpenAiForwardSidecarCandidate[];
+listOpenAiForwardSidecarCandidates(config: oprConfig): OpenAiForwardSidecarCandidate[];
 resolveFirstUsableOpenAiSidecar(
   candidates: readonly OpenAiForwardSidecarCandidate[],
   incomingHeaders: Headers,
-  config: OcxConfig,
+  config: oprConfig,
 ): Promise<ResolvedOpenAiForwardSidecar | undefined>;
-selectOpenAiImagesProvider(config: OcxConfig): OpenAiImagesProviderSelection;
+selectOpenAiImagesProvider(config: oprConfig): OpenAiImagesProviderSelection;
 ```
 
 `undefined` means only no configured candidate, or Direct-only with missing caller auth.
@@ -369,18 +369,18 @@ Change synchronous planner contracts to consume an already resolved shared selec
 
 ```ts
 planWebSearch(
-  config: OcxConfig,
-  parsed: OcxParsedRequest,
+  config: oprConfig,
+  parsed: oprParsedRequest,
   isPassthrough: boolean,
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
   modelId: string,
   openAiSidecar?: ResolvedOpenAiForwardSidecar,
 ): SidecarPlan | undefined;
 planVisionSidecar(
-  config: OcxConfig,
-  provider: OcxProviderConfig,
+  config: oprConfig,
+  provider: oprProviderConfig,
   modelId: string,
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   openAiSidecar?: ResolvedOpenAiForwardSidecar,
 ): VisionPlan | undefined;
 ```
@@ -498,3 +498,4 @@ API uses key auth; no configured/public/routable `chatgpt` remains.
 `done` — landed in `3a9e498f` with audit closure in `005cbb8d`; final cross-tier proof and
 terminal criteria are indexed in [`050_integration_verification.md`](./050_integration_verification.md),
 [`190_consolidated_finish_plan.md`](./190_consolidated_finish_plan.md), and the `051` audit.
+

@@ -27,7 +27,7 @@ src/
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
 ├── responses/
-│   ├── parser.ts       # Responses request → OcxParsedRequest
+│   ├── parser.ts       # Responses request → oprParsedRequest
 │   ├── schema.ts       # Zod validation
 │   └── compaction.ts   # remote compaction prompts, envelopes, compact history
 ├── service.ts          # launchd / systemd / Task Scheduler background service
@@ -77,9 +77,9 @@ src/
 ## Парсер
 
 `responses/parser.ts` валидирует входящий запрос через `responses/schema.ts` (Zod), затем строит
-`OcxParsedRequest`:
+`oprParsedRequest`:
 
-- **Сообщения** — элементы `input` становятся нормализованным `OcxMessage[]`: user / developer /
+- **Сообщения** — элементы `input` становятся нормализованным `oprMessage[]`: user / developer /
   assistant / toolResult. Элементы `reasoning` становятся блоками thinking; элементы
   `function_call`, `custom_tool_call` и `tool_search_call` становятся вызовами инструментов; их
   аналоги `*_output` становятся результатами инструментов.
@@ -139,7 +139,7 @@ loopback; настроенные записи `corsAllowOrigins` расширя�
 перед маршрутизируемым вызовом, а `oauth/token-guardian.ts` может проактивно обновлять только тех
 провайдеров, чья политика это разрешает. Учётные данные пула Codex/ChatGPT и привязка потоков
 живут в `codex/` и не попадают в ответы management API. Использование по запросам нормализуется в
-`OcxUsage`, отражается в терминальных событиях Responses и агрегируется модулем `usage/` для
+`oprUsage`, отражается в терминальных событиях Responses и агрегируется модулем `usage/` для
 дашборда и необязательной JSONL-диагностики.
 
 ## Транспорт и compaction
@@ -183,9 +183,10 @@ Compaction контекста Codex работает для маршрутизи
 
 ## Основные типы
 
-Внутренняя модель живёт в `types.ts`: `OcxParsedRequest`, `OcxContext`, объединение `OcxMessage`,
-`OcxContentPart` (text / image), `OcxToolCall`, `OcxTool`, `AdapterEvent` и типы конфигурации
-(`OcxConfig`, `OcxProviderConfig`). Широко используются два хелпера: `namespacedToolName()` и
+Внутренняя модель живёт в `types.ts`: `oprParsedRequest`, `oprContext`, объединение `oprMessage`,
+`oprContentPart` (text / image), `oprToolCall`, `oprTool`, `AdapterEvent` и типы конфигурации
+(`oprConfig`, `oprProviderConfig`). Широко используются два хелпера: `namespacedToolName()` и
 `modelInList()` (толерантное сопоставление с тегом `:size` для `noVisionModels` /
 `noReasoningModels`).
+
 

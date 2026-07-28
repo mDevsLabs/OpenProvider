@@ -1,20 +1,20 @@
 import { describe, expect, test } from "bun:test";
 import { createAnthropicAdapter } from "../src/adapters/anthropic";
 import { parseRequest } from "../src/responses/parser";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
-const provider = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x", authMode: "apiKey" } as unknown as OcxProviderConfig;
+const provider = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x", authMode: "apiKey" } as unknown as oprProviderConfig;
 
-function parsed(reasoning?: string, extraOpts: Record<string, unknown> = {}, modelId = "anthropic/claude-sonnet-4.5"): OcxParsedRequest {
+function parsed(reasoning?: string, extraOpts: Record<string, unknown> = {}, modelId = "anthropic/claude-sonnet-4.5"): oprParsedRequest {
   return {
     modelId,
     stream: false,
     options: { ...(reasoning !== undefined ? { reasoning } : {}), ...extraOpts },
     context: { systemPrompt: ["sys"], messages: [{ role: "user", content: "hi" }] },
-  } as unknown as OcxParsedRequest;
+  } as unknown as oprParsedRequest;
 }
 
-async function bodyOf(p: OcxParsedRequest): Promise<Record<string, unknown>> {
+async function bodyOf(p: oprParsedRequest): Promise<Record<string, unknown>> {
   const { body } = await createAnthropicAdapter(provider).buildRequest(p);
   return JSON.parse(typeof body === "string" ? body : JSON.stringify(body)) as Record<string, unknown>;
 }
@@ -165,3 +165,4 @@ describe("anthropic extended-thinking gate", () => {
     expect(messages).toEqual([{ role: "user", content: "continue on anthropic" }]);
   });
 });
+

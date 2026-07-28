@@ -30,12 +30,12 @@ import { hardenConfigDir, hardenExistingSecret, renameAtomicFile, saveConfig } f
 let testDir = "";
 
 beforeEach(() => {
-  testDir = mkdtempSync(join(tmpdir(), "opr-config-"));
-  process.env.OPENPROVIDER_HOME = testDir;
+  testDir = mkdtempSync(join(tmpdir(), "ocx-config-"));
+  process.env.OPENCODEX_HOME = testDir;
 });
 
 afterEach(() => {
-  delete process.env.OPENPROVIDER_HOME;
+  delete process.env.OPENCODEX_HOME;
   if (testDir && existsSync(testDir)) rmSync(testDir, { recursive: true, force: true });
   testDir = "";
 });
@@ -66,7 +66,7 @@ function writeResponsesPathConfig(responsesPath: string): void {
   });
 }
 
-describe("openprovider config defaults", () => {
+describe("opencodex config defaults", () => {
   test("atomic rename retries transient Windows sharing violations", () => {
     const sleeps: number[] = [];
     let attempts = 0;
@@ -174,7 +174,145 @@ describe("openprovider config defaults", () => {
     }
   });
 
-  test("loads valid config from OPENPROVIDER_HOME", () => {
+  test("native subagent-default sync is opt-in and ignores malformed opt-ins without falling back", () => {
+    const base = {
+      port: 12345,
+      providers: {
+        custom: {
+          adapter: "openai-responses",
+          baseUrl: "https://example.test/v1",
+        },
+      },
+      defaultProvider: "custom",
+      codexAccounts: [{ id: "account-1", email: "owner@example.test", isMain: true }],
+      injectionModel: "gpt-5.6-terra",
+    };
+    expect(getDefaultConfig().syncCodexSubagentDefaults).toBeUndefined();
+
+    for (const enabled of [true, false]) {
+      writeConfig({ ...base, syncCodexSubagentDefaults: enabled });
+      expect(loadConfig().syncCodexSubagentDefaults).toBe(enabled);
+    }
+
+    for (const invalid of [null, "true", 1]) {
+      writeConfig({ ...base, syncCodexSubagentDefaults: invalid });
+      const diagnostics = readConfigDiagnostics();
+      expect(diagnostics).toMatchObject({
+        source: "file",
+        error: null,
+        config: {
+          port: 12345,
+          defaultProvider: "custom",
+          providers: { custom: { baseUrl: "https://example.test/v1" } },
+          codexAccounts: [{ id: "account-1", email: "owner@example.test", isMain: true }],
+          injectionModel: "gpt-5.6-terra",
+        },
+      });
+      expect(diagnostics.config.syncCodexSubagentDefaults).toBeUndefined();
+      expect(diagnostics.warnings).toContain("syncCodexSubagentDefaults ignored: expected a boolean");
+      expect(loadConfig()).toMatchObject({
+        port: 12345,
+        defaultProvider: "custom",
+        providers: { custom: { baseUrl: "https://example.test/v1" } },
+        codexAccounts: [{ id: "account-1", email: "owner@example.test", isMain: true }],
+      });
+      expect(backupNames()).toEqual([]);
+    }
+  });
+
+  test("validates disk injection selections and safely normalizes a model-less sync opt-in", () => {
+    const base = {
+      port: 10100,
+      providers: {
+        openai: {
+          adapter: "openai-responses",
+          baseUrl: "https://chatgpt.com/backend-api/codex",
+          authMode: "forward",
+        },
+      },
+      defaultProvider: "openai",
+    };
+
+    writeConfig({
+      ...base,
+      injectionModel: "gpt-5.6-terra",
+      injectionEffort: "ultra",
+      syncCodexSubagentDefaults: true,
+    });
+    expect(loadConfig()).toMatchObject({
+      injectionModel: "gpt-5.6-terra",
+      injectionEffort: "ultra",
+      syncCodexSubagentDefaults: true,
+    });
+
+    for (const invalid of ["", "   "]) {
+      writeConfig({ ...base, injectionModel: invalid, syncCodexSubagentDefaults: true });
+      const diagnostics = readConfigDiagnostics();
+      expect(diagnostics.source).toBe("file");
+      expect(diagnostics.error).toBeNull();
+      expect(diagnostics.config.injectionModel).toBe(invalid);
+      expect(diagnostics.config.syncCodexSubagentDefaults).toBeUndefined();
+      expect(diagnostics.warnings).toContain("syncCodexSubagentDefaults ignored: a nonblank injectionModel is required");
+    }
+
+    for (const invalid of ["", "turbo"]) {
+      writeConfig({
+        ...base,
+        injectionModel: "gpt-5.6-terra",
+        injectionEffort: invalid,
+        syncCodexSubagentDefaults: true,
+      });
+      const diagnostics = readConfigDiagnostics();
+      expect(diagnostics.source).toBe("file");
+      expect(diagnostics.error).toBeNull();
+      expect(diagnostics.config.injectionEffort).toBe(invalid);
+      expect(diagnostics.config.syncCodexSubagentDefaults).toBeUndefined();
+      expect(diagnostics.warnings).toContain("syncCodexSubagentDefaults ignored: injectionEffort must be a supported Codex reasoning effort");
+    }
+
+    for (const [field, invalid] of [["injectionModel", 1], ["injectionEffort", 1]] as const) {
+      writeConfig({
+        ...base,
+        injectionModel: "gpt-5.6-terra",
+        syncCodexSubagentDefaults: true,
+        [field]: invalid,
+      });
+      const diagnostics = readConfigDiagnostics();
+      expect(diagnostics.source).toBe("file");
+      expect(diagnostics.error).toBeNull();
+      expect(diagnostics.config.port).toBe(10100);
+      expect(diagnostics.config.defaultProvider).toBe("openai");
+      expect(diagnostics.config.providers.openai.baseUrl).toBe("https://chatgpt.com/backend-api/codex");
+      expect(diagnostics.config[field]).toBeUndefined();
+      expect(diagnostics.config.syncCodexSubagentDefaults).toBeUndefined();
+      expect(diagnostics.warnings).toContain(`${field} ignored: expected a string`);
+      expect(diagnostics.warnings?.some(warning => warning.startsWith("syncCodexSubagentDefaults ignored:"))).toBe(true);
+      expect(loadConfig()).toMatchObject({
+        port: 10100,
+        defaultProvider: "openai",
+        providers: { openai: { baseUrl: "https://chatgpt.com/backend-api/codex" } },
+      });
+      expect(backupNames()).toEqual([]);
+    }
+
+    // Guidance-only values retain their pre-existing compatibility. They are
+    // constrained only when the native Codex config mutation is opted into.
+    writeConfig({ ...base, injectionModel: "legacy/model", injectionEffort: "provider-specific" });
+    expect(readConfigDiagnostics()).toMatchObject({
+      source: "file",
+      error: null,
+      config: { injectionModel: "legacy/model", injectionEffort: "provider-specific" },
+    });
+
+    writeConfig({ ...base, syncCodexSubagentDefaults: true });
+    const normalized = readConfigDiagnostics();
+    expect(normalized.source).toBe("file");
+    expect(normalized.error).toBeNull();
+    expect(normalized.config.syncCodexSubagentDefaults).toBeUndefined();
+    expect(loadConfig().syncCodexSubagentDefaults).toBeUndefined();
+  });
+
+  test("loads valid config from OPENCODEX_HOME", () => {
     writeConfig({
       port: 12345,
       providers: {
@@ -348,11 +486,11 @@ describe("openprovider config defaults", () => {
     expect(backupNames()).toHaveLength(0);
   });
 
-  test("resolves relative OPENPROVIDER_HOME once to an absolute config directory", () => {
-    const parent = mkdtempSync(join(tmpdir(), "opr-config-parent-"));
+  test("resolves relative OPENCODEX_HOME once to an absolute config directory", () => {
+    const parent = mkdtempSync(join(tmpdir(), "ocx-config-parent-"));
     const oldCwd = process.cwd();
     try {
-      process.env.OPENPROVIDER_HOME = "relative-home";
+      process.env.OPENCODEX_HOME = "relative-home";
       process.chdir(parent);
       const firstPath = getConfigPath();
       const expectedConfigDir = resolve("relative-home");
@@ -361,18 +499,18 @@ describe("openprovider config defaults", () => {
 
       expect(firstPath).toBe(join(expectedConfigDir, "config.json"));
       expect(getConfigPath()).toBe(firstPath);
-      expect(getPidPath()).toBe(join(expectedConfigDir, "opr.pid"));
+      expect(getPidPath()).toBe(join(expectedConfigDir, "ocx.pid"));
     } finally {
       process.chdir(oldCwd);
       rmSync(parent, { recursive: true, force: true });
     }
   });
 
-  test("uses the default home when OPENPROVIDER_HOME is unset", () => {
-    delete process.env.OPENPROVIDER_HOME;
+  test("uses the default home when OPENCODEX_HOME is unset", () => {
+    delete process.env.OPENCODEX_HOME;
 
-    expect(getConfigPath()).toBe(join(homedir(), ".openprovider", "config.json"));
-    expect(getPidPath()).toBe(join(homedir(), ".openprovider", "opr.pid"));
+    expect(getConfigPath()).toBe(join(homedir(), ".opencodex", "config.json"));
+    expect(getPidPath()).toBe(join(homedir(), ".opencodex", "ocx.pid"));
   });
 
   test("loads UTF-8 BOM config files written by Windows tools", () => {
@@ -405,7 +543,7 @@ describe("openprovider config defaults", () => {
       const backups = backupNames();
       expect(backups).toHaveLength(1);
       expect(readFileSync(join(testDir, backups[0]), "utf-8")).toBe("{ invalid json");
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Could not load openprovider config"));
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Could not load opencodex config"));
     } finally {
       errorSpy.mockRestore();
     }
@@ -478,6 +616,26 @@ describe("openprovider config defaults", () => {
     }
   });
 
+  test("accepts bearer transport only for Anthropic API-key providers", () => {
+    const base = { port: 10100, defaultProvider: "gateway" };
+    writeConfig({
+      ...base,
+      providers: {
+        gateway: { adapter: "anthropic", baseUrl: "https://gateway.example/v1", authMode: "key", apiKeyTransport: "bearer" },
+      },
+    });
+    expect(readConfigDiagnostics().error).toBeNull();
+
+    for (const provider of [
+      { adapter: "openai-chat", baseUrl: "https://gateway.example/v1", authMode: "key", apiKeyTransport: "bearer" },
+      { adapter: "anthropic", baseUrl: "https://gateway.example/v1", authMode: "oauth", apiKeyTransport: "bearer" },
+    ]) {
+      writeConfig({ ...base, providers: { gateway: provider } });
+      expect(readConfigDiagnostics().source).toBe("fallback");
+      expect(readConfigDiagnostics().error).toContain("apiKeyTransport");
+    }
+  });
+
   test("validates provider context cap maps explicitly", () => {
     writeConfig({
       port: 10100,
@@ -545,6 +703,60 @@ describe("openprovider config defaults", () => {
       expect(readConfigDiagnostics().source).toBe("fallback");
       expect(readConfigDiagnostics().error).toContain("modelSupportsReasoningSummaries");
     }
+  });
+
+  test("modelReasoningSummaryDelivery validates known values and rejects summary opt-out conflicts (#538)", () => {
+    writeConfig({
+      port: 12345,
+      providers: {
+        custom: {
+          adapter: "openai-responses",
+          baseUrl: "https://example.test/v1",
+          modelSupportsReasoningSummaries: { strict: true },
+          modelReasoningSummaryDelivery: {
+            strict: "sequential",
+            concurrent: "concurrent_cutoff",
+          },
+        },
+      },
+      defaultProvider: "custom",
+    });
+    expect(readConfigDiagnostics().error).toBeNull();
+
+    for (const modelReasoningSummaryDelivery of [
+      [],
+      { strict: "serial" },
+      { "": "sequential" },
+    ]) {
+      writeConfig({
+        port: 12345,
+        providers: {
+          custom: {
+            adapter: "openai-responses",
+            baseUrl: "https://example.test/v1",
+            modelReasoningSummaryDelivery,
+          },
+        },
+        defaultProvider: "custom",
+      });
+      expect(readConfigDiagnostics().source).toBe("fallback");
+      expect(readConfigDiagnostics().error).toContain("modelReasoningSummaryDelivery");
+    }
+
+    writeConfig({
+      port: 12345,
+      providers: {
+        custom: {
+          adapter: "openai-responses",
+          baseUrl: "https://example.test/v1",
+          modelSupportsReasoningSummaries: { STRICT: false },
+          modelReasoningSummaryDelivery: { strict: "sequential" },
+        },
+      },
+      defaultProvider: "custom",
+    });
+    expect(readConfigDiagnostics().source).toBe("fallback");
+    expect(readConfigDiagnostics().error).toContain("conflicts with modelSupportsReasoningSummaries=false");
   });
 
   test("modelAdapters accepts only allowed wires on eligible providers (#404)", () => {
@@ -820,14 +1032,14 @@ describe("openprovider config defaults", () => {
     expect(parsePidFile("not-json")).toBeNull();
   });
 
-  test("recognizes openprovider start command lines", () => {
+  test("recognizes opencodex start command lines", () => {
     expect(isOcxStartCommandLine('bun run src/cli.ts start')).toBe(true);
     expect(isOcxStartCommandLine('"C:/tools/bun/bin/bun.exe" "run" "src/cli/index.ts" "start"')).toBe(true);
-    expect(isOcxStartCommandLine('bun C:/tools/bun/install/global/node_modules/@mdevs/openprovider/src/cli.ts start')).toBe(true);
-    expect(isOcxStartCommandLine("openprovider start")).toBe(true);
+    expect(isOcxStartCommandLine('bun C:/tools/bun/install/global/node_modules/@bitkyc08/opencodex/src/cli.ts start')).toBe(true);
+    expect(isOcxStartCommandLine("opencodex start")).toBe(true);
 
     expect(isOcxStartCommandLine("bun run src/cli.ts status")).toBe(false);
-    expect(isOcxStartCommandLine("bun test C:/work/openprovider/tests/config.test.ts")).toBe(false);
+    expect(isOcxStartCommandLine("bun test C:/work/opencodex/tests/config.test.ts")).toBe(false);
     expect(isOcxStartCommandLine("notepad.exe")).toBe(false);
   });
 
@@ -988,4 +1200,3 @@ describe("config.ts – Windows ACL hardening integration", () => {
     spy.mockRestore();
   });
 });
-

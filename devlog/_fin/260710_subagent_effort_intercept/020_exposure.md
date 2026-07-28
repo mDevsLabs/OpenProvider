@@ -42,7 +42,7 @@ Worker A — GUI (`gui/` only):
 
 Worker B — docs (`docs-site/src/content/docs/**/reference/configuration.md` only, 3
 locales en / ko / zh-cn):
-- Add `effortCap?` and `subagentEffortCap?` rows to the Top level (`OcxConfig`) table
+- Add `effortCap?` and `subagentEffortCap?` rows to the Top level (`oprConfig`) table
   next to `injectionEffort?`: ladder value low..max; hard ceiling rewritten per-request;
   subagent variant applies only to requests carrying codex-rs spawned-child markers
   (`x-openai-subagent` / turn-metadata `subagent_kind`); lower of both wins; caps only
@@ -60,3 +60,4 @@ locales en / ko / zh-cn):
 - All three locale files gain BOTH keys with consistent wording; en/ko/zh-cn docs rows
   match the shipped semantics (strip behavior included).
 - `bun test` remains 0 fail (no server-side changes in WP2).
+

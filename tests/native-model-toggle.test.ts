@@ -8,10 +8,10 @@ import {
   visibleNativeSlugs,
 } from "../src/codex/catalog";
 import { handleManagementAPI } from "../src/server/management-api";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
-function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
-  return { port: 10100, providers: {}, defaultProvider: "openai", ...overrides } as OcxConfig;
+function makeConfig(overrides: Partial<oprConfig> = {}): oprConfig {
+  return { port: 10100, providers: {}, defaultProvider: "openai", ...overrides } as oprConfig;
 }
 
 function nativeTemplate(): Record<string, unknown> {
@@ -130,3 +130,4 @@ describe("native GPT model toggles (bare slugs in disabledModels)", () => {
     expect(sub.available).toContain("gpt-5.6-terra");
   });
 });
+

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { routeModel } from "../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
 const OVERRIDE_PROVIDERS = [
   { id: "ollama", registryBaseUrl: "http://localhost:11434/v1" },
@@ -9,7 +9,7 @@ const OVERRIDE_PROVIDERS = [
   { id: "litellm", registryBaseUrl: "http://localhost:4000/v1" },
 ] as const;
 
-function configFor(providerName: string, provider: OcxProviderConfig): OcxConfig {
+function configFor(providerName: string, provider: oprProviderConfig): oprConfig {
   return {
     port: 10100,
     defaultProvider: providerName,
@@ -100,3 +100,4 @@ for (const { id, adapter, registryTemplate, resolvedBaseUrl } of [
     expect(routeModel(config, `${id}/model`).provider.baseUrl).toBe(registryTemplate);
   });
 }
+

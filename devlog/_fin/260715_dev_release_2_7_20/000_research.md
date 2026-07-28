@@ -43,8 +43,9 @@ Work class: C4 (release surface)
 
 ## Search and inspection evidence
 
-- Terms: `release`, `preview`, `npm publish`, `dev/main/preview`, `fontSize`, `fontWeight`, `lineHeight`, `borderRadius`, `OPENCODEX_PROXY_TARGET`.
+- Terms: `release`, `preview`, `npm publish`, `dev/main/preview`, `fontSize`, `fontWeight`, `lineHeight`, `borderRadius`, `@mdevs/openprovider_PROXY_TARGET`.
 - Inspected: `package.json`, `scripts/release.ts`, `.github/workflows/release.yml`, `structure/06_docs-and-release.md`, PR #134 metadata/diff, all 19 remote changed-file paths, all 13 local changed-file paths, and the design-system ADR/docs.
 - Reuse decision: no new runtime abstraction or dependency is planned. Any repair must stay in the existing GUI token/CSS/component owners or the touched cross-platform modules.
+
 
 

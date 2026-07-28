@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { createAnthropicAdapter } from "../src/adapters/anthropic";
 import { PROVIDER_REGISTRY } from "../src/providers/registry";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 import { AnthropicTokenError, refreshAnthropicToken } from "../src/oauth/anthropic";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });
 
-function parsed(): OcxParsedRequest {
+function parsed(): oprParsedRequest {
   return {
     modelId: "claude-haiku-4-5",
     context: { messages: [{ role: "user", content: "hi", timestamp: 0 }] },
@@ -16,7 +16,7 @@ function parsed(): OcxParsedRequest {
   };
 }
 
-function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
+function provider(overrides: Partial<oprProviderConfig> = {}): oprProviderConfig {
   return {
     adapter: "anthropic",
     baseUrl: "https://api.anthropic.com",
@@ -84,3 +84,4 @@ describe("anthropic provider hardening", () => {
     expect(anthropic?.modelContextWindows?.["claude-haiku-4-5"]).toBe(200_000);
   });
 });
+

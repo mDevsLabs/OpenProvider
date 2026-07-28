@@ -3,9 +3,9 @@ import {
   namespacedToolName,
   toolAllowedByChoice,
   toolChoiceAliases,
-  type OcxRequestOptions,
-  type OcxTool,
-  type OcxProviderConfig,
+  type oprRequestOptions,
+  type oprTool,
+  type oprProviderConfig,
 } from "../types";
 
 const NEIGHBOR_AGENT_TOOL_NAMES = ["Read", "Grep", "Glob", "Bash", "LS", "apply_patch"] as const;
@@ -18,7 +18,7 @@ function uniqueNames(names: readonly string[]): string[] {
   return [...new Set(names.filter(name => name.trim().length > 0))];
 }
 
-function toolChoiceAllows(tool: Pick<OcxTool, "namespace" | "name">, toolChoice: OcxRequestOptions["toolChoice"] | undefined): boolean {
+function toolChoiceAllows(tool: Pick<oprTool, "namespace" | "name">, toolChoice: oprRequestOptions["toolChoice"] | undefined): boolean {
   if (!toolChoice || toolChoice === "auto" || toolChoice === "required") return true;
   if (toolChoice === "none") return false;
   if (isAllowedToolChoice(toolChoice)) return toolAllowedByChoice(tool, new Set(toolChoice.allowedTools));
@@ -32,7 +32,7 @@ function isOpenAIOrChatGPTHost(hostname: string): boolean {
     || hostname.endsWith(".chatgpt.com");
 }
 
-export function shouldInjectNonOpenAIToolCatalogNudge(provider: Pick<OcxProviderConfig, "baseUrl">): boolean {
+export function shouldInjectNonOpenAIToolCatalogNudge(provider: Pick<oprProviderConfig, "baseUrl">): boolean {
   try {
     return !isOpenAIOrChatGPTHost(new URL(provider.baseUrl).hostname);
   } catch {
@@ -60,12 +60,13 @@ export function buildNonOpenAIToolCatalogNudgeFromNames(wireNames: readonly stri
 }
 
 export function buildNonOpenAIToolCatalogNudgeForTools(
-  tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined,
-  toolChoice?: OcxRequestOptions["toolChoice"],
-  toWireName: (tool: Pick<OcxTool, "namespace" | "name">) => string = tool => namespacedToolName(tool.namespace, tool.name),
+  tools: readonly Pick<oprTool, "namespace" | "name">[] | undefined,
+  toolChoice?: oprRequestOptions["toolChoice"],
+  toWireName: (tool: Pick<oprTool, "namespace" | "name">) => string = tool => namespacedToolName(tool.namespace, tool.name),
 ): string | undefined {
   const visibleNames = tools
     ?.filter(tool => toolChoiceAllows(tool, toolChoice))
     .map(toWireName);
   return buildNonOpenAIToolCatalogNudgeFromNames(visibleNames);
 }
+

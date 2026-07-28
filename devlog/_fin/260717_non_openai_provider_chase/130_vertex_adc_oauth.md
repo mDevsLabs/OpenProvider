@@ -43,4 +43,5 @@ bun run build:gui
 - `DONE`: ADC setup is first-class and all token-source/redaction/live Vertex probes pass.
 - `NOOP`: CLI/GUI already expose the complete ADC path by the time this phase starts.
 - `NEEDS_HUMAN`: project, IAM role, billing, or ADC login is missing.
-- `UNSAFE`: implementation would embed unapproved OAuth credentials or duplicate refresh tokens into OCX config.
+- `UNSAFE`: implementation would embed unapproved OAuth credentials or duplicate refresh tokens into opr config.
+

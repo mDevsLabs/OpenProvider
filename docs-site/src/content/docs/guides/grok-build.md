@@ -20,7 +20,7 @@ model = "gpt-5.6-sol"
 base_url = "http://127.0.0.1:10100/v1"
 api_backend = "chat_completions"
 api_key = "OpenProvider-loopback"
-name = "OCX gpt-5.6-sol"
+name = "opr gpt-5.6-sol"
 # ... one [model.opr-*] table per visible model ...
 # <<< OpenProvider managed block <<<
 ```
@@ -127,4 +127,5 @@ the id `grok-4.5`. Generated aliases avoid dots entirely for this reason.
   atomically — Grok never sees a half-written config.
 - **Catalog updates:** the fenced block reflects the catalog at injection time. After
   adding providers or models, run `opr ensure` (or restart the proxy) to refresh it.
+
 

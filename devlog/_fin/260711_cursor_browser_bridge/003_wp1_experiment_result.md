@@ -18,7 +18,7 @@ Probe method: POST /v1/responses through the REAL request-builder path (so
 `requestContextArgs` fires and system-note injection is faithful), reading raw
 protocol frames. The user's live proxy on 10100 was used only for the read-only
 baseline probes with debug ON (user-authorized); provider-identity variants ran on
-an ISOLATED second proxy (port 10199, separate OPENCODEX_HOME/CODEX_HOME copies)
+an ISOLATED second proxy (port 10199, separate @mdevs/openprovider_HOME/CODEX_HOME copies)
 so the live session and Cursor account pool were never disturbed. All copied
 tokens/temp dirs were deleted after.
 
@@ -36,7 +36,7 @@ tokens/temp dirs were deleted after.
    => NAMING is not the gate. (H1 disproven.)
 
 3. PROVIDER-IDENTITY variant (isolated 10199, env-gated scaffold
-   `OCX_CURSOR_PROBE_PROVIDER=opencode` -> advertise client tools as provider
+   `opr_CURSOR_PROBE_PROVIDER=opencode` -> advertise client tools as provider
    `opencode`, name `mcp_opencode_<tool>`, exactly the working reference scheme),
    3 runs:
    - `[PROBE] execCase=requestContextArgs` x3  (tools WERE advertised under `opencode`)
@@ -58,7 +58,7 @@ CROWD-OUT. In EVERY probe the model had, and reached for, Cursor's native tool
 suite (`shellToolCall`/`shellStreamArgs`) and treated the injected MCP tools as
 absent. The reference bridge `opencode-cursor` presents itself to Cursor as a
 client WITHOUT the native tool surface, so its model has no native Shell and must
-use the injected `mcp_opencode_*` tools. Opencodex advertises the full Cursor
+use the injected `mcp_opencode_*` tools. @mdevs/openprovider advertises the full Cursor
 native tool suite (Shell/ReadFile/rg/ApplyPatch/...) AND the injected MCP tools;
 the model consistently binds to native and never surfaces the MCP tools. So the
 fix is likely about HOW openprovider declares client capabilities / which native
@@ -89,3 +89,5 @@ a mechanical fix:
   native-exec probe log) reverted; `git status` clean, `tsc` clean, cursor tests
   25/25 pass.
 - Debug turned OFF on 10100. Isolated homes with copied OAuth tokens deleted.
+
+

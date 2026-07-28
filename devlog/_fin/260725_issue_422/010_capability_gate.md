@@ -124,7 +124,7 @@ if (parsed._compactionRequest === true && !isCanonicalOpenAiForwardProvider(prov
  */
 export function supportsNativeResponsesCompactEndpoint(
   providerName: string,
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
 ): boolean
 ```
 
@@ -157,7 +157,7 @@ summary로 바꿔 최종적으로 200 + `"(no summary available)"`를 반환한�
 | `json.status !== "completed"` | 502. `failed`는 `upstream_error`로 upstream 메시지 전달, `incomplete`도 거부 — 잘린 요약을 replacement history로 설치하면 안 된다 |
 | `json.error`가 존재 | 502, `upstream_error`, 그 메시지 전달 |
 | `compaction` item 개수 `!== 1` | 502, `invalid_response_error`, 개수 명시 |
-| decoded summary가 비어 있음 | 502, `invalid_response_error`. `decodeCompactionSummary("ocx1:")`는 null이 아니라 **빈 문자열**을 반환하므로 null 검사만으로는 통과한다. `decoded !== null && decoded.trim().length > 0`을 요구한다 |
+| decoded summary가 비어 있음 | 502, `invalid_response_error`. `decodeCompactionSummary("opr1:")`는 null이 아니라 **빈 문자열**을 반환하므로 null 검사만으로는 통과한다. `decoded !== null && decoded.trim().length > 0`을 요구한다 |
 
 빈 summary를 성공으로 포장하지 않는다. 호출자가 실패를 알아야 재시도든 다른 경로든 택할 수 있다.
 
@@ -286,7 +286,7 @@ B에서 확인할 것:
      빈-summary 검사가 대신 실패시켜서 통과하면 wiring 누락을 놓친다
 9b. `v1 compact rejects incomplete and empty envelopes`
    - 내부 응답 `status:"incomplete"` → 비-2xx (잘린 요약 설치 금지)
-   - `encrypted_content`가 `"ocx1:"`(빈 envelope) → 비-2xx
+   - `encrypted_content`가 `"opr1:"`(빈 envelope) → 비-2xx
 9c. `noncanonical forward provider still gets the rewrite`
    - `authMode:"forward"`인 custom baseUrl provider의 upstream body에
      `compaction_trigger`와 tools가 없어야 함
@@ -308,3 +308,4 @@ bun run typecheck
 bun test tests/responses-compaction-routing.test.ts tests/responses-compaction.test.ts \
          tests/openai-responses-passthrough.test.ts
 ```
+

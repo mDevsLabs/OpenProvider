@@ -137,7 +137,7 @@ Mode → capability matrix:
   default deny) and pass it into `handleCursorNativeExec(...)` at `:200`.
 
 ### MODIFY `src/adapters/cursor/transport.ts` + provider config
-- Read `provider.cursorExecPolicy` (new optional `OcxProviderConfig` field) → build a
+- Read `provider.cursorExecPolicy` (new optional `oprProviderConfig` field) → build a
   `CursorExecPolicy`; absent ⇒ `DEFAULT_CURSOR_EXEC_POLICY` (deny). Document in config.
 
 ## 5. Out of scope (separate later phases)
@@ -163,3 +163,4 @@ Mode → capability matrix:
 - GPT Pro review 260627 — finding **#1 (Critical)**, both review passes.
 - jawcode `packages/ai/src/providers/cursor.ts:1256-1258, 1376-1382, 1100-1139` — typed-rejection default.
 - `112` (auth forwarding) · `113` (lifecycle) · `117` (false-safety error text) · `118` (index/test map).
+

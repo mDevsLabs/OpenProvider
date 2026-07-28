@@ -27,7 +27,7 @@ import {
 import { isInjectionDebugEnabled } from "../../lib/debug-settings";
 import { injectionDebugLog } from "../../lib/injection-debug-log";
 import { modelInList, namespacedToolName } from "../../types";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig, OcxProviderContinuationState, OcxUsage } from "../../types";
+import type { AdapterEvent, oprConfig, oprParsedRequest, oprProviderConfig, oprProviderContinuationState, oprUsage } from "../../types";
 import {
   forceRefreshOAuthAccessSnapshot,
   getOAuthCredentialApiBaseUrl,
@@ -159,7 +159,7 @@ export async function bufferCompactResponse(upstream: Response, signal: AbortSig
 
 export async function handleResponsesCompact(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
 ): Promise<Response> {
   let body: unknown;
@@ -309,7 +309,7 @@ export async function handleResponsesCompact(
   }
 
   // ROUTED model: run the v2 synthetic-compaction turn internally (appends COMPACT_PROMPT, no
-  // tools) and decode the resulting ocx1 envelope into plain v1 replacement-history items.
+  // tools) and decode the resulting opr1 envelope into plain v1 replacement-history items.
   const inputItems = Array.isArray(raw.input) ? (raw.input as unknown[]) : [];
   const internalBody = {
     ...raw,
@@ -363,7 +363,7 @@ export async function handleResponsesCompact(
   }
   const encrypted = compactionItems[0]!.encrypted_content;
   const decoded = typeof encrypted === "string" ? decodeCompactionSummary(encrypted) : null;
-  // An empty `ocx1:` envelope decodes to "" rather than null, so length is what matters.
+  // An empty `opr1:` envelope decodes to "" rather than null, so length is what matters.
   if (decoded === null || decoded.trim().length === 0) {
     return formatErrorResponse(502, "invalid_response_error", "compaction turn produced an empty summary");
   }
@@ -371,3 +371,4 @@ export async function handleResponsesCompact(
   const output = buildCompactV1Output(extractCompactUserMessages(inputItems), summary);
   return new Response(JSON.stringify({ output }), { headers: { "Content-Type": "application/json" } });
 }
+

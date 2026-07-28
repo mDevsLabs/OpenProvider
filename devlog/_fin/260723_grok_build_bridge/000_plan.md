@@ -30,8 +30,8 @@ Session: 019f8e74-906b-7430-be5d-5598745922b6 (cxc-loop, docs-first roadmap cycl
 | grok model | configured backend | opr model | text | exit | error |
 |---|---|---|---|---|---|
 | opr-chat | chat_completions | cursor/grok-4.5 | (없음) | 1 | `missing field 'input_tokens_details'` |
-| opr-native-chat | chat_completions | gpt-5.4-mini | **OCX_NATIVE_OK** | **0** | — |
-| opr-resp | responses | cursor/grok-4.5 | OCX_RESP_OK | 1 | `missing field 'input_tokens_details'` |
+| opr-native-chat | chat_completions | gpt-5.4-mini | **opr_NATIVE_OK** | **0** | — |
+| opr-resp | responses | cursor/grok-4.5 | opr_RESP_OK | 1 | `missing field 'input_tokens_details'` |
 
 ### 해석
 1. 7/16 블로커 ①(chat/completions 404)은 v2.7.35에서 해소 — 기본 백엔드로 wire가 뚫림.
@@ -62,3 +62,4 @@ wp1이 유일한 코드 변경. 예상 diff: `responsesUsage()`가 `input_tokens
 - 스모크 로그: `/tmp/grok-smoke-{chat,native,resp}.{out,err}`
 - grok config: `/tmp/grok-opr-smoke-260723/config.toml`
 - 직전 판정: `devlog/_fin/260716_grok_build_connect/030_feasibility_verdict.md`, `040_live_smoke.md`
+

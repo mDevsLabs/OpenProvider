@@ -24,7 +24,7 @@ One resolver shared by the CLI and the management API, so launch-time and the GU
 never disagree:
 
 ```ts
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { detectClaudeAuth, type AuthDetectResult, type AuthSourceId } from "./auth-detect";
 
 export type MarkerMode = "proxy" | "subscription";
@@ -47,7 +47,7 @@ export interface ResolvedAuthMode {
  * auto-unknown resolves to subscription: the historical default, because flipping a
  * subscriber into proxy mode on a failed read is the F1 failure.
  */
-export function resolveClaudeAuthMode(config: OcxConfig, detection: AuthDetectResult): ResolvedAuthMode {
+export function resolveClaudeAuthMode(config: oprConfig, detection: AuthDetectResult): ResolvedAuthMode {
   if (config.claudeCode?.authMode === "proxy") {
     return { markerMode: "proxy", origin: "manual", detection };
   }
@@ -189,3 +189,4 @@ the current two-option select cannot express. Validation widens to
 |---------|----------|
 | `bun test tests/claude-auth-mode.test.ts tests/claude-auth-detect.test.ts tests/claude-cli.test.ts` | pass |
 | `bun x tsc --noEmit` | clean |
+

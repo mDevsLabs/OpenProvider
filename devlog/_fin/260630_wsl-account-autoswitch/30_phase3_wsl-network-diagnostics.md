@@ -39,7 +39,7 @@ WHAM fetch paths swallow the error and return `quota: null`
    - `CODEX_HOME` via src/codex-paths.ts:25 (`CODEX_HOME`), plus `auth.json`
      existence the way `readCodexTokens` checks it
      (src/codex-auth-collision.ts:8-12).
-   - `OPENCODEX_HOME` via `getConfigDir()` (src/config.ts:148-150, resolver at
+   - `@mdevs/openprovider_HOME` via `getConfigDir()` (src/config.ts:148-150, resolver at
      :21-27) and whether `config.json` exists (`getConfigPath`,
      src/config.ts:152-154).
 2. Filesystem type of each state dir: detect drvfs / `/mnt/*` mounts (the
@@ -93,8 +93,8 @@ NEW `src/doctor.ts`
 - `export async function runDoctor(): Promise<void>` - prints a sectioned,
   ASCII report and exits 0 (diagnostics never fail the process).
 - `collectPaths()`: build rows for `CODEX_HOME` (src/codex-paths.ts:25),
-  `CODEX_HOME/auth.json`, `OPENCODEX_HOME` (`getConfigDir`), and
-  `OPENCODEX_HOME/config.json` (`getConfigPath`), each with `exists`
+  `CODEX_HOME/auth.json`, `@mdevs/openprovider_HOME` (`getConfigDir`), and
+  `@mdevs/openprovider_HOME/config.json` (`getConfigPath`), each with `exists`
   (`existsSync`) and resolved absolute path.
 - `detectFsType(path)`: parse `/proc/mounts` (absent off-Linux -> "n/a"),
   pick the longest mount-point prefix of `path`, return `{ fstype, mount,
@@ -122,7 +122,7 @@ MODIFY `src/cli.ts`
 
 NEW `tests/doctor.test.ts`
 
-- Path report: set `OPENCODEX_HOME`/`CODEX_HOME` to a temp dir (mirror the
+- Path report: set `@mdevs/openprovider_HOME`/`CODEX_HOME` to a temp dir (mirror the
   `beforeEach` env isolation in tests/codex-routing.test.ts:63-73); assert the
   report marks `config.json`/`auth.json` absent, then present after writing.
 - `detectFsType`: feed a synthetic `/proc/mounts` fixture string to the parser
@@ -146,3 +146,4 @@ NEW `tests/doctor.test.ts`
 ## Build record
 
 - Pending implementation.
+

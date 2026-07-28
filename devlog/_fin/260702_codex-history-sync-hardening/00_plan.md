@@ -44,7 +44,7 @@ re-tag design entirely, `session_index.jsonl` reconciliation, cross-process sync
 - `injectCodexConfig()`: when forward-sync `history.failed`, historyMessage notes the skip
   (`history sync skipped: state DB locked (close the Codex app and rerun 'opr start')`).
 
-**MODIFY `src/update.ts` + `bin/ocx.mjs`**
+**MODIFY `src/update.ts` + `bin/opr.mjs`**
 - After the successful stop gate, scan the opr config dir for `codex-history-backup-*.json`;
   if present, print a non-blocking warning that native history visibility is not restored
   and how to fix (close Codex app → `opr stop`). Update proceeds (blocking an update on an
@@ -62,3 +62,4 @@ re-tag design entirely, `session_index.jsonl` reconciliation, cross-process sync
 ## Verification gate (C)
 
 `bun test ./tests/` (0 fail) + `bun x tsc --noEmit` (0 errors).
+

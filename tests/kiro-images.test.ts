@@ -6,7 +6,7 @@ import { createKiroAdapter } from "../src/adapters/kiro";
 import { normalizeKiroImages, KIRO_IMAGE_BASE64_BUDGET, KIRO_MAX_IMAGES_PER_MESSAGE, type KiroImage } from "../src/adapters/kiro-images";
 import { resetNormalizeStateForTests, TIER_SPECS, type EncodeFn } from "../src/adapters/anthropic-image-normalize";
 import { sniffImageDimensions } from "../src/adapters/anthropic-image-guard";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
 const origHome = process.env.HOME;
 const origRegion = process.env.KIRO_REGION;
@@ -26,10 +26,10 @@ afterEach(() => {
   rmSync(tmp, { recursive: true, force: true });
 });
 
-const provider = { adapter: "kiro", baseUrl: "https://runtime.us-east-1.kiro.dev", authMode: "oauth", apiKey: "tok-123" } as unknown as OcxProviderConfig;
+const provider = { adapter: "kiro", baseUrl: "https://runtime.us-east-1.kiro.dev", authMode: "oauth", apiKey: "tok-123" } as unknown as oprProviderConfig;
 
-function parsedWith(messages: unknown[]): OcxParsedRequest {
-  return { modelId: "claude-sonnet-4.5", stream: true, options: {}, context: { messages } } as unknown as OcxParsedRequest;
+function parsedWith(messages: unknown[]): oprParsedRequest {
+  return { modelId: "claude-sonnet-4.5", stream: true, options: {}, context: { messages } } as unknown as oprParsedRequest;
 }
 
 function currentUim(body: string): Record<string, unknown> {
@@ -233,3 +233,4 @@ test("K2b: tool-result image rides its carrier and is normalized through the rea
   const d = sniffImageDimensions(allImages[0].source.bytes);
   expect(Math.max(d!.width, d!.height)).toBeLessThanOrEqual(2000);
 });
+

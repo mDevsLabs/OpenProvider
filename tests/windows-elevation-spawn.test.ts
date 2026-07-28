@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { EventEmitter } from "node:events";
 import {
-  OCX_ELEVATED_CREATE_FAILED,
-  OCX_ELEVATED_PROTOCOL_CODES,
-  OCX_ELEVATED_PROTOCOL_FAILED,
-  OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
-  OCX_ELEVATED_RUN_FAILED_ROLLED_BACK,
-  OCX_ELEVATED_SUCCESS,
-  OCX_ELEVATED_UAC_CANCELLED,
+  opr_ELEVATED_CREATE_FAILED,
+  opr_ELEVATED_PROTOCOL_CODES,
+  opr_ELEVATED_PROTOCOL_FAILED,
+  opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
+  opr_ELEVATED_RUN_FAILED_ROLLED_BACK,
+  opr_ELEVATED_SUCCESS,
+  opr_ELEVATED_UAC_CANCELLED,
   WindowsElevationError,
   buildElevatedSchtasksCreateAndRunScript,
   classifyElevatedSchedulerExitCode,
@@ -106,7 +106,7 @@ describe("runWindowsElevated spawn contract", () => {
     }) as never);
 
     await runWindowsElevated("schtasks.exe", ["/create"]);
-    expect(commandScript).toContain(`if ($null -eq $p.ExitCode) { exit ${OCX_ELEVATED_PROTOCOL_FAILED} }`);
+    expect(commandScript).toContain(`if ($null -eq $p.ExitCode) { exit ${opr_ELEVATED_PROTOCOL_FAILED} }`);
     expect(commandScript).toContain("$null = $p.Handle;");
     expect(commandScript).not.toContain("$p.Handleif");
     expect(commandScript).toMatch(/\$null = \$p\.Handle;\s*if \(\$null -eq \$p\.ExitCode\)/);
@@ -118,7 +118,7 @@ describe("runWindowsElevated spawn contract", () => {
   });
 
   test("maps exit 1223 to cancelled", async () => {
-    fakeChild({ code: OCX_ELEVATED_UAC_CANCELLED });
+    fakeChild({ code: opr_ELEVATED_UAC_CANCELLED });
     await expect(runWindowsElevated("schtasks.exe", ["/create"])).rejects.toMatchObject({
       name: "WindowsElevationError",
       reason: "cancelled",
@@ -165,12 +165,12 @@ describe("runWindowsElevated spawn contract", () => {
 
     let late: { exitCode: number } | null = null;
     const lateWait = started.completion.then(value => { late = value; });
-    child.emit("close", OCX_ELEVATED_SUCCESS, null);
+    child.emit("close", opr_ELEVATED_SUCCESS, null);
     await lateWait;
-    expect(late).toEqual({ exitCode: OCX_ELEVATED_SUCCESS, stdout: "", stderr: "" });
+    expect(late).toEqual({ exitCode: opr_ELEVATED_SUCCESS, stdout: "", stderr: "" });
     child.emit("close", 1, null); // second close must not double-settle
     await Promise.resolve();
-    expect(late?.exitCode).toBe(OCX_ELEVATED_SUCCESS);
+    expect(late?.exitCode).toBe(opr_ELEVATED_SUCCESS);
   });
 
   test("launcher error before elevation settles as launch-failed without hang", async () => {
@@ -196,10 +196,10 @@ describe("runWindowsElevated spawn contract", () => {
     const raced = await raceWithTimeout(started.completion, 20);
     expect(raced.status).toBe("timed-out");
     expect(child.kill).not.toHaveBeenCalled();
-    child.emit("close", OCX_ELEVATED_CREATE_FAILED, null);
+    child.emit("close", opr_ELEVATED_CREATE_FAILED, null);
     await expect(started.completion).resolves.toMatchObject({
       outcome: "create-failed",
-      exitCode: OCX_ELEVATED_CREATE_FAILED,
+      exitCode: opr_ELEVATED_CREATE_FAILED,
     });
   });
 
@@ -213,18 +213,18 @@ describe("runWindowsElevated spawn contract", () => {
 
 describe("elevated scheduler protocol codes", () => {
   test("reserved codes are unique and exclude UAC cancellation", () => {
-    const set = new Set<number>(OCX_ELEVATED_PROTOCOL_CODES);
-    expect(set.size).toBe(OCX_ELEVATED_PROTOCOL_CODES.length);
-    expect(set.has(OCX_ELEVATED_UAC_CANCELLED)).toBe(false);
-    expect(classifyElevatedSchedulerExitCode(OCX_ELEVATED_SUCCESS)).toBe("success");
-    expect(classifyElevatedSchedulerExitCode(OCX_ELEVATED_CREATE_FAILED)).toBe("create-failed");
-    expect(classifyElevatedSchedulerExitCode(OCX_ELEVATED_RUN_FAILED_ROLLED_BACK)).toBe("run-failed-rolled-back");
-    expect(classifyElevatedSchedulerExitCode(OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED)).toBe("run-failed-rollback-failed");
-    expect(classifyElevatedSchedulerExitCode(OCX_ELEVATED_PROTOCOL_FAILED)).toBe("protocol-failed");
+    const set = new Set<number>(opr_ELEVATED_PROTOCOL_CODES);
+    expect(set.size).toBe(opr_ELEVATED_PROTOCOL_CODES.length);
+    expect(set.has(opr_ELEVATED_UAC_CANCELLED)).toBe(false);
+    expect(classifyElevatedSchedulerExitCode(opr_ELEVATED_SUCCESS)).toBe("success");
+    expect(classifyElevatedSchedulerExitCode(opr_ELEVATED_CREATE_FAILED)).toBe("create-failed");
+    expect(classifyElevatedSchedulerExitCode(opr_ELEVATED_RUN_FAILED_ROLLED_BACK)).toBe("run-failed-rolled-back");
+    expect(classifyElevatedSchedulerExitCode(opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED)).toBe("run-failed-rollback-failed");
+    expect(classifyElevatedSchedulerExitCode(opr_ELEVATED_PROTOCOL_FAILED)).toBe("protocol-failed");
     expect(classifyElevatedSchedulerExitCode(1)).toBe("protocol-failed");
     expect(classifyElevatedSchedulerExitCode(-1)).toBe("protocol-failed");
     expect(classifyElevatedSchedulerExitCode(99999)).toBe("protocol-failed");
-    expect(classifyElevatedSchedulerExitCode(OCX_ELEVATED_UAC_CANCELLED)).toBe("protocol-failed");
+    expect(classifyElevatedSchedulerExitCode(opr_ELEVATED_UAC_CANCELLED)).toBe("protocol-failed");
   });
 });
 
@@ -236,11 +236,11 @@ describe("one-UAC create/run/rollback elevated script", () => {
       ["/run", "/tn", "openprovider-proxy"],
       ["/delete", "/tn", "openprovider-proxy", "/f"],
     );
-    expect(script).toContain("Invoke-OcxSchtasks");
-    expect(script).toContain(`exit ${OCX_ELEVATED_CREATE_FAILED}`);
-    expect(script).toContain(`exit ${OCX_ELEVATED_SUCCESS}`);
-    expect(script).toContain(`exit ${OCX_ELEVATED_RUN_FAILED_ROLLED_BACK}`);
-    expect(script).toContain(`exit ${OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED}`);
+    expect(script).toContain("Invoke-oprSchtasks");
+    expect(script).toContain(`exit ${opr_ELEVATED_CREATE_FAILED}`);
+    expect(script).toContain(`exit ${opr_ELEVATED_SUCCESS}`);
+    expect(script).toContain(`exit ${opr_ELEVATED_RUN_FAILED_ROLLED_BACK}`);
+    expect(script).toContain(`exit ${opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED}`);
     expect(script).toContain('"C:\\Users\\Jane Doe\\task.xml"');
     expect(script).not.toContain("-Verb RunAs");
     expect(script).not.toMatch(/Set-Content|Out-File|Add-Content|New-Item/i);
@@ -306,7 +306,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     setFinalizeWindowsSchedulerHooksForTests({
       elevateCreateAndRun: async () => {
         elevateLaunches += 1;
-        return { outcome: "success", exitCode: OCX_ELEVATED_SUCCESS, stdout: "", stderr: "" };
+        return { outcome: "success", exitCode: opr_ELEVATED_SUCCESS, stdout: "", stderr: "" };
       },
       verify: okVerify,
       writeInstallState: () => { writeCount += 1; },
@@ -323,7 +323,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     setFinalizeWindowsSchedulerHooksForTests({
       elevateCreateAndRun: async () => {
         elevateLaunches += 1;
-        return { outcome: "create-failed", exitCode: OCX_ELEVATED_CREATE_FAILED, stdout: "", stderr: "" };
+        return { outcome: "create-failed", exitCode: opr_ELEVATED_CREATE_FAILED, stdout: "", stderr: "" };
       },
       writeInstallState: () => { writeCount += 1; },
     });
@@ -339,7 +339,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
         elevateLaunches += 1;
         return {
           outcome: "run-failed-rolled-back",
-          exitCode: OCX_ELEVATED_RUN_FAILED_ROLLED_BACK,
+          exitCode: opr_ELEVATED_RUN_FAILED_ROLLED_BACK,
           stdout: "",
           stderr: "",
         };
@@ -359,7 +359,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
         elevateLaunches += 1;
         return {
           outcome: "run-failed-rollback-failed",
-          exitCode: OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
+          exitCode: opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
           stdout: "",
           stderr: "",
         };
@@ -421,7 +421,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
 
     resolveCompletion({
       outcome: "success",
-      exitCode: OCX_ELEVATED_SUCCESS,
+      exitCode: opr_ELEVATED_SUCCESS,
       stdout: "",
       stderr: "",
     });
@@ -459,7 +459,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     expect(result.kind).toBe("indeterminate");
     resolveCompletion({
       outcome: "create-failed",
-      exitCode: OCX_ELEVATED_CREATE_FAILED,
+      exitCode: opr_ELEVATED_CREATE_FAILED,
       stdout: "",
       stderr: "",
     });
@@ -491,7 +491,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     const result = await finalizeWindowsSchedulerServiceRegistration();
     resolveCompletion({
       outcome: "run-failed-rolled-back",
-      exitCode: OCX_ELEVATED_RUN_FAILED_ROLLED_BACK,
+      exitCode: opr_ELEVATED_RUN_FAILED_ROLLED_BACK,
       stdout: "",
       stderr: "",
     });
@@ -523,7 +523,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     const result = await finalizeWindowsSchedulerServiceRegistration();
     resolveCompletion({
       outcome: "run-failed-rollback-failed",
-      exitCode: OCX_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
+      exitCode: opr_ELEVATED_RUN_FAILED_ROLLBACK_FAILED,
       stdout: "",
       stderr: "",
     });
@@ -557,7 +557,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     expect(result.kind).toBe("indeterminate");
     resolveCompletion({
       outcome: "protocol-failed",
-      exitCode: OCX_ELEVATED_PROTOCOL_FAILED,
+      exitCode: opr_ELEVATED_PROTOCOL_FAILED,
       stdout: "",
       stderr: "",
     });
@@ -597,7 +597,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     owned.delete("attempt-a");
     resolveCompletion({
       outcome: "success",
-      exitCode: OCX_ELEVATED_SUCCESS,
+      exitCode: opr_ELEVATED_SUCCESS,
       stdout: "",
       stderr: "",
     });
@@ -673,7 +673,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     setFinalizeWindowsSchedulerHooksForTests({
       elevateCreateAndRun: async () => {
         elevateLaunches += 1;
-        return { outcome: "protocol-failed", exitCode: OCX_ELEVATED_PROTOCOL_FAILED, stdout: "", stderr: "" };
+        return { outcome: "protocol-failed", exitCode: opr_ELEVATED_PROTOCOL_FAILED, stdout: "", stderr: "" };
       },
       writeInstallState: () => { writeCount += 1; },
       taskInstalled: () => {
@@ -693,7 +693,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     setFinalizeWindowsSchedulerHooksForTests({
       elevateCreateAndRun: async () => {
         elevateLaunches += 1;
-        return { outcome: "success", exitCode: OCX_ELEVATED_SUCCESS, stdout: "", stderr: "" };
+        return { outcome: "success", exitCode: opr_ELEVATED_SUCCESS, stdout: "", stderr: "" };
       },
       verify: () => ({
         taskInstalled: true,
@@ -719,7 +719,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     setFinalizeWindowsSchedulerHooksForTests({
       elevateCreateAndRun: async () => {
         elevateLaunches += 1;
-        return { outcome: "success", exitCode: OCX_ELEVATED_SUCCESS, stdout: "", stderr: "" };
+        return { outcome: "success", exitCode: opr_ELEVATED_SUCCESS, stdout: "", stderr: "" };
       },
       verify: () => ({
         taskInstalled: true,
@@ -754,7 +754,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
       child.stdout.setEncoding = () => undefined;
       child.stderr.setEncoding = () => undefined;
       child.kill = mock(() => true);
-      queueMicrotask(() => child.emit("close", OCX_ELEVATED_SUCCESS, null));
+      queueMicrotask(() => child.emit("close", opr_ELEVATED_SUCCESS, null));
       return child as never;
     }) as never);
 
@@ -766,7 +766,7 @@ describe("finalizeWindowsSchedulerServiceRegistration", () => {
     );
     expect(launches).toBe(1);
     expect(result.outcome).toBe("success");
-    expect(result.exitCode).toBe(OCX_ELEVATED_SUCCESS);
+    expect(result.exitCode).toBe(opr_ELEVATED_SUCCESS);
   });
 });
 
@@ -838,4 +838,5 @@ describe("evaluateSchedulerInstallRestartReconciliation", () => {
     }).status).toBe("unhealthy");
   });
 });
+
 

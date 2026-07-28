@@ -62,7 +62,7 @@ import { loadConfig } from "../config";
 import { findLiveProxy, probeHostname, type LiveProxy } from "../server/proxy-liveness";
 import { runningProxyUpdateHeaders } from "../oauth/login-cli";
 import { getProviderRegistryEntry, providerCodexAccountMode } from "../providers/registry";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 
 export type AccountType = "codex" | "oauth" | "api-key";
 export interface AccountRow {
@@ -73,7 +73,7 @@ export interface AccountRow {
 export interface AccountDeps {
   baseUrl?: string;                       // test injection; skips findLiveProxy
   fetchImpl?: typeof fetch;
-  loadConfigImpl?: () => OcxConfig;
+  loadConfigImpl?: () => oprConfig;
 }
 ```
 
@@ -278,3 +278,4 @@ Test matrix (activation scenarios, C-ACTIVATION-GROUNDING-01):
   (login-cli.ts:9); another session is landing provider-work commits on `dev`.
 - Re-check `findLiveProxy` signature in proxy-liveness.ts before writing
   `resolveLive` (line drift expected; contract stable).
+

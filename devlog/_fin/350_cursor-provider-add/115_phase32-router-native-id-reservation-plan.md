@@ -65,14 +65,14 @@ no native provider exists, throw a clear error (do not fall through to Cursor or
 // Broadened native pattern: gpt-*, o<N>-* (o1/o3/o4/future o5…), codex-*.
 const NATIVE_OPENAI_BARE_RE = /^(gpt-|o[0-9]+-|codex-)/;
 
-function nativeOpenAiSlugs(config: OcxConfig): Set<string> {
+function nativeOpenAiSlugs(config: oprConfig): Set<string> {
   // union of configured openai/chatgpt provider model lists + known Codex catalog ids
   …
 }
-function isReservedNativeOpenAiBareId(id: string, config: OcxConfig): boolean {
+function isReservedNativeOpenAiBareId(id: string, config: oprConfig): boolean {
   return NATIVE_OPENAI_BARE_RE.test(id) || nativeOpenAiSlugs(config).has(id);
 }
-function findConfiguredNativeOpenAiProvider(config: OcxConfig): [string, OcxProviderConfig] | undefined {
+function findConfiguredNativeOpenAiProvider(config: oprConfig): [string, oprProviderConfig] | undefined {
   return Object.entries(config.providers).find(
     ([name]) => ["openai","chatgpt","openai-apikey"].some(p => name === p || name.startsWith(`${p}-`)));
 }
@@ -113,3 +113,4 @@ if (isReservedNativeOpenAiBareId(modelId, config)) {
 ## 7. Cross-references
 - GPT Pro review 260627 — finding **#6 (Medium-high)**.
 - `96` (routing+stream RCA) · commit `698bbba` (ordering fix this hardens) · `118` (index).
+

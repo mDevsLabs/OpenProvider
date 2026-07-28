@@ -9,7 +9,7 @@ All 18 English docs are covered by both translations.
 
 ko/reference/architecture.md jumps from bridge behavior to transport/compaction,
 omitting English lines 108-121 that document management endpoints, OAuth, usage
-aggregation, `OPENCODEX_API_AUTH_TOKEN`, and remote-bind authentication.
+aggregation, `@mdevs/openprovider_API_AUTH_TOKEN`, and remote-bind authentication.
 Security-relevant: remote authentication requirement is undocumented in Korean.
 
 ### Chinese: how-it-works.mdx missing account-pool routing
@@ -54,3 +54,4 @@ Chinese:
   `합친 것입니다`, `수단은 ... 것입니다`
 - Source-parity drift: ko/zh quickstarts include GPT-5.6 three-command example
   absent from English source
+

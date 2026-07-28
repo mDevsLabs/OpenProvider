@@ -51,7 +51,7 @@ plutil -p ~/Library/LaunchAgents/com.openprovider.proxy.plist
 Verify:
 
 - `EnvironmentVariables.CODEX_HOME` is present when installed with `CODEX_HOME`;
-- `OCX_SERVICE=1` is present;
+- `opr_SERVICE=1` is present;
 - proxy starts and `bun run src/cli.ts status` reports a live PID.
 
 ### Linux
@@ -64,7 +64,7 @@ systemctl --user cat openprovider-proxy.service
 Verify:
 
 - unit contains `Environment="CODEX_HOME=/tmp/opr-codex-home"`;
-- unit contains `Environment="OCX_SERVICE=1"`;
+- unit contains `Environment="opr_SERVICE=1"`;
 - logs append to the openprovider config log path;
 - `systemctl --user status openprovider-proxy.service` is active.
 
@@ -80,7 +80,7 @@ type "$HOME\.openprovider\openprovider-service.cmd"
 Verify:
 
 - wrapper script exists;
-- wrapper script sets `OCX_SERVICE=1`;
+- wrapper script sets `opr_SERVICE=1`;
 - wrapper script preserves `CODEX_HOME`;
 - Task Scheduler entry calls the wrapper, not an unquoted inline command.
 
@@ -111,3 +111,4 @@ After sync/start, open a fresh Codex process and verify:
 - `model_catalog_json` is startup-loaded by Codex, so an already-running Codex UI may need restart after catalog changes.
 - `CODEX_HOME` must already exist when explicitly set, matching upstream Codex behavior.
 - Windows service verification needs a real Windows host; macOS/Linux can only validate syntax and generated files for that path.
+

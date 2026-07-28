@@ -5,19 +5,19 @@ import { join } from "node:path";
 import { loadConfig, saveConfig } from "../src/config";
 import { projectAlibabaRegionMigration } from "../src/providers/alibaba-region-migration";
 import { routeModel } from "../src/router";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const INTL_URL = "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1";
 
 /** A config exhibiting the #457 mismatch: Beijing id, international endpoint. */
-function migratableConfig(): OcxConfig {
+function migratableConfig(): oprConfig {
   return {
     port: 10100,
     defaultProvider: "alibaba-token-plan",
     providers: {
       "alibaba-token-plan": { adapter: "openai-chat", apiKey: "sk-intl-key", baseUrl: INTL_URL },
     },
-  } as unknown as OcxConfig;
+  } as unknown as oprConfig;
 }
 
 test("moves a Beijing entry holding an international endpoint", () => {
@@ -73,7 +73,7 @@ test("a genuine Beijing config is untouched", () => {
       port: 10100,
       defaultProvider: "alibaba-token-plan",
       providers: { "alibaba-token-plan": { adapter: "openai-chat", apiKey: "sk-cn", ...(baseUrl ? { baseUrl } : {}) } },
-    } as unknown as OcxConfig;
+    } as unknown as oprConfig;
     const before = structuredClone(config);
     const projection = projectAlibabaRegionMigration(config);
     expect(projection.changed).toBe(false);
@@ -122,4 +122,5 @@ test("carries liveModels and a user-authored note, but not the Beijing catalog",
   expect(moved.note).toBe("my own note");
   expect(moved.models).toContain("kimi-k2.7-code");
 });
+
 

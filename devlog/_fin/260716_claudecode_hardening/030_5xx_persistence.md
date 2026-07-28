@@ -63,7 +63,7 @@ redaction은 `logCtx.upstreamError` 캡처 지점(request-log.ts ~line 286,
 ## Accept criteria + activation
 
 - NEW `tests/usage-failure-persistence.test.ts`:
-  1. `OPENCODEX_HOME=<tmpdir>` 격리(감사 확인: config.ts:62의 per-call env 해석이라
+  1. `@mdevs/openprovider_HOME=<tmpdir>` 격리(감사 확인: config.ts:62의 per-call env 해석이라
      프로세스 중간 오버라이드 가능 — tests/api-usage.test.ts:68 패턴) 후
      `addRequestLog`로 status 502 +
      terminalStatus "failed" + closeReason "terminal" + upstreamError 항목 기록 →
@@ -71,3 +71,4 @@ redaction은 `logCtx.upstreamError` 캡처 지점(request-log.ts ~line 286,
   2. status 200 completed 항목 → 진단 필드 부재 (기존 형태 불변)
 - 전체 스위트 green. `addRequestLog`는 `appendUsageEntry`를 직접 호출(주입 seam
   없음, 감사 blocker #5 확인)이므로 env-var 격리 경로가 유일한 assertion 루트다.
+

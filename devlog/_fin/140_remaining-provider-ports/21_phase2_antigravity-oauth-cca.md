@@ -83,10 +83,10 @@ timeout, and error-classification armor Vertex got, so it's production-grade fro
 Register in `OAUTH_PROVIDERS` (`src/oauth/index.ts`) under key `"antigravity"` (matching `oauthId`
 above). Implements login + refresh + project discovery. **`OAuthCredentials` (`src/oauth/types.ts`)
 gains an optional `projectId?: string`** — note this is the OAuth credential type, NOT
-`OcxProviderConfig` (which already uses `project`/`location` for Vertex and needs no change here).
+`oprProviderConfig` (which already uses `project`/`location` for Vertex and needs no change here).
 The server injects only the bare access token into `apiKey`, so the adapter reads `projectId` from
-the stored credential — same audit fix the 20_ plan noted. `OcxProviderConfig`'s allowed-key union
-(`types.ts:58`) does NOT need editing for this (no new `OcxProviderConfig` field).
+the stored credential — same audit fix the 20_ plan noted. `oprProviderConfig`'s allowed-key union
+(`types.ts:58`) does NOT need editing for this (no new `oprProviderConfig` field).
 
 Project discovery (mirror CLIProxyAPI `FetchProjectID` / `OnboardUser`):
 
@@ -223,3 +223,4 @@ label, or add a thin `safeAntigravityHttpErrorMessage` that delegates with an `"
   `userAgent` literal, stable sessionId), `response`-unwrap in parseStream, `fetchAntigravityWithRetry`.
 - Tests: `tests/google-antigravity-wire.test.ts` + `tests/google-antigravity-oauth.test.ts`;
   `provider-registry-parity` alias snapshot updated. Suite 1034/0, tsc clean.
+

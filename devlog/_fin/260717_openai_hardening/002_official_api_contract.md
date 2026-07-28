@@ -25,7 +25,7 @@ caps auto-compaction at `min(90% of context, max input)`. Max output is recorded
 here but does not need a separate Codex picker field in this unit.
 
 `gpt-5.6` is an upstream alias that routes to Sol. The API provider may expose it
-as a normal upstream model id; it is not an OCX virtual Pro alias.
+as a normal upstream model id; it is not an opr virtual Pro alias.
 
 ## Reasoning contract
 
@@ -92,3 +92,4 @@ request resolves the same virtual selection and reapplies `reasoning.mode: "pro"
 The guide also documents persisted reasoning, explicit prompt caching, and
 Programmatic Tool Calling. They are intentionally excluded until provider/auth
 ownership and the Pro alias boundary are stable and independently tested.
+

@@ -8,7 +8,7 @@ Goal: MAIN settings expose EXACTLY TWO sidecar settings — webSearchSidecar
 PER-CLIENT OVERRIDE of the same two (unset = inherit global). Strings in en/ko/
 zh-cn (+ German for compile completeness). Strict management-API validation.
 
-Write scope: src/types.ts (OcxClaudeCodeConfig override fields), src/server/
+Write scope: src/types.ts (oprClaudeCodeConfig override fields), src/server/
 management-api.ts (/api/sidecar-settings + /api/claude-code sidecar override),
 the Claude effective-config merge point (src/server/claude-messages.ts OR the
 config passed to handleResponses — determine exact seam), gui/src/pages/
@@ -16,7 +16,7 @@ Dashboard.tsx, gui/src/pages/ClaudeCode.tsx, gui/src/i18n/{en,ko,zh,de}.ts, and
 tests (management + precedence). Out of scope: docs (WP6), desktop-3p.
 
 ## Config (src/types.ts)
-- OcxClaudeCodeConfig (~247): add
+- oprClaudeCodeConfig (~247): add
   `webSearchSidecar?: { backend?: "openai"|"anthropic"; model?: string }` and
   `visionSidecar?: { backend?: "openai"|"anthropic"; model?: string }`.
   Absent nested object (or null on PUT) => inherit global.
@@ -113,3 +113,4 @@ keys.
 
 Net: backend is a tri-state on the wire — "openai" | "anthropic" | null(clear).
 GUI Auto = the null/unset state.
+

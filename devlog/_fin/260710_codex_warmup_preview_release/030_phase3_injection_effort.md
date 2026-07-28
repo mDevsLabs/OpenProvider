@@ -9,7 +9,7 @@
 
 ## Diff-level inclusion map
 
-- MODIFY `src/types.ts`: add optional `OcxConfig.injectionEffort`.
+- MODIFY `src/types.ts`: add optional `oprConfig.injectionEffort`.
 - MODIFY `src/reasoning-effort.ts`: export membership validation for the existing Codex effort ladder.
 - MODIFY `src/server/management-api.ts`: GET returns current effort plus allowed efforts; PUT validates model/effort before mutating config, supports clear/unchanged semantics, and clears effort with model.
 - MODIFY `src/server/responses.ts`: inject `reasoning_effort` guidance only when both an injection model and effort are configured; preserve the original max/ultra gate without a model.
@@ -43,3 +43,4 @@ Rendered verification uses the existing GUI server and native browser tooling at
 - GUI build succeeds.
 - One clean rendered observation covers desktop/tablet/mobile layout and the conditional selector state.
 - An independent reviewer finds no unresolved High/Critical issue in the combined release diff.
+

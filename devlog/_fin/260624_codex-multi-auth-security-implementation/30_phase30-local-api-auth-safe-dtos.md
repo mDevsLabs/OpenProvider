@@ -13,7 +13,7 @@ Implement Patch 3 from `devlog/280_codex-multi-auth-security-patch-plan/00_patch
 - stop returning provider headers, API key prefixes, or unrestricted account emails from management DTOs;
 - keep loopback-only default behavior working without adding a new GUI login flow in this slice.
 
-This phase does not implement a full authenticated remote GUI UX. If a user chooses `hostname: "0.0.0.0"`, API clients must set `OPENCODEX_API_AUTH_TOKEN` before startup and send `x-openprovider-api-key`.
+This phase does not implement a full authenticated remote GUI UX. If a user chooses `hostname: "0.0.0.0"`, API clients must set `@mdevs/openprovider_API_AUTH_TOKEN` before startup and send `x-openprovider-api-key`.
 
 ## Security Basis
 
@@ -24,7 +24,7 @@ This phase does not implement a full authenticated remote GUI UX. If a user choo
 ## Acceptance Criteria
 
 - Default loopback binding (`undefined`, `127.0.0.1`, `localhost`, `::1`) continues to work without a local API key.
-- Non-loopback binding (`0.0.0.0` or other externally reachable host) fails startup/config validation unless `OPENCODEX_API_AUTH_TOKEN` is present.
+- Non-loopback binding (`0.0.0.0` or other externally reachable host) fails startup/config validation unless `@mdevs/openprovider_API_AUTH_TOKEN` is present.
 - When local API auth is required:
   - `/api/*` management routes require `x-openprovider-api-key`;
   - `/v1/responses` HTTP requires `x-openprovider-api-key`;
@@ -45,7 +45,7 @@ This phase does not implement a full authenticated remote GUI UX. If a user choo
 
 ### `src/types.ts`
 
-No code change. Phase 30 uses env-only `OPENCODEX_API_AUTH_TOKEN` to avoid persisting local API credentials into `~/.openprovider/config.json`.
+No code change. Phase 30 uses env-only `@mdevs/openprovider_API_AUTH_TOKEN` to avoid persisting local API credentials into `~/.openprovider/config.json`.
 
 ### MODIFY `src/server.ts`
 
@@ -58,18 +58,18 @@ import { timingSafeEqual } from "node:crypto";
 Add helpers near CORS/auth utilities:
 
 ```ts
-function configuredApiAuthToken(config: OcxConfig): string | undefined;
+function configuredApiAuthToken(config: oprConfig): string | undefined;
 function isLoopbackHostname(hostname: string | undefined): boolean;
-function isApiAuthRequired(config: OcxConfig): boolean;
-function hasValidApiAuth(req: Request, config: OcxConfig): boolean;
-function requireApiAuth(req: Request, config: OcxConfig): Response | null;
-function assertServerAuthConfig(config: OcxConfig): void;
-function safeConfigDTO(config: OcxConfig): unknown;
+function isApiAuthRequired(config: oprConfig): boolean;
+function hasValidApiAuth(req: Request, config: oprConfig): boolean;
+function requireApiAuth(req: Request, config: oprConfig): Response | null;
+function assertServerAuthConfig(config: oprConfig): void;
+function safeConfigDTO(config: oprConfig): unknown;
 ```
 
 Rules:
 
-- `configuredApiAuthToken()` returns `process.env.OPENCODEX_API_AUTH_TOKEN?.trim()` only.
+- `configuredApiAuthToken()` returns `process.env.@mdevs/openprovider_API_AUTH_TOKEN?.trim()` only.
 - `isLoopbackHostname()` accepts `undefined`, `""`, `localhost`, `127.0.0.1`, and `::1`.
 - `isApiAuthRequired()` returns true only when host is non-loopback.
 - `assertServerAuthConfig()` throws before `Bun.serve()` if host is non-loopback and no token exists.
@@ -255,7 +255,7 @@ Changed tests:
 
 Implemented behavior:
 
-- Non-loopback hostnames require env-only `OPENCODEX_API_AUTH_TOKEN` before `Bun.serve()`.
+- Non-loopback hostnames require env-only `@mdevs/openprovider_API_AUTH_TOKEN` before `Bun.serve()`.
 - When non-loopback auth is required, `x-openprovider-api-key` is validated with constant-time comparison.
 - CORS allows `X-OpenProvider-API-Key`.
 - `/api/*`, `/v1/responses` HTTP, and `/v1/responses` WebSocket have auth gates; loopback remains unchanged.
@@ -340,3 +340,5 @@ Residual risks accepted for this phase:
 ## Commit Boundary
 
 One implementation commit for Phase 30 local API auth gate and safe DTOs. Do not mix in manual import identity changes or outcome classifier changes.
+
+

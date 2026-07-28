@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { AdapterEvent, OcxProviderConfig } from "../types";
+import type { AdapterEvent, oprProviderConfig } from "../types";
 import type { ProviderAdapter } from "./base";
 import { cursorExecDeniedMessage, cursorRequestDeclaresFullAccess } from "./cursor/exec-policy";
 import { isCursorBenignCancelError, isCursorInvalidArgumentError, safeCursorErrorMessage } from "./cursor/cursor-errors";
@@ -51,7 +51,7 @@ function safeCursorTransportError(err: unknown): string {
   return "Cursor upstream error: transport failed before completion.";
 }
 
-export function createCursorAdapter(provider: OcxProviderConfig, deps: CursorAdapterDeps = {}): ProviderAdapter {
+export function createCursorAdapter(provider: oprProviderConfig, deps: CursorAdapterDeps = {}): ProviderAdapter {
   return {
     name: "cursor",
 
@@ -177,9 +177,10 @@ export function createCursorAdapter(provider: OcxProviderConfig, deps: CursorAda
         }
       } catch (err) {
         if (isCursorBenignCancelError(err)) return;
-        const partialUsage = (err as { partialUsage?: import("../types").OcxUsage }).partialUsage;
+        const partialUsage = (err as { partialUsage?: import("../types").oprUsage }).partialUsage;
         emit({ type: "error", message: safeCursorTransportError(err), ...(partialUsage ? { usage: partialUsage } : {}) });
       }
     },
   };
 }
+

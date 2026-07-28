@@ -134,13 +134,13 @@ Only if implementation refactors status collection enough to alter runtime owner
 ```bash
 bun test tests/cli-status-json.test.ts tests/cli-help.test.ts
 bun run typecheck
-node bin/ocx.mjs status --json
+node bin/opr.mjs status --json
 ```
 
 Optional manual verification after implementation:
 
 ```bash
-node bin/ocx.mjs status --json | jq .
+node bin/opr.mjs status --json | jq .
 ```
 
 ## Risk Notes
@@ -154,3 +154,4 @@ node bin/ocx.mjs status --json | jq .
 ```text
 feat(cli): add json status diagnostics
 ```
+

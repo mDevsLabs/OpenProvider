@@ -17,14 +17,14 @@ implemented in the live protobuf bridge.
 Add tool metadata to `CursorRunRequest`:
 
 ```ts
-import type { OcxTool } from "../../types";
+import type { oprTool } from "../../types";
 
 export interface CursorRunRequest {
   modelId: string;
   conversationId: string;
   system: string[];
   messages: CursorRequestMessage[];
-  tools?: OcxTool[];
+  tools?: oprTool[];
   toolChoice?: "auto" | "none" | "required" | { name: string };
 }
 ```
@@ -37,7 +37,7 @@ into the generic request builder.
 Copy tools and tool choice from parsed request:
 
 ```ts
-export function createCursorRequest(parsed: OcxParsedRequest): CursorRunRequest {
+export function createCursorRequest(parsed: oprParsedRequest): CursorRunRequest {
   return {
     modelId: normalizeCursorModelId(parsed.modelId, parsed.options.reasoning),
     conversationId: parsed.previousResponseId ?? generatedConversationId(),
@@ -51,13 +51,13 @@ export function createCursorRequest(parsed: OcxParsedRequest): CursorRunRequest 
 
 ### NEW: `src/adapters/cursor/tool-definitions.ts`
 
-One owner for converting `OcxTool` to Cursor `McpToolDefinition`.
+One owner for converting `oprTool` to Cursor `McpToolDefinition`.
 
 Planned API:
 
 ```ts
-export function buildCursorToolDefinitions(tools: readonly OcxTool[] | undefined): McpToolDefinition[];
-export function cursorToolWireName(tool: OcxTool): string;
+export function buildCursorToolDefinitions(tools: readonly oprTool[] | undefined): McpToolDefinition[];
+export function cursorToolWireName(tool: oprTool): string;
 ```
 
 Rules:
@@ -66,8 +66,8 @@ Rules:
   chat adapter behavior and existing bridge maps.
 - `name` and `toolName` both use the advertised wire name.
 - `providerIdentifier` should identify openprovider client tools, e.g. `openprovider-responses`.
-- `description` maps from `OcxTool.description`.
-- `inputSchema` is JSON bytes of `OcxTool.parameters ?? {}`.
+- `description` maps from `oprTool.description`.
+- `inputSchema` is JSON bytes of `oprTool.parameters ?? {}`.
 - Preserve `strict` only if Cursor protobuf has a compatible field. If not, do not invent one.
 
 Open question for GPT Pro/audit: whether Cursor uses `RequestContext.tools` only for MCP
@@ -122,4 +122,5 @@ Modify or add:
 - Tool choice may need a Cursor-specific field rather than request-context-only handling.
   If no field exists, we still preserve it on internal types for future mapping and test the
   no-regression behavior.
+
 

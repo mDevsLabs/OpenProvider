@@ -1,8 +1,8 @@
-// One-shot isolated smoke (040 cr5). Run with OPENCODEX_HOME + CODEX_HOME pre-set to tmpdirs:
-//   OPENCODEX_HOME=$(mktemp -d) CODEX_HOME=$(mktemp -d) bun devlog/_plan/260716_claudecode_hardening/smoke.ts
+// One-shot isolated smoke (040 cr5). Run with @mdevs/openprovider_HOME + CODEX_HOME pre-set to tmpdirs:
+//   @mdevs/openprovider_HOME=$(mktemp -d) CODEX_HOME=$(mktemp -d) bun devlog/_plan/260716_claudecode_hardening/smoke.ts
 import { saveConfig } from "../../../src/config";
 import { startServer } from "../../../src/server";
-import type { OcxConfig } from "../../../src/types";
+import type { oprConfig } from "../../../src/types";
 
 let upstreamCalls = 0;
 const upstream = Bun.serve({
@@ -27,7 +27,7 @@ saveConfig({
   providers: {
     native: { adapter: "openai-responses", baseUrl: `${upstream.url.toString().replace(/\/$/, "")}/v1`, authMode: "forward", allowPrivateNetwork: true },
   },
-} as OcxConfig);
+} as oprConfig);
 
 const server = startServer(0);
 const healthz = await fetch(new URL("/healthz", server.url));
@@ -46,3 +46,5 @@ console.log(JSON.stringify({
 server.stop(true);
 upstream.stop(true);
 process.exit(0);
+
+

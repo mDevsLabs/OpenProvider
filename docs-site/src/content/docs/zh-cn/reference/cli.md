@@ -19,7 +19,7 @@ OpenProvider 的命令行工具是 `opr`。运行 `opr help`（或 `--help` / `-
 
 启动代理服务器（首选端口 `10100`）。如果该端口已被占用，OpenProvider 会选择并记录另一个可用
 端口。它会写入 PID/运行时端口状态，并拒绝启动第二个仍存活的实例。启动时会把各 provider 的
-模型同步进 Codex 目录。关闭时会恢复原生 Codex，除非它以受管服务运行（`OCX_SERVICE=1`）。
+模型同步进 Codex 目录。关闭时会恢复原生 Codex，除非它以受管服务运行（`opr_SERVICE=1`）。
 
 ```bash
 opr start
@@ -344,7 +344,7 @@ opr login xai
 
 把 OpenProvider 作为登录管理的后台服务运行（macOS **launchd**、Linux **systemd user unit**、
 Windows **Task Scheduler**），登录时自动启动，崩溃后自动重启。服务进程会设置
-`OCX_SERVICE=1`，因此重启不会反复改动 Codex 配置。
+`opr_SERVICE=1`，因此重启不会反复改动 Codex 配置。
 
 | Subcommand | Action |
 | --- | --- |
@@ -413,7 +413,7 @@ opr debug usage logs [-f|--follow]
 ```
 
 不指定范围时，`opr debug` 会打印用法；代理停止时，还会显示下次启动采用的环境变量默认值。
-provider debug 默认读取 `OCX_DEBUG=1`（旧的 `OCX_DEBUG_FRAMES=1` 仍可用），usage debug 默认读取
+provider debug 默认读取 `opr_DEBUG=1`（旧的 `opr_DEBUG_FRAMES=1` 仍可用），usage debug 默认读取
 `OpenProvider_USAGE_DEBUG=1`。
 
 ## 更新
@@ -452,5 +452,6 @@ opr update --tag preview
 两个 dispatch 目标会刻意从普通帮助中隐藏：`__refresh-version [preview]` 在 detached process 中
 刷新更新通知缓存；`__gui-update-worker <job-id> [latest|preview] [restart]` 执行仪表盘更新任务。
 它们属于实现细节，不是稳定的用户命令。
+
 
 

@@ -20,7 +20,7 @@ import {
 import { saveCodexAccountCredential } from "../src/codex/account-store";
 import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../src/codex/account-runtime-state";
 import { clearAccountQuota, updateAccountQuota } from "../src/codex/quota";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const savedCodexHome = process.env.CODEX_HOME;
 const savedOpenproviderHome = process.env.OPENPROVIDER_HOME;
@@ -35,7 +35,7 @@ function installPoolCredential(accountId: string, now = Date.now()): void {
   });
 }
 
-function cfg(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function cfg(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     providers: {
@@ -716,3 +716,4 @@ describe("subagent model fallback chain", () => {
     expect(subagentFallbackGuidanceText(cfg({ subagentModelFallback: undefined }))).toBe("");
   });
 });
+

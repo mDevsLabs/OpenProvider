@@ -3,21 +3,21 @@ import { buildClaudeEnv } from "../src/cli/claude";
 import { PROXY_MARKER, type AuthDetectDeps, type AuthPresence } from "../src/claude/auth-detect";
 import { authModeIntent, resolveClaudeAuthMode } from "../src/claude/auth-mode";
 import { detectClaudeAuth } from "../src/claude/auth-detect";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * Auto is a RESOLUTION, not stored state: registering a Claude login changes the next
  * launch with no migration. A manual choice bypasses detection forever.
  */
 
-function cfg(claudeCode?: OcxConfig["claudeCode"], apiKeys?: { key: string }[]): OcxConfig {
+function cfg(claudeCode?: oprConfig["claudeCode"], apiKeys?: { key: string }[]): oprConfig {
   return {
     port: 10100,
     defaultProvider: "openai",
     providers: {},
     ...(claudeCode ? { claudeCode } : {}),
     ...(apiKeys ? { apiKeys } : {}),
-  } as unknown as OcxConfig;
+  } as unknown as oprConfig;
 }
 
 function detection(presence: AuthPresence, staleProxyMarker = false) {
@@ -239,3 +239,4 @@ test("subscription mode has no hijack defence, by design", () => {
   // The leftover DOES win here. Choosing proxy mode explicitly is the escape hatch.
   expect(merged.ANTHROPIC_BASE_URL).toBe("https://hijacker.example.com");
 });
+

@@ -68,7 +68,7 @@ Main is usable when its token is live (instead of requiring a managed credential
 // + import
 import { MAIN_CODEX_ACCOUNT_ID, isMainAccountTokenLive } from "./codex-main-account";
 
-export function isCodexAccountUsable(config: OcxConfig, accountId: string): boolean {
+export function isCodexAccountUsable(config: oprConfig, accountId: string): boolean {
   if (accountId === MAIN_CODEX_ACCOUNT_ID) {
     return isMainAccountTokenLive() && !isAccountNeedsReauth(accountId);
   }
@@ -87,7 +87,7 @@ Make main a selectable candidate, give it a plan, and let it count as "configure
 import { MAIN_CODEX_ACCOUNT_ID, getMainAccountPlan } from "./codex-main-account";
 
 // hasConfiguredPoolAccount (L45)
-function hasConfiguredPoolAccount(config: OcxConfig, accountId: string): boolean {
+function hasConfiguredPoolAccount(config: oprConfig, accountId: string): boolean {
   if (accountId === MAIN_CODEX_ACCOUNT_ID) return isCodexAccountUsable(config, accountId);
   return (config.codexAccounts ?? []).some(account => !account.isMain && account.id === accountId);
 }
@@ -171,7 +171,7 @@ return (authCtx.kind === "pool" || authCtx.kind === "main-pool")
 // usesCodexForwardPoolAuth — widen guard to include main-pool
 function usesCodexForwardPoolAuth(
   authCtx: CodexAuthContext,
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
 ): authCtx is Extract<CodexAuthContext, { kind: "pool" | "main-pool" }> {
   return (authCtx.kind === "pool" || authCtx.kind === "main-pool")
     && provider.authMode === "forward" && provider.adapter === "openai-responses";
@@ -285,3 +285,4 @@ Concretely in CodexAuth.tsx:
 - `codex-websocket-registry`: a `main-pool` authContext registers/unregisters under `__main__`.
 - (GUI) keep change minimal; covered by existing GUI test harness + tsc. Add a unit test only
   if a routing helper is extracted.
+

@@ -37,13 +37,13 @@ import { getConfigPath, readConfigDiagnostics, saveConfig } from "../src/config"
 import { routeModel } from "../src/router";
 import { handleManagementAPI } from "../src/server/management-api";
 import { handleResponses } from "../src/server/responses";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { syncCatalogModels } from "../src/codex/catalog";
 import { injectClaudeAgentDefs } from "../src/claude/agents-inject";
 
 const VALID_COMBO = { targets: [{ provider: "a", model: "m1" }] };
 
-function baseConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function baseConfig(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     defaultProvider: "a",
@@ -65,7 +65,7 @@ function baseConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
   };
 }
 
-function rrConfig(stickyLimit: number, weights: number[]): OcxConfig {
+function rrConfig(stickyLimit: number, weights: number[]): oprConfig {
   const providers = baseConfig().providers;
   const names = ["a", "b", "c"];
   return baseConfig({
@@ -84,7 +84,7 @@ function rrConfig(stickyLimit: number, weights: number[]): OcxConfig {
   });
 }
 
-function successfulPicks(config: OcxConfig, count: number): string[] {
+function successfulPicks(config: oprConfig, count: number): string[] {
   const combo = getCombo(config, "free")!;
   return Array.from({ length: count }, () => {
     const pick = pickComboTarget(config, "free")!;
@@ -115,7 +115,7 @@ function writeRawConfig(config: unknown): void {
 }
 
 async function comboApi(
-  config: OcxConfig,
+  config: oprConfig,
   method: string,
   path: string,
   body?: unknown,
@@ -131,7 +131,7 @@ async function comboApi(
   });
 }
 
-async function comboApiRaw(config: OcxConfig, method: string, path: string, body: string): Promise<Response | null> {
+async function comboApiRaw(config: oprConfig, method: string, path: string, body: string): Promise<Response | null> {
   const req = new Request(`http://localhost${path}`, {
     method,
     headers: { "content-type": "application/json" },
@@ -389,7 +389,7 @@ describe("combo management API", () => {
       expect(pickComboTarget(config, "new")?.target.provider).toBe("b");
       config.combos!.old = config.combos!.new!;
       expect(pickComboTarget(config, "old")?.target.provider).toBe("b");
-      const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as OcxConfig;
+      const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as oprConfig;
       expect(persisted.combos?.old).toBeUndefined();
       expect(persisted.combos?.new?.alias).toBe("new-public");
       expect(persisted.disabledModels).toEqual(["before", "new-public", "middle", "after"]);
@@ -425,7 +425,7 @@ describe("combo management API", () => {
       expect(response?.status).toBe(200);
       expect(config.disabledModels).toEqual(["before", "stable-public", "after"]);
       expect(config.subagentModels).toEqual(["stable-public", "another"]);
-      const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as OcxConfig;
+      const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as oprConfig;
       expect(persisted.disabledModels).toEqual(["before", "stable-public", "after"]);
       expect(persisted.subagentModels).toEqual(["stable-public", "another"]);
     });
@@ -574,7 +574,7 @@ describe("combo management API", () => {
       expect(response?.status).toBe(200);
       expect(config.disabledModels).toEqual(["before", "combo/free", "after"]);
       expect(config.subagentModels).toEqual(["combo/free", "another"]);
-      const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as OcxConfig;
+      const persisted = JSON.parse(readFileSync(getConfigPath(), "utf8")) as oprConfig;
       expect(persisted.disabledModels).toEqual(["before", "combo/free", "after"]);
       expect(persisted.subagentModels).toEqual(["combo/free", "another"]);
     });
@@ -822,3 +822,4 @@ describe("supported disabled-provider activation", () => {
     });
   }, 10_000);
 });
+

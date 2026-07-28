@@ -11,7 +11,7 @@ Complete the remaining Patch 2 account-lifecycle security work after Phase 20A/2
 - bind pool auth contexts to a credential generation;
 - fail closed when a WebSocket or thread tries to reuse a deleted/replaced generation;
 - invalidate open WebSockets for a deleted account;
-- add a process-shared refresh lock around refresh-token rotation so two proxy processes sharing `OPENCODEX_HOME` do not use the same rotating refresh token concurrently;
+- add a process-shared refresh lock around refresh-token rotation so two proxy processes sharing `@mdevs/openprovider_HOME` do not use the same rotating refresh token concurrently;
 - preserve the existing legacy credential compatibility and safe non-PII logging behavior.
 
 This is still Patch 2. Local API authentication/safe DTOs remain Patch 3.
@@ -351,3 +351,4 @@ Residual risks accepted for this phase:
 ## Commit Boundary
 
 One implementation commit for Phase 20C account lifecycle completion. Do not mix in Patch 3 API authentication or Patch 4 manual import changes.
+

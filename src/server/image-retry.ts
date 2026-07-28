@@ -8,10 +8,10 @@
  * responses.ts consumes it.
  */
 
-import type { OcxParsedRequest } from "../types";
+import type { oprParsedRequest } from "../types";
 
 /** True when the parsed request carries at least one inline (data-URL) image. */
-export function parsedHasInlineImage(parsed: OcxParsedRequest): boolean {
+export function parsedHasInlineImage(parsed: oprParsedRequest): boolean {
   const messages = (parsed as { context?: { messages?: unknown[] } }).context?.messages ?? [];
   for (const message of messages) {
     const content = (message as { content?: unknown }).content;
@@ -32,7 +32,7 @@ export function parsedHasInlineImage(parsed: OcxParsedRequest): boolean {
 export function shouldAttemptImageTierRetry(args: {
   status: number;
   adapterName: string;
-  parsed: OcxParsedRequest;
+  parsed: oprParsedRequest;
   alreadyAttempted: boolean;
 }): boolean {
   return args.status === 413
@@ -40,3 +40,4 @@ export function shouldAttemptImageTierRetry(args: {
     && args.adapterName === "anthropic"
     && parsedHasInlineImage(args.parsed);
 }
+

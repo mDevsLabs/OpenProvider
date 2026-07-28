@@ -18,7 +18,7 @@ cannot see it.
 
 **2. `profile: unknown field "appliedFingerprint"`** (screenshot 2).
 `src/types.ts:437-445` declares `appliedFingerprint` and `appliedAt` on
-`OcxClaudeDesktopProfile`, and `src/server/management/agent-settings-routes.ts:84`
+`oprClaudeDesktopProfile`, and `src/server/management/agent-settings-routes.ts:84`
 and `:450` write both after a successful apply. But
 `src/claude/desktop-profile.ts:79` validates with
 `assertExactKeys(value, ["version", "assignments", "defaults"], "profile")`, which
@@ -131,3 +131,4 @@ improved. WP5 follows WP3 so the tab reports correct context windows.
 - `c-grok-tab` — the Grok surface renders and is reachable.
 - `c-gates` — `bun run typecheck`, `bun run test`, `gui bun run test`,
   `bun run lint:gui`, `bun run privacy:scan`, zero new failures.
+

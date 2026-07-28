@@ -68,7 +68,7 @@ export interface WinswEntry {
 
 /**
  * Build the WinSW v2 XML. Never embeds the API token value — the app loads it from
- * OCX_API_TOKEN_FILE at startup (cli handleStart). PATH is baked for parity with the
+ * opr_API_TOKEN_FILE at startup (cli handleStart). PATH is baked for parity with the
  * Task Scheduler wrapper / launchd / systemd: the SCM service environment lacks the
  * user's interactive PATH, which provider subprocesses may need.
  */
@@ -77,7 +77,7 @@ export function buildWinswXml(entry: WinswEntry, env: NodeJS.ProcessEnv = proces
   const user = env.USERNAME?.trim() || "";
   const listenPort = (() => {
     if (typeof port === "number" && Number.isFinite(port) && port > 0 && port <= 65535) return Math.trunc(port);
-    const baked = env.OCX_BAKE_PORT?.trim();
+    const baked = env.opr_BAKE_PORT?.trim();
     if (baked && /^\d+$/.test(baked)) {
       const n = Number(baked);
       if (n > 0 && n <= 65535) return n;
@@ -87,8 +87,8 @@ export function buildWinswXml(entry: WinswEntry, env: NodeJS.ProcessEnv = proces
   // Services never bake `--port 0` (parsePortOption rejects it); treat as default.
   const safeListenPort = listenPort > 0 && listenPort <= 65535 ? listenPort : 10100;
   const envLines = [
-    `  <env name="OCX_SERVICE" value="1"/>`,
-    `  <env name="OCX_API_TOKEN_FILE" value="${xmlEscape(serviceApiTokenFilePath())}"/>`,
+    `  <env name="opr_SERVICE" value="1"/>`,
+    `  <env name="opr_API_TOKEN_FILE" value="${xmlEscape(serviceApiTokenFilePath())}"/>`,
     `  <env name="PATH" value="${xmlEscape(env.PATH ?? "")}"/>`,
     env.CODEX_HOME?.trim() ? `  <env name="CODEX_HOME" value="${xmlEscape(currentCodexHomeAbsolute())}"/>` : null,
     env.OPENPROVIDER_HOME?.trim() ? `  <env name="OPENPROVIDER_HOME" value="${xmlEscape(getConfigDir())}"/>` : null,
@@ -358,4 +358,5 @@ export function winswStatusSummary(): string {
 export function defaultWinswEntry(cliDir: string): WinswEntry {
   return { bun: durableBunPath(), cli: join(cliDir, "cli", "index.ts") };
 }
+
 

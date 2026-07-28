@@ -99,7 +99,7 @@ provider/requests/measured/tokens/share 5열이다. `gui/src/pages/Usage.tsx:445
   `src/usage/log.ts:32-45`
 - attempt에는 실제 provider/model/adapter/status, `durationMs`, usageStatus, optional usage와
   totalTokens가 있다. `src/usage/log.ts:16-30`
-- `OcxUsage`에는 inclusive input, output, optional total, cache read/write, reasoning output,
+- `oprUsage`에는 inclusive input, output, optional total, cache read/write, reasoning output,
   estimated flag가 있다. cache detail은 total에 다시 더하지 않는 계약이다.
   `src/types.ts:227-245`
 - request log가 append될 때 위 parent usage/duration/attempts가 그대로 persisted usage entry로
@@ -362,3 +362,4 @@ WP5를 WP1 뒤에 두고 WP6-8이 그 additive API만 소비하게 하면 Usage/
   provider Overview/Usage tab에 30일 provider 합계를 넣고 Accounts tab에는 넣지 않는다.
   `gui/src/components/provider-workspace/ProviderWorkspaceShell.tsx:104-116`,
   `src/providers/label.ts:7-18`, `src/usage/log.ts:16-45`
+

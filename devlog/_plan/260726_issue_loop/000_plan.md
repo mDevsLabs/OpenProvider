@@ -201,7 +201,7 @@ consistent phase map — was confirmed correct.
 
 | Blocker | Disposition |
 |---------|-------------|
-| `routeListAt` with `K extends keyof OcxConfig` does not compile: the key type also admits `customModels`/`apiKeys`/`codexAccounts`, so `map` infers a union array that is not assignable back | Folded: an explicit `RoutedListKey` union of the three routed-string lists, verified against the compiler |
+| `routeListAt` with `K extends keyof oprConfig` does not compile: the key type also admits `customModels`/`apiKeys`/`codexAccounts`, so `map` infers a union array that is not assignable back | Folded: an explicit `RoutedListKey` union of the three routed-string lists, verified against the compiler |
 | `COPYFILE_EXCL` makes creation exclusive but not publication atomic — a crash mid-copy leaves a truncated file that the next run accepts as a valid rollback point | Folded: copy to a temp, verify the bytes, publish with `link` (EEXIST rather than replace), and verify an existing snapshot against the still-unmigrated source, throwing `AlibabaBackupIntegrityError` on mismatch so `save` never runs |
 
 Also folded, non-blocking: the rewriter was described as "pure" while its
@@ -232,3 +232,4 @@ prevent a healthy start for other reasons.
 Recorded here because the lesson generalizes: three consecutive rounds of audit
 pressure pushed toward ever-stricter guards, and strictness in a startup path is
 not free.
+

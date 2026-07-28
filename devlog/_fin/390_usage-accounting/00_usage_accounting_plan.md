@@ -13,7 +13,7 @@ This is not a billing system. It is a local observability surface for the proxy 
 
 ## Current System
 
-- Adapter usage already exists in `src/types.ts` as `OcxUsage`.
+- Adapter usage already exists in `src/types.ts` as `oprUsage`.
 - `src/bridge.ts` converts adapter usage into OpenAI Responses-shaped `usage`.
 - `src/server.ts` already inspects Responses JSON/SSE metadata for model and service tier fields, but request logs are in-memory only and do not persist token usage.
 - `gui/src/pages/Logs.tsx` renders request logs without a token column.
@@ -29,7 +29,7 @@ Use the openprovider config directory:
 ~/.openprovider/usage.jsonl
 ```
 
-Resolve it through `getConfigDir()` so `OPENCODEX_HOME` test fixtures and custom homes work.
+Resolve it through `getConfigDir()` so `OpenProvider_HOME` test fixtures and custom homes work.
 
 JSONL is intentionally append-only:
 
@@ -221,3 +221,4 @@ Full-goal stop audit must prove:
 - `/api/logs` and `/api/usage` behavior is tested;
 - Usage GUI tab and Logs token column build cleanly;
 - structure docs match implementation.
+

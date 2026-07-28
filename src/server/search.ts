@@ -19,7 +19,7 @@ import {
 import { formatCodexProviderForLog } from "../codex/routing";
 import { signalWithTimeout } from "../lib/abort";
 import { sidecarEnter } from "../lib/sidecar-tracker";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { listOpenAiForwardSidecarCandidates, resolveFirstUsableOpenAiSidecar } from "../providers/openai-sidecar";
 import { readJsonRequestBody } from "./request-decompress";
 import { ForwardAdmissionCredentialError, validateForwardAdmissionCredential } from "./auth-cors";
@@ -38,7 +38,7 @@ const SEARCH_RESPONSE_MAX_BYTES = 16 * 1024 * 1024;
 
 export async function handleSearch(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
 ): Promise<Response> {
   try { validateForwardAdmissionCredential(req.headers, config); }
@@ -134,3 +134,4 @@ export async function handleSearch(
     linkedSignal.cleanup();
   }
 }
+

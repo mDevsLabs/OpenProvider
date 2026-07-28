@@ -103,24 +103,24 @@ The **after** snippets are the required final state after both commits.
 
 ### 4.1 `src/lib/errors.ts` — MODIFY — CHERRY-PICK checkpoint, then RE-DERIVE final
 
-#### A. Add focused message predicates after `OcxErrorPayload`
+#### A. Add focused message predicates after `oprErrorPayload`
 
 Before:
 
 ```ts
-export interface OcxErrorPayload {
+export interface oprErrorPayload {
   message: string;
   type: string;
   code: string | null;
 }
 
-export function classifyError(status: number, type: string, message: string): OcxErrorPayload {
+export function classifyError(status: number, type: string, message: string): oprErrorPayload {
 ```
 
 After:
 
 ```ts
-export interface OcxErrorPayload {
+export interface oprErrorPayload {
   message: string;
   type: string;
   code: string | null;
@@ -178,7 +178,7 @@ function isPermissionMessage(text: string): boolean {
   );
 }
 
-export function classifyError(status: number, type: string, message: string): OcxErrorPayload {
+export function classifyError(status: number, type: string, message: string): oprErrorPayload {
 ```
 
 Do not export these predicates and do not add a provider argument. The credential-cue
@@ -685,7 +685,7 @@ import { saveConfig } from "../src/config";
 import { classifyError } from "../src/lib/errors";
 import { startServer } from "../src/server";
 import { clearRequestLogsForTests } from "../src/server/request-log";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const SUBSCRIPTION_MESSAGE =
@@ -696,23 +696,23 @@ let previousHome: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.OpenProvider_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-403-e2e-codex-");
   testDir = mkdtempSync(join(tmpdir(), "opr-403-e2e-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.OpenProvider_HOME = testDir;
   clearRequestLogsForTests();
 });
 
 afterEach(() => {
   clearRequestLogsForTests();
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.OpenProvider_HOME;
+  else process.env.OpenProvider_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
-function config(baseUrl: string): OcxConfig {
+function config(baseUrl: string): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -728,7 +728,7 @@ function config(baseUrl: string): OcxConfig {
         defaultModel: "pro-model",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 async function runUpstreamFailure(status: 401 | 403, body: unknown): Promise<{
@@ -1060,3 +1060,4 @@ complete.
   → 401/authentication_error/invalid_api_key. Rebuttal: none.
 - Cherry-pick safety confirmed in throwaway worktree (fa4ca861 onto b6281b7a,
   clean apply, 6 files). Baseline focused suites 30/30 pass.
+

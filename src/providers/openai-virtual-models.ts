@@ -1,6 +1,6 @@
 import { PROVIDER_REGISTRY } from "./registry";
 import { OPENAI_API_PROVIDER_ID } from "./openai-tiers";
-import type { OcxParsedRequest } from "../types";
+import type { oprParsedRequest } from "../types";
 import type { RouteResult } from "../router";
 import type { RequestLogContext } from "../server/request-log";
 
@@ -50,7 +50,7 @@ export function resolveOpenAiVirtualModel(
 }
 
 export function applyOpenAiVirtualModel(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   route: RouteResult,
   logCtx: RequestLogContext,
 ): OpenAiVirtualModelResolution | undefined {
@@ -80,3 +80,4 @@ export function resolveOpenAiCompactModel(
 ): OpenAiVirtualModelResolution | undefined {
   return resolveOpenAiVirtualModel(providerName, selectedModelId);
 }
+

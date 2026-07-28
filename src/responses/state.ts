@@ -1,7 +1,7 @@
 import { chmodSync, existsSync, lstatSync, mkdirSync, opendirSync, readFileSync, unlinkSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { atomicWriteFile, getConfigDir } from "../config";
-import type { OcxProviderContinuationState } from "../types";
+import type { oprProviderContinuationState } from "../types";
 
 const MAX_STORED_RESPONSES = 1_000;
 const RESPONSE_TTL_MS = 60 * 60 * 1_000;
@@ -23,7 +23,7 @@ interface StoredResponseState {
   createdAt: number;
   items: unknown[];
   /** v2 provider-keyed continuation metadata. */
-  providers?: OcxProviderContinuationState;
+  providers?: oprProviderContinuationState;
   /** v1 Cursor-only metadata, accepted only while loading old snapshots. */
   conversationId?: string;
   cursorCheckpointUsable?: boolean;
@@ -347,7 +347,7 @@ export function previousResponseConversationId(responseId: string | undefined): 
   return previousResponseProviderState(responseId)?.cursor?.conversationId;
 }
 
-export function previousResponseProviderState(responseId: string | undefined): OcxProviderContinuationState | undefined {
+export function previousResponseProviderState(responseId: string | undefined): oprProviderContinuationState | undefined {
   if (!responseId) return undefined;
   ensureLoaded();
   pruneResponses();
@@ -402,7 +402,7 @@ export function responseStateMetrics(): ResponseStateMetrics {
 export function rememberResponseState(
   requestBody: unknown,
   response: { id?: unknown; output?: unknown; status?: unknown; incomplete_details?: unknown },
-  providerState?: OcxProviderContinuationState | string,
+  providerState?: oprProviderContinuationState | string,
   opts?: { force?: boolean },
 ): void {
   if (!requestBody || typeof requestBody !== "object" || Array.isArray(requestBody)) return;
@@ -420,7 +420,7 @@ export function rememberResponseState(
       || (details as { reason?: unknown }).reason !== "max_output_tokens") return;
   } else if (response.status !== undefined && response.status !== "completed") return;
   ensureLoaded();
-  const normalizedProviderState: OcxProviderContinuationState = typeof providerState === "string"
+  const normalizedProviderState: oprProviderContinuationState = typeof providerState === "string"
     ? { cursor: { conversationId: providerState } }
     : structuredClone(providerState ?? {});
   if (normalizedProviderState.cursor?.conversationId) {
@@ -461,3 +461,4 @@ export function clearResponseStateForTests(): void {
     /* no snapshot on disk */
   }
 }
+

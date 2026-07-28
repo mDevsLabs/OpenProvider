@@ -10,7 +10,7 @@ Three places disagree about the shape of a stored profile:
 
 | Location | Behaviour |
 |----------|-----------|
-| `src/types.ts:437-445` | `OcxClaudeDesktopProfile` DECLARES `appliedFingerprint?` and `appliedAt?` |
+| `src/types.ts:437-445` | `oprClaudeDesktopProfile` DECLARES `appliedFingerprint?` and `appliedAt?` |
 | `src/server/management/agent-settings-routes.ts:84`, `:450` | WRITES both into `config.claudeCode.desktopProfile` after a successful apply |
 | `src/claude/desktop-profile.ts:79` | REJECTS both: `assertExactKeys(value, ["version", "assignments", "defaults"], "profile")` |
 
@@ -120,3 +120,4 @@ Mutation check: revert the allowlist entry and confirm the new case fails.
 |---------|----------|
 | `bun test tests/claude-desktop-profile.test.ts tests/claude-management-api.test.ts` | pass |
 | `bun run typecheck` | exit 0 |
+

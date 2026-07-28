@@ -395,7 +395,7 @@ Routed mapping separately converts `ultra` to `max`, applies provider aliases, a
 
 ```ts
 // src/reasoning-effort.ts:115-135
-export function mapReasoningEffort(provider: OcxProviderConfig, modelId: string, requested: string | undefined): string | undefined {
+export function mapReasoningEffort(provider: oprProviderConfig, modelId: string, requested: string | undefined): string | undefined {
   if (!requested) return undefined;
   if (modelInList(provider.noReasoningModels, modelId)) return undefined;
 
@@ -471,3 +471,4 @@ Bucket judgment: reclassify #297 from Bucket 2 (“investigate now”) to Bucket
 ## Effort estimate
 
 **Medium: 0.5–1 engineer day after a reproducible binary/version is available.** The code delta should be small, but establishing the threshold, preventing multi-install candidate skew, adding the binary-version fixture matrix, and running full cross-surface tests dominate the work. If no mismatch evidence is produced, the remaining work is only an evidence-backed issue reply/close (approximately 30 minutes, no code change).
+

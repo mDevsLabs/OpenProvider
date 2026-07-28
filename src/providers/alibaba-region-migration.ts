@@ -2,7 +2,7 @@ import { ALIBABA_INTL_BASE_URL_CHOICES } from "./base-url-choices";
 import { providerConfigSeed } from "./derive";
 import { rewriteProviderReferences } from "./provider-id-rewrite";
 import { PROVIDER_REGISTRY } from "./registry";
-import type { OcxConfig, OcxProviderConfig } from "../types";
+import type { oprConfig, oprProviderConfig } from "../types";
 
 const BEIJING_ID = "alibaba-token-plan";
 const INTL_ID = "alibaba-token-plan-intl";
@@ -26,7 +26,7 @@ const INTL_ID = "alibaba-token-plan-intl";
 const USER_OWNED_FIELDS = ["apiKey", "apiKeyPool", "disabled", "baseUrl", "allowPrivateNetwork", "liveModels"] as const;
 
 export interface AlibabaRegionMigrationProjection {
-  config: OcxConfig;
+  config: oprConfig;
   changed: boolean;
   warnings: string[];
 }
@@ -46,7 +46,7 @@ function isInternationalEndpoint(baseUrl: string): boolean {
  * uses, so the migrated row is indistinguishable from one the user had created
  * against the international provider directly.
  */
-function buildIntlRow(source: OcxProviderConfig): OcxProviderConfig {
+function buildIntlRow(source: oprProviderConfig): oprProviderConfig {
   const entry = PROVIDER_REGISTRY.find(e => e.id === INTL_ID);
   // Fail fast rather than fabricate a row: a missing registry entry means the
   // destination this migration targets no longer exists.
@@ -95,7 +95,7 @@ function buildIntlRow(source: OcxProviderConfig): OcxProviderConfig {
  * key the reference rewrite would land on — because merging two settings is a
  * user decision, not a migration's.
  */
-export function projectAlibabaRegionMigration(config: OcxConfig): AlibabaRegionMigrationProjection {
+export function projectAlibabaRegionMigration(config: oprConfig): AlibabaRegionMigrationProjection {
   const beijing = config.providers[BEIJING_ID];
   const savedBaseUrl = typeof beijing?.baseUrl === "string" ? beijing.baseUrl : "";
   if (!beijing || !savedBaseUrl || !isInternationalEndpoint(savedBaseUrl)) {
@@ -141,3 +141,4 @@ export function projectAlibabaRegionMigration(config: OcxConfig): AlibabaRegionM
     ],
   };
 }
+

@@ -1,17 +1,17 @@
 import { expect, test } from "bun:test";
 import { parseRequest } from "../src/responses/parser";
 import { buildClaudeReplayConfig } from "../src/server/claude-messages";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 import { planVisionSidecar } from "../src/vision";
 import { planWebSearch } from "../src/web-search";
 
-const routed: OcxProviderConfig = {
+const routed: oprProviderConfig = {
   adapter: "openai-chat",
   baseUrl: "https://routed.test/v1",
   apiKey: "routed-key",
   noVisionModels: ["text-model"],
 };
-const forward: OcxProviderConfig = {
+const forward: oprProviderConfig = {
   adapter: "openai-responses",
   baseUrl: "https://chatgpt.test/v1",
   authMode: "forward",
@@ -38,7 +38,7 @@ const request = parseRequest({
 });
 
 test("Claude replay overrides both sidecars while preserving global-only settings", () => {
-  const config: OcxConfig = {
+  const config: oprConfig = {
     port: 10100,
     defaultProvider: "routed",
     providers: { routed, forward },
@@ -105,7 +105,7 @@ test("Claude replay overrides both sidecars while preserving global-only setting
 });
 
 test("unset Claude overrides inherit the global sidecar backend and model", () => {
-  const config: OcxConfig = {
+  const config: oprConfig = {
     port: 10100,
     defaultProvider: "routed",
     providers: { routed, forward },
@@ -124,3 +124,4 @@ test("unset Claude overrides inherit the global sidecar backend and model", () =
     settings: { model: "global-vision" },
   });
 });
+

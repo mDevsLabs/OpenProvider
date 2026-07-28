@@ -99,8 +99,9 @@ subagentModels = [
 대시보드의 **Sub-agents** 페이지 또는 OpenProvider 설정에서 바꿀 수 있습니다. 목록은 최대 5개 모델을
 받으며 배열 순서에 의미가 있습니다.
 
-현재 `OcxConfig`에는 일반 `modelOrder`, `providerOrder`, priority map 설정이 없습니다. 지원되는 정렬
+현재 `oprConfig`에는 일반 `modelOrder`, `providerOrder`, priority map 설정이 없습니다. 지원되는 정렬
 필드는 `subagentModels`입니다(`src/types.ts:238-246`). `disabledModels`와 각 프로바이더의
 `selectedModels`는 노출 필드입니다(`src/types.ts:276-282`, `src/types.ts:439-446`). 따라서 나머지
 선택기 순서를 바꾸려면 설정 수정이 아니라 코드 동작 변경이 필요합니다.
+
 

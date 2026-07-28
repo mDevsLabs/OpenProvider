@@ -4,9 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createAzureAdapter } from "../src/adapters/azure";
 import { getConfigPath, loadConfig, readConfigDiagnostics } from "../src/config";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
-const parsed: OcxParsedRequest = {
+const parsed: oprParsedRequest = {
   modelId: "gpt-5.5",
   context: { messages: [] },
   stream: true,
@@ -14,7 +14,7 @@ const parsed: OcxParsedRequest = {
   _rawBody: { model: "gpt-5.5", input: [], stream: true },
 };
 
-function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
+function provider(overrides: Partial<oprProviderConfig> = {}): oprProviderConfig {
   return {
     adapter: "azure-openai",
     baseUrl: "https://myres.openai.azure.com/openai",
@@ -31,6 +31,30 @@ describe("Azure OpenAI adapter hardening", () => {
     expect(new URL(request.url).searchParams.has("api-version")).toBe(false);
     expect(request.headers["api-key"]).toBe("azure-key");
     expect(request.headers.Authorization).toBeUndefined();
+  });
+
+  test("lowers the private image_gen namespace on the inherited API-key path", async () => {
+    const request = await createAzureAdapter(provider()).buildRequest({
+      ...parsed,
+      _rawBody: {
+        model: "gpt-5.5",
+        input: [{
+          type: "additional_tools",
+          tools: [{
+            type: "namespace",
+            name: "image_gen",
+            tools: [{ type: "function", name: "imagegen", parameters: {} }],
+          }],
+        }],
+      },
+    });
+    const body = JSON.parse(request.body) as {
+      input: Array<{ tools?: Array<{ type: string; name?: string }> }>;
+    };
+
+    expect(body.input[0]?.tools).toEqual([
+      { type: "function", name: "image_gen__imagegen", parameters: {} },
+    ]);
   });
 
   test("rejects missing and blank API keys", async () => {
@@ -83,3 +107,4 @@ describe("Azure OpenAI adapter hardening", () => {
     }
   });
 });
+

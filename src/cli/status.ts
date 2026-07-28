@@ -2,7 +2,7 @@ import { durableBunRuntime } from "../lib/bun-runtime";
 import { codexAutoStartEnabled, getConfigPath, getPidPath, readConfigDiagnostics, readPid, readRuntimePort, type RuntimePortState } from "../config";
 import { diagnoseCodexBundledPlugins, type CodexPluginsDiagnostic } from "../codex/plugins-doctor";
 import { isOpenproviderHealthz, probeHostname } from "../server/proxy-liveness";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { diagnoseService } from "../service";
 import { collectStartupHealth, type StartupHealth } from "../codex/autostart-health";
 import { getCodexRoutingKind } from "../codex/inject";
@@ -10,6 +10,7 @@ import { diagnoseCodexShim } from "../codex/shim";
 import { displayCodexRuntimePath, effortClampAppliesToRuntime, loadLastEffortClamp, resolveCodexRuntime } from "../codex/runtime";
 import { redactSecretString, redactUserPath } from "../lib/redact";
 import { collectOrcaCodexHomeDiagnostic, type OrcaCodexHomeDiagnostic } from "../codex/home";
+import { grokFenceEndpointDrift, readGrokStatus } from "../grok/status";
 
 type HealthCheck = {
   ok: boolean;
@@ -85,7 +86,7 @@ export type ListenTarget = {
 };
 
 export function selectListenTarget(
-  config: Pick<OcxConfig, "port" | "hostname">,
+  config: Pick<oprConfig, "port" | "hostname">,
   pid: number | null,
   runtimePort: RuntimePortState | null,
 ): ListenTarget {
@@ -194,6 +195,22 @@ export async function collectStatus(): Promise<CliStatusView> {
       `Catalog clamp removed: ${lastClamp!.removedEfforts.join(", ")}. Run opr doctor for diagnosis and recovery.`,
     );
   }
+  // A Grok fence naming a port we are not listening on is invisible everywhere else:
+  // grok retries the refused connection on its own side, so no request — and therefore
+  // no log line — ever reaches us. Surface it here, where the live port is already known.
+  const grokDrift = (() => {
+    try {
+      return grokFenceEndpointDrift(readGrokStatus(), health.ok ? listen.port : undefined);
+    } catch {
+      return null; // reading grok's config must never break `opr status`
+    }
+  })();
+  if (grokDrift) {
+    warningParts.push(
+      `Grok Build config points at port ${grokDrift.fencePort}, but the proxy is on `
+      + `${grokDrift.livePort}; grok turns will retry against a closed port. Run 'opr ensure' to repoint it.`,
+    );
+  }
   const codexRuntime = {
     path: displayCodexRuntimePath(resolvedRuntime.runtime.command),
     version: resolvedRuntime.runtime.version,
@@ -263,4 +280,5 @@ export async function collectStatus(): Promise<CliStatusView> {
     },
   };
 }
+
 

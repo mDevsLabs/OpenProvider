@@ -30,7 +30,7 @@ Add a documented config/env override for the Bun executable used by service mode
 
 Candidate names to evaluate:
 
-- `OPENCODEX_BUN_PATH`
+- `OpenProvider_BUN_PATH`
 - config field under service/runtime settings
 
 Rules:
@@ -69,3 +69,4 @@ Short-term release posture:
 - Run service with override Bun.
 - Confirm logs show the selected runtime.
 - If crash reproduction exists, compare bundled vs override runtime behavior.
+

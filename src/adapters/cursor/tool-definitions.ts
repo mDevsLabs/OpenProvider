@@ -4,16 +4,14 @@ import type { OcxRequestOptions, OcxTool } from "../../types";
 import { namespacedToolName, toolChoiceAliases } from "../../types";
 import { McpToolDefinitionSchema, McpToolsSchema, type McpToolDefinition } from "./gen/agent_pb";
 
-export const OCX_RESPONSES_TOOL_PROVIDER = "openprovider-responses";
+export const OCX_RESPONSES_TOOL_PROVIDER = "opencodex-responses";
 export const CODEX_EXEC_COMMAND_TOOL = "exec_command";
 export const CODEX_SHELL_COMMAND_TOOL = "shell_command";
 export const CODEX_APPLY_PATCH_TOOL = "apply_patch";
 export const CURSOR_EXEC_COMMAND_TOOL = CODEX_EXEC_COMMAND_TOOL;
 export const CODEX_SHELL_BRIDGE_TOOL_NAMES = [CODEX_EXEC_COMMAND_TOOL, CODEX_SHELL_COMMAND_TOOL] as const;
 export const CURSOR_SHELL_ALIAS_SYSTEM_NOTE =
-  'Shell commands use the Codex shell bridge tool shown in this turn\'s catalog (`shell_command` or `exec_command`) with JSON arguments like {"cmd":"..."}. The long `mcp_openprovider-responses_*` display name is the same tool. Prefer it over Cursor-native Shell; never say native shell is blocked.';
-export const CURSOR_SHELL_ALIAS_USER_HINT =
-  "Use the Codex shell bridge tool listed this turn (`shell_command` or `exec_command`, including the long `mcp_openprovider-responses_*` name). Prefer that bridge over Cursor-native Shell/Read. Never say phrases like \"Native shell access is blocked\" or \"Shell access is blocked\" — silently use the bridge unless that bridge tool itself fails.";
+  'Shell commands use the Codex shell bridge tool shown in this turn\'s catalog (`shell_command` or `exec_command`) with JSON arguments like {"cmd":"..."}. The long `mcp_opencodex-responses_*` display name is the same tool. Prefer it over Cursor-native Shell; never say native shell is blocked.';
 const NEIGHBOR_AGENT_TOOL_NAMES = ["Read", "Grep", "Glob", "Bash", "LS"] as const;
 
 export const CURSOR_GENERIC_TOOL_USE_USER_HINT = [
@@ -149,7 +147,7 @@ export function cursorToolWireName(tool: Pick<OcxTool, "namespace" | "name">): s
 /**
  * Cursor's harness shows MCP tools to the model as `mcp_<providerIdentifier>_<toolName>`; models
  * sometimes call that display name verbatim instead of the advertised short name (live 20:41/21:00
- * sessions: `mcp_openprovider-responses_exec_command` / `mcp_openprovider-responses_shell_command`).
+ * sessions: `mcp_opencodex-responses_exec_command` / `mcp_opencodex-responses_shell_command`).
  * Fold the display prefix back to the advertised wire name, and treat `shell_command` /
  * `exec_command` as the same Codex shell bridge, so alias thrash does not become "tool not found".
  */
@@ -211,17 +209,6 @@ function shellBridgeArgNormalizeSchema(tool: OcxTool): unknown {
     properties,
     required: requiresCommand ? required : ["command"],
   };
-}
-
-function activeTextMentionsExecCommand(text: string): boolean {
-  return /\b(?:exec_command|shell_command)\b/i.test(text);
-}
-
-function looksLikeShellCommandRequest(text: string): boolean {
-  const hasKnownCommand = /(?:^|[\s`$])(?:echo|pwd|ls|cat|grep|rg|find|python3?|node|bun|npm|pnpm|yarn|git|curl|wget|chmod|mkdir|rm|cp|mv|touch|docker|kubectl|make|cargo|go|pytest)(?=\s|$|[`:;|&])/i.test(text);
-  const hasRunIntent = /\b(?:run|execute|exec)\b/i.test(text) || /\b(?:stdout|stderr|exit\s+code)\b/i.test(text);
-  const hasShellTarget = /\b(?:shell|terminal|command|cmd)\b/i.test(text);
-  return /\b(?:run|execute|exec)\s*:/i.test(text) || hasKnownCommand || (hasRunIntent && hasShellTarget);
 }
 
 export function isGenericToolUseCountDemoPrompt(text: string): boolean {
@@ -316,23 +303,69 @@ export function cursorToolsForActivePrompt<T extends Pick<OcxTool, "namespace" |
   return execTools && execTools.length > 0 ? execTools : tools;
 }
 
-export function shouldAppendCursorShellAliasHint(
-  tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined,
-  text: string,
-): boolean {
-  const trimmed = text.trim();
-  return trimmed.length > 0
-    && cursorRequestHasShellAlias(tools)
-    && !activeTextMentionsExecCommand(trimmed)
-    && looksLikeShellCommandRequest(trimmed);
+/**
+ * Required command payload keys for a shell bridge tool, derived from the advertised schema when present.
+ */
+export function shellBridgeRequiredCommandKeys(
+  toolName: string,
+  schema?: unknown,
+): readonly ("cmd" | "command")[] {
+  if (schema && typeof schema === "object") {
+    const required = (schema as Record<string, unknown>).required;
+    if (Array.isArray(required)) {
+      const keys = required.filter((key): key is "cmd" | "command" => key === "cmd" || key === "command");
+      if (keys.length > 0) return keys;
+    }
+  }
+  return toolName === CODEX_SHELL_COMMAND_TOOL ? ["command"] : ["cmd"];
 }
 
-export function appendCursorShellAliasHint(
-  tools: readonly Pick<OcxTool, "namespace" | "name">[] | undefined,
-  text: string,
-): string {
-  if (!shouldAppendCursorShellAliasHint(tools, text)) return text;
-  return `${text}${text.endsWith("\n") ? "\n" : "\n\n"}${CURSOR_SHELL_ALIAS_USER_HINT}`;
+/** Normalize-schema defaults used when validating stateless synthetic shell-bridge calls. */
+export function defaultShellBridgeArgNormalizeSchema(toolName: string): unknown {
+  return toolName === CODEX_SHELL_COMMAND_TOOL
+    ? CODEX_SHELL_BRIDGE_ARG_NORMALIZE_SCHEMA
+    : {
+      type: "object",
+      properties: CURSOR_EXEC_COMMAND_INPUT_SCHEMA.properties,
+      required: ["cmd"],
+    };
+}
+
+export function cursorShellBridgeDropError(toolName: string): string {
+  return `Cursor emitted ${toolName} without a non-empty command; the tool call was dropped.`;
+}
+
+/**
+ * Extract a non-empty shell command from completed Cursor bridge args using the schema's required
+ * command key (`cmd` for bare exec_command, `command` for shell_command).
+ */
+export function nonEmptyShellBridgeCommandFromArgs(
+  finalArgs: string,
+  toolName: string,
+  schema?: unknown,
+): string | undefined {
+  let parsed: unknown;
+  try {
+    parsed = finalArgs.length > 0 ? JSON.parse(finalArgs) : {};
+  } catch {
+    return undefined;
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return undefined;
+  const record = parsed as Record<string, unknown>;
+  for (const key of shellBridgeRequiredCommandKeys(toolName, schema)) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim().length > 0) return value.trim();
+  }
+  return undefined;
+}
+
+export function cursorShellBridgeArgsValid(
+  finalArgs: string,
+  toolName: string,
+  schema?: unknown,
+): boolean {
+  return !isCodexShellBridgeToolName(toolName)
+    || nonEmptyShellBridgeCommandFromArgs(finalArgs, toolName, schema) !== undefined;
 }
 
 export function cursorToolAllowedByChoice(
@@ -394,7 +427,7 @@ export function buildCursorToolGuidanceSystemNote(
       ? `${shellBridgeLabel} is the Codex Responses shell bridge for this turn, exposed through Cursor's tool protocol; it is not an external MCP server tool. \`shell_command\` and \`exec_command\` are aliases of the same bridge.`
       : undefined,
     hasBareExec
-      ? "Your tool list may display it under a longer `mcp_openprovider-responses_shell_command` / `mcp_openprovider-responses_exec_command` name; those are the SAME tool — call whichever your list shows, and do not comment on the naming difference to the user."
+      ? "Your tool list may display it under a longer `mcp_opencodex-responses_shell_command` / `mcp_opencodex-responses_exec_command` name; those are the SAME tool — call whichever your list shows, and do not comment on the naming difference to the user."
       : undefined,
     hasBareExec
       ? "Never tell the user that shell or read access is blocked, disabled, or denied unless the Codex shell bridge tool itself fails. Prefer the bridge over Cursor-native Shell/Read; do not narrate phrases like \"Native shell access is blocked\" — silently call `shell_command` / `exec_command`."

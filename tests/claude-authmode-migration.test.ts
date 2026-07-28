@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { runClaudeAuthModeMigration } from "../src/claude/auth-mode-migration";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * Before auto existed, "Subscription" was stored by DELETING the key. So the upgrade
@@ -8,8 +8,8 @@ import type { OcxConfig } from "../src/types";
  * proxy (devlog 260726_claude_auth_auto/015).
  */
 
-function config(claudeCode?: OcxConfig["claudeCode"]): OcxConfig {
-  return { port: 10100, defaultProvider: "openai", providers: {}, ...(claudeCode ? { claudeCode } : {}) } as unknown as OcxConfig;
+function config(claudeCode?: oprConfig["claudeCode"]): oprConfig {
+  return { port: 10100, defaultProvider: "openai", providers: {}, ...(claudeCode ? { claudeCode } : {}) } as unknown as oprConfig;
 }
 
 test("a pre-upgrade block without authMode is pinned to subscription", () => {
@@ -61,3 +61,4 @@ test("an empty-string sentinel is treated as unmigrated, not as done", () => {
   expect(runClaudeAuthModeMigration(c)).toBe(true);
   expect(c.claudeCode!.authMode).toBe("subscription");
 });
+

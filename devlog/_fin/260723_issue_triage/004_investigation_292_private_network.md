@@ -81,7 +81,7 @@ function classifyIpv6(hostname: string): DestinationAssessment {
 `src/lib/destination-policy.ts:113-125`:
 
 ```ts
-export function providerDestinationConfigError(name: string, provider: Pick<OcxProviderConfig, "baseUrl" | "allowPrivateNetwork">): string | null {
+export function providerDestinationConfigError(name: string, provider: Pick<oprProviderConfig, "baseUrl" | "allowPrivateNetwork">): string | null {
   const assessment = assessDestination(provider.baseUrl);
   if (!assessment) return null;
   if (assessment.kind === "public" || assessment.kind === "hostname") return null;
@@ -91,7 +91,7 @@ export function providerDestinationConfigError(name: string, provider: Pick<OcxP
   return `baseUrl points to a ${assessment.detail}; set allowPrivateNetwork:true only for intentionally local/self-hosted providers`;
 }
 
-export function assertProviderDestinationAllowed(name: string, provider: Pick<OcxProviderConfig, "baseUrl" | "allowPrivateNetwork">): void {
+export function assertProviderDestinationAllowed(name: string, provider: Pick<oprProviderConfig, "baseUrl" | "allowPrivateNetwork">): void {
   const error = providerDestinationConfigError(name, provider);
   if (error) throw new Error(`provider ${name} ${error}`);
 }
@@ -134,7 +134,7 @@ Security caveat: because the opt-in check is before DNS lookup, an opted-in ordi
 For a custom provider, routing calls the guard with the original provider object. For a registry provider, it calls the guard with the effective base URL and the persisted flag. `src/router.ts:120-125` and `src/router.ts:161-165`:
 
 ```ts
-function routedProviderConfig(providerName: string, provider: OcxProviderConfig): OcxProviderConfig {
+function routedProviderConfig(providerName: string, provider: oprProviderConfig): oprProviderConfig {
   const registryEntry = PROVIDER_REGISTRY.find(entry => entry.id === providerName);
   if (!registryEntry) {
     assertProviderDestinationAllowed(providerName, provider);
@@ -153,7 +153,7 @@ assertProviderDestinationAllowed(providerName, { baseUrl, allowPrivateNetwork: p
 The selected route carries that guarded provider into the actual upstream request. `src/router.ts:227-233`:
 
 ```ts
-function routeResult(providerName: string, provider: OcxProviderConfig, modelId: string): RouteResult {
+function routeResult(providerName: string, provider: oprProviderConfig, modelId: string): RouteResult {
   const codexAccountMode = providerCodexAccountMode(providerName, provider);
   return {
     providerName,
@@ -195,7 +195,7 @@ The sync operation refreshes the catalog at `src/codex/sync.ts:29-46`:
 ```ts
 export async function syncModelsToCodex(
   port?: number,
-  config: OcxConfig = loadConfig(),
+  config: oprConfig = loadConfig(),
   log: Pick<Console, "log" | "error"> | null = console,
   deps: CodexSyncDeps = defaultDeps,
 ): Promise<CodexSyncResult> {
@@ -216,7 +216,7 @@ export async function syncModelsToCodex(
 
 ```ts
 export async function refreshCodexModelCatalog(
-  config: OcxConfig,
+  config: oprConfig,
   deps: RefreshDeps = defaultDeps,
 ): Promise<CodexCatalogRefreshResult> {
   const result = await deps.syncCatalogModels(config);
@@ -228,7 +228,7 @@ export async function refreshCodexModelCatalog(
 ```
 
 ```ts
-export async function syncCatalogModels(config: OcxConfig): Promise<{ added: number; path: string }> {
+export async function syncCatalogModels(config: oprConfig): Promise<{ added: number; path: string }> {
   const catalogPath = readCodexCatalogPath();
   const catalog = loadCatalogForSync(catalogPath);
   if (!catalog) return { added: 0, path: catalogPath };
@@ -257,7 +257,7 @@ The aggregate delegates to the canonical gatherer at `src/server/management-api.
  * share the same fetch, the same per-provider cache (dedups Codex's frequent /v1/models polling),
  * and the same stale fallback when a provider blips, instead of a parallel uncached copy.
  */
-export async function fetchAllModels(config: OcxConfig): Promise<CatalogModel[]> {
+export async function fetchAllModels(config: oprConfig): Promise<CatalogModel[]> {
   const { gatherRoutedModels } = await import("../codex/catalog");
   return gatherRoutedModels(config);
 }
@@ -280,7 +280,7 @@ if (url.pathname === "/v1/models" && req.method === "GET") {
 The gatherer clones each complete provider with object spread, enriches registry defaults in place, and passes that same object to `fetchProviderModels`. `src/codex/catalog.ts:1563-1579`:
 
 ```ts
-export async function gatherRoutedModels(config: OcxConfig): Promise<CatalogModel[]> {
+export async function gatherRoutedModels(config: oprConfig): Promise<CatalogModel[]> {
   const ttlMs = config.modelCacheTtlMs ?? DEFAULT_MODEL_CACHE_TTL_MS;
   // Persisted provider entries can predate newer registry fields (noVisionModels,
   // modelInputModalities, ...). The ROUTER merges registry seeds at request time
@@ -290,7 +290,7 @@ export async function gatherRoutedModels(config: OcxConfig): Promise<CatalogMode
   // Enrich a CLONE: hydrated defaults must never leak into the persisted config.
   const activeProviders = Object.entries(config.providers)
     .filter(([, prov]) => prov.disabled !== true)
-    .map(([name, prov]): [string, OcxProviderConfig] => {
+    .map(([name, prov]): [string, oprProviderConfig] => {
       const enriched = { ...prov };
       enrichProviderFromRegistry(name, enriched);
       return [name, enriched];
@@ -302,7 +302,7 @@ export async function gatherRoutedModels(config: OcxConfig): Promise<CatalogMode
 For a custom provider, registry enrichment exits without modifying it. `src/providers/derive.ts:200-203`:
 
 ```ts
-export function enrichProviderFromRegistry(name: string, prov: OcxProviderConfig): void {
+export function enrichProviderFromRegistry(name: string, prov: oprProviderConfig): void {
   const entry = PROVIDER_REGISTRY.find(row => row.id === name);
   if (!entry) return;
   const seed = providerConfigSeed(entry);
@@ -384,7 +384,7 @@ Any 2xx HTML/text block response throws a JavaScript `SyntaxError`. The catch re
 By contrast, the destination policy throws a plain `Error`, not a `SyntaxError` (`src/lib/destination-policy.ts:123-125`):
 
 ```ts
-export function assertProviderDestinationAllowed(name: string, provider: Pick<OcxProviderConfig, "baseUrl" | "allowPrivateNetwork">): void {
+export function assertProviderDestinationAllowed(name: string, provider: Pick<oprProviderConfig, "baseUrl" | "allowPrivateNetwork">): void {
   const error = providerDestinationConfigError(name, provider);
   if (error) throw new Error(`provider ${name} ${error}`);
 }
@@ -477,3 +477,4 @@ Patch `fetchProviderModels` at `src/codex/catalog.ts:1440-1445`: validate the ef
 ## Effort estimate
 
 **Small (S), approximately 0.5 developer day.** Expect one catalog callsite/helper change plus 3-4 focused regression cases; add another 0.25 day if `/api/providers/test` is unified in the same patch. No GUI change should be required.
+

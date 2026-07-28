@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { buildClaudeDesktopState } from "../src/server/management/shared";
 import { nativeOpenAiContextWindow, visibleNativeSlugs } from "../src/codex/catalog";
 import { generateDesktop3pModels } from "../src/claude/desktop-3p";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * D1b: native Desktop models carry their real context window, and the DTO and the
@@ -21,7 +21,7 @@ const config = {
   port: 10100,
   defaultProvider: "openai",
   providers: {},
-} as unknown as OcxConfig;
+} as unknown as oprConfig;
 
 test("buildClaudeDesktopState gives native rows their real context window", async () => {
   const home = tempHome();
@@ -57,3 +57,4 @@ test("the desktop-3p writer resolves the same native window as the DTO", () => {
   expect(sol).toBeDefined();
   expect(expected).toBe(372_000);
 });
+

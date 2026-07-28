@@ -11,6 +11,10 @@ import {
   stripOpenproviderConfig,
   stripRootContextWindowOverrides,
 } from "../src/codex/inject";
+import {
+  MANAGED_AGENTS_TABLE_MARKER,
+  MANAGED_SUBAGENT_DEFAULT_MARKER,
+} from "../src/codex/subagent-defaults";
 
 describe("Codex config injection", () => {
   test("omits provider-level Responses WebSocket support by default", () => {
@@ -184,6 +188,26 @@ describe("Codex config injection", () => {
     expect(stripped).not.toContain("[model_providers.openprovider]");
     expect(stripped).not.toContain("[profiles.openprovider]");
   });
+
+  test("strip removes only marker-owned native subagent defaults", () => {
+    const stripped = stripOpenProviderConfig([
+      MANAGED_AGENTS_TABLE_MARKER,
+      "[agents]",
+      MANAGED_SUBAGENT_DEFAULT_MARKER,
+      'default_subagent_model = "gpt-5.6-sol"',
+      MANAGED_SUBAGENT_DEFAULT_MARKER,
+      'default_subagent_reasoning_effort = "high"',
+      "max_threads = 8",
+      "",
+    ].join("\n"));
+
+    expect(stripped).toContain("[agents]");
+    expect(stripped).toContain("max_threads = 8");
+    expect(stripped).not.toContain(MANAGED_AGENTS_TABLE_MARKER);
+    expect(stripped).not.toContain(MANAGED_SUBAGENT_DEFAULT_MARKER);
+    expect(stripped).not.toContain("default_subagent_model");
+    expect(stripped).not.toContain("default_subagent_reasoning_effort");
+  });
 });
 
 describe("Design B openai_base_url injection", () => {
@@ -284,7 +308,7 @@ describe("Design B openai_base_url injection", () => {
     expect(stripped).toContain('model = "gpt-5.5"');
   });
 
-  test("legacy marker directly before the provider table survives the root strip order (removeOcxSection keeps its anchor)", () => {
+  test("legacy marker directly before the provider table survives the root strip order (removeoprSection keeps its anchor)", () => {
     // No Design B form present — stripInjectedOpenaiBaseUrl must not eat the legacy EOF marker
     // in a way that leaves the [model_providers.openprovider] table behind.
     const legacyOnly = [
@@ -330,5 +354,6 @@ describe("EOL boundary helpers (Windows CRLF configs)", () => {
     expect(applyEol(crlf, "\r\n")).toBe(crlf);
   });
 });
+
 
 

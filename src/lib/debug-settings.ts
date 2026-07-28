@@ -1,23 +1,23 @@
 /**
  * Runtime-controllable debug flags.
- * Provider debug: `opr debug provider on|off|status|reset|logs [-f]` (or OCX_DEBUG=1 on start).
+ * Provider debug: `opr debug provider on|off|status|reset|logs [-f]` (or opr_DEBUG=1 on start).
  * Usage capture: `opr debug usage on|off|status|reset|logs [-f]` (or OPENPROVIDER_USAGE_DEBUG=1).
- * Injection log: `opr debug injection on|off|status|reset` (or OCX_INJECTION_DEBUG=1) —
+ * Injection log: `opr debug injection on|off|status|reset` (or opr_INJECTION_DEBUG=1) —
  * multi-agent guidance-injection console lines, default OFF.
- * Claude inbound capture: `opr debug claude on|off|status|reset` (or OCX_CLAUDE_DEBUG=1) —
+ * Claude inbound capture: `opr debug claude on|off|status|reset` (or opr_CLAUDE_DEBUG=1) —
  * allowlist-scalar ring of inbound Anthropic request metadata, default OFF.
  * `/api/debug` and `opr debug` override env defaults without restart.
  */
 
 export const DEBUG_ENV = {
-  debug: "OCX_DEBUG",
+  debug: "opr_DEBUG",
   usage: "OPENPROVIDER_USAGE_DEBUG",
-  injection: "OCX_INJECTION_DEBUG",
-  claude: "OCX_CLAUDE_DEBUG",
+  injection: "opr_INJECTION_DEBUG",
+  claude: "opr_CLAUDE_DEBUG",
 } as const;
 
 /** Legacy env var that still enables provider debug logging. */
-const LEGACY_DEBUG_ENV = ["OCX_DEBUG_FRAMES"] as const;
+const LEGACY_DEBUG_ENV = ["opr_DEBUG_FRAMES"] as const;
 
 export type DebugFlag = keyof typeof DEBUG_ENV;
 
@@ -106,3 +106,4 @@ export function clearDebugSettings(): DebugSettingsView {
 export function resetDebugSettingsForTests(): void {
   clearDebugSettings();
 }
+

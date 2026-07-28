@@ -16,10 +16,10 @@ Timestamps are 2026-07-11 KST; raw payloads in /tmp/opr-ab-*.json (session-local
 
 - BEFORE (flag unset), read prompt via `cursor/gpt-5.6-luna`:
   model relayed exactly the NATIVE_LOCAL_EXEC_DISABLED denial text.
-- AFTER, same request: replied `OCX-NATIVE-EXEC-TEST-2607111905 hello from
+- AFTER, same request: replied `opr-NATIVE-EXEC-TEST-2607111905 hello from
   baseline` — the file's exact content.
 - AFTER, write prompt: `/tmp/opr-native-exec-write-test.txt` created on disk
-  with exact line `OCX-WRITE-OK-2607111920`; model replied DONE.
+  with exact line `opr-WRITE-OK-2607111920`; model replied DONE.
 
 ## Activation proof (deterministic, A-gate blocker 2)
 
@@ -37,3 +37,4 @@ Timestamps are 2026-07-11 KST; raw payloads in /tmp/opr-ab-*.json (session-local
 - The legacy boolean equals the future `nativeLocalExec:"on"` (010 doc);
   after WP2 lands and the proxy is next restarted by the user, the config can
   optionally move to `"codex-sandbox"`.
+

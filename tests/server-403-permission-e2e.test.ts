@@ -6,7 +6,7 @@ import { saveConfig } from "../src/config";
 import { classifyError } from "../src/lib/errors";
 import { startServer } from "../src/server";
 import { clearRequestLogsForTests } from "../src/server/request-log";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const SUBSCRIPTION_MESSAGE =
@@ -33,7 +33,7 @@ afterEach(() => {
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
-function config(baseUrl: string): OcxConfig {
+function config(baseUrl: string): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -49,7 +49,7 @@ function config(baseUrl: string): OcxConfig {
         defaultModel: "pro-model",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 async function runUpstreamFailure(status: 401 | 403, body: unknown): Promise<{
@@ -139,3 +139,4 @@ describe("upstream 401/403 classification (end-to-end)", () => {
     });
   });
 });
+

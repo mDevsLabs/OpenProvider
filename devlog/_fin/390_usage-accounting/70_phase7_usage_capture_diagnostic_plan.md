@@ -20,7 +20,7 @@ Phase 7 ships two layers so we can diagnose without another full goal cycle:
    the ChatCompletions shape (`prompt_tokens` / `completion_tokens`) and pick up
    cached/reasoning details under either `_tokens_details` naming. This may
    already fix the bug for some clients.
-2. **Diagnostic capture** — when `OPENCODEX_USAGE_DEBUG=1` is set, append a
+2. **Diagnostic capture** — when `OpenProvider_USAGE_DEBUG=1` is set, append a
    rolling debug record per finalized request to `~/.openprovider/usage-debug.jsonl`
    so we can see what the upstream actually returns and act on Phase 8 with
    evidence instead of guesses. (SSE inspection accumulates block payloads into
@@ -37,14 +37,14 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
 ### NEW
 
 - `src/usage-debug.ts` (~80 lines)
-  - `export const USAGE_DEBUG_ENV = "OPENCODEX_USAGE_DEBUG";`
+  - `export const USAGE_DEBUG_ENV = "OpenProvider_USAGE_DEBUG";`
   - `export const USAGE_DEBUG_BODY_SAMPLE_BYTES = 2048;`
   - `export function isUsageDebugEnabled(): boolean` — true when env equals `"1"`.
     (Strict equality — `"true"`, `"yes"`, `"0"` are all false.)
   - `export function usageDebugPath(): string` — `${getConfigDir()}/usage-debug.jsonl`.
   - `export interface UsageDebugRecord` — `{ ts, requestId, provider, model,
     upstreamContentType, upstreamStatus, bodyKind: "sse" | "json" | "other" | "none",
-    bodySample: string, extractedUsage: OcxUsage | null }`.
+    bodySample: string, extractedUsage: oprUsage | null }`.
   - `export function appendUsageDebug(record: UsageDebugRecord): void` — ensures
     the parent dir exists (`mkdirSync(getConfigDir(), { recursive: true, mode: 0o700 })`
     mirroring `ensureUsageLogDir` in `src/usage-log.ts`), appends one JSON line to
@@ -113,7 +113,7 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
 ### TEST (NEW)
 
 - `tests/usage-debug.test.ts` (~70 lines)
-  - Inline `beforeEach`/`afterEach` with `mkdtempSync` + `OPENCODEX_HOME` env
+  - Inline `beforeEach`/`afterEach` with `mkdtempSync` + `OpenProvider_HOME` env
     swap, matching the pattern in `tests/usage-log.test.ts:16-26` (no shared
     helper exists yet — duplicating the pattern is acceptable for a single
     additional file).
@@ -134,7 +134,7 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
     - ChatCompletions shape (`prompt_tokens` + `completion_tokens` +
       `prompt_tokens_details.cached_tokens` +
       `completion_tokens_details.reasoning_tokens`) → returns equivalent
-      `OcxUsage` mapped from prompt/completion to input/output.
+      `oprUsage` mapped from prompt/completion to input/output.
     - Empty / null / wrong-type / missing both pairs → `undefined`.
 
 ### TEST (MODIFY)
@@ -148,7 +148,7 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
 
 - Append a one-line note to the existing usage section in
   `structure/05_gui-and-management-api.md` (where `usage.jsonl` and `/api/usage`
-  are already documented) pointing at `OPENCODEX_USAGE_DEBUG=1` and
+  are already documented) pointing at `OpenProvider_USAGE_DEBUG=1` and
   `~/.openprovider/usage-debug.jsonl` as the debug capture for upstream response
   shape investigations. No new file.
 
@@ -156,7 +156,7 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
 
 - `npx bun test tests/usage-debug.test.ts tests/usage-shape-extraction.test.ts tests/request-log.test.ts tests/usage-summary.test.ts tests/usage-log.test.ts`
 - `npx tsc --noEmit -p tsconfig.json`
-- Manual: restart proxy with `OPENCODEX_USAGE_DEBUG=1`, make one Codex CLI call to
+- Manual: restart proxy with `OpenProvider_USAGE_DEBUG=1`, make one Codex CLI call to
   `gpt-5.5`, inspect `~/.openprovider/usage-debug.jsonl` head — confirm the body sample
   shows the real shape from the chatgpt backend.
 
@@ -172,7 +172,7 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
    - `tests/usage-shape-extraction.test.ts` (new)
    - `tests/request-log.test.ts` (modified)
 
-3. `docs(usage): Phase 7 plan + OPENCODEX_USAGE_DEBUG cue in structure docs`
+3. `docs(usage): Phase 7 plan + OpenProvider_USAGE_DEBUG cue in structure docs`
    - This devlog file + the appended line in
      `structure/05_gui-and-management-api.md`.
 
@@ -186,3 +186,4 @@ Phase 8 will apply the targeted fix once Phase 7's diagnostic shows the real sha
 - We do not change the SSE inspection logic itself; only add observability around
   it. Worst case Phase 7 fixes one of the two shapes and Phase 8 still needs a fix
   for the other; that's fine and intentional.
+

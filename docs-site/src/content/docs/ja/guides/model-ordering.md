@@ -98,8 +98,9 @@ subagentModels = [
 ダッシュボードの **Sub-agents** ページまたは OpenProvider 設定で変更できます。一覧は最大 5 モデルを
 受け付け、配列順序に意味があります。
 
-現在 `OcxConfig` には一般 `modelOrder`、`providerOrder`、priority map 設定はありません。サポートされるソート
+現在 `oprConfig` には一般 `modelOrder`、`providerOrder`、priority map 設定はありません。サポートされるソート
 フィールドは `subagentModels` です(`src/types.ts:238-246`)。`disabledModels` と各プロバイダーの
 `selectedModels` は公開フィールドです(`src/types.ts:276-282`、`src/types.ts:439-446`)。そのため残りの
 ピッカー順序を変えるには設定変更ではなくコード動作の変更が必要です。
+
 

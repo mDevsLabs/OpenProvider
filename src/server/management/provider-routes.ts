@@ -34,7 +34,6 @@ import { primeCodexPoolQuotas } from "../../codex/auth-api";
 import { getProviderDiscoveryStatus } from "../../codex/model-cache";
 import { DEFAULT_PROVIDER_CONTEXT_CAP, globalContextCapValue, providerContextCap, providerContextCaps, setAllProviderContextCaps, setGlobalContextCapValue, setProviderContextCap } from "../../providers/context-cap";
 import { resolveCodexHomeDir } from "../../codex/home";
-import { scanStorage } from "../../storage/scanner";
 import { readUsageEntries } from "../../usage/log";
 import { getUsageDebugLogEntries } from "../../usage/debug";
 import { parseRange, parseUsageSurface, summarizeUsage } from "../../usage/summary";
@@ -49,7 +48,7 @@ import {
   setDebugSettings,
   type DebugFlag,
 } from "../../lib/debug-settings";
-import type { OcxClaudeCodeConfig, OcxConfig, OcxCustomModel, OcxProviderConfig } from "../../types";
+import type { oprClaudeCodeConfig, oprConfig, oprCustomModel, oprProviderConfig } from "../../types";
 import { drainAndShutdown } from "../lifecycle";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "../request-log";
 import { estimateComboCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
@@ -77,6 +76,7 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
       liveModels: p.liveModels !== false,
       models: p.models ?? [],
       authMode: p.authMode,
+      apiKeyTransport: p.apiKeyTransport,
       disabled: p.disabled === true,
       codexAccountMode: providerCodexAccountMode(name, p),
       discovery: p.liveModels === false ? undefined : getProviderDiscoveryStatus(name),
@@ -92,7 +92,7 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const providerError = providerManagementConfigError(name, body.provider);
     if (providerError) return jsonResponse({ error: providerError }, 400);
-    const prov = body.provider ? stripCodexRuntimeProviderFields(body.provider as OcxProviderConfig) : undefined;
+    const prov = body.provider ? stripCodexRuntimeProviderFields(body.provider as oprProviderConfig) : undefined;
     if (!name || !prov?.adapter || !prov?.baseUrl) {
       return jsonResponse({ error: "name, provider.adapter and provider.baseUrl are required" }, 400);
     }
@@ -173,7 +173,7 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
     if (Object.hasOwn(rawBody, "apiKey")) {
       return jsonResponse({ error: "apiKey cannot be patched here; use the provider API-key endpoints" }, 400);
     }
-    const next: OcxProviderConfig = { ...config.providers[name]! };
+    const next: oprProviderConfig = { ...config.providers[name]! };
     let touched = false;
 
     if (Object.hasOwn(rawBody, "disabled")) {
@@ -212,6 +212,18 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
         touched = true;
       } else {
         return jsonResponse({ error: "authMode must be key, forward, oauth, or local" }, 400);
+      }
+    }
+    if (Object.hasOwn(rawBody, "apiKeyTransport")) {
+      const transport = rawBody.apiKeyTransport;
+      if (transport === "x-api-key" || transport === "bearer") {
+        next.apiKeyTransport = transport;
+        touched = true;
+      } else if (transport === "") {
+        delete next.apiKeyTransport;
+        touched = true;
+      } else {
+        return jsonResponse({ error: "apiKeyTransport must be x-api-key, bearer, or empty to clear" }, 400);
       }
     }
    if (Object.hasOwn(rawBody, "note")) {
@@ -439,3 +451,4 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
   }
   return null;
 }
+

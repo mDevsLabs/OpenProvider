@@ -25,7 +25,7 @@ tags: [grok-build, pr-403, review-blockers, production]
 - 지적: 메인테이너 #2, codex P2 `src/grok/inject.ts:134`, CodeRabbit `docs/guides/grok-build.md:54`
 - 현재 코드: `buildGrokManagedBlock()`가 모든 모델에 `api_key = "openprovider-loopback"` 고정 방출
   (`src/grok/inject.ts` 내 `lines.push(... 'api_key = "openprovider-loopback"')`).
-- 실제 결과: `src/server/auth-cors.ts`는 비루프백 바인드에서 실제 `OPENCODEX_API_AUTH_TOKEN`을
+- 실제 결과: `src/server/auth-cors.ts`는 비루프백 바인드에서 실제 `OpenProvider_API_AUTH_TOKEN`을
   요구하므로 자동 등록된 모델은 전부 401. 사용자가 손으로 키를 고쳐도 다음
   `start`/`ensure`/`restart`의 `syncGrokConfig()`가 블록을 통째로 재생성하며 되돌린다.
   메인테이너 재현 결과 `REAL_TOKEN_PRESERVED=false`.
@@ -36,7 +36,7 @@ tags: [grok-build, pr-403, review-blockers, production]
 
 - 지적: 메인테이너 #1, codex P2 `src/cli/index.ts:397`, CodeRabbit `src/cli/index.ts:398`
 - 현재 코드: `src/service.ts:869-891` `stopServiceIfInstalled()`는 첫 줄에서
-  `assertServiceEnvironmentMatchesInstall()`를 호출해 다른 `CODEX_HOME`/`OPENCODEX_HOME`에
+  `assertServiceEnvironmentMatchesInstall()`를 호출해 다른 `CODEX_HOME`/`OpenProvider_HOME`에
   설치된 서비스면 **매니저를 건드리기 전에** throw한다.
   `handleStop()`(`src/cli/index.ts` 내 try/catch)은 이 예외를 경고만 찍고 계속 진행해,
   아래에서 `stripGrokConfig()`로 공유 `~/.grok/config.toml` 블록을 제거한다.
@@ -76,7 +76,7 @@ tags: [grok-build, pr-403, review-blockers, production]
 ## B6 — 의도적 서비스/API 종료가 fence를 남김 (P2)
 
 - 지적: codex P2 `src/cli/index.ts:212`
-- 현재 코드: 데몬의 `syncCleanup()`은 `if (!process.env.OCX_SERVICE)`일 때만
+- 현재 코드: 데몬의 `syncCleanup()`은 `if (!process.env.opr_SERVICE)`일 때만
   `stripGrokConfig()`를 부른다 — 서비스 매니저의 크래시/재spawn 때 fence를 지키려는 의도이며
   이 배제 자체는 옳다. 그러나 `src/server/management-api.ts:136-148`의 `POST /api/stop`은
   `stopServiceIfInstalled()` + `restoreNativeCodex()`만 하고 grok strip을 전혀 호출하지 않는다.
@@ -135,3 +135,4 @@ D6은 사용자 데이터 복구 경로라 우선순위가 높다.
   테스트로 확인됐다(`001` E3 정정). 메인테이너 원안(비루프백 자동 등록 거부)으로 되돌렸다.
 - **2026-07-26, B5 알고리즘 교체.** 초판 strip 규칙은 정보 이론상 불가능한 복원을 시도했고
   중간 삽입 경로에서 개행이 누적되는 퇴행을 유발했다. inject를 단사로 만드는 방식으로 교체.
+

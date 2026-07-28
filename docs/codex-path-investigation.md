@@ -211,7 +211,7 @@ OpenProvider service plist should include:
 ```xml
 <key>EnvironmentVariables</key>
 <dict>
-  <key>OCX_SERVICE</key><string>1</string>
+  <key>opr_SERVICE</key><string>1</string>
   <key>PATH</key><string>...</string>
   <key>CODEX_HOME</key><string>/Users/me/.codex-custom</string>
 </dict>
@@ -244,7 +244,7 @@ OpenProvider systemd units should pin the resolved install-time variables:
 
 ```ini
 [Service]
-Environment="OCX_SERVICE=1"
+Environment="opr_SERVICE=1"
 Environment="PATH=/usr/local/bin:/usr/bin:/bin"
 Environment="CODEX_HOME=/home/me/.codex-custom"
 StandardOutput="append:/home/me/.OpenProvider/service.log"
@@ -289,7 +289,7 @@ https://learn.microsoft.com/en-us/windows-server/administration/windows-commands
 Because Task Scheduler does not automatically encode OpenProvider-specific
 environment overrides into the command the way a shell session does, OpenProvider
 service install writes a small `.cmd` wrapper under `~/.OpenProvider/`. That wrapper
-sets `OCX_SERVICE=1`, preserves `PATH`, preserves `CODEX_HOME` when present, and
+sets `opr_SERVICE=1`, preserves `PATH`, preserves `CODEX_HOME` when present, and
 then starts OpenProvider.
 
 ## Required OpenProvider behavior
@@ -383,7 +383,7 @@ definition should preserve that value:
 - Linux: add `Environment="CODEX_HOME=/some/path"` to the systemd user unit.
 - macOS: add `CODEX_HOME` under launchd `EnvironmentVariables`.
 - Windows: run Task Scheduler through an explicit `.cmd` wrapper that sets
-  `OCX_SERVICE=1` and preserves `CODEX_HOME` when present.
+  `opr_SERVICE=1` and preserves `CODEX_HOME` when present.
 
 ## Why macOS appeared fine
 
@@ -477,6 +477,7 @@ Run these cases before release:
   https://www.manpagez.com/man/5/launchd.plist/
 - Microsoft Task Scheduler `schtasks /create`:
   https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks-create
+
 
 
 

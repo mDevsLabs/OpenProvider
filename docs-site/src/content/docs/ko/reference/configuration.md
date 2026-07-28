@@ -1,10 +1,10 @@
 ---
 title: 설정 레퍼런스
-description: ~/.OpenProvider/config.json의 모든 필드 — 최상위 옵션, 프로바이더, 사이드카.
+description: ~/.opencodex/config.json의 모든 필드 — 최상위 옵션, 프로바이더, 사이드카.
 ---
 
-OpenProvider는 `~/.OpenProvider/config.json`에서 설정을 읽습니다. `opr init`과 대시보드가 이 파일을
-쓰지만 직접 편집해도 됩니다. 프록시는 시작할 때 다시 읽습니다. 잘렸거나 올바른 JSON이 아닌 등
+opencodex는 `~/.opencodex/config.json`에서 설정을 읽습니다. `ocx init`과 대시보드가 이 파일을
+쓰지만 직접 편집해도 됩니다. 프록시는 시작할 때 다시 읽습니다. **서비스가 실행 중일 때는 직접 고치기 전에 프록시를 멈추거나 대시보드/관리 API를 쓰세요.** 실행 중인 프로세스는 설정을 메모리에 두고, 중간에 저장하면 디스크를 덮어쓸 수 있습니다. v2.7.41부터 손수 수정한 `claudeCode` 하위 트리는 그런 저장에서도 유지됩니다. 다른 키(예: `providers`)는 여전히 덮어써질 수 있습니다. 잘렸거나 올바른 JSON이 아닌 등
 파일을 파싱할 수 없으면 `config.json.invalid-<timestamp>`로 백업하고 콘솔에 경고한 뒤 기본값으로
 시작합니다. 파일이 없어도 기본 설정(단일 `openai` forward 프로바이더)을 사용합니다.
 
@@ -26,20 +26,21 @@ namespaced selected id를 bare id로 바꿉니다.
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `port` | `number` | `10100` | 프록시가 수신할 포트. |
-| `hostname?` | `string` | `"127.0.0.1"` | 바인드 주소. LAN에 공개하려면 `"0.0.0.0"`으로 설정합니다(`OpenProvider_API_AUTH_TOKEN` 필요, 아래 [원격 접근](#원격-접근) 참조). |
+| `hostname?` | `string` | `"127.0.0.1"` | 바인드 주소. LAN에 공개하려면 `"0.0.0.0"`으로 설정합니다(`OPENCODEX_API_AUTH_TOKEN` 필요, 아래 [원격 접근](#원격-접근) 참조). |
 | `proxy?` | `string` | — | 외부로 나가는 HTTP(S) 프록시 URL 또는 `${ENV_VAR}` 참조. 해당 환경 변수가 비어 있을 때 `HTTP_PROXY` / `HTTPS_PROXY`에 적용하고, loopback은 `NO_PROXY`에 유지합니다. |
 | `providers` | `Record<string, OcxProviderConfig>` | — | 프로바이더 이름 → 설정 map. |
 | `openaiProviderTierVersion?` | `2` | migration 설정 | 단일 옵션형 OpenAI projection 완료 마커. |
 | `defaultProvider` | `string` | `"openai"` | 라우팅에서 더 나은 match를 찾지 못했을 때 쓸 프로바이더. |
 | `subagentModels?` | `string[]` | `gpt-5.5`, GPT-5.6 3종, `gpt-5.4-mini` | Codex 서브에이전트 선택기 앞쪽에 표시할 네이티브 slug 또는 `provider/model` id. 최대 5개이며, 명시적인 빈 배열도 그대로 보존합니다. v2 가이던스 로스터는 설정 목록과 Codex의 picker-visible·v2 호환·priority 순 상위 5개의 교집합이며 정규 카탈로그 slug와 사용 가능한 effort 사다리를 씁니다. 제외된 항목도 설정에는 남습니다. |
-| `injectionModel?` | `string` | — | 주입되는 multi-agent 안내(v2 표면)에 들어갈 네이티브/라우팅 모델. 위임 안내에서 이 모델을 `fork_turns: "none"`과 함께 `spawn_agent`에 넘기게 합니다. |
-| `injectionEffort?` | `string` | — | 선호하는 `spawn_agent` reasoning effort(`low`부터 `ultra`). `injectionModel`과 함께 쓸 때만 의미가 있습니다. |
+| `injectionModel?` | `string` | — | 선호하는 네이티브/라우팅 서브에이전트 모델. 별도 `multiAgentGuidanceEnabled`가 제어하는 OpenCodex 작성 v2 위임 가이드에서 사용하며, `syncCodexSubagentDefaults`를 선택하면 새 task의 Codex 네이티브 기본값으로도 적용할 수 있습니다. |
+| `injectionEffort?` | `string` | — | 선호하는 서브에이전트 reasoning effort(`low`부터 `ultra`). `injectionModel`과 함께 쓸 때만 의미가 있으며, 위임 가이드와 선택적인 Codex 네이티브 기본값에서 사용합니다. |
+| `syncCodexSubagentDefaults?` | `boolean` | `false` | OpenCodex가 활성 Codex 라우팅을 관리할 때 선택한 `injectionModel`/`injectionEffort`를 다음 sync 또는 restart에서 Codex 네이티브 `[agents]` 서브에이전트 기본값으로 적용하는 선택 기능. 외부 사용자 관리 provider 설정은 변경하지 않습니다. 새로 생성되는 Codex task에만 적용하고 위임 자체를 일으키지는 않습니다. 기존 사용자 소유 대상 항목은 충돌로 취급해 덮어쓰지 않고 보존합니다. `injectionModel`이 필요하며 모델을 지우면 이 옵션도 꺼집니다. `GET/PUT /api/injection-model`의 부분 업데이트 필드로 제공됩니다. |
 | `effortCap?` | `string` | — | reasoning effort에 요청별로 적용하는 강제 상한입니다. 멀티 에이전트 V2 전용 기능으로, 자체 도구 목록에 V2 협업 표면이 있는 메인 턴과, `x-openai-subagent: collab_spawn` 헤더 또는 `x-codex-turn-metadata`의 `"subagent_kind": "thread_spawn"` 표식이 정확히 일치하는 스폰된 자식 턴에 적용됩니다(표식이 붙은 자식은 자체 도구 표면과 무관하게 적용 대상입니다). 일반 메인 턴과 V1 표면 메인 턴은 건드리지 않고, 컴팩션 턴은 항상 상한을 우회하며, `multiAgentMode: "v1"`은 상한 기능 전체를 비활성화합니다(대시보드도 패널을 숨깁니다). `low`부터 `ultra`까지 허용하며 값을 높이지 않고 낮추기만 합니다. 상한 이하에서 모델이 지원하는 가장 높은 단계로 내립니다. 모델이 effort 제어를 노출하지 않거나 상한 이하에 지원 단계가 없으면 effort 필드를 제거하고 프로바이더 기본값을 적용합니다. `max`와 `ultra`도 허용하지만 더 낮은 rank 상한을 만들지는 않습니다(클라이언트가 `ultra`를 `max`로 변환하므로 요청은 `low`부터 `max`로 들어옵니다). 단, 알려진 모델 effort 사다리에 따라 단계가 내려가거나 필드가 제거될 수 있습니다. 대시보드 선택기는 `low`부터 `xhigh`까지 제공합니다. `GET /api/effort-caps`와 `PUT /api/effort-caps`로 관리합니다. |
 | `subagentEffortCap?` | `string` | — | 같은 강제 상한을 codex-rs 표식이 정확히 일치하는 스폰된 자식 턴에만 적용합니다: `x-openai-subagent: collab_spawn` 또는 `x-codex-turn-metadata`의 `"subagent_kind": "thread_spawn"`. 그 외 내부 서브에이전트 범주(리뷰, 컴팩션, 메모리 정리)는 이 상한에 걸리지 않으며, `multiAgentMode: "v1"`은 기능 전체를 비활성화합니다. `low`부터 `ultra`까지 허용하며 두 상한이 모두 설정되면 더 낮은 값이 적용되고, 값을 높이지 않고 낮추기만 합니다. 상한 이하에서 모델이 지원하는 가장 높은 단계로 내립니다. 모델이 effort 제어를 노출하지 않거나 상한 이하에 지원 단계가 없으면 effort 필드를 제거하고 프로바이더 기본값을 적용합니다. `max`와 `ultra`도 허용하지만 더 낮은 rank 상한을 만들지는 않습니다(클라이언트가 `ultra`를 `max`로 변환하므로 요청은 `low`부터 `max`로 들어옵니다). 단, 알려진 모델 effort 사다리에 따라 단계가 내려가거나 필드가 제거될 수 있습니다. 대시보드 선택기는 `low`부터 `xhigh`까지 제공합니다. `GET /api/effort-caps`와 `PUT /api/effort-caps`로 관리합니다. |
 | `injectionPrompt?` | `string` | — | 주입되는 v2 안내 본문을 통째로 교체하는 커스텀 텍스트. `{{model}}`, `{{effort}}`, `{{roster}}` 플레이스홀더가 치환되며 발화 조건은 그대로입니다. `PUT /api/injection-model`의 `prompt` 키로도 설정할 수 있습니다. |
-| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenProvider가 작성하는 multi-agent developer 가이던스만 제어합니다. 미설정/`true`는 v1/v2 가이던스를 유지하고, `false`는 collaboration surface, `subagentModels`, routing, effort cap을 바꾸지 않고 둘 다 억제합니다. `GET/PUT /api/injection-model`은 유효값을 제공하며 PUT은 부분 업데이트입니다. |
+| `multiAgentGuidanceEnabled?` | `boolean` | `true` | OpenCodex가 작성하는 multi-agent developer 가이던스만 제어합니다. 미설정/`true`는 v1/v2 가이던스를 유지하고, `false`는 Codex 네이티브 `[agents]` 기본값, collaboration surface, `subagentModels`, routing, effort cap을 바꾸지 않고 둘 다 억제합니다. `GET/PUT /api/injection-model`은 유효값을 제공하며 PUT은 부분 업데이트입니다. |
 | `disabledModels?` | `string[]` | — | Codex에서 숨길 모델. 라우팅된 `provider/model` id는 카탈로그와 `/v1/models`에서 제외합니다. `gpt-5.4` 같은 일반 네이티브 GPT slug는 카탈로그 항목을 `visibility: "hide"`로 바꾸고 일반 `/v1/models` 목록에서 뺍니다. 대시보드 Models 페이지에서 모델별로 전환할 수 있습니다. |
-| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3단계 multi-agent surface override. `"v1"`은 업스트림 pin보다 우선해 모든 모델을 v1로, `"default"`는 업스트림 model pin(sol/terra=v2, luna=v1)을 따르고, `"v2"`는 모두 v2로 강제합니다. 대시보드 Models 페이지나 `opr v2 mode`에서 설정합니다. |
+| `multiAgentMode?` | `"v1" \| "default" \| "v2"` | `"default"` | 3단계 multi-agent surface override. `"v1"`은 업스트림 pin보다 우선해 모든 모델을 v1로, `"default"`는 업스트림 model pin(sol/terra=v2, luna=v1)을 따르고, `"v2"`는 모두 v2로 강제합니다. 대시보드 Models 페이지나 `ocx v2 mode`에서 설정합니다. |
 | `providerContextCaps?` | `Record<string,number>` | `{}` | 프로바이더별 Codex 표시 context cap. 알려진 context window를 낮추기만 합니다. |
 | `contextCapValue?` | `number` | `350000` | 대시보드 context-cap control에서 쓸 값. 바꾸면 `providerContextCaps`에서 활성화된 모든 항목을 갱신합니다. |
 | `stallTimeoutSec?` | `number` | `300` | 업스트림 데이터가 오지 않을 때 bridge가 중단하고 `response.incomplete`를 내보내기까지의 초. 최소 1. |
@@ -47,12 +48,14 @@ namespaced selected id를 bare id로 바꿉니다.
 | `shutdownTimeoutMs?` | `number` | `5000` | 진행 중인 turn을 중단하기 전 graceful drain deadline. |
 | `websockets?` | `boolean` | `false` | `supports_websockets`를 알려 Codex가 Responses WebSocket 경로를 쓰게 합니다. 생략하거나 `false`이면 HTTP/SSE를 유지합니다. |
 | `apiKeys?` | `OcxApiKey[]` | `[]` | 비-loopback 바인드에서 관리 API와 data plane 인증에 추가로 허용할 생성형 `ocx_…` 자격 증명. 대시보드가 관리하며 항목 필드는 아래에 설명합니다. |
-| `codexAutoStart?` | `boolean` | `true` | Codex shim이 Codex 실행 전에 `opr ensure`를 실행하게 합니다. `false`이면 `opr ensure`가 아무 작업도 하지 않습니다. |
-| `codexShimAutoRestore?` | `boolean` | `true` | 완료된 외부 Codex 업데이트가 이전에 설치한 shim을 교체하면 자동으로 복구합니다. 끄려면 `false`로 설정하거나 프로세스에 `OpenProvider_CODEX_SHIM_AUTO_RESTORE=0`을 설정합니다. |
-| `syncResumeHistory?` | `boolean` | `true` | 되돌릴 수 있는 Codex App 기록 호환 모드. OpenProvider가 원래 Codex thread metadata를 백업하고, 예전 OpenAI interactive row를 `OpenProvider`로 재매핑하며, OpenProvider가 만든 `exec` row를 App에 보이는 source로 잠시 승격합니다. `opr stop` / `opr restore`는 백업한 OpenAI row를 복원하고 남은 OpenProvider user thread를 OpenAI로 돌려 네이티브 Codex가 `config.toml`에서 프록시를 제거한 뒤에도 이어서 열 수 있게 합니다. 끄려면 `false`로 설정합니다. |
+| `codexAutoStart?` | `boolean` | `true` | Codex shim이 Codex 실행 전에 `ocx ensure`를 실행하게 합니다. `false`이면 `ocx ensure`가 아무 작업도 하지 않습니다. |
+| `codexShimAutoRestore?` | `boolean` | `true` | 완료된 외부 Codex 업데이트가 이전에 설치한 shim을 교체하면 자동으로 복구합니다. 끄려면 `false`로 설정하거나 프로세스에 `OPENCODEX_CODEX_SHIM_AUTO_RESTORE=0`을 설정합니다. |
+| `syncResumeHistory?` | `boolean` | `true` | 되돌릴 수 있는 Codex App 기록 호환 모드. opencodex가 원래 Codex thread metadata를 백업하고, 예전 OpenAI interactive row를 `opencodex`로 재매핑하며, opencodex가 만든 `exec` row를 App에 보이는 source로 잠시 승격합니다. `ocx stop` / `ocx restore`는 백업한 OpenAI row를 복원하고 남은 opencodex user thread를 OpenAI로 돌려 네이티브 Codex가 `config.toml`에서 프록시를 제거한 뒤에도 이어서 열 수 있게 합니다. 끄려면 `false`로 설정합니다. |
 | `codexAccounts?` | `CodexAccount[]` | `[]` | Codex Auth 대시보드에서 관리하는 ChatGPT/Codex pool 계정 metadata. secret은 `codex-accounts.json`에 따로 둡니다. |
 | `activeCodexAccountId?` | `string` | — | 수동으로 선택한 pool 계정. 선택 시 기존 thread affinity를 지우고 다음 요청부터 적용하며, 진행 중인 요청은 기존 계정을 유지합니다. |
-| `autoSwitchThreshold?` | `number` | `80` | 새 세션 자동 전환용 사용량 백분율 threshold. 알려진 5시간, 주간, 30일 quota window 중 가장 높은 점수를 씁니다. `0`이면 quota 자동 전환을 끕니다. |
+| `autoSwitchThreshold?` | `number` | `80` | 새 세션 자동 전환용 사용량 백분율 threshold. 알려진 5시간, 주간, 30일 quota window 중 가장 높은 점수를 씁니다. `0`이면 quota 자동 전환을 끕니다. `quota` 전략과 `fill-first` drain threshold에도 사용됩니다. |
+| `accountPoolStrategy?` | `"quota" \| "round-robin" \| "fill-first"` | `"quota"` | Codex pool의 새 세션 rotation 전략. **새 세션에만** 적용되며 기존 thread id는 affinity를 유지합니다. `quota`(기본) — 활성 계정이 `autoSwitchThreshold`를 넘으면 알려진 usage가 가장 낮은 계정 선택. `round-robin` — 적격 계정 간 smooth weighted 균등 분배. `fill-first` — cooldown, 사용 불가 또는(설정 시) `autoSwitchThreshold`까지 활성 계정을 소진(알 수 없는 usage는 강제 전환하지 않음)한 뒤 안정 정렬 순으로 다음 계정. |
+| `accountPoolStickyLimit?` | `number` | `1` | 한 round-robin 선택이 다음으로 넘어가기 전에 유지하는 성공적 새 세션 bind 수. 범위 1–100. `accountPoolStrategy`가 `round-robin`일 때만 적용. |
 | `upstreamFailoverThreshold?` | `number` | `3` | 일시적인 업스트림 실패가 연속으로 발생한 뒤, 이후 새 세션을 다른 적합한 pool 계정으로 failover할 횟수. `0`이면 실패 기반 failover를 끕니다. |
 | `modelCacheTtlMs?` | `number` | `300000` | 프로바이더별 `/models` 캐시의 유효 기간(5분). |
 | `cacheRetention?` | `"none" \| "short" \| "long"` | `"short"` | Anthropic prompt cache 정책. 끔, 5분 ephemeral, 1시간 extended 중 하나입니다. |
@@ -62,18 +65,24 @@ namespaced selected id를 bare id로 바꿉니다.
 | `corsAllowOrigins?` | `string[]` | `[]` | CORS에서 추가로 허용할 정확한 origin. loopback origin은 항상 허용합니다. |
 
 `maxConcurrentThreadsPerSession`은 `config.json` 키가 아니라 `PUT /api/v2`에서 쓰는 camel-case
-필드입니다. `opr v2 threads <n>`은 대응하는 `max_concurrent_threads_per_session` 값을 Codex의
+필드입니다. `ocx v2 threads <n>`은 대응하는 `max_concurrent_threads_per_session` 값을 Codex의
 `$CODEX_HOME/config.toml` 안 `[features.multi_agent_v2]`에 저장합니다. 해당 table이 생기도록 v2를
 먼저 켜세요.
 
 백업 지원 이전의 개발 빌드에서 이미 `syncResumeHistory`를 실행했다면
-`opr recover-history --legacy-openai`로 같은 native-provider 복구를 강제할 수 있습니다.
+`ocx recover-history --legacy-openai`로 같은 native-provider 복구를 강제할 수 있습니다.
 
 :::note[Codex 계정 풀]
 pool 계정 추가와 quota 갱신은 대시보드의 **Codex Auth** 페이지에서 처리하세요. 설정에는 secret이
 아닌 계정 metadata만 저장하고, access/refresh token은 강화된 Codex 계정 credential store에 따로
-보관합니다. 기존 thread id는 계정 affinity를 유지하며, 새 세션은 quota, cooldown, health에 따라
-자동 라우팅될 수 있습니다.
+보관합니다. 기존 thread id는 계정 affinity를 유지하며, 새 세션은 `accountPoolStrategy`, quota,
+cooldown, health에 따라 자동 라우팅됩니다.
+
+**rotation 전략**(새 세션만; bound thread는 변경 없음): `quota`(기본) — `autoSwitchThreshold` 초과 시
+최저 usage 선택; `round-robin` — 균등 분배, `accountPoolStickyLimit`(기본 `1`, 1–100)로 한 선택당
+성공 bind 수; `fill-first` — 활성 계정을 cooldown, 재인증 또는 threshold까지 소진(알 수 없는 usage는
+강제 전환하지 않음)한 뒤 안정 정렬 순으로 다음 계정. rotation은 provider enforcement를 우회하지
+않습니다 — 다계정 사용은 ToS 위반일 수 있습니다.
 :::
 
 ### 관리형 레코드 형태
@@ -100,24 +109,24 @@ pool 계정 추가와 quota 갱신은 대시보드의 **Codex Auth** 페이지�
 
 ## 원격 접근
 
-OpenProvider는 기본적으로 `127.0.0.1`(loopback 전용)에 바인드합니다. `hostname`을 `0.0.0.0` 같은
+opencodex는 기본적으로 `127.0.0.1`(loopback 전용)에 바인드합니다. `hostname`을 `0.0.0.0` 같은
 비-loopback 주소로 설정하면 관리 API(`/api/*`)와 data plane(`/v1/responses`) **모두**에 token
 인증을 강제합니다.
 
-시작 전에 `OpenProvider_API_AUTH_TOKEN` 환경 변수를 설정하세요.
+시작 전에 `OPENCODEX_API_AUTH_TOKEN` 환경 변수를 설정하세요.
 
 ```bash
-export OpenProvider_API_AUTH_TOKEN="your-secret-token"
-opr start
+export OPENCODEX_API_AUTH_TOKEN="your-secret-token"
+ocx start
 ```
 
 비-loopback 바인드에서는 이 변수가 없으면 프록시가 시작되지 않습니다. LAN 접근용 백그라운드
-서비스를 설치할 때도 같은 변수를 먼저 export한 뒤 `opr service install`을 실행해야 launchd,
-systemd, Task Scheduler에 전달됩니다. 클라이언트는 모든 요청의 `x-OpenProvider-api-key` 헤더에
+서비스를 설치할 때도 같은 변수를 먼저 export한 뒤 `ocx service install`을 실행해야 launchd,
+systemd, Task Scheduler에 전달됩니다. 클라이언트는 모든 요청의 `x-opencodex-api-key` 헤더에
 token을 넣어야 합니다.
 
 ```
-x-OpenProvider-api-key: your-secret-token
+x-opencodex-api-key: your-secret-token
 ```
 
 `Authorization: Bearer …` 헤더도 허용합니다. 시작 후에는 대시보드에서 생성한 `apiKeys`를 환경 변수
@@ -126,7 +135,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 
 :::caution[LAN 노출]
 `0.0.0.0`에 바인드하면 프록시와 설정된 모든 프로바이더 자격 증명이 로컬 네트워크에 노출됩니다.
-신뢰할 수 있는 네트워크에서만 사용하고 강력한 `OpenProvider_API_AUTH_TOKEN`을 반드시 설정하세요.
+신뢰할 수 있는 네트워크에서만 사용하고 강력한 `OPENCODEX_API_AUTH_TOKEN`을 반드시 설정하세요.
 :::
 
 ## 프로바이더 (`OcxProviderConfig`)
@@ -138,6 +147,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 | `responsesPath?` | `string` | `key` 인증 `openai-responses` 요청에 사용할 선택적 상대 resource path. `/`로 시작해야 하며 URL scheme, query, fragment를 포함할 수 없습니다. 생략하면 기존 `/v1/responses` URL 구성을 유지합니다. |
 | `disabled?` | `boolean` | 설정은 디스크에 남기되 라우팅과 모델/카탈로그 목록에서 제외합니다. |
 | `apiKey?` | `string` | API 키 또는 요청 시점에 해석할 `${ENV_VAR}` / `$ENV_VAR` 참조. |
+| `apiKeyTransport?` | `"x-api-key" \| "bearer"` | Anthropic API 키 헤더 방식입니다. 기본값은 네이티브 `x-api-key`이며, `Authorization: Bearer <key>`를 요구하는 호환 gateway에는 `"bearer"`를 설정합니다. key 인증 `anthropic` 프로바이더에서만 유효합니다. |
 | `apiKeyPool?` | `ApiKeyPoolEntry[]` | 여러 키를 담는 pool. `apiKey`는 활성 항목을 반영합니다. 각 항목에는 `id`, `key`, 선택 `label`, 선택 숫자 `addedAt`이 있습니다. |
 | `defaultModel?` | `string` | 명시적인 모델 없이 이 프로바이더를 선택했을 때 쓸 모델. |
 | `models?` | `string[]` | seed/fallback 모델 목록. `liveModels`가 `false`이면 여기 있는 모델만 발견됩니다. |
@@ -155,6 +165,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 | `reasoningEfforts?` | `string[]` | 알리고 전송할 프로바이더 단위 Codex reasoning 레이블(`low`, `medium`, `high`, `xhigh`, `max`, `ultra`). |
 | `modelReasoningEfforts?` | `Record<string,string[]>` | 모델별 reasoning 레이블. 빈 배열은 해당 모델의 effort control을 숨깁니다. |
 | `modelSupportsReasoningSummaries?` | `Record<string,boolean>` | 모델별 reasoning summary capability. 모델 값을 `false`로 두면 summary 지원을 알리지 않고 `openai-responses` 요청 전에 summary-delivery 필드를 제거합니다. |
+| `modelReasoningSummaryDelivery?` | `Record<string,"sequential" \| "sequential_cutoff" \| "concurrent" \| "concurrent_cutoff">` | 모델별 Responses delivery enum입니다. 설정된 모델은 summary 지원을 유지하며 기존 `stream_options.reasoning_summary_delivery` 값만 바꿉니다. 같은 모델의 summary capability를 `false`로 설정할 수 없습니다. |
 | `modelAdapters?` | `Record<string,string>` | 여러 wire를 쓰는 모델이 한 게이트웨이에 섞여 있을 때의 모델별 wire 지정. 키는 upstream native 모델 ID이고 값은 `openai-chat` 또는 `openai-responses`만 허용합니다. `web_search` 같은 hosted tool 때문에 한 모델만 Responses API가 필요할 때 씁니다. upstream이 wire를 고정한 모델과 canonical ChatGPT forward provider에서는 override가 거부됩니다. |
 | `reasoningEffortMap?` | `Record<string,string>` | 프로바이더 단위 reasoning 레이블 wire alias. 업스트림이 다른 값을 요구할 때만 사용합니다. |
 | `modelReasoningEffortMap?` | `Record<string,Record<string,string>>` | 모델별 reasoning 레이블 wire alias. |
@@ -168,7 +179,7 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 | `thinkingToggleModels?` | `string[]` | effort 단계 대신 vendor `thinking.enabled` toggle을 쓰는 chat 모델. |
 | `thinkingBudgetModels?` | `string[]` | 정수 `thinking_budget`을 쓰는 chat 모델. effort를 budget 비율로 매핑합니다. |
 | `noVisionModels?` | `string[]` | 텍스트 전용 모델. [비전 사이드카](/ko/guides/sidecars/)가 이미지를 설명합니다. Ollama의 `:size` 태그도 일치시킵니다. |
-| `escapeBuiltinToolNames?` | `boolean` | Umans 같은 Anthropic 호환 gateway가 wire에서 툴 이름 escaping을 요구할 때 사용합니다. OpenProvider는 툴 호출을 Codex에 돌려주기 전에 prefix를 제거합니다. |
+| `escapeBuiltinToolNames?` | `boolean` | Umans 같은 Anthropic 호환 gateway가 wire에서 툴 이름 escaping을 요구할 때 사용합니다. opencodex는 툴 호출을 Codex에 돌려주기 전에 prefix를 제거합니다. |
 | `googleMode?` | `"ai-studio" \| "vertex" \| "cloud-code-assist"` | Google 전송/인증 모드. 기본 `ai-studio`. |
 | `project?` | `string` | Vertex project id 또는 Antigravity Cloud Code Assist project id. |
 | `location?` | `string` | Vertex location. 환경 변수 fallback은 `GOOGLE_CLOUD_LOCATION`. |
@@ -178,8 +189,8 @@ token 대신 쓸 수 있습니다. 모든 후보는 timing side channel을 막�
 
 ## Cursor 프로바이더 (`adapter: "cursor"`)
 
-Cursor bridge는 실험적입니다. `opr login cursor`를 실행한 뒤
-`~/.OpenProvider/config.json`(Windows: `%USERPROFILE%\.OpenProvider\config.json`)의 `providers` 아래에
+Cursor bridge는 실험적입니다. `ocx login cursor`를 실행한 뒤
+`~/.opencodex/config.json`(Windows: `%USERPROFILE%\.opencodex\config.json`)의 `providers` 아래에
 `cursor` 항목을 추가하거나 편집하세요.
 
 Cursor 서버가 지시하는 네이티브 로컬 툴은 기본적으로 **꺼져 있습니다**. Codex는 자체 툴
@@ -205,7 +216,7 @@ Codex 승인 경로 없이 로컬 파일을 읽고, 쓰고, 지우고, 나열하
 
 [웹 대시보드](/ko/guides/web-dashboard/)에서도 설정할 수 있습니다. **Providers →
 Cursor → Edit JSON**에서 `"unsafeAllowNativeLocalExec": true`를 추가해 저장한 뒤 프록시를
-재시작하세요(`opr restart` 또는 `opr stop` + `opr start`).
+재시작하세요(`ocx restart` 또는 `ocx stop` + `ocx start`).
 
 MCP, 화면 녹화, computer-use는 별도의 `mcpServers` / `desktopExecutor` 설정을 쓰며 이 플래그의 영향을
 받지 않습니다.
@@ -248,7 +259,7 @@ OpenRouter에서 같은 모델을 제공하는 endpoint마다 prompt cache 지�
 일부 프로바이더는 실시간 모델 카탈로그가 매우 크거나 느립니다. Codex에 `models`로 고정한 모델만
 보이게 하려면 `liveModels`를 `false`로 설정하세요.
 
-`liveModels`가 `false`이고 `models`가 비어 있거나 생략되면 OpenProvider는 해당 프로바이더의 라우팅
+`liveModels`가 `false`이고 `models`가 비어 있거나 생략되면 opencodex는 해당 프로바이더의 라우팅
 모델을 하나도 노출하지 않습니다.
 
 `selectedModels`는 목적이 다릅니다. 모델 발견은 계속 실행하되 선택한 id만 Codex 카탈로그와
@@ -321,7 +332,7 @@ stall은 무활동 감시 장치이며 전체 생성 timeout이 아닙니다.
 요청은 `maxDescriptionsPerTurn` 한도를 쓰지 않습니다. 원격 `https:` 이미지와 실패하거나 빈 설명은
 캐시하지 않습니다.
 
-Anthropic OAuth 검색과 이미지 설명 요청은 OpenProvider에서 이미 사용 중인 Claude Code OAuth
+Anthropic OAuth 검색과 이미지 설명 요청은 opencodex에서 이미 사용 중인 Claude Code OAuth
 fingerprint 방식을 그대로 따릅니다. 저장소의 기존 OAuth 선례 안에 있지만, 실제로 사용할 계정과
 작업량으로 충분히 soak test하는 편이 좋습니다.
 
@@ -371,9 +382,7 @@ fingerprint 방식을 그대로 따릅니다. 저장소의 기존 OAuth 선례 �
 :::
 
 :::note[원자적 쓰기]
-모든 설정 및 카탈로그 파일(`config.toml`, `OpenProvider-catalog.json`)은 `atomicWriteFile`(임시 파일 +
-이름 바꾸기)로 원자적으로 기록합니다. `opr stop`과 프록시 자체 종료 handler처럼 여러 writer가
+모든 설정 및 카탈로그 파일(`config.toml`, `opencodex-catalog.json`)은 `atomicWriteFile`(임시 파일 +
+이름 바꾸기)로 원자적으로 기록합니다. `ocx stop`과 프록시 자체 종료 handler처럼 여러 writer가
 동시에 Codex를 복원하더라도 파일이 반만 기록되는 일을 막습니다.
 :::
-
-

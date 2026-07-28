@@ -261,7 +261,7 @@ export default function ApiKeys({ apiBase }: { apiBase: string }) {
       </div>
       <p className="page-sub">
         {subtitleParts[0]}
-        <code>Authorization: Bearer ocx_...</code>
+        <code>Authorization: Bearer opr_...</code>
         {subtitleParts[1]}
         <code>x-openprovider-api-key</code>
         {subtitleParts[2]}
@@ -308,3 +308,4 @@ export default function ApiKeys({ apiBase }: { apiBase: string }) {
     </section>
   );
 }
+

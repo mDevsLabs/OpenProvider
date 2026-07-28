@@ -13,7 +13,7 @@ describe("update-job restart avoids the shell-less .cmd EINVAL (Windows, bun/sou
   const src = read("src/update/job.ts");
   test("no opr.cmd shim is spawned for restart", () => {
     expect(src).not.toContain('"opr.cmd"');
-    expect(src).not.toMatch(/function ocxBin/);
+    expect(src).not.toMatch(/function oprBin/);
   });
   test("bun/source restart uses the runtime executable + launcher (a real .exe, no shell)", () => {
     // restartCommand's non-npm branch resolves to process.execPath + the package launcher.
@@ -23,8 +23,8 @@ describe("update-job restart avoids the shell-less .cmd EINVAL (Windows, bun/sou
     expect(src).toContain('? [launcher, "start", "--port", String(Math.trunc(port))]');
     expect(src).toContain(': [launcher, "start"]');
   });
-  test("service update restart bakes OCX_BAKE_PORT so wrappers hard-pin the captured port", () => {
-    expect(src).toContain("OCX_BAKE_PORT");
+  test("service update restart bakes opr_BAKE_PORT so wrappers hard-pin the captured port", () => {
+    expect(src).toContain("opr_BAKE_PORT");
     // Service reinstall still runs (with bake) even when reclaim warns; direct start refuses to hop.
     expect(src).toContain("refusing to hop");
     expect(src).toContain("runtimeTrusted");
@@ -57,3 +57,4 @@ describe("server bind canonicalizes explicit localhost but preserves wildcards (
     expect(src).not.toContain('hostname: "127.0.0.1",');
   });
 });
+

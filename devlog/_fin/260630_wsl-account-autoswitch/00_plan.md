@@ -69,7 +69,7 @@ Four parallel investigators, all read-only:
 
 - D1: When all candidates are unknown and active is over threshold, prefer (a) round-robin rotation, (b) least-recently-used, or (c) stay put but surface a loud "quota unknown" log. (Phase 10)
 - D2: Should quota prime at startup for all pool accounts (cost: N WHAM calls on boot), or lazily on first route when the active is unknown? (Phase 20)
-- D3: drvfs `/mnt/c` state dir — hard warn only, or refuse unless `OPENCODEX_ALLOW_DRVFS=1`? (Phase 50)
+- D3: drvfs `/mnt/c` state dir — hard warn only, or refuse unless `@mdevs/openprovider_ALLOW_DRVFS=1`? (Phase 50)
 
 ## Status
 
@@ -83,3 +83,4 @@ Four parallel investigators, all read-only:
 - `40_phase4_thread-affinity-reeval.md`
 - `50_phase5_drvfs-hardening.md`
 - `90_final-review.md`
+

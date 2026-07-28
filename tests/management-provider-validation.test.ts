@@ -28,7 +28,7 @@ import {
 } from "../src/server";
 import { handleManagementAPI } from "../src/server/management-api";
 import { clearModelCache, markProviderDiscoveryFailed } from "../src/codex/model-cache";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { fakeChatGptJwt } from "./helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 import * as destinationPolicy from "../src/lib/destination-policy";
@@ -43,7 +43,7 @@ const originalGlobalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-server-auth-test");
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
-function config(hostname?: string): OcxConfig {
+function config(hostname?: string): oprConfig {
   return {
     port: 10100,
     hostname,
@@ -67,7 +67,7 @@ const canonicalDirect = {
   codexAccountMode: "direct",
 } as const;
 
-function poolProviders(): OcxConfig["providers"] {
+function poolProviders(): oprConfig["providers"] {
   return {
     openai: { ...canonicalDirect, codexAccountMode: "pool" },
   };
@@ -300,6 +300,42 @@ describe("provider management validation", () => {
       }
       expect(loadConfig().providers["custom-summary-capability"].modelSupportsReasoningSummaries).toEqual({ strict: false });
 
+      const acceptedSummaryDelivery = await fetch(new URL("/api/providers", server.url), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: "custom-summary-delivery",
+          provider: {
+            adapter: "openai-responses",
+            baseUrl: "https://api.example.test/v1",
+            modelSupportsReasoningSummaries: { summary: true },
+            modelReasoningSummaryDelivery: { summary: "sequential" },
+          },
+        }),
+      });
+      expect(acceptedSummaryDelivery.status).toBe(200);
+      for (const provider of [
+        {
+          adapter: "openai-responses",
+          baseUrl: "https://api.example.test/v1",
+          modelReasoningSummaryDelivery: { summary: "serial" },
+        },
+        {
+          adapter: "openai-responses",
+          baseUrl: "https://api.example.test/v1",
+          modelSupportsReasoningSummaries: { SUMMARY: false },
+          modelReasoningSummaryDelivery: { summary: "sequential" },
+        },
+      ]) {
+        const rejected = await fetch(new URL("/api/providers", server.url), {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: "custom-summary-delivery", provider }),
+        });
+        expect(rejected.status).toBe(400);
+      }
+      expect(loadConfig().providers["custom-summary-delivery"].modelReasoningSummaryDelivery).toEqual({ summary: "sequential" });
+
       const acceptedModelAdapters = await fetch(new URL("/api/providers", server.url), {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -387,7 +423,7 @@ describe("provider management validation", () => {
       });
       expect(response.status).toBe(200);
 
-      const saved = JSON.parse(readFileSync(join(TEST_DIR, "config.json"), "utf8")) as OcxConfig;
+      const saved = JSON.parse(readFileSync(join(TEST_DIR, "config.json"), "utf8")) as oprConfig;
       expect(saved.providers["opencode-free"]).toBeDefined();
       expect(saved.providers["opencode-free"]?.headers).toBeUndefined();
       expect(saved.providers["opencode-free"]?.keyOptional).toBe(true);
@@ -948,7 +984,7 @@ describe("provider management validation", () => {
           apiKey: "sk-secret-value",
         },
       },
-    } as OcxConfig);
+    } as oprConfig);
 
     const server = startServer(0);
     try {
@@ -999,7 +1035,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       defaultProvider: "test-openai",
       providers: {
@@ -1055,7 +1091,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       defaultProvider: "test-openai",
       providers: {
@@ -1097,7 +1133,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       hostname: "127.0.0.1",
       defaultProvider: "extra",
@@ -1196,7 +1232,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       hostname: "127.0.0.1",
       defaultProvider: "extra",
@@ -1251,7 +1287,7 @@ describe("provider management validation", () => {
       authMode: "forward",
       disabled: true,
     } as const;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       hostname: "127.0.0.1",
       defaultProvider: "extra",
@@ -1309,7 +1345,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       hostname: "127.0.0.1",
       defaultProvider: "extra",
@@ -1366,7 +1402,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       hostname: "127.0.0.1",
       defaultProvider: "extra",
@@ -1475,7 +1511,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       hostname: "127.0.0.1",
       defaultProvider: "openai",
@@ -1494,7 +1530,7 @@ describe("provider management validation", () => {
       clearThreadAccountMap: () => { affinityClears += 1; },
       clearProviderQuotaCache: () => { quotaCacheClears += 1; },
       refreshCodexCatalog: async () => { catalogRefreshes += 1; },
-      primeCodexPoolQuotas: (_config: OcxConfig, reason: string) => { primes.push(reason); },
+      primeCodexPoolQuotas: (_config: oprConfig, reason: string) => { primes.push(reason); },
     };
     const patch = async (name: string, body: unknown) => {
       const req = new Request(`http://127.0.0.1/api/providers?name=${name}`, {
@@ -1549,7 +1585,7 @@ describe("provider management validation", () => {
     if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
     mkdirSync(TEST_DIR, { recursive: true });
     process.env.OPENPROVIDER_HOME = TEST_DIR;
-    const liveConfig: OcxConfig = {
+    const liveConfig: oprConfig = {
       port: 0,
       hostname: "127.0.0.1",
       defaultProvider: "openai",
@@ -1557,6 +1593,7 @@ describe("provider management validation", () => {
       providers: {
         openai: { ...canonicalDirect },
         extra: { adapter: "openai-chat", baseUrl: "https://extra.example.test/v1", apiKey: "sk-existing", note: "old note" },
+        gateway: { adapter: "anthropic", baseUrl: "https://gateway.example.test/v1", apiKey: "sk-gateway" },
         nvidia: { adapter: "openai-chat", baseUrl: "https://integrate.api.nvidia.com/v1", apiKey: "sk-nvidia" },
         ollama: { adapter: "openai-chat", baseUrl: "http://localhost:11434/v1" },
       },
@@ -1597,6 +1634,17 @@ describe("provider management validation", () => {
     expect(keyWrite?.status).toBe(400);
     expect(await keyWrite?.json()).toMatchObject({ error: expect.stringContaining("API-key endpoints") });
     expect(liveConfig.providers.extra.apiKey).toBe("sk-existing");
+
+    // Key-auth Anthropic gateways can select bearer; other adapters and auth modes cannot.
+    const bearer = await patch("gateway", { apiKeyTransport: "bearer" });
+    expect(bearer?.status).toBe(200);
+    expect(liveConfig.providers.gateway.apiKeyTransport).toBe("bearer");
+    expect((await patch("gateway", { apiKeyTransport: "invalid" }))?.status).toBe(400);
+    expect((await patch("extra", { apiKeyTransport: "bearer" }))?.status).toBe(400);
+    expect((await patch("gateway", { authMode: "oauth" }))?.status).toBe(400);
+    const clearTransport = await patch("gateway", { apiKeyTransport: "" });
+    expect(clearTransport?.status).toBe(200);
+    expect(liveConfig.providers.gateway.apiKeyTransport).toBeUndefined();
 
     // authMode local is guarded by the registry: nvidia (key) → 400; ollama (local) → ok.
     const nvidiaLocal = await patch("nvidia", { authMode: "local" });
@@ -1774,3 +1822,4 @@ describe("provider management validation", () => {
     }
   });
 });
+

@@ -16,7 +16,7 @@ with test fixtures, dropping all real routed entries (cursor/*, xai/*, ...):
   (`src/server.ts:1779/1793`) → `syncCatalogModels(testConfig)`
   (`src/codex-catalog.ts:873`) → `atomicWriteFile(catalogPath, ...)`.
 - `readCodexCatalogPath()` resolves via CODEX_HOME/`~/.codex/config.toml`; the
-  test overrides only `OPENCODEX_HOME`, NOT `CODEX_HOME` → the write hits the
+  test overrides only `@mdevs/openprovider_HOME`, NOT `CODEX_HOME` → the write hits the
   user's real catalog.
 - The empty-gather preservation guard in `mergeCatalogEntriesForSync`
   (`src/codex-catalog.ts` "routed model fetch returned empty; preserving ...")
@@ -46,7 +46,7 @@ with test fixtures, dropping all real routed entries (cursor/*, xai/*, ...):
   test that boots the server or can reach `refreshCodexCatalogBestEffort`.
   Since these tests run in-process (not subprocess), set/restore
   `process.env.CODEX_HOME` in beforeEach/afterEach alongside the existing
-  OPENCODEX_HOME handling.
+  @mdevs/openprovider_HOME handling.
 - AUDIT all other tests that boot the server request handler or call
   config-mutating endpoints (`/api/providers`, `/api/provider-context-caps`,
   `/api/models` etc.) for the same gap; apply the same isolation. Candidates:
@@ -142,7 +142,7 @@ Verification:
 
 Changes:
 - Added per-test isolated `CODEX_HOME` setup/teardown alongside the existing
-  `OPENCODEX_HOME` restoration.
+  `@mdevs/openprovider_HOME` restoration.
 
 Impact:
 - Provider-management and provider-context-cap tests no longer point catalog
@@ -200,3 +200,4 @@ Verification:
   `stat -f "%Sm"` stayed `Jul  2 20:41:40 2026`;
   `shasum` stayed
   `7be0d990236deda2c409b608942159cdb4f62a5c  /Users/jun/.codex/openprovider-catalog.json`.
+

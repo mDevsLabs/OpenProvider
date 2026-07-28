@@ -2,9 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { createOpenAIChatAdapter, stripBracketedModelSuffix } from "../src/adapters/openai-chat";
 import { createAnthropicAdapter } from "../src/adapters/anthropic";
 import { routeModel } from "../src/router";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprParsedRequest, oprProviderConfig } from "../src/types";
 
-function parsed(modelId: string): OcxParsedRequest {
+function parsed(modelId: string): oprParsedRequest {
   return {
     modelId,
     context: { messages: [{ role: "user", content: "hello", timestamp: 0 }] },
@@ -13,7 +13,7 @@ function parsed(modelId: string): OcxParsedRequest {
   };
 }
 
-function openaiChatProvider(): OcxProviderConfig {
+function openaiChatProvider(): oprProviderConfig {
   return {
     adapter: "openai-chat",
     baseUrl: "https://api.z.ai/api/paas/v4",
@@ -21,8 +21,8 @@ function openaiChatProvider(): OcxProviderConfig {
   };
 }
 
-function routedZaiProvider(): OcxProviderConfig {
-  const config: OcxConfig = {
+function routedZaiProvider(): oprProviderConfig {
+  const config: oprConfig = {
     port: 10100,
     defaultProvider: "zai",
     providers: {
@@ -35,7 +35,7 @@ function routedZaiProvider(): OcxProviderConfig {
   return routeModel(config, "zai/glm-5.2[1m]").provider;
 }
 
-function anthropicProvider(): OcxProviderConfig {
+function anthropicProvider(): oprProviderConfig {
   return {
     adapter: "anthropic",
     baseUrl: "https://api.z.ai/api/coding/paas/v4",
@@ -81,7 +81,7 @@ describe("openai-chat adapter wire model normalization", () => {
   });
 
   test("an unflagged provider sends glm-5.2[1m] verbatim", async () => {
-    const provider: OcxProviderConfig = {
+    const provider: oprProviderConfig = {
       adapter: "openai-chat",
       baseUrl: "https://example.test/v1",
     };
@@ -102,3 +102,4 @@ describe("anthropic adapter leaves the bracketed suffix intact", () => {
     expect(model).toBe("glm-5.2[1m]");
   });
 });
+

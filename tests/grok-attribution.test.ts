@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { buildGrokManagedBlock, injectGrokConfig } from "../src/grok/inject";
 import { handleChatCompletions } from "../src/server/chat-completions";
 import type { RequestLogContext } from "../src/server/request-log";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * D3 activation evidence: the fence stamps `x-openprovider-grok` on every registered
@@ -44,7 +44,7 @@ function chatReq(headers: Record<string, string>): Request {
   });
 }
 
-const config = { port: 0, defaultProvider: "mock", providers: {} } as unknown as OcxConfig;
+const config = { port: 0, defaultProvider: "mock", providers: {} } as unknown as oprConfig;
 
 test("a request carrying the header is tagged grok; one without is not", async () => {
   // The handler sets logCtx.surface before any upstream work; a routing failure for the
@@ -58,3 +58,4 @@ test("a request carrying the header is tagged grok; one without is not", async (
   await handleChatCompletions(chatReq({}), config, plain).catch(() => {});
   expect(plain.surface).toBeUndefined();
 });
+

@@ -10,14 +10,14 @@ for Cursor to continue coherently. Also preserve the Responses API controls that
 ## Findings
 
 - `src/responses/parser.ts` already parses prior `function_call`, `custom_tool_call`,
-  `tool_search_call`, and their outputs into `OcxAssistantMessage` toolCall parts plus
-  `OcxToolResultMessage`.
+  `tool_search_call`, and their outputs into `oprAssistantMessage` toolCall parts plus
+  `oprToolResultMessage`.
 - `src/adapters/cursor/request-builder.ts` currently drops assistant `toolCall` parts
   (`contentPartToText()` returns `undefined`) and serializes tool results as bare text. Cursor
   therefore loses call id/name/args/result pairing in root prompt blobs.
 - `src/types.ts` only models `toolChoice` as `"auto" | "none" | "required" | { name }`.
   `allowed_tools` is reduced to `"auto"` in `mapToolChoice()`, and `parallel_tool_calls` is parsed
-  by the schema but not retained in `OcxRequestOptions`.
+  by the schema but not retained in `oprRequestOptions`.
 - `src/adapters/cursor/protobuf-events.ts` can enforce "no more than one synthetic client tool call"
   when `parallel_tool_calls === false`, but the state currently lacks that option.
 
@@ -25,7 +25,7 @@ for Cursor to continue coherently. Also preserve the Responses API controls that
 
 ### MODIFY `src/types.ts`
 
-- Extend `OcxRequestOptions.toolChoice` with:
+- Extend `oprRequestOptions.toolChoice` with:
 
 ```ts
 | { mode: "auto" | "required"; allowedTools: string[] }
@@ -112,3 +112,4 @@ output:
 - No live Cursor/native destructive smoke.
 - No implementation of run suspension/resume for synthetic client tools arriving through
   `execServerMessage.mcpArgs`; that path remains fail-closed from Phase 43.
+

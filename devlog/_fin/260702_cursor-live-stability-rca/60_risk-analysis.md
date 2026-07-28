@@ -14,7 +14,7 @@ Owner: Boss (main session). Inputs: live-eval matrix (00_), WP plans (10/20/30/
 | R4 | `id` echo mismatch (uint32, proto3 default 0 omitted) → server still waits | Low | High | Explicit test: reply id === query id for every case, including id=0 edge. |
 | R5 | `isClientToolFrame` narrowing re-opens the parallel client-tool race it guarded (if any legit client-tool lifecycle frame is not `mcpToolCall`, e.g. `truncatedToolCall` wrapping) | Low-Med | High | Keep existing race tests (`cursor-tool-finalize-race.test.ts`) green; add a fixture for truncated/mixed frames; if in doubt, treat `truncatedToolCall` as client-activity too. |
 | R6 | Auto-rejecting `webSearchRequestQuery` degrades answers for search-flavored prompts (agent may hallucinate instead of searching) | Med | Low-Med | Acceptable initial default (determinism); WP2b/follow-up can approve + service via the existing web-search sidecar/fetch path behind a config flag. |
-| R7 | Behavior change for Cursor IDE-like flows we don't see (queries meant for human UI) | Low | Med | All replies logged; OCX_DEBUG_FRAMES capture retained for one release cycle. |
+| R7 | Behavior change for Cursor IDE-like flows we don't see (queries meant for human UI) | Low | Med | All replies logged; opr_DEBUG_FRAMES capture retained for one release cycle. |
 
 Open input: S1 (how jawcode answers each query) may flip R2/R6 defaults.
 
@@ -129,3 +129,4 @@ S1/S2 results (landed):
 2. WP2 default for webSearchRequestQuery: rejected (deterministic) vs
    approved+sidecar. Default proposal: rejected now, flag later.
 3. Main-instance restart timing for live acceptance of WP2/WP0.
+

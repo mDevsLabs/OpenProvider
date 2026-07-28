@@ -67,7 +67,7 @@ const staleContractPattern = [
 ].join("|");
 
 export function finalGatePlan(root: string, evidenceDir: string, unitRoot = dirname(evidenceDir)): GateSpec[] {
-  const env = { ...process.env, OCX_EVIDENCE_DIR: evidenceDir } as Record<string, string>;
+  const env = { ...process.env, opr_EVIDENCE_DIR: evidenceDir } as Record<string, string>;
   const unitPath = relative(root, unitRoot);
   return [
     { name: "openai-provider-option-e2e", command: ["bun", "test", "tests/openai-provider-option-e2e.test.ts"], cwd: root, env },
@@ -154,3 +154,4 @@ if (import.meta.main) {
   });
   console.log("OpenAI provider-option final gates passed");
 }
+

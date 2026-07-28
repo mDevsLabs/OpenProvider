@@ -131,7 +131,7 @@ export interface CursorProtobufEventState {
   estimatedInputTokens?: number;
 }
 
-function resolvedTurnUsage(state: CursorProtobufEventState): OcxUsage {
+function resolvedTurnUsage(state: CursorProtobufEventState): oprUsage {
   const contextTokens = reportableContextTokens(state);
   if (contextTokens !== undefined) return usageFromContextTokens(state, contextTokens);
   const estimate = state.estimatedInputTokens;
@@ -248,3 +248,4 @@ bun test tests/cursor-blob.test.ts tests/cursor-protobuf-events.test.ts \
 ```
 
 `tests/token-estimate.test.ts`는 공유 estimator를 건드리지 않았음을 증명하는 가드다.
+

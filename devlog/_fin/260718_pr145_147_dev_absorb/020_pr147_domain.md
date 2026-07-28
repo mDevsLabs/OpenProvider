@@ -60,7 +60,7 @@ Current `dev` has no `src/combos/` directory and no combo types. Relevant owners
   validation;
 - `src/server/management-api.ts:417-455`: provider creation;
 - `src/server/management-api.ts:643-654`: provider deletion;
-- `src/types.ts:430-476`: current `OcxConfig` tail.
+- `src/types.ts:430-476`: current `oprConfig` tail.
 
 PR #147 was based before the landed PR #139/#140 rebuild. Its `router.ts` hunk would
 drop current `codexAccountMode`, `routeResult()`, legacy-provider rejection, canonical
@@ -155,7 +155,7 @@ tautological `picks.size >= 1` test.
 ### 3.3 `defaultEffort` split from `6824e7bc`
 
 020 stores and returns the normalized default and exposes
-`comboDefaultEffort(config, id)`. It does **not** mutate `OcxParsedRequest`. In 030 the
+`comboDefaultEffort(config, id)`. It does **not** mutate `oprParsedRequest`. In 030 the
 combo orchestrator applies the default to a fresh raw JSON clone only when `reasoning`
 is absent or is an object without its own `effort`; `reasoning:null` and owned effort
 values are preserved. Each concrete target then applies its normal supported-ladder
@@ -168,13 +168,13 @@ All before snippets are from current `dev`. All after snippets are the required 
 
 ### 4.1 `src/types.ts` — MODIFY — source shape then maintainer-narrowed final types
 
-Before (`OcxConfig` ends after `upstreamFailoverThreshold`):
+Before (`oprConfig` ends after `upstreamFailoverThreshold`):
 
 ```ts
   /** Consecutive non-2xx upstream responses before switching future new threads. Default 3. 0 = disabled. */
   upstreamFailoverThreshold?: number;
-  /** Background proactive token refresh ("Token Guardian"). Off by default; see OcxTokenGuardianConfig. */
-  tokenGuardian?: OcxTokenGuardianConfig;
+  /** Background proactive token refresh ("Token Guardian"). Off by default; see oprTokenGuardianConfig. */
+  tokenGuardian?: oprTokenGuardianConfig;
 ```
 
 After:
@@ -183,38 +183,38 @@ After:
   /** Consecutive non-2xx upstream responses before switching future new threads. Default 3. 0 = disabled. */
   upstreamFailoverThreshold?: number;
   /** Virtual `combo/<id>` models spanning concrete provider/model targets (issue #133). */
-  combos?: Record<string, OcxComboConfig>;
-  /** Background proactive token refresh ("Token Guardian"). Off by default; see OcxTokenGuardianConfig. */
-  tokenGuardian?: OcxTokenGuardianConfig;
+  combos?: Record<string, oprComboConfig>;
+  /** Background proactive token refresh ("Token Guardian"). Off by default; see oprTokenGuardianConfig. */
+  tokenGuardian?: oprTokenGuardianConfig;
 ```
 
-Insert immediately after `OcxConfig`:
+Insert immediately after `oprConfig`:
 
 ```ts
-export type OcxComboStrategy = "failover" | "round-robin";
-export type OcxComboDefaultEffort = "low" | "medium" | "high" | "xhigh" | "max" | "ultra";
+export type oprComboStrategy = "failover" | "round-robin";
+export type oprComboDefaultEffort = "low" | "medium" | "high" | "xhigh" | "max" | "ultra";
 
-export interface OcxComboTarget {
+export interface oprComboTarget {
   provider: string;
   model: string;
   /** Relative SWRR batch weight. Default 1; valid range 1..10000. */
   weight?: number;
 }
 
-export interface OcxComboConfig {
-  targets: OcxComboTarget[];
+export interface oprComboConfig {
+  targets: oprComboTarget[];
   /** Ordered failover (default) or deterministic smooth weighted round-robin. */
-  strategy?: OcxComboStrategy;
+  strategy?: oprComboStrategy;
   /** Successful requests retained on one RR selection batch. Default 1; range 1..100. */
   stickyLimit?: number;
   /** Used only when the client omits reasoning.effort. Default medium. */
-  defaultEffort?: OcxComboDefaultEffort;
+  defaultEffort?: oprComboDefaultEffort;
 }
 ```
 
 The snippet is the 020-tip result. Commit 1 may reconstruct the source PR's
 `defaultEffort?: string` shape; commit 2, authored by the maintainer with the Wibias
-co-author trailer, introduces `OcxComboDefaultEffort` and narrows the field to the final
+co-author trailer, introduces `oprComboDefaultEffort` and narrows the field to the final
 union shown here.
 
 Do not add a second effort ladder constant to `src/types.ts`; runtime validation reuses
@@ -228,15 +228,15 @@ but no dependency on `src/config.ts`, avoiding an ESM config↔combos cycle):
 ```ts
 import { isCodexReasoningEffort } from "../reasoning-effort";
 import type {
-  OcxComboConfig,
-  OcxComboDefaultEffort,
-  OcxComboStrategy,
-  OcxComboTarget,
-  OcxProviderConfig,
+  oprComboConfig,
+  oprComboDefaultEffort,
+  oprComboStrategy,
+  oprComboTarget,
+  oprProviderConfig,
 } from "../types";
 
 export const COMBO_NAMESPACE = "combo";
-export const COMBO_DEFAULT_EFFORT: OcxComboDefaultEffort = "medium";
+export const COMBO_DEFAULT_EFFORT: oprComboDefaultEffort = "medium";
 const COMBO_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
 
 export interface ComboValidationIssue {
@@ -245,13 +245,13 @@ export interface ComboValidationIssue {
 }
 
 export interface NormalizedComboConfig {
-  strategy: OcxComboStrategy;
+  strategy: oprComboStrategy;
   stickyLimit: number;
-  defaultEffort: OcxComboDefaultEffort;
-  targets: Array<Required<OcxComboTarget>>;
+  defaultEffort: oprComboDefaultEffort;
+  targets: Array<Required<oprComboTarget>>;
 }
 
-export function targetKey(target: Pick<OcxComboTarget, "provider" | "model">): string {
+export function targetKey(target: Pick<oprComboTarget, "provider" | "model">): string {
   return `${target.provider}/${target.model}`;
 }
 
@@ -269,7 +269,7 @@ export function comboModelId(id: string): string {
 export function comboConfigIssues(
   id: string,
   raw: unknown,
-  providers: Record<string, OcxProviderConfig>,
+  providers: Record<string, oprProviderConfig>,
   options: { requireEnabledTarget?: boolean } = {},
 ): ComboValidationIssue[] {
   const issues: ComboValidationIssue[] = [];
@@ -382,13 +382,13 @@ export function comboConfigIssues(
 export function comboConfigError(
   id: string,
   raw: unknown,
-  providers: Record<string, OcxProviderConfig>,
+  providers: Record<string, oprProviderConfig>,
   options: { requireEnabledTarget?: boolean } = {},
 ): string | null {
   return comboConfigIssues(id, raw, providers, options)[0]?.message ?? null;
 }
 
-export function normalizeComboConfig(raw: OcxComboConfig): NormalizedComboConfig {
+export function normalizeComboConfig(raw: oprComboConfig): NormalizedComboConfig {
   return {
     strategy: raw.strategy ?? "failover",
     stickyLimit: raw.stickyLimit ?? 1,
@@ -402,14 +402,14 @@ export function normalizeComboConfig(raw: OcxComboConfig): NormalizedComboConfig
 }
 
 export function comboDefaultEffort(
-  config: { combos?: Record<string, OcxComboConfig> },
+  config: { combos?: Record<string, oprComboConfig> },
   id: string,
-): OcxComboDefaultEffort | null {
+): oprComboDefaultEffort | null {
   const combos = config.combos;
   if (!combos || !Object.prototype.hasOwnProperty.call(combos, id)) return null;
   const value: unknown = combos[id]!.defaultEffort ?? COMBO_DEFAULT_EFFORT;
   return typeof value === "string" && isCodexReasoningEffort(value)
-    ? value as OcxComboDefaultEffort
+    ? value as oprComboDefaultEffort
     : null;
 }
 
@@ -417,12 +417,12 @@ export function isValidComboId(id: string): boolean {
   return COMBO_ID_PATTERN.test(id);
 }
 
-export function listComboIds(config: { combos?: Record<string, OcxComboConfig> }): string[] {
+export function listComboIds(config: { combos?: Record<string, oprComboConfig> }): string[] {
   return Object.keys(config.combos ?? {}).sort((a, b) => a.localeCompare(b));
 }
 
 export function getCombo(
-  config: { combos?: Record<string, OcxComboConfig> },
+  config: { combos?: Record<string, oprComboConfig> },
   id: string,
 ): NormalizedComboConfig | undefined {
   const combos = config.combos;
@@ -467,13 +467,13 @@ valid. Only the PUT-upsert caller sets `requireEnabledTarget:true`.
 Use one state map per combo and smooth weighted selection:
 
 ```ts
-import type { OcxComboTarget, OcxConfig } from "../types";
+import type { oprComboTarget, oprConfig } from "../types";
 import { getCombo, parseComboModelId, targetKey } from "./types";
 import type { NormalizedComboConfig } from "./types";
 
 export interface ComboPick {
   comboId: string;
-  target: Required<OcxComboTarget>;
+  target: Required<oprComboTarget>;
   targetIndex: number;
   attempted: string[];
 }
@@ -486,15 +486,15 @@ interface SelectionState {
 
 const selectionState = new Map<string, SelectionState>();
 
-function targetProviderIsUsable(config: OcxConfig, target: OcxComboTarget): boolean {
+function targetProviderIsUsable(config: oprConfig, target: oprComboTarget): boolean {
   return Object.prototype.hasOwnProperty.call(config.providers, target.provider)
     && config.providers[target.provider]?.disabled !== true;
 }
 
 function smoothWeightedIndex(
-  targets: Required<OcxComboTarget>[],
+  targets: Required<oprComboTarget>[],
   state: SelectionState,
-  eligible: (target: Required<OcxComboTarget>) => boolean,
+  eligible: (target: Required<oprComboTarget>) => boolean,
 ): number {
   let best = -1;
   let bestScore = Number.NEGATIVE_INFINITY;
@@ -520,22 +520,22 @@ Public behavior:
 
 ```ts
 export function pickComboTarget(
-  config: OcxConfig,
+  config: oprConfig,
   comboId: string,
   options: {
     exclude?: Iterable<string>;
-    eligible?: (target: Required<OcxComboTarget>) => boolean;
+    eligible?: (target: Required<oprComboTarget>) => boolean;
   } = {},
 ): ComboPick | null;
 
 export function noteComboSuccess(
   comboId: string,
   combo: NormalizedComboConfig,
-  target: Required<OcxComboTarget>,
+  target: Required<oprComboTarget>,
 ): void;
 
 export function clearComboSelectionState(comboId?: string): void;
-export function tryPickComboModel(config: OcxConfig, modelId: string): ComboPick | null;
+export function tryPickComboModel(config: oprConfig, modelId: string): ComboPick | null;
 ```
 
 `pickComboTarget` composes three eligibility gates: provider still exists/enabled,
@@ -647,7 +647,7 @@ Extend, do not replace, current `RouteResult` (`src/router.ts:7-12`):
 ```ts
 export interface RouteResult {
   providerName: string;
-  provider: OcxProviderConfig;
+  provider: oprProviderConfig;
   modelId: string;
   codexAccountMode?: CodexAccountMode;
   combo?: ComboPick;
@@ -768,7 +768,7 @@ matching persisted-config replacement semantics.
       requireEnabledTarget: true,
     });
     if (error) return jsonResponse({ error }, 400);
-    const normalized = normalizeComboConfig(body.combo as import("../types").OcxComboConfig);
+    const normalized = normalizeComboConfig(body.combo as import("../types").oprComboConfig);
     config.combos = { ...(config.combos ?? {}), [id]: normalized };
     saveConfig(config);
     clearComboSelectionState(id);
@@ -868,7 +868,7 @@ all-disabled mutation-only error is asserted through `comboConfigError(...,
 
 ### 4.10 `tests/combo-management-api.test.ts` — NEW — GET/PUT-upsert/DELETE and provider-deletion guard
 
-Call `handleManagementAPI` directly with an isolated `OPENCODEX_HOME`. Cover GET sorted
+Call `handleManagementAPI` directly with an isolated `OpenProvider_HOME`. Cover GET sorted
 output; PUT create/update and normalized defaults; POST/PATCH are not accepted as combo
 create/update operations and leave config/disk unchanged; PUT null/array/string/number/
 boolean root bodies return 400 before property access; PUT object/array/number `id` values
@@ -1085,3 +1085,4 @@ has leaked into this slice.
   `HEAD~4..HEAD`; contributor-source suffix trimming stays in commit 1, while final
   no-trim wire behavior moves to maintainer-authored commit 2 with the exact Wibias
   co-author trailer.
+

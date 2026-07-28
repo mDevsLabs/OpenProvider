@@ -12,7 +12,7 @@
  * parsed.options.reasoning feeds routed adapters, _rawBody.reasoning.effort feeds the
  * ChatGPT passthrough serializer.
  */
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../types";
+import type { oprConfig, oprParsedRequest, oprProviderConfig } from "../types";
 import { modelInList } from "../types";
 import { codexEffortRank, configuredReasoningEfforts, isCodexReasoningEffort, modelRecordValue } from "../reasoning-effort";
 import { catalogModelEfforts } from "../codex/catalog";
@@ -43,7 +43,7 @@ export function isThreadSpawnRequest(headers: Headers): boolean {
 }
 
 /** The effective ceiling for this turn, or undefined when no configured cap applies. */
-export function effortCapFor(config: OcxConfig, subagent: boolean): string | undefined {
+export function effortCapFor(config: oprConfig, subagent: boolean): string | undefined {
   const caps: string[] = [];
   if (config.effortCap && isCodexReasoningEffort(config.effortCap)) caps.push(config.effortCap);
   if (subagent && config.subagentEffortCap && isCodexReasoningEffort(config.subagentEffortCap)) {
@@ -71,7 +71,7 @@ export function effortCapFor(config: OcxConfig, subagent: boolean): string | und
 export function effortCapAppliesTo(
   surface: "v1" | "v2" | null,
   headers: Headers,
-  config: OcxConfig,
+  config: oprConfig,
   compaction = false,
 ): boolean {
   if (compaction) return false;
@@ -98,7 +98,7 @@ export function effortCapAppliesTo(
  * validates against that backend. A custom responses provider (key mode) serving a
  * native-looking bare id must NOT inherit the unrelated native ladder.
  */
-export function supportedLadderFor(route: { provider: OcxProviderConfig; modelId: string }): string[] | undefined {
+export function supportedLadderFor(route: { provider: oprProviderConfig; modelId: string }): string[] | undefined {
   const { provider, modelId } = route;
   if (modelInList(provider.noReasoningModels, modelId)) return [];
   const raw = modelRecordValue(provider.modelReasoningEfforts, modelId) ?? provider.reasoningEfforts;
@@ -147,9 +147,9 @@ export function resolveCappedEffort(cap: string, supported: readonly string[] | 
  * for request-log annotation (`to: "none"` on strip), or null when nothing changed.
  */
 export function applyEffortCap(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   headers: Headers,
-  config: OcxConfig,
+  config: oprConfig,
   supported?: readonly string[] | undefined,
 ): { from: string; to: string; subagent: boolean } | null {
   const subagent = isThreadSpawnRequest(headers);
@@ -170,3 +170,4 @@ export function applyEffortCap(
   if (raw?.reasoning && typeof raw.reasoning === "object") raw.reasoning.effort = resolved;
   return { from: requested, to: resolved, subagent };
 }
+

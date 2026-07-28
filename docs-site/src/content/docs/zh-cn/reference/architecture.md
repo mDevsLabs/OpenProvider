@@ -26,7 +26,7 @@ src/
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
 ├── responses/
-│   ├── parser.ts       # Responses request → OcxParsedRequest
+│   ├── parser.ts       # Responses request → oprParsedRequest
 │   ├── schema.ts       # Zod validation
 │   └── compaction.ts   # remote compaction prompts, envelopes, compact history
 ├── service.ts          # launchd / systemd / Task Scheduler background service
@@ -68,9 +68,9 @@ src/
 ## 解析器
 
 `responses/parser.ts` 使用 `responses/schema.ts`（Zod）校验传入请求，然后构建
-`OcxParsedRequest`：
+`oprParsedRequest`：
 
-- **消息（Messages）** —— `input` 条目会变成规范化的 `OcxMessage[]`：user / developer /
+- **消息（Messages）** —— `input` 条目会变成规范化的 `oprMessage[]`：user / developer /
   assistant / toolResult。`reasoning` 条目变成 thinking block；`function_call`、
   `custom_tool_call`、`tool_search_call` 条目变成工具调用；对应的 `*_output` 条目变成工具结果。
 - **工具（Tools）** —— function 工具直接透传；**带命名空间的（MCP）工具会被扁平化**为
@@ -122,7 +122,7 @@ origin allowlist。
 
 OAuth 实现在 `oauth/` 中；每次路由调用前都会即时加载或刷新 access token，而
 `oauth/token-guardian.ts` 只会主动刷新策略允许的 provider。Codex/ChatGPT pool credential 与
-thread affinity 位于 `codex/` 下，不会出现在管理 API 响应中。请求用量会规范化为 `OcxUsage`，
+thread affinity 位于 `codex/` 下，不会出现在管理 API 响应中。请求用量会规范化为 `oprUsage`，
 显示在 Responses 终止 event 中，并由 `usage/` 汇总，供仪表盘和可选的 JSONL 诊断使用。
 
 ## 传输与 compaction
@@ -159,8 +159,9 @@ Codex context compaction 同样适用于路由模型。`server/responses/compact
 
 ## 核心类型
 
-内部模型位于 `types.ts`：`OcxParsedRequest`、`OcxContext`、`OcxMessage` 联合类型、
-`OcxContentPart`（text / image）、`OcxToolCall`、`OcxTool`、`AdapterEvent`，以及配置类型
-（`OcxConfig`、`OcxProviderConfig`）。两个常用 helper 是 `namespacedToolName()` 和
+内部模型位于 `types.ts`：`oprParsedRequest`、`oprContext`、`oprMessage` 联合类型、
+`oprContentPart`（text / image）、`oprToolCall`、`oprTool`、`AdapterEvent`，以及配置类型
+（`oprConfig`、`oprProviderConfig`）。两个常用 helper 是 `namespacedToolName()` 和
 `modelInList()`；后者会在匹配 `noVisionModels` / `noReasoningModels` 时容忍 `:size` 标签。
+
 

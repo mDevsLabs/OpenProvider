@@ -19,7 +19,7 @@
 2. bridge.ts non-streaming `flushRawReasoning`: when `options?.hideThinkingSummary === true`,
    push the envelope-only item instead of the visible `content[reasoning_text]` item.
 3. Envelope: reuse ReasoningEnvelope.txt (exists; parser.ts:301 already decodes
-   encrypted_content -> thinking for replay). Verify decode path maps txt -> OcxThinkingContent
+   encrypted_content -> thinking for replay). Verify decode path maps txt -> oprThinkingContent
    and openai-chat replay serializes it via preserveReasoningContentModels reasoning_content.
 
 ## Accept criteria / activation scenarios
@@ -32,3 +32,4 @@
   content; openai-chat buildRequest with a preserveReasoningContentModels provider emits
   reasoning_content for that message.
 - Live glm-5.2 probe (WP3): with summary none, stream shows no reasoning_text.delta.
+

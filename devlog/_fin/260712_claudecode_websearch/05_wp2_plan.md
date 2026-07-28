@@ -23,7 +23,7 @@ Out of scope: vision, claude-messages auth (WP3), GUI (WP5).
 
 ## Design
 
-D1 Config: OcxWebSearchSidecarConfig.backend?: "openai" | "anthropic".
+D1 Config: oprWebSearchSidecarConfig.backend?: "openai" | "anthropic".
    Precedence: explicit backend wins; unset -> "anthropic" iff an enabled
    anthropic-adapter oauth provider WITH a stored credential exists, else
    "openai". Credential presence via sync oauth store read (getCredential
@@ -102,3 +102,4 @@ Evidence: .codexclaw/evidence/260712-wp2-plan-audit.md
 - F6 ACCEPT (MINOR): the parser design is correct — Anthropic streams carry the full
   web_search_tool_result.content on content_block_start; drop the R2 delta-carried-hits
   fallback claim (unsupported, not implemented).
+

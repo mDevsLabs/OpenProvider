@@ -89,7 +89,7 @@ cleanup. 특히 **`nextGroups` 기반 cleanup을 반드시 보존**한다.
   변경한다. API key/base URL/adapter/custom 필드 유실 없음.
 - physical `combo`, shared-prefix alias, stale bare native disable 세 분기는 management API
   테스트로 실제 활성화된다.
-- 기존 통합 4커밋과 충돌 없음. `fc517004`는 `OcxUsage`만 확장하고 `#370`은 `router.ts`를
+- 기존 통합 4커밋과 충돌 없음. `fc517004`는 `oprUsage`만 확장하고 `#370`은 `router.ts`를
   건드리지 않는다.
 - docs-site 5개 로케일이 네 가지 의미(allowlist AND not-disabled, individual-on 원자적 조정,
   All-on의 allowlist 제거, future discovery 모델 활성화)에서 모두 일치한다. 모순 없음.
@@ -420,7 +420,7 @@ shared owner를 한 곳으로 만든다.
  export const COMBO_NAMESPACE = "combo";
 +
 +export function preservesPhysicalComboProvider(
-+  config: Pick<OcxConfig, "providers" | "combos">,
++  config: Pick<oprConfig, "providers" | "combos">,
 +): boolean {
 +  return Object.hasOwn(config.providers, COMBO_NAMESPACE)
 +    && Object.keys(config.combos ?? {}).length === 0;
@@ -617,3 +617,4 @@ rg -n "Model visibility|モデルの表示|모델 노출|Видимость мо
 ## 실행 영수증
 
 _(C/D 단계에서 작성)_
+

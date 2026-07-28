@@ -41,7 +41,7 @@ adapter 이름만 보고 native `/responses/compact`를 호출한다. 그 엔드
 `src/providers/openai-tiers.ts:32`:
 
 ```ts
-export function isCanonicalOpenAiForwardProvider(provider: OcxProviderConfig): boolean {
+export function isCanonicalOpenAiForwardProvider(provider: oprProviderConfig): boolean {
   return provider.adapter === "openai-responses"
     && provider.authMode === "forward"
     && normalizedBaseUrl(provider.baseUrl) === CODEX_FORWARD_BASE_URL;
@@ -57,7 +57,7 @@ export function isCanonicalOpenAiForwardProvider(provider: OcxProviderConfig): b
 - `src/responses/compaction.ts`: `COMPACT_PROMPT`, `SUMMARY_PREFIX`,
   `encodeCompactionSummary()`, `decodeCompactionSummary()`, `buildCompactV1Output()`
 - `src/bridge.ts:652`: `options.compaction`이 참이면 정확히 하나의 `compaction` item을 생성
-- `src/adapters/openai-responses.ts:127` `scrubOcxCompactionItems()`: 우리가 만든 compaction
+- `src/adapters/openai-responses.ts:127` `scruboprCompactionItems()`: 우리가 만든 compaction
   item을 다음 턴에 되돌리는 로직이 이미 있다
 - `compact.ts:307` 이하: routed 모델용 v1 synthetic 경로가 이미 구현되어 있다
 
@@ -82,3 +82,4 @@ export function isCanonicalOpenAiForwardProvider(provider: OcxProviderConfig): b
   경로를 유지한다. `001_external_evidence.md` 참조.
 - `compact.ts:311`의 내부 요청은 `stream: false`다. routed 경로가 non-stream을 처리할 수
   있어야 v1이 동작한다 — 현재 routed 경로가 이미 그렇게 쓰이고 있으므로 B에서 확인한다.
+

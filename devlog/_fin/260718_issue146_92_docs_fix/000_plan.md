@@ -18,7 +18,7 @@ Close out the two "actionable-now" findings from the 2026-07-18 Sol review sweep
 
 - IN: README (en/ko/zh), docs-site installation.md (en/ko/zh-cn),
   docs-site sub-agent-surface.md (en/ko/zh-cn), `scripts/install.sh` and
-  `scripts/install.ps1` comments, `bin/ocx.mjs` fail() hint string
+  `scripts/install.ps1` comments, `bin/opr.mjs` fail() hint string
   (9 install surfaces total; see 010 for the authoritative list).
 - OUT (decision cards, not this unit): posting GitHub comments on #146/#92/#145/#147,
   filing the upstream openai/codex issue for #92, any code change to install
@@ -31,7 +31,7 @@ Close out the two "actionable-now" findings from the 2026-07-18 Sol review sweep
 ## Evidence base (from Sol reviewers, 2026-07-18)
 
 - #146 root cause: `package.json` deps `bun@1.3.14`; bun's `postinstall: node install.js`
-  replaces a placeholder binary; `bin/ocx.mjs` lazy retry cannot write a root-owned
+  replaces a placeholder binary; `bin/opr.mjs` lazy retry cannot write a root-owned
   global prefix. Correct commands (npm 11.18 dry-run verified):
   - `npm install -g --allow-scripts=bun @mdevs/openprovider` (user-owned prefix)
   - `sudo npm install -g --allow-scripts=bun @mdevs/openprovider` (sudo-installed prefix)
@@ -58,11 +58,11 @@ One work-phase = one full PABCD cycle.
 
 - AC-1: every install surface (README.md/ko/zh-CN §install + troubleshooting,
   docs-site installation.md en/ko/zh-cn, scripts/install.sh, scripts/install.ps1,
-  bin/ocx.mjs fail hint) names `--allow-scripts=bun` with the full package
+  bin/opr.mjs fail hint) names `--allow-scripts=bun` with the full package
   argument, covering both non-sudo and sudo recovery. Grep gate per 010: every
   RECOMMENDED command carries the package argument; explanatory prose quoting
   npm's abbreviated warning is exempt.
-- AC-2: `node --check bin/ocx.mjs` clean (tsc does not cover bin/); focused
+- AC-2: `node --check bin/opr.mjs` clean (tsc does not cover bin/); focused
   install tests (`tests/install-scripts.test.ts` and any hint-pinning tests)
   pass; `bun x tsc --noEmit` clean for overall repo health.
 - AC-3: README ×3 + sub-agent-surface ×3 no longer state unconditional cross-model
@@ -86,4 +86,5 @@ One work-phase = one full PABCD cycle.
 - DC-4 (review comments): post the four Sol review verdicts as PR/issue comments.
 - DC-5 (#144 draft): product placement (docs-site vs GUI lazy-load) — feedback to
   Wibias only, no local work planned.
+
 

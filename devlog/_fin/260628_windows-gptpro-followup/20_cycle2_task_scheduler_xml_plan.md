@@ -7,7 +7,7 @@ GPT Pro found that `schtasks /create /sc onlogon /du 9999:59` does not implement
 
 ### MODIFY src/service.ts
 1. Add XML escaping helper for Task Scheduler XML values.
-2. Add `windowsTaskXmlPath()` beside `windowsServiceScriptPath()` under OPENCODEX_HOME.
+2. Add `windowsTaskXmlPath()` beside `windowsServiceScriptPath()` under @mdevs/openprovider_HOME.
 3. Export `buildWindowsTaskXml(script = windowsServiceScriptPath()): string` that includes:
    - Task Scheduler v1.4 XML root namespace;
    - LogonTrigger enabled;
@@ -41,3 +41,4 @@ GPT Pro found that `schtasks /create /sc onlogon /du 9999:59` does not implement
 
 ## Known debt
 `src/service.ts` already exceeds the 500-line guideline. This patch keeps changes local; splitting service manager backends is a separate refactor.
+

@@ -47,11 +47,11 @@ Competing hypotheses to disambiguate with ONE live probe:
 
 Driver: a throwaway script that imports `createLiveCursorTransport` and drives ONE
 live turn against api2.cursor.sh using the cursor access token from
-`~/.openprovider/auth.json` (via `OPENCODEX_CURSOR_TEST_TOKEN`). This is a pure
+`~/.openprovider/auth.json` (via `@mdevs/openprovider_CURSOR_TEST_TOKEN`). This is a pure
 outbound h2 request: no second server, no pid file, no config writes, no Codex
 sync, zero interference with the live proxy on port 10100.
 
-`buildCursorToolDefinitions` gets an env-gated (`OCX_CURSOR_TOOL_PROBE=1`)
+`buildCursorToolDefinitions` gets an env-gated (`opr_CURSOR_TOOL_PROBE=1`)
 experimental branch that emits the SAME probe tool under 3 variant schemes with
 distinct model-facing names in ONE request, so a single live turn tests the whole
 matrix (budget: 1 Cursor request):
@@ -94,7 +94,7 @@ direct independent audit (AUDIT-LOOP-01 fallback). One blocker found and folded:
   `createLiveCursorTransport.run()` is UNSOUND for provider-id variants. Both
   `mcpArgsFromToolCall` (protobuf-events.ts:48-51) and
   `mapSyntheticMcpExecToToolEvents` (protobuf-events.ts:126) hard-filter on
-  `args.providerIdentifier === OCX_RESPONSES_TOOL_PROVIDER`. A variant-B call
+  `args.providerIdentifier === opr_RESPONSES_TOOL_PROVIDER`. A variant-B call
   (provider `openprovider`) is therefore NEVER surfaced as `tool_call_start` through
   `run()` - it routes to native-exec `mcpExec` -> `toolNotFound` and is invisible
   to a CursorServerMessage observer. The script also bypasses the real
@@ -105,8 +105,10 @@ direct independent audit (AUDIT-LOOP-01 fallback). One blocker found and folded:
   LIVE proxy on 127.0.0.1:10100 (loopback => no API key needed; auth-cors
   `isApiAuthRequired` false) with `debug:true`, and read the RAW protocol frames
   from the `/api/debug/logs` ring buffer. Raw frames are captured BEFORE the
-  OCX_RESPONSES surfacing filter, so a toolCall under ANY providerIdentifier is
+  opr_RESPONSES surfacing filter, so a toolCall under ANY providerIdentifier is
   observable, and the full production tool-processing path (system notes,
   cursorToolsForActivePrompt) is exercised faithfully. Zero restart, zero config
   writes; verify pid unchanged. This diagnoses which hypothesis (H1/H2/H3) holds;
   the fix (or NEEDS_HUMAN) follows from the frames.
+
+

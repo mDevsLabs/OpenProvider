@@ -140,8 +140,8 @@ Every implementation phase must run:
 ```bash
 bun test tests/cli-status-json.test.ts tests/cli-help.test.ts
 bun run typecheck
-node bin/ocx.mjs --version
-node bin/ocx.mjs status --json
+node bin/opr.mjs --version
+node bin/opr.mjs status --json
 ```
 
 Use employee verification before each B->C transition.
@@ -153,3 +153,4 @@ Use employee verification before each B->C transition.
 - `fix(cli): report runtime fallback port in status`
 
 Each commit must be independently reversible.
+

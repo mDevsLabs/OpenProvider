@@ -26,7 +26,7 @@ src/
 ├── bridge.ts           # AdapterEvent stream → Responses SSE / JSON
 ├── reasoning-effort.ts # reasoning-effort translation, clamping, and catalog levels
 ├── responses/
-│   ├── parser.ts       # Responses request → OcxParsedRequest
+│   ├── parser.ts       # Responses request → oprParsedRequest
 │   ├── schema.ts       # Zod validation
 │   └── compaction.ts   # remote compaction prompts, envelopes, compact history
 ├── service.ts          # launchd / systemd / Task Scheduler background service
@@ -70,9 +70,9 @@ the `server/responses.ts` facade and its `server/responses/*.ts` modules:
 ## The parser
 
 `responses/parser.ts` validates the incoming request with `responses/schema.ts` (Zod), then builds an
-`OcxParsedRequest`:
+`oprParsedRequest`:
 
-- **Messages** — `input` items become a normalized `OcxMessage[]`: user / developer / assistant /
+- **Messages** — `input` items become a normalized `oprMessage[]`: user / developer / assistant /
   toolResult. `reasoning` items become thinking blocks; `function_call`, `custom_tool_call`, and
   `tool_search_call` items become tool calls; their `*_output` counterparts become tool results.
 - **Tools** — function tools pass through; **namespaced (MCP) tools are flattened** to
@@ -130,7 +130,7 @@ generation CAS so concurrent writers cannot clobber a newer credential. A shared
 (`oauth/health.ts`) feeds `opr status`, `opr doctor`, the management API, and the dashboard.
 Codex/ChatGPT pool credentials and process-local thread affinity live under `codex/` and are kept out
 of management responses; affinity clears on `401` / `403` / `429` (not pinned through rate limits)
-and is not persisted across restarts. Request usage is normalized to `OcxUsage`, surfaced in
+and is not persisted across restarts. Request usage is normalized to `oprUsage`, surfaced in
 Responses terminal events, and aggregated by `usage/` for the dashboard and optional JSONL
 diagnostics.
 
@@ -168,8 +168,9 @@ upstream providers may support only a smaller subset or require a real alias. Th
 
 ## Core types
 
-The internal model lives in `types.ts`: `OcxParsedRequest`, `OcxContext`, the `OcxMessage` union,
-`OcxContentPart` (text / image), `OcxToolCall`, `OcxTool`, `AdapterEvent`, and the config types
-(`OcxConfig`, `OcxProviderConfig`). Two helpers are widely used: `namespacedToolName()` and
+The internal model lives in `types.ts`: `oprParsedRequest`, `oprContext`, the `oprMessage` union,
+`oprContentPart` (text / image), `oprToolCall`, `oprTool`, `AdapterEvent`, and the config types
+(`oprConfig`, `oprProviderConfig`). Two helpers are widely used: `namespacedToolName()` and
 `modelInList()` (tolerant `:size`-tag matching for `noVisionModels` / `noReasoningModels`).
+
 

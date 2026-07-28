@@ -22,7 +22,7 @@ The checked-in tree proves why the server seam belongs here:
 
 - `resolveProviderTransport` currently returns only base URL/static headers
   (`src/providers/xai-transport.ts:62-88`); there is not yet a transport fetch wrapper.
-- `OcxProviderConfig` currently has no fetch member (`src/types.ts:559-590`).
+- `oprProviderConfig` currently has no fetch member (`src/types.ts:559-590`).
 - the ordinary server fallback calls `fetchWithHeaderTimeout` at
   `src/server/responses.ts:948-953` and recovery calls it at `:978-982`;
 - `fetchWithHeaderTimeout` currently invokes global `fetch` directly at
@@ -98,7 +98,7 @@ form; retain any unrelated comments only if they remain accurate:
 
 ```ts
 import { createHash, randomUUID } from "node:crypto";
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 
 export const XAI_GROK_CLI_BASE_URL = "https://cli-chat-proxy.grok.com/v1";
 
@@ -172,9 +172,9 @@ export function deriveXaiConvId(promptCacheKey: string): string {
 
 export function resolveProviderTransport(
   providerName: string,
-  provider: OcxProviderConfig,
+  provider: oprProviderConfig,
   promptCacheKey?: string,
-): OcxProviderConfig {
+): oprProviderConfig {
   if (providerName !== "xai") return provider;
 
   const cacheKey = promptCacheKey?.trim();
@@ -220,7 +220,7 @@ server reconstructs request headers.
 Before (`src/types.ts:559-562`):
 
 ```ts
-export interface OcxProviderConfig {
+export interface oprProviderConfig {
   adapter: string;
   baseUrl: string;
 ```
@@ -228,7 +228,7 @@ export interface OcxProviderConfig {
 After:
 
 ```ts
-export interface OcxProviderConfig {
+export interface oprProviderConfig {
   adapter: string;
   baseUrl: string;
   /** Transport executor used inside the server's header-timeout wrapper. Never persisted. */
@@ -383,7 +383,7 @@ import {
   XAI_GROK_CLI_BASE_URL,
   XAI_GROK_CLIENT_VERSION,
 } from "../src/providers/xai-transport";
-import type { OcxProviderConfig } from "../src/types";
+import type { oprProviderConfig } from "../src/types";
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const OMITTED = [
@@ -395,7 +395,7 @@ const OMITTED = [
   "x-grok-client-mode",
 ] as const;
 
-function provider(authMode: "oauth" | "key"): OcxProviderConfig {
+function provider(authMode: "oauth" | "key"): oprProviderConfig {
   return {
     adapter: "openai-chat",
     baseUrl: "https://api.x.ai/v1",
@@ -549,7 +549,7 @@ import { join } from "node:path";
 import { saveConfig } from "../src/config";
 import { deriveXaiConvId } from "../src/providers/xai-transport";
 import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -561,23 +561,23 @@ let isolatedCodexHome: IsolatedCodexHome | null = null;
 let upstream: ReturnType<typeof Bun.serve> | null = null;
 
 beforeEach(() => {
-  previousHome = process.env.OPENCODEX_HOME;
+  previousHome = process.env.@mdevs/openprovider_HOME;
   isolatedCodexHome = installIsolatedCodexHome("opr-xai-parity-codex-");
   testDir = mkdtempSync(join(tmpdir(), "opr-xai-parity-"));
-  process.env.OPENCODEX_HOME = testDir;
+  process.env.@mdevs/openprovider_HOME = testDir;
 });
 
 afterEach(() => {
   upstream?.stop(true);
   upstream = null;
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
+  if (previousHome === undefined) delete process.env.@mdevs/openprovider_HOME;
+  else process.env.@mdevs/openprovider_HOME = previousHome;
   isolatedCodexHome?.restore();
   isolatedCodexHome = null;
   if (testDir) rmSync(testDir, { recursive: true, force: true });
 });
 
-function config(baseUrl: string, connectTimeoutMs = 1_000): OcxConfig {
+function config(baseUrl: string, connectTimeoutMs = 1_000): oprConfig {
   return {
     port: 0,
     hostname: "127.0.0.1",
@@ -593,7 +593,7 @@ function config(baseUrl: string, connectTimeoutMs = 1_000): OcxConfig {
         defaultModel: "grok-test",
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
 }
 
 function post(serverUrl: string): Promise<Response> {
@@ -764,3 +764,5 @@ Verification:
 - `bun test --isolate ./tests/xai-transport.test.ts ./tests/server-xai-header-parity.test.ts ./tests/server-xai-oauth-401-replay.test.ts`: 30 pass, 0 fail.
 - `bun test --isolate ./tests/`: 2628 pass, 0 fail across 246 files.
 - `bun run typecheck`: pass (`tsc --noEmit`).
+
+

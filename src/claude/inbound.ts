@@ -5,11 +5,11 @@
  *  - translate-and-replay: the produced body MUST pass the real responsesRequestSchema
  *    parse so routing/OAuth/pool/failover are inherited unchanged.
  *  - thinking/redacted_thinking blocks on replay are DROPPED (v1 policy) — routed
- *    providers carry reasoning in Responses items/ocxr1 envelopes instead.
+ *    providers carry reasoning in Responses items/oprr1 envelopes instead.
  *  - thinking.budget_tokens is NEVER forwarded raw; it maps to an effort tier.
  *  - top_k is accepted and silently dropped (no Responses equivalent, CCR parity).
  */
-import type { OcxClaudeCodeConfig } from "../types";
+import type { oprClaudeCodeConfig } from "../types";
 import { resolveAlias } from "./alias";
 import { stripOneMillionMarker } from "./context-windows";
 import { resolveDesktop3pAlias } from "./desktop-3p";
@@ -24,7 +24,7 @@ function isRec(v: unknown): v is Rec {
 }
 
 /** Alias first, then modelMap: exact id, then date-suffix-stripped (`-\d{8}$`), else passthrough. */
-export function resolveInboundModel(model: string, cc?: OcxClaudeCodeConfig): string {
+export function resolveInboundModel(model: string, cc?: oprClaudeCodeConfig): string {
   // Defensive: Desktop/CLI strip the [1m] context-variant marker client-side, but a
   // leaking build must not break alias decode (devlog 138 — the 1M signal is the
   // anthropic-beta header, never the id). Case-insensitive: the CLI matches /\[1m\]/i.
@@ -131,7 +131,7 @@ function pushUserMessage(input: Rec[], blocks: Rec[]): void {
 export const DEFAULT_BLOCKED_SKILLS = ["claude-api"];
 
 /** Shared effective policy for proxy elision and generated routed-agent guards. */
-export function effectiveBlockedSkillNames(cc?: Pick<OcxClaudeCodeConfig, "blockedSkills">): string[] {
+export function effectiveBlockedSkillNames(cc?: Pick<oprClaudeCodeConfig, "blockedSkills">): string[] {
   const names = cc?.blockedSkills ?? DEFAULT_BLOCKED_SKILLS;
   return [...new Set(names
     .filter((name): name is string => typeof name === "string")
@@ -146,9 +146,9 @@ export function effectiveBlockedSkillNames(cc?: Pick<OcxClaudeCodeConfig, "block
  * rides the subagent's system prompt, so the proxy re-routes here. Only the
  * FIRST directive wins; the scan is bounded to the system field.
  */
-const OCX_ROUTE_RE = /<!--\s*opr-route:\s*([^\s]+)\s*-->/;
+const opr_ROUTE_RE = /<!--\s*opr-route:\s*([^\s]+)\s*-->/;
 
-export function extractOcxRouteDirective(body: unknown): string | null {
+export function extractoprRouteDirective(body: unknown): string | null {
   if (!isRec(body)) return null;
   const system = body.system;
   let text: string | undefined;
@@ -160,7 +160,7 @@ export function extractOcxRouteDirective(body: unknown): string | null {
       .join("\n");
   }
   if (!text) return null;
-  const match = OCX_ROUTE_RE.exec(text);
+  const match = opr_ROUTE_RE.exec(text);
   return match ? match[1]! : null;
 }
 
@@ -382,7 +382,7 @@ export interface ClaudeInboundTranslation {
  * Translate an Anthropic Messages request body into a /v1/responses request body.
  * Throws AnthropicRequestError (-> 400 invalid_request_error) on malformed input.
  */
-export function anthropicToResponsesBody(raw: unknown, cc?: OcxClaudeCodeConfig): Rec {
+export function anthropicToResponsesBody(raw: unknown, cc?: oprClaudeCodeConfig): Rec {
   return anthropicToResponsesTranslation(raw, cc).body;
 }
 
@@ -391,7 +391,7 @@ export function anthropicToResponsesBody(raw: unknown, cc?: OcxClaudeCodeConfig)
  * OUT-OF-BODY tuple (audit 133 R3#1 — an in-body marker would leak upstream through
  * the native Responses forward and 400).
  */
-export function anthropicToResponsesTranslation(raw: unknown, cc?: OcxClaudeCodeConfig): ClaudeInboundTranslation {
+export function anthropicToResponsesTranslation(raw: unknown, cc?: oprClaudeCodeConfig): ClaudeInboundTranslation {
   if (!isRec(raw)) throw new AnthropicRequestError("request body must be a JSON object");
   if (typeof raw.model !== "string" || raw.model.length === 0) {
     throw new AnthropicRequestError("model is required");
@@ -490,3 +490,4 @@ export function anthropicToResponsesTranslation(raw: unknown, cc?: OcxClaudeCode
 
   return { body, cacheKeySource };
 }
+

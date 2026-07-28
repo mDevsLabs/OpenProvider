@@ -146,7 +146,7 @@ Relevant findings:
 
 Implications for openprovider:
 
-- `OcxUsage.cachedInputTokens` currently merges cache-read and cache-creation tokens for Anthropic. This is sufficient for OpenAI Responses compatibility but less precise than Claude Code/Copilot telemetry.
+- `oprUsage.cachedInputTokens` currently merges cache-read and cache-creation tokens for Anthropic. This is sufficient for OpenAI Responses compatibility but less precise than Claude Code/Copilot telemetry.
 - The request log display should eventually distinguish read vs write tokens for providers that expose both.
 - The immediate bug behind low Anthropic cache hits is not usage parsing; it is that message history lacks a moving cache breakpoint.
 
@@ -178,3 +178,4 @@ Proceed with a narrow implementation pass:
 3. Add request-shape tests for native Anthropic, OAuth Anthropic, and Umans gateway shape; Umans must not receive the top-level field.
 4. Add OpenAI Responses passthrough test for `prompt_cache_retention`.
 5. Update cache devlog taxonomy after verification.
+

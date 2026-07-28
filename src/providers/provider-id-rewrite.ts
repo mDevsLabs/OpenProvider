@@ -1,4 +1,4 @@
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 
 export interface ProviderRewriteResult {
   /** Number of references re-pointed. */
@@ -31,7 +31,7 @@ export interface ProviderRewriteResult {
  * caller that moves a provider row handles its own allowlist, where the
  * destination catalog is known.
  */
-export function rewriteProviderReferences(config: OcxConfig, from: string, to: string): ProviderRewriteResult {
+export function rewriteProviderReferences(config: oprConfig, from: string, to: string): ProviderRewriteResult {
   const prefix = `${from}/`;
   const collisions: string[] = [];
   let changed = 0;
@@ -47,7 +47,7 @@ export function rewriteProviderReferences(config: OcxConfig, from: string, to: s
    * Rewrite a routed-string list in place. Assigning the result unconditionally
    * would add an own property with value `undefined` where the field was absent,
    * which breaks the no-op contract. The key type is an explicit union rather
-   * than `keyof OcxConfig`: the latter also admits `customModels` and friends, so
+   * than `keyof oprConfig`: the latter also admits `customModels` and friends, so
    * `map` would infer a union array that is not assignable back.
    */
   type RoutedListKey = "disabledModels" | "subagentModels" | "subagentModelFallback";
@@ -148,3 +148,4 @@ export function rewriteProviderReferences(config: OcxConfig, from: string, to: s
 
   return { changed, collisions };
 }
+

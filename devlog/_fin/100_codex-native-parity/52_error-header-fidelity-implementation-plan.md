@@ -48,13 +48,13 @@ Local gap:
 Complete content:
 
 ```ts
-export interface OcxErrorPayload {
+export interface oprErrorPayload {
   message: string;
   type: string;
   code: string | null;
 }
 
-export function classifyError(status: number, type: string, message: string): OcxErrorPayload {
+export function classifyError(status: number, type: string, message: string): oprErrorPayload {
   const text = message.toLowerCase();
   if (text.includes("context_length_exceeded") || text.includes("context window") || text.includes("context length") || text.includes("maximum context") || text.includes("too many tokens")) {
     return { message, type: "invalid_request_error", code: "context_length_exceeded" };
@@ -87,7 +87,7 @@ export function classifyError(status: number, type: string, message: string): Oc
 Import classifier:
 
 ```diff
- import type { AdapterEvent, OcxUsage } from "./types";
+ import type { AdapterEvent, oprUsage } from "./types";
 +import { classifyError } from "./errors";
 ```
 
@@ -300,3 +300,4 @@ Commit as:
 ```text
 [agent] fix: align error and header fidelity
 ```
+

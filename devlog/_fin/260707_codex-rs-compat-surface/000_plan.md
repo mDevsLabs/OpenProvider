@@ -14,7 +14,7 @@ against openprovider src/responses/{schema,parser}.ts + bridge and close routed-
 2. **custom_tool_call_output with array output passes raw blocks through** (BUG, verified).
    codex-rs CustomToolCallOutput.output is FunctionCallOutputPayload (string | content items).
    openprovider schema requires string; array falls to loose branch and raw `{type:"input_text"}`
-   objects leak into OcxContentPart[] (invalid parts for adapters).
+   objects leak into oprContentPart[] (invalid parts for adapters).
 
 3. **`context_compaction` input items silently dropped** (BUG, verified).
    codex-rs ResponseItem::ContextCompaction { encrypted_content: Option<String> } is
@@ -34,9 +34,10 @@ against openprovider src/responses/{schema,parser}.ts + bridge and close routed-
 - src/responses/parser.ts: handle input_text/encrypted_content blocks; array custom output;
   context_compaction handler (reuse compactionItemToText); local_shell_call -> toolCall;
   web_search_call -> assistant text note.
-- src/adapters/openai-responses.ts: scrub ocx1 context_compaction in passthrough.
+- src/adapters/openai-responses.ts: scrub opr1 context_compaction in passthrough.
 - tests: extend responses parser tests.
 Out of scope: GUI, multiauth, provider adapters other than the scrub line.
 
 ## Verification
 bun test ./tests/ && bun x tsc --noEmit
+

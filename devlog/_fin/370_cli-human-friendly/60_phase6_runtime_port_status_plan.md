@@ -142,7 +142,7 @@ Run:
 bun test tests/cli-status-json.test.ts tests/config.test.ts tests/ports.test.ts
 bun test tests/cli-status-json.test.ts tests/cli-help.test.ts
 bun run typecheck
-node bin/ocx.mjs status --json
+node bin/opr.mjs status --json
 ```
 
 Use Backend read-only verification before B->C.
@@ -154,3 +154,4 @@ Expected commit:
 ```text
 fix(cli): report runtime fallback port in status
 ```
+

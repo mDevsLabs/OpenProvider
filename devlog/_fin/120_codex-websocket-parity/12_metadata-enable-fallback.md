@@ -27,7 +27,7 @@ Add a single config switch and a **central override** in `buildCatalogEntries`, 
 entry's flag is set deterministically (overriding both the routed strip and any native template
 leak):
 
-- `config.websockets?: boolean` (default `false`) in `OcxConfig`.
+- `config.websockets?: boolean` (default `false`) in `oprConfig`.
 - `buildCatalogEntries(..., wsEnabled)`: after each entry is derived, `if (wsEnabled)
   entry.supports_websockets = true; else delete entry.supports_websockets;` — for **native and
   routed alike**. This makes the advertised capability match the actually-implemented endpoint
@@ -38,11 +38,11 @@ leak):
 ### MODIFY
 
 ```text
-/Users/jun/Developer/new/700_projects/openprovider/src/types.ts   (or wherever OcxConfig is defined)
+/Users/jun/Developer/new/700_projects/openprovider/src/types.ts   (or wherever oprConfig is defined)
 ```
 
 ```diff
- export interface OcxConfig {
+ export interface oprConfig {
    // … existing fields …
 +  /** Advertise supports_websockets so Codex opens the WS endpoint (120). Default false until 120.2 ships. */
 +  websockets?: boolean;
@@ -125,3 +125,4 @@ endpoint up + flag on → WS turn completes; endpoint down → HTTP fallback (no
 ```text
 [agent] feat: gate supports_websockets advertisement behind config.websockets
 ```
+

@@ -239,7 +239,7 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
     expect(env.CODEX_HOME).toBe("/tmp/codex");
     expect(env.NO_PROXY).toBe("127.0.0.1,localhost,::1");
     expect(env.no_proxy).toBe("127.0.0.1,localhost,::1");
-    expect(env.OCX_SHIM_BYPASS).toBe("1");
+    expect(env.opr_SHIM_BYPASS).toBe("1");
   });
 
   test("keeps the fixture admission token through an installed Unix shim without reading its token file", () => {
@@ -262,3 +262,4 @@ describe("OpenAI provider-option live policy and runtime isolation", () => {
     expect(new TextDecoder().decode(result.stdout)).not.toContain("real-state-sentinel");
   });
 });
+

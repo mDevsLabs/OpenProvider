@@ -1,7 +1,7 @@
 # 000 — Claude Code 경로 transient 5xx 하드닝 로드맵
 
 상태: WP0 P-phase 초안 (A 감사 전) / 세션 019f6835-16d8-7f92-8d33-daa81df702cd
-근거: devlog/260716_ocx_claude_sol_502_midstream/01,02 (sol 빌더 사망 포렌식 + 병렬 분석)
+근거: devlog/260716_opr_claude_sol_502_midstream/01,02 (sol 빌더 사망 포렌식 + 병렬 분석)
 
 ## Objective
 
@@ -59,3 +59,4 @@ Claude Code Task 에이전트를 즉사시키는 구조를 제거한다. 세 겹
 | 비-transient 비재시도 | mock 400/401 | 1회 호출, 원 status 보존 |
 | SSE fail transient 매핑 | mock 200 SSE 후 response.failed(status 502) | Anthropic error 이벤트 type=overloaded_error |
 | 실패 영속화 | 502 항목 addRequestLog | usage.jsonl 라인에 errorCode/upstreamError 존재 |
+

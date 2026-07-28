@@ -11,14 +11,14 @@ against the current tree rather than against the merge diff.
 `src/lib/process-control.ts:106-124` kept both sides: `stopProxy()` now `throw`s
 a descriptive error when the proxy answers 409, because forcing past a refusal
 would strip shared config out from under a service owned by a different
-`CODEX_HOME`/`OPENCODEX_HOME`.
+`CODEX_HOME`/`OpenProvider_HOME`.
 
 ```ts
 // src/lib/process-control.ts:110-118
 if (graceful === "refused") {
   throw new Error(
     "The running proxy refused to stop: a service installed under a different "
-    + "CODEX_HOME/OPENCODEX_HOME owns it. Run the stop from that home.",
+    + "CODEX_HOME/OpenProvider_HOME owns it. Run the stop from that home.",
   );
 }
 ```
@@ -101,3 +101,4 @@ source-asserts `handleStop`, so the new case sits with its siblings.
 |---------|----------|
 | `bun test tests/grok-lifecycle.test.ts tests/process-control-graceful.test.ts` | pass |
 | `bun run typecheck` | exit 0 |
+

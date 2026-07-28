@@ -93,7 +93,7 @@ Contract invariants:
   `systemEnv`.
 - `systemEnv` remains the raw stored preference in the API response; the GUI owns
   effective display-state reconciliation.
-- Do not add `autoConnectSupported` to `OcxClaudeCodeConfig`, PUT validation, or
+- Do not add `autoConnectSupported` to `oprClaudeCodeConfig`, PUT validation, or
   the config file. It is runtime capability metadata, not user configuration.
 
 ## 2. i18n additions
@@ -322,7 +322,7 @@ Insertion anchor: append at end of file, immediately after the closing of the
 last test `PUT validation rejects bad shapes`
 (`tests/claude-management-api.test.ts:382`, file currently ends with that
 test's `});`). No import changes: the file already imports `saveConfig`,
-`loadConfig`, `startServer`, and `OcxConfig`.
+`loadConfig`, `startServer`, and `oprConfig`.
 
 Platform override helper, matching `tests/system-env.test.ts:29-31`:
 
@@ -339,13 +339,13 @@ state:
 ```ts
 // before (first line of afterEach body):
 afterEach(() => {
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
+  if (previousHome === undefined) delete process.env.OpenProvider_HOME;
 
 // after:
 const originalPlatform = process.platform;
 afterEach(() => {
   setPlatform(originalPlatform);
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
+  if (previousHome === undefined) delete process.env.OpenProvider_HOME;
 ```
 
 New tests (appended verbatim):
@@ -368,7 +368,7 @@ test("GET /api/claude-code reports Auto-connect unsupported outside Darwin", asy
   saveConfig({
     ...loadConfig(),
     claudeCode: { systemEnv: true },
-  } as OcxConfig);
+  } as oprConfig);
   setPlatform("linux");
   const server = startServer(0);
   try {
@@ -486,7 +486,7 @@ platform tests and React SSR render tests; no Playwright dependency is added.
 ## Out of scope and follow-up
 
 - Actual Linux environment injection is a separately tracked follow-up for
-  resolution (a): Bash login/non-login and zsh hooks, `OPENCODEX_HOME`, user-wins
+  resolution (a): Bash login/non-login and zsh hooks, `OpenProvider_HOME`, user-wins
   ownership, safe uninstall/revert, SSH/systemd behavior, secret lifecycle, and
   Linux/Windows/macOS CI coverage.
 - No Linux shell files, systemd user environment, `/etc/environment`, WSL path,
@@ -496,3 +496,4 @@ platform tests and React SSR render tests; no Playwright dependency is added.
   already states that system environment integration is macOS-only and recommends
   `opr claude` elsewhere.
 - Open questions: **none**.
+

@@ -66,13 +66,13 @@ arrays must contain both IDs in registry order.
 2. `git merge --no-ff pr-129` -> resolve duplicates per conflict map, then stacked fixes:
    - replace machine-derived bootstrap `client` hash (hostname/OS/arch/CPU/username)
      with a persisted random UUID under the repo's config dir helper
-     (`getConfigDir()` / OPENCODEX_HOME-aware; no hardcoded ~/.openprovider).
+     (`getConfigDir()` / @mdevs/openprovider_HOME-aware; no hardcoded ~/.openprovider).
    - retry predicate: drain/cancel first response body, then retry ONCE on 401 only;
      403 is NOT retried unless a documented MiMo token-expiry signature in the body
      identifies it as retryable (align tests with this exact predicate).
    - bootstrap: propagate abort signal, add timeout, single-flight in-flight promise.
    - activation-level tests REQUIRED for each fix (audit item 2): UUID persistence
-     under OPENCODEX_HOME, concurrent bootstrap single-flight, timeout/abort
+     under @mdevs/openprovider_HOME, concurrent bootstrap single-flight, timeout/abort
      propagation, expired-token retry path, first-body disposal before retry, and NO
      retry for unrelated 403s.
    - drop its copy of the openai-chat precedence change + symlink-skip hunk.
@@ -90,3 +90,4 @@ arrays must contain both IDs in registry order.
 - Existing `opencode-zen` provider behavior change from #128's host-based Zen schema
   sanitizer: verify it is intentional and covered by a test, or scope it to
   opencode-free.
+

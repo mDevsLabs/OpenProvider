@@ -7,7 +7,7 @@ Make Windows service/runtime investigations easier by exposing the exact Bun run
 ## Scope
 
 - MODIFY `src/bun-runtime.ts`:
-  - Add an `OPENCODEX_BUN_PATH` override reader.
+  - Add an `@mdevs/openprovider_BUN_PATH` override reader.
   - Accept the override only when it points to a real Bun binary by the existing size gate.
   - Keep fallback order: valid override -> bundled Bun -> `process.execPath`.
   - Add a small diagnostic helper that returns runtime path/source and version command metadata without spawning during import.
@@ -31,3 +31,4 @@ Make Windows service/runtime investigations easier by exposing the exact Bun run
 
 - `bun test tests/bun-runtime.test.ts tests/cli-help.test.ts tests/service.test.ts`
 - `bun x tsc --noEmit`
+

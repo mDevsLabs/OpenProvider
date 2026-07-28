@@ -7,7 +7,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { handleManagementAPI } from "../src/server/management-api";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const savedHome = process.env.OPENPROVIDER_HOME;
 let tempHome: string | null = null;
@@ -26,17 +26,17 @@ function isolatedHome(): void {
   process.env.OPENPROVIDER_HOME = tempHome;
 }
 
-function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function makeConfig(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     providers: {},
     defaultProvider: "openai",
     subagentModelFallback: ["gpt-5.6-sol", "kimi/k3"],
     ...overrides,
-  } as OcxConfig;
+  } as oprConfig;
 }
 
-async function put(config: OcxConfig, body: unknown): Promise<Response> {
+async function put(config: oprConfig, body: unknown): Promise<Response> {
   const req = new Request("http://localhost/api/subagent-model-fallback", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -89,3 +89,4 @@ describe("/api/subagent-model-fallback atomic validation", () => {
     expect(config.subagentModelFallback).toEqual(next);
   });
 });
+

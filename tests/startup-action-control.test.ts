@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { startupInstallArgv, type StartupInstallAction } from "../src/server/startup-action-control";
 import { handleManagementAPI } from "../src/server/management-api";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
-const config = { port: 10100, providers: {}, defaultProvider: "openai", codexAutoStart: true } as OcxConfig;
+const config = { port: 10100, providers: {}, defaultProvider: "openai", codexAutoStart: true } as oprConfig;
 
 describe("startup install actions", () => {
   test("maps the allowlisted actions to fixed CLI argv", () => {
@@ -46,3 +46,4 @@ describe("startup install actions", () => {
     expect(called).toBe(false);
   });
 });
+

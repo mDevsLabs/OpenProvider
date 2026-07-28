@@ -40,7 +40,7 @@ Routes in `src/server/index.ts`:
 
 Auth (`src/server/auth-cors.ts`):
 - Loopback (`127.0.0.1` / localhost): data-plane API key **not required**
-- Non-loopback: `OPENCODEX_API_AUTH_TOKEN` or configured API keys via Bearer / `x-openprovider-api-key` / `x-api-key`
+- Non-loopback: `@mdevs/openprovider_API_AUTH_TOKEN` or configured API keys via Bearer / `x-openprovider-api-key` / `x-api-key`
 
 Live probe (this host, 2026-07-16):
 ```text
@@ -125,7 +125,7 @@ OpenProvider can import `~/.grok/auth.json` and call `cli-chat-proxy` as an **xA
 ## Live smoke (2026-07-16)
 See [040_live_smoke.md](./040_live_smoke.md).
 
-- **PASS content**: `anthropic/claude-opus-4-8`, `cursor/grok-4.5`, `opencode-go/glm-5.2` returned `OCX_SMOKE_OK` via Grok headless → OpenProvider Responses.
+- **PASS content**: `anthropic/claude-opus-4-8`, `cursor/grok-4.5`, `opencode-go/glm-5.2` returned `opr_SMOKE_OK` via Grok headless → OpenProvider Responses.
 - **FAIL request**: native `gpt-5.6-sol` / `gpt-5.6-luna` → OpenProvider `System messages are not allowed`.
 - **FAIL backend**: `chat_completions` → `404 Unknown endpoint: POST /v1/chat/completions`.
 - **Friction**: Grok exits non-zero after successful text due to missing usage detail fields on `response.completed`.
@@ -146,3 +146,5 @@ See [040_live_smoke.md](./040_live_smoke.md).
 - Auth loopback: `/Users/jun/Developer/new/700_projects/openprovider/src/server/auth-cors.ts`
 - Live: `http://127.0.0.1:10100/v1/models` (2026-07-16)
 - Analysis: `/Users/jun/Developer/codex/180_grok-build/analysis/`
+
+

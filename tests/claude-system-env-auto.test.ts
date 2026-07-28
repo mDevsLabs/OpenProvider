@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { injectSystemEnv } from "../src/server/system-env";
 import { PROXY_MARKER } from "../src/claude/auth-detect";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * Auto must reach PLAIN `claude` launches, not just `opr claude`. Before this, the
@@ -39,7 +39,7 @@ const baseConfig = {
   providers: {},
   defaultProvider: "test",
   claudeCode: { systemEnv: true },
-} as unknown as OcxConfig;
+} as unknown as oprConfig;
 
 beforeEach(() => {
   setPlatform("darwin");
@@ -112,7 +112,7 @@ test("an explicit subscription withholds the marker even under the same detectio
   await injectSystemEnv(4567, {
     ...baseConfig,
     claudeCode: { systemEnv: true, authMode: "subscription" },
-  } as unknown as OcxConfig);
+  } as unknown as oprConfig);
   expect(shellEnvContents).not.toContain(PROXY_MARKER);
 });
 
@@ -120,7 +120,7 @@ test("an explicit proxy still writes the marker", async () => {
   await injectSystemEnv(4567, {
     ...baseConfig,
     claudeCode: { systemEnv: true, authMode: "proxy" },
-  } as unknown as OcxConfig);
+  } as unknown as oprConfig);
   expect(shellEnvContents).toContain(`ANTHROPIC_AUTH_TOKEN='${PROXY_MARKER}'`);
 });
 
@@ -129,7 +129,7 @@ test("a configured admission key wins over the marker decision", async () => {
   await injectSystemEnv(4567, {
     ...baseConfig,
     apiKeys: [{ key: "admission-key" }],
-  } as unknown as OcxConfig);
+  } as unknown as oprConfig);
   expect(shellEnvContents).toContain("ANTHROPIC_AUTH_TOKEN='admission-key'");
   expect(shellEnvContents).not.toContain(PROXY_MARKER);
 });
@@ -147,3 +147,4 @@ test("auto with an exported user API key writes no marker", async () => {
     else process.env.ANTHROPIC_API_KEY = previous;
   }
 });
+

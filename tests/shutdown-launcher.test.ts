@@ -8,7 +8,7 @@ import { join } from "node:path";
 /**
  * Regression: `opr start` + Ctrl-C must NOT orphan the Bun proxy.
  *
- * The bin/ocx.mjs launcher used a blocking spawnSync that did not forward signals,
+ * The bin/opr.mjs launcher used a blocking spawnSync that did not forward signals,
  * so a signal delivered only to the launcher killed it and left the Bun child
  * serving forever (port bound, opr.pid/runtime-port.json left behind, Codex config
  * not restored). The launcher now forwards SIGINT/SIGTERM/SIGHUP to the child and
@@ -18,7 +18,7 @@ import { join } from "node:path";
  * on PATH to exercise the real launcher.
  */
 
-const BIN_OCX = join(import.meta.dir, "..", "bin", "ocx.mjs");
+const BIN_opr = join(import.meta.dir, "..", "bin", "opr.mjs");
 const nodeAvailable = !spawnSync("node", ["--version"], { stdio: "ignore" }).error;
 const runnable = process.platform !== "win32" && nodeAvailable;
 
@@ -80,7 +80,7 @@ describe.skipIf(!runnable)("opr launcher graceful shutdown", () => {
         const codexConfig = join(home, "config.toml");
         writeFileSync(codexConfig, 'model = "gpt-5.1"\n');
 
-        const child = spawn("node", [BIN_OCX, "start", "--port", String(port)], {
+        const child = spawn("node", [BIN_opr, "start", "--port", String(port)], {
           stdio: "ignore",
           env: { ...process.env, OPENPROVIDER_HOME: home, CODEX_HOME: home },
         });
@@ -118,3 +118,4 @@ describe.skipIf(!runnable)("opr launcher graceful shutdown", () => {
     );
   }
 });
+

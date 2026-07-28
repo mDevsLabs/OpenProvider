@@ -120,7 +120,7 @@ test("free-directory metadata cannot shadow a custom runtime provider", () => {
   expect(FREE_PROVIDER_DIRECTORY.some(entry => entry.id === "qoder")).toBe(true);
   expect(PROVIDER_REGISTRY.some(entry => entry.id === "qoder")).toBe(false);
 
-  const config: OcxConfig = {
+  const config: oprConfig = {
     port: 10100,
     defaultProvider: "qoder",
     providers: {
@@ -168,3 +168,4 @@ Co-authored-by: Haydern <oriskinhaydern@gmail.com>
 bun test --isolate tests/provider-registry-parity.test.ts
 bun run typecheck
 ```
+

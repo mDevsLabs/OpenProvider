@@ -5,7 +5,7 @@ import { saveConfig } from "../src/config";
 import { windowsEnvIndirectBatchValue } from "../src/lib/win-paths";
 import { assertServiceAuthEnvironment, assertServiceEnvironmentMatchesInstall, bakedServicePathsDiagnostic, buildPlist, buildUnit, buildWindowsLauncherVbs, buildWindowsSchtasksCreateArgs, buildWindowsServiceScript, buildWindowsTaskXml, deriveWindowsServiceDiagnostic, normalizeServiceSubcommand, parseServiceInstallState, readWindowsSchedulerXmlState, resolveServiceListenPort, serviceLogPath, serviceStartableFromTray, serviceStatusSummary, windowsTaskRegistrationHealthy } from "../src/service";
 import { serviceApiTokenFilePath } from "../src/lib/service-secrets";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-service-test");
 const previousOpenProviderHome = process.env.OpenProvider_HOME;
@@ -51,29 +51,29 @@ function expectTextToContainPath(text: string, path: string): void {
 }
 
 describe("service listen-port bake", () => {
-  test("resolveServiceListenPort prefers override, then OCX_BAKE_PORT, then config", () => {
+  test("resolveServiceListenPort prefers override, then opr_BAKE_PORT, then config", () => {
     process.env.OpenProvider_HOME = TEST_DIR;
     mkdirSync(TEST_DIR, { recursive: true });
-    saveConfig({ port: 10100, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as OcxConfig);
+    saveConfig({ port: 10100, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as oprConfig);
     expect(resolveServiceListenPort(18765)).toBe(18765);
-    const prev = process.env.OCX_BAKE_PORT;
+    const prev = process.env.opr_BAKE_PORT;
     try {
-      process.env.OCX_BAKE_PORT = "15555";
+      process.env.opr_BAKE_PORT = "15555";
       expect(resolveServiceListenPort()).toBe(15555);
-      delete process.env.OCX_BAKE_PORT;
+      delete process.env.opr_BAKE_PORT;
       expect(resolveServiceListenPort()).toBe(10100);
-      saveConfig({ port: 0, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as OcxConfig);
+      saveConfig({ port: 0, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as oprConfig);
       expect(resolveServiceListenPort()).toBe(10100);
     } finally {
-      if (prev === undefined) delete process.env.OCX_BAKE_PORT;
-      else process.env.OCX_BAKE_PORT = prev;
+      if (prev === undefined) delete process.env.opr_BAKE_PORT;
+      else process.env.opr_BAKE_PORT = prev;
     }
   });
 
   test("Windows batch and launchd/systemd shell commands bake start --port", () => {
     process.env.OpenProvider_HOME = TEST_DIR;
     mkdirSync(TEST_DIR, { recursive: true });
-    saveConfig({ port: 13337, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as OcxConfig);
+    saveConfig({ port: 13337, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as oprConfig);
     const script = buildWindowsServiceScript({ bun: "C:\\OpenProvider\\bun.exe", cli: "C:\\OpenProvider\\cli.ts" });
     expect(script).toContain("start --port 13337");
     expect(buildPlist()).toContain("start --port 13337");
@@ -165,7 +165,7 @@ describe("service install auth preflight", () => {
       hostname: "0.0.0.0",
       providers: { openai: { adapter: "openai-chat", baseUrl: "https://api.example.test/v1" } },
       defaultProvider: "openai",
-    } as OcxConfig);
+    } as oprConfig);
 
     expect(() => assertServiceAuthEnvironment()).toThrow("OpenProvider_API_AUTH_TOKEN");
   });
@@ -180,7 +180,7 @@ describe("service install auth preflight", () => {
       hostname: "0.0.0.0",
       providers: { openai: { adapter: "openai-chat", baseUrl: "https://api.example.test/v1" } },
       defaultProvider: "openai",
-    } as OcxConfig);
+    } as oprConfig);
 
     expect(() => assertServiceAuthEnvironment()).not.toThrow();
   });
@@ -398,8 +398,8 @@ describe("Windows service task", () => {
       const script = buildWindowsServiceScript();
       expect(script).toContain('set "PATH=C:\\safe & echo PWNED & rem "');
       expect(script).toContain('set "OpenProvider_HOME=C:\\opr & del C:\\important & rem "');
-      expect(script).toContain('set "OCX_API_TOKEN_FILE=');
-      expect(script).toContain('set /p OpenProvider_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"');
+      expect(script).toContain('set "opr_API_TOKEN_FILE=');
+      expect(script).toContain('set /p OpenProvider_API_AUTH_TOKEN=<"%opr_API_TOKEN_FILE%"');
       expect(script).not.toContain('set "PATH=C:\\safe" & echo PWNED');
       expect(script).not.toContain('set "OpenProvider_HOME=C:\\opr" & del');
       expect(script).not.toContain("token & echo LEAK");
@@ -419,9 +419,9 @@ describe("Windows service task", () => {
       cli: "C:\\OpenProvider&Dir\\cli.ts",
     });
 
-    expect(script).toContain('set "OCX_BUN=C:\\Bun&Dir\\100%%bun^^\\bun.exe"');
-    expect(script).toContain('set "OCX_CLI=C:\\OpenProvider&Dir\\cli.ts"');
-    expect(script).toContain('"%OCX_BUN%" "%OCX_CLI%" start --port');
+    expect(script).toContain('set "opr_BUN=C:\\Bun&Dir\\100%%bun^^\\bun.exe"');
+    expect(script).toContain('set "opr_CLI=C:\\OpenProvider&Dir\\cli.ts"');
+    expect(script).toContain('"%opr_BUN%" "%opr_CLI%" start --port');
     expect(script).not.toContain('"C:\\Bun&Dir\\100%bun^\\bun.exe"');
   });
 
@@ -429,7 +429,7 @@ describe("Windows service task", () => {
     const script = buildWindowsServiceScript({ bun: "C:\\OpenProvider\\bun.exe", cli: "C:\\OpenProvider\\cli.ts" });
 
     expect(script).toContain("chcp 65001 >nul");
-    expect(script.indexOf("chcp 65001 >nul")).toBeLessThan(script.indexOf('set "OCX_SERVICE=1"'));
+    expect(script.indexOf("chcp 65001 >nul")).toBeLessThan(script.indexOf('set "opr_SERVICE=1"'));
     expect(script).toContain("ping -n 6 127.0.0.1 >nul");
     expect(script).not.toContain("timeout /t");
   });
@@ -445,9 +445,9 @@ describe("Windows service task", () => {
         cli: "C:\\Users\\한글사용자\\AppData\\Roaming\\npm\\node_modules\\OpenProvider\\src\\cli.ts",
       });
 
-      expect(script).toContain('set "OCX_BUN=%APPDATA%\\npm\\node_modules\\bun\\bin\\bun.exe"');
-      expect(script).toContain('set "OCX_CLI=%APPDATA%\\npm\\node_modules\\OpenProvider\\src\\cli.ts"');
-      expect(script).not.toContain('set "OCX_BUN=C:\\Users\\한글사용자');
+      expect(script).toContain('set "opr_BUN=%APPDATA%\\npm\\node_modules\\bun\\bin\\bun.exe"');
+      expect(script).toContain('set "opr_CLI=%APPDATA%\\npm\\node_modules\\OpenProvider\\src\\cli.ts"');
+      expect(script).not.toContain('set "opr_BUN=C:\\Users\\한글사용자');
     } finally {
       if (oldUserProfile === undefined) delete process.env.USERPROFILE;
       else process.env.USERPROFILE = oldUserProfile;
@@ -470,15 +470,15 @@ describe("Windows service task", () => {
       });
 
       expectTextToContainPath(script, serviceLogPath());
-      expect(script).toContain('set "OCX_SERVICE_LOG=');
+      expect(script).toContain('set "opr_SERVICE_LOG=');
       expect(script).toContain("OpenProvider service wrapper start");
-      expect(script).toContain('echo bun="%OCX_BUN%"');
+      expect(script).toContain('echo bun="%opr_BUN%"');
       expect(script).toContain('echo bun_source="');
-      expect(script).toContain('echo cli="%OCX_CLI%"');
+      expect(script).toContain('echo cli="%opr_CLI%"');
       expect(script).toContain('echo OpenProvider_home="%OpenProvider_HOME%"');
       expect(script).toContain('echo codex_home="%CODEX_HOME%"');
-      expect(script).toContain('echo token_file="%OCX_API_TOKEN_FILE%"');
-      expect(script).toMatch(/"%OCX_BUN%" "%OCX_CLI%" start --port \d+ >>"%OCX_SERVICE_LOG%" 2>&1/);
+      expect(script).toContain('echo token_file="%opr_API_TOKEN_FILE%"');
+      expect(script).toMatch(/"%opr_BUN%" "%opr_CLI%" start --port \d+ >>"%opr_SERVICE_LOG%" 2>&1/);
       expect(script).toContain("child exited with code %ERRORLEVEL%");
       expect(script).not.toContain("local-secret");
       expect(script).not.toContain('set "OpenProvider_API_AUTH_TOKEN=');
@@ -709,4 +709,5 @@ describe("service diagnostics", () => {
     expect(statusCase).toContain("serviceDiagnosticsSummary()");
   });
 });
+
 

@@ -27,8 +27,8 @@
 PR이 아래를 추가한다. **이걸 빼면 수정 자체가 컴파일되지 않는다.**
 
 ```diff
--  | { type: "metadata"; usage?: OcxUsage; contextUsagePercentage?: number }
-+  | { type: "metadata"; usage?: OcxUsage; contextUsagePercentage?: number; stopReason?: string }
+-  | { type: "metadata"; usage?: oprUsage; contextUsagePercentage?: number }
++  | { type: "metadata"; usage?: oprUsage; contextUsagePercentage?: number; stopReason?: string }
 ```
 
 그리고 `parseKiroEvent`의 `metadataEvent` 분기에서:
@@ -625,3 +625,4 @@ maintainer 불변조건 문서이므로 최종 매트릭스에 맞춰 고친다.
 
 PR head의 Ubuntu CI는 `4240 pass / 1 fail`인데, 실패는 무관한
 `combo management API > PUT renames atomically...` 타임아웃이다. 통합 head에서 전체 재확인한다.
+

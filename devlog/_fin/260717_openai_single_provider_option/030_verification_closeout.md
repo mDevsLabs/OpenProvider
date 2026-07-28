@@ -105,9 +105,9 @@ The rename/rewrite of `scripts/openai-three-tier-runtime-child.ts` ->
 cycle consumes the already-renamed child and owns only the PARENT smoke/evidence
 orchestration below. The child contract for reference:
 
-- Continue deleting inherited `OPENAI_*`, `CODEX_*`, `OPENCODEX_*`, and proxy env variables before
+- Continue deleting inherited `OPENAI_*`, `CODEX_*`, `OpenProvider_*`, and proxy env variables before
   installing fixture-only values.
-- Continue using temporary `OPENCODEX_HOME`/`CODEX_HOME`, an explicit loopback host, a reserved
+- Continue using temporary `OpenProvider_HOME`/`CODEX_HOME`, an explicit loopback host, a reserved
   kernel-assigned port, and deny-by-default intercepted upstream fetches.
 - Configure one `openai` (mode omitted to test pool default) and unchanged `openai-apikey`.
 - Add one fixture pool credential. Seed main quota hot and added quota cool so the first bare probe
@@ -145,7 +145,7 @@ Write:
 
 Runtime evidence has separate `poolDefault`, `direct`, and `apiPro` objects under the same public
 provider contract. The existing opt-in live-key probe remains API-only and requires
-`OCX_ALLOW_LIVE_OPENAI_SMOKE=1`; otherwise it records `NOT RUN` with zero live calls.
+`opr_ALLOW_LIVE_OPENAI_SMOKE=1`; otherwise it records `NOT RUN` with zero live calls.
 
 ## Verification-tooling renames
 
@@ -276,7 +276,7 @@ The grounded allowlist is:
 
 For each, change only paragraphs/tables/config rows that publish Direct/Multi as providers, the
 legacy namespace, marker 1 as current, or the v1 backup as the current restore point. Add
-`OcxProviderConfig.codexAccountMode?: "pool" | "direct"` with default Pool in configuration
+`oprProviderConfig.codexAccountMode?: "pool" | "direct"` with default Pool in configuration
 reference. Do not opportunistically translate or rewrite unrelated sections.
 
 After edits, rerun the same `rg` allowlist discovery. A newly found current docs page is added only
@@ -436,3 +436,4 @@ by the user after this unit is complete.
 - Gate totals and commit anchor are recorded in `evidence/030_gate_summary.txt`.
 
 Terminal status: **PASS — READY_FOR_PARENT_ARCHIVE**. Per delegation, the unit remains in `_plan`.
+

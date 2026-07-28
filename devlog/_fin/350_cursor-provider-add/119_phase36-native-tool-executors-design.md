@@ -116,7 +116,7 @@ Each of WP37 and WP38 is its own full P→A→B→C→D cycle.
 
 ### Config surface (decided here, implemented in WP37/38)
 
-Add to `OcxProviderConfig` (cursor adapter only reads them):
+Add to `oprProviderConfig` (cursor adapter only reads them):
 
 ```ts
 /** MCP servers openprovider starts and exposes to the Cursor agent as callable tools. */
@@ -179,3 +179,4 @@ export interface CursorMcpServerConfig {
 - Policy interplay: devlog `111_phase28-native-exec-policy-gate-plan.md`
 - Honest-error principle: devlog `117_phase34-error-truth-suffix-audit-plan.md`
 - Research: subagent dc65e9c5 (jawcode exec handlers), MCP TS SDK docs (2026-06-27)
+

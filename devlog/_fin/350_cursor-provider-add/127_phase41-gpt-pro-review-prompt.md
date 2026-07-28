@@ -32,9 +32,9 @@ RCA evidence from local code:
 Planned patches:
 
 Phase 42:
-- Add `tools?: OcxTool[]` and `toolChoice?: ...` to `CursorRunRequest`.
+- Add `tools?: oprTool[]` and `toolChoice?: ...` to `CursorRunRequest`.
 - Preserve `parsed.context.tools` and `parsed.options.toolChoice` in `createCursorRequest`.
-- Add `src/adapters/cursor/tool-definitions.ts` to convert `OcxTool` into Cursor
+- Add `src/adapters/cursor/tool-definitions.ts` to convert `oprTool` into Cursor
   `McpToolDefinition` using `namespacedToolName`.
 - Merge those client tool definitions into `RequestContext.tools` alongside configured
   local MCP tool definitions.
@@ -60,4 +60,5 @@ Questions for you:
 5. Identify any correctness/security gaps in the plan before patching.
 
 Please give a concrete patch plan with file paths and any blocking concerns.
+
 

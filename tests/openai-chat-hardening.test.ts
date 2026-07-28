@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { createOpenAIChatAdapter } from "../src/adapters/openai-chat";
 import { routeModel } from "../src/router";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { AdapterEvent, oprConfig, oprParsedRequest, oprProviderConfig } from "../src/types";
 
-function parsed(): OcxParsedRequest {
+function parsed(): oprParsedRequest {
   return {
     modelId: "test-model",
     context: { messages: [{ role: "user", content: "hi", timestamp: 0 }] },
@@ -12,7 +12,7 @@ function parsed(): OcxParsedRequest {
   };
 }
 
-function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
+function provider(overrides: Partial<oprProviderConfig> = {}): oprProviderConfig {
   return {
     adapter: "openai-chat",
     baseUrl: "https://example.test/v1",
@@ -28,7 +28,7 @@ async function collect(stream: AsyncGenerator<AdapterEvent>): Promise<AdapterEve
   return events;
 }
 
-function routedProvider(name: "litellm" | "ollama", apiKey?: string): OcxProviderConfig {
+function routedProvider(name: "litellm" | "ollama", apiKey?: string): oprProviderConfig {
   const config = {
     port: 10100,
     defaultProvider: name,
@@ -40,7 +40,7 @@ function routedProvider(name: "litellm" | "ollama", apiKey?: string): OcxProvide
         ...(apiKey !== undefined ? { apiKey } : {}),
       },
     },
-  } as OcxConfig;
+  } as oprConfig;
   return routeModel(config, `${name}/test-model`).provider;
 }
 
@@ -161,6 +161,61 @@ describe("openai-chat credential hardening", () => {
 
     expect(body).not.toHaveProperty("prompt_cache_key");
   });
+
+  test("canonical Kimi Coding Plan routes forward Codex prompt_cache_key", () => {
+    for (const [providerName, authMode] of [
+      ["kimi", "oauth"],
+      ["kimi-code", "key"],
+    ] as const) {
+      const config: oprConfig = {
+        port: 10100,
+        defaultProvider: providerName,
+        providers: {
+          [providerName]: {
+            adapter: "openai-chat",
+            baseUrl: "https://api.kimi.com/coding/v1",
+            apiKey: "test-kimi-credential",
+            authMode,
+          },
+        },
+      };
+      const route = routeModel(config, `${providerName}/k3`);
+      const req = parsed();
+      req.modelId = route.modelId;
+      req.options.promptCacheKey = "codex-kimi-session-v1";
+
+      expect(route.provider.promptCacheKey).toBe(true);
+      const body = JSON.parse(createOpenAIChatAdapter(route.provider).buildRequest(req).body);
+      expect(body).toMatchObject({
+        model: "k3",
+        prompt_cache_key: "codex-kimi-session-v1",
+      });
+    }
+  });
+
+  test("an explicit Kimi promptCacheKey false remains an opt-out", () => {
+    const config: oprConfig = {
+      port: 10100,
+      defaultProvider: "kimi",
+      providers: {
+        kimi: {
+          adapter: "openai-chat",
+          baseUrl: "https://api.kimi.com/coding/v1",
+          apiKey: "test-kimi-credential",
+          authMode: "oauth",
+          promptCacheKey: false,
+        },
+      },
+    };
+    const route = routeModel(config, "kimi/k3");
+    const req = parsed();
+    req.modelId = route.modelId;
+    req.options.promptCacheKey = "codex-kimi-session-v1";
+
+    expect(route.provider.promptCacheKey).toBe(false);
+    const body = JSON.parse(createOpenAIChatAdapter(route.provider).buildRequest(req).body);
+    expect(body).not.toHaveProperty("prompt_cache_key");
+  });
 });
 
 describe("openai-chat max output defaults", () => {
@@ -212,3 +267,4 @@ describe("openai-chat max output defaults", () => {
     expect(body.thinking_budget).toBe(15_000);
   });
 });
+

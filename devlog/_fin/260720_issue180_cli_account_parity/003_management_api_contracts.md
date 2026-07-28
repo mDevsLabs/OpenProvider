@@ -12,14 +12,14 @@ Errors are JSON `{ "error": string }` (codex-auth sometimes adds `code`/`reason`
   (src/server/auth-cors.ts:114-116) → no token needed; CLI must send a loopback
   Host and no foreign Origin (src/server/auth-cors.ts:55-73).
 - Non-loopback bind: client must send `x-openprovider-api-key` / `Authorization: Bearer`
-  / `x-api-key` matching `OPENCODEX_API_AUTH_TOKEN` or a `config.apiKeys` entry
+  / `x-api-key` matching `OpenProvider_API_AUTH_TOKEN` or a `config.apiKeys` entry
   (src/server/auth-cors.ts:156-163, 125-143). Existing CLI convention:
   `runningProxyUpdateHeaders()` (src/oauth/login-cli.ts:9-14) injects the env token.
 - Port ladder (canonical): `findLiveProxy()` (src/server/proxy-liveness.ts:93-144) =
   pid file (`readAlivePid`, src/config.ts:846-857) → `runtime-port.json`
   (`readRuntimePort`, src/config.ts:750-759) → `/healthz` identity probe
-  (`isOpencodexHealthz`, src/server/proxy-liveness.ts:59-65) → `config.port ?? 10100`
-  fallback. Config dir: `OPENCODEX_HOME` or `~/.openprovider` (src/config.ts:268-274).
+  (`isOpenProviderHealthz`, src/server/proxy-liveness.ts:59-65) → `config.port ?? 10100`
+  fallback. Config dir: `OpenProvider_HOME` or `~/.openprovider` (src/config.ts:268-274).
 
 ## Family A — Codex (ChatGPT) account pool
 
@@ -32,7 +32,7 @@ emails masked via `maskEmail` (src/lib/privacy.ts:1-12).
 | Endpoint | Shape / semantics | Anchor |
 |---|---|---|
 | GET `/api/codex-auth/accounts` (`?refresh=1` forces fresh quota) | `{ accounts: CodexAuthAccountDto[] }` main-first; DTO `{ id, email(masked), plan?, logLabel?, isMain, quota: { weeklyPercent?, monthlyPercent?, weeklyResetAt?, monthlyResetAt?, resetCredits?, updatedAt } \| null, needsReauth?, hasCredential }`; go/free plans expose monthly fields only | src/codex/auth-api.ts:387-390, DTO :259-268, `quotaForPlan` :57-70 |
-| POST `/api/codex-auth/accounts` | manual token import; gated by env `OPENCODEX_ENABLE_UNVERIFIED_CODEX_IMPORT=1`, else 403 `manual_import_disabled` | src/codex/auth-api.ts:392-434, :36 |
+| POST `/api/codex-auth/accounts` | manual token import; gated by env `OpenProvider_ENABLE_UNVERIFIED_CODEX_IMPORT=1`, else 403 `manual_import_disabled` | src/codex/auth-api.ts:392-434, :36 |
 | DELETE `/api/codex-auth/accounts?id=` | always 200 `{ ok: true }` (no 404); purges credential + quota + thread affinity; clears `activeCodexAccountId` if pointed here | src/codex/auth-api.ts:436-443; src/codex/account-lifecycle.ts:14-20 |
 | GET `/api/codex-auth/active` | `{ activeCodexAccountId: string \| null, autoSwitchThreshold: number (default 80), upstreamFailoverThreshold: number (default 3) }` | src/codex/auth-api.ts:458-465 |
 | PUT `/api/codex-auth/active` body `{ accountId: string \| null }` | `"__main__"` = Codex App login; pool id must exist → 400 "Account not found"; `null` clears pin (auto-select lowest usage, src/codex/routing.ts:384-389). Response `{ ok, activeCodexAccountId }`. Writes config only; does NOT clear in-memory thread affinity — pinned threads keep their account until affinity expiry (src/codex/routing.ts:346-378), i.e. applies to NEW threads/sessions | src/codex/auth-api.ts:445-456 |
@@ -80,7 +80,7 @@ when ≤8 chars, `${ENV}` refs verbatim (src/providers/api-keys.ts:28-32).
 
 Adjacent: GET `/api/key-providers` (key-login picker metadata,
 src/server/management-api.ts:963-966); GET/POST/DELETE `/api/keys` = the proxy's OWN
-admission keys — POST returns the full `ocx_…` key exactly once
+admission keys — POST returns the full `opr_…` key exactly once
 (src/server/management-api.ts:1518-1543).
 
 ## Provider-capability matrix
@@ -124,3 +124,4 @@ replacement-style set (`kiro`) or show a generic hint.
 
 Conclusion: the issue #180 minimal scope (`list` / `current` / `use`) needs NO new
 server contract — all three families already expose the required reads and switches.
+

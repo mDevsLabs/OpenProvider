@@ -50,9 +50,9 @@ src/codex-auth-context.ts:70 to `true` and evicts the account. A transient
 drvfs hiccup on `/mnt/c` thus reads as a revoked credential and silently drops a
 pool account from rotation until restart.
 
-`getConfigDir()` resolves to `OPENCODEX_HOME` or `~/.openprovider`
+`getConfigDir()` resolves to `@mdevs/openprovider_HOME` or `~/.openprovider`
 (src/config.ts:148, via `resolveConfigDir` src/config.ts:21). If a WSL user
-points `OPENCODEX_HOME` under `/mnt/c`, every lock and atomic write above runs
+points `@mdevs/openprovider_HOME` under `/mnt/c`, every lock and atomic write above runs
 on drvfs.
 
 ## Design
@@ -103,14 +103,14 @@ begins with `/mnt/` (drvfs mount root). If so, emit one diagnostic line.
 Recommendation for D3: warn-only, no refusal. The `/mnt/c` lock unreliability is
 UNCONFIRMED, so a hard refusal would block legitimate setups on an unproven
 risk. Provide the escape hatch the other direction: keep the warning unless
-`OPENCODEX_ALLOW_DRVFS=1` is set, which silences it for users who have
+`@mdevs/openprovider_ALLOW_DRVFS=1` is set, which silences it for users who have
 intentionally chosen that layout. This matches the plan's "gate behind local
-diagnostics" guidance and the `OPENCODEX_*` env convention already used by
-`OPENCODEX_HOME`.
+diagnostics" guidance and the `@mdevs/openprovider_*` env convention already used by
+`@mdevs/openprovider_HOME`.
 
 Warning copy (single line, ASCII): state dir is on a Windows drive mount
 (`/mnt/...`); file locks and atomic renames may behave unexpectedly; prefer a
-native Linux path such as `~/.openprovider`; set `OPENCODEX_ALLOW_DRVFS=1` to
+native Linux path such as `~/.openprovider`; set `@mdevs/openprovider_ALLOW_DRVFS=1` to
 silence.
 
 ## Diff-level plan
@@ -127,7 +127,7 @@ MODIFY src/codex-auth-context.ts
 
 NEW startup guard (place with existing boot diagnostics; likely src/config.ts or
 the server bootstrap that already calls `hardenConfigDir`)
-- Best-effort drvfs detection + warn, gated by `OPENCODEX_ALLOW_DRVFS`.
+- Best-effort drvfs detection + warn, gated by `@mdevs/openprovider_ALLOW_DRVFS`.
 
 NEW tests/codex-drvfs-hardening.test.ts (or extend an existing codex-account
 test file if one already owns this surface).
@@ -147,7 +147,7 @@ test file if one already owns this surface).
 - Lock-timeout still transient: `CodexCredentialRefreshLockTimeoutError`
   continues to return `false` from the classifier (existing behavior).
 - drvfs warn: with config dir mocked under `/mnt/c`, startup emits the warning;
-  with `OPENCODEX_ALLOW_DRVFS=1`, it does not. A non-`/mnt` path: no warning.
+  with `@mdevs/openprovider_ALLOW_DRVFS=1`, it does not. A non-`/mnt` path: no warning.
 
 ## Risks
 
@@ -171,3 +171,4 @@ test file if one already owns this surface).
 
 (to be filled when the phase lands: files changed, verification commands,
 commit.)
+

@@ -6,7 +6,7 @@ import { createKiroAdapter } from "../adapters/kiro";
 import { createMimoFreeAdapter } from "../adapters/mimo-free";
 import { createOpenAIChatAdapter } from "../adapters/openai-chat";
 import { createResponsesPassthroughAdapter } from "../adapters/openai-responses";
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 import { isWirePinnedModel, MODEL_ADAPTER_OVERRIDE_ALLOWED, pinnedWireAdapter } from "../types";
 import { isCanonicalOpenAiForwardProvider } from "../providers/openai-tiers";
 
@@ -17,7 +17,7 @@ import { isCanonicalOpenAiForwardProvider } from "../providers/openai-tiers";
  * Safe to call more than once on its own output — the pin check does not look at the
  * current adapter, so a second pass cannot let an override displace a pin.
  */
-export function resolveWireProtocolOverride(providerName: string, modelId: string, providerConfig: OcxProviderConfig): OcxProviderConfig {
+export function resolveWireProtocolOverride(providerName: string, modelId: string, providerConfig: oprProviderConfig): oprProviderConfig {
   const pinned = pinnedWireAdapter(providerName, modelId);
   if (pinned && providerConfig.adapter !== pinned) {
     return { ...providerConfig, adapter: pinned };
@@ -38,7 +38,7 @@ export function resolveWireProtocolOverride(providerName: string, modelId: strin
 }
 
 /** Build the provider adapter for a resolved provider config. */
-export function resolveAdapter(providerConfig: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
+export function resolveAdapter(providerConfig: oprProviderConfig, cacheRetention?: "none" | "short" | "long") {
   switch (providerConfig.adapter) {
     case "openai-chat":
       return createOpenAIChatAdapter(providerConfig);
@@ -61,3 +61,4 @@ export function resolveAdapter(providerConfig: OcxProviderConfig, cacheRetention
       throw new Error(`Unknown adapter: ${providerConfig.adapter}`);
   }
 }
+

@@ -87,7 +87,7 @@ export function isTechnicalLiteral(value: string): boolean {
   if (/^curl\b/i.test(trimmed)) return true;
   if (/^-H\b/.test(trimmed)) return true;
   if (/^-d\b/.test(trimmed)) return true;
-  if (/^ocx\b/i.test(trimmed)) return true;
+  if (/^opr\b/i.test(trimmed)) return true;
   if (/^codex\b/i.test(trimmed)) return true;
 
   // HTTP headers / auth schemes
@@ -154,3 +154,4 @@ export function isBrandOrModelLiteral(value: unknown): boolean {
   if (isModelIdentifier(trimmed)) return true;
   return false;
 }
+

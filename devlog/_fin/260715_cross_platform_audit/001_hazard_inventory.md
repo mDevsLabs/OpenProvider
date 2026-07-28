@@ -22,7 +22,7 @@ Source: read-only survey by sol explorer subagent (id 019f6516-fd7b-72f3-b60e-06
 - `src/cli/claude.ts:179`: `spawn("claude", args, { stdio: "inherit", env })`.
 - On Windows, npm installs `claude.cmd`; Node/Bun cannot launch `.cmd` shell-less
   (post-CVE-2024-27980 behavior). The repo already documents this convention at
-  `src/codex/catalog.ts:610-614` and handles it in `bin/ocx.mjs:97-148` and
+  `src/codex/catalog.ts:610-614` and handles it in `bin/opr.mjs:97-148` and
   `src/update/index.ts:53-64` — this site predates/missed the convention.
 - Effect: `opr claude` fails with ENOENT on Windows npm installs.
 
@@ -78,7 +78,7 @@ documented supported termination path. Only the `sh -c` spawn half of P4-3 stand
 - Env/home hygiene: `homedir()` defaults throughout; `src/lib/gcp-adc.ts:73` handles
   APPDATA; `src/codex/plugins-doctor.ts:111` checks LOCALAPPDATA/PROGRAMFILES/APPDATA;
   `src/server/system-env.ts:76,93` HOME reads are darwin-gated.
-- Spawn hygiene present elsewhere: `bin/ocx.mjs:97-148`, `src/update/index.ts:53-64`
+- Spawn hygiene present elsewhere: `bin/opr.mjs:97-148`, `src/update/index.ts:53-64`
   (npm.cmd), `src/lib/process-control.ts:100-105` (taskkill.exe),
   `src/lib/open-url.ts:14-20` (open/rundll32/xdg-open), `src/service.ts` (launchd/
   Task Scheduler/systemd split), `src/codex/shim.ts` (per-platform shims).
@@ -87,3 +87,4 @@ documented supported termination path. Only the `sh -c` spawn half of P4-3 stand
 - Test masking noted: `tests/cursor-desktop-exec.test.ts:22-24` uses POSIX-only commands
   (cat/printf), so the suite can't exercise the D4 Windows path — 020 tests must inject
   platform instead of relying on host behavior.
+

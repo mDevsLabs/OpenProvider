@@ -19,7 +19,7 @@ tags: [grok-build, docs, devlog]
 CodeRabbit 지적("api_key만 바꾸라고 하면 안 된다, base_url도 도달 가능해야 한다")은 옳다.
 다만 020에서 비루프백 블록이 `env_key`를 방출하도록 바뀌므로 안내 내용 자체가 달라진다:
 
-- 자동 등록된 블록은 비루프백 바인드에서 `env_key = "OPENCODEX_API_AUTH_TOKEN"`을 쓴다.
+- 자동 등록된 블록은 비루프백 바인드에서 `env_key = "OpenProvider_API_AUTH_TOKEN"`을 쓴다.
   사용자는 **grok을 실행하는 환경에 그 변수를 export**하면 된다. 설정 파일을 손댈 필요가 없다.
 - `base_url`은 우리가 실제 바인드 호스트로 생성하므로 `127.0.0.1` 고정 문제가 사라진다.
   수동 예시도 도달 가능한 호스트(`http://192.168.1.10:10100/v1`)로 바꾼다.
@@ -63,3 +63,4 @@ CodeRabbit은 "핫리로드를 약속하지 말라"고 했지만 원본에는 �
 ## 게이트
 
 `bun run docs:check`(존재 시) → `bun run typecheck` → 링크/빌드 확인.
+

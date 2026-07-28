@@ -1,6 +1,6 @@
 import { codexAutoStartEnabled } from "../config";
 import { diagnoseService, type ServiceDiagnostic } from "../service";
-import type { OcxConfig } from "../types";
+import type { oprConfig } from "../types";
 import { getCodexRoutingKind, type CodexRoutingKind } from "./inject";
 import { diagnoseCodexShim, type CodexShimDiagnostic } from "./shim";
 
@@ -70,7 +70,7 @@ export function deriveStartupHealth(inputs: StartupHealthInputs): StartupHealth 
     ? "none"
     : "cli-only";
   // We can only credit an openprovider service/shim for routing that openprovider owns.
-  // An arbitrary localhost gateway has an independent lifecycle that OCX cannot repair.
+  // An arbitrary localhost gateway has an independent lifecycle that opr cannot repair.
   const ownsLocalRouting = inputs.routingKind === "openprovider-local";
   const protection: StartupProtection = ownsLocalRouting && inputs.serviceViable
     ? "service"
@@ -112,7 +112,7 @@ export interface StartupHealthDiagnostics {
 
 /** Collect current machine state without mutating config, services, or shims. */
 export function collectStartupHealth(
-  config: Pick<OcxConfig, "codexAutoStart">,
+  config: Pick<oprConfig, "codexAutoStart">,
   diagnostics: StartupHealthDiagnostics = {},
 ): StartupHealth {
   const shim = diagnostics.shim ?? diagnoseCodexShim();
@@ -147,3 +147,4 @@ export function startupHealthSummary(health: StartupHealth): string {
   if (health.serviceInstalled && !health.serviceViable) return `AT RISK after restart (installed service is disabled, stopped, or unhealthy; run '${command}')`;
   return `AT RISK after restart (no viable background service; run '${command}')`;
 }
+

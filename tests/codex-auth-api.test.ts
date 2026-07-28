@@ -20,7 +20,7 @@ import {
   getTrackedCodexWebSocketCountForAccount,
   registerCodexWebSocket,
 } from "../src/codex/websocket-registry";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 import type { WsData } from "../src/server/ws-bridge";
 import { MAIN_CODEX_ACCOUNT_ID } from "../src/codex/main-account";
 import {
@@ -37,7 +37,7 @@ let previousCodexHome: string | undefined;
 let previousManualImportEnv: string | undefined;
 let previousFetch: typeof fetch;
 
-function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
+function makeConfig(overrides: Partial<oprConfig> = {}): oprConfig {
   return {
     port: 10100,
     providers: {},
@@ -81,7 +81,7 @@ function mockCodexWarmupSuccess(): { calls: () => number } {
 }
 
 function seedPoolAccount(
-  config: OcxConfig,
+  config: oprConfig,
   account: {
     id: string;
     email: string;
@@ -449,7 +449,13 @@ describe("codex-auth API", () => {
     const req = new Request("http://localhost/api/codex-auth/active", { method: "GET" });
     const resp = await handleCodexAuthAPI(req, new URL(req.url), config);
     const data = await resp!.json() as { activeCodexAccountId: string | null; autoSwitchThreshold: number };
-    expect(data).toEqual({ activeCodexAccountId: "pool-live", autoSwitchThreshold: 55, upstreamFailoverThreshold: 3 });
+    expect(data).toEqual({
+      activeCodexAccountId: "pool-live",
+      autoSwitchThreshold: 55,
+      upstreamFailoverThreshold: 3,
+      accountPoolStrategy: "quota",
+      accountPoolStickyLimit: 1,
+    });
   });
 
   test("GET /api/codex-auth/accounts returns large live pools without dropping entries", async () => {
@@ -1639,3 +1645,4 @@ describe("codex-auth helpers", () => {
     expect(isAccountNeedsReauth(id)).toBe(false);
   });
 });
+

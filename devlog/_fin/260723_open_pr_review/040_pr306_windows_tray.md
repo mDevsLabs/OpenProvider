@@ -14,7 +14,7 @@
   on sha256(home path); heartbeat JSON + action log.
 - `opr tray install|start|stop|status|uninstall` CLI + `HKCU\...\Run` login registration,
   preserved across package updates (`src/update/tray-update-plan.mjs`).
-- Restart-safety diagnostics: `src/codex/autostart-health.ts` classifies OCX-owned routing vs
+- Restart-safety diagnostics: `src/codex/autostart-health.ts` classifies opr-owned routing vs
   custom/remote gateways vs stale/disabled/conflicting lifecycle state; fail-closed injection.
 - Management API startup/tray health endpoint (secret-free) + localized Startup dashboard page.
 
@@ -33,7 +33,8 @@
 ## Verdict: **HOLD — needs cross-platform CI run + explicit GUI approval**
 
 Not mergeable in this pass: (1) GUI-touching → owner sign-off required; (2) cross-platform CI
-has not run on current head — Windows behavior is the whole point of the PR; (3) `bin/ocx.mjs`,
+has not run on current head — Windows behavior is the whole point of the PR; (3) `bin/opr.mjs`,
 `src/service.ts`, `src/update/*` touch the service lifecycle path that release policy treats as
 security-review scope. Recommend: trigger CI, then a dedicated review session for the
 service/update/tray triangle before any merge decision.
+

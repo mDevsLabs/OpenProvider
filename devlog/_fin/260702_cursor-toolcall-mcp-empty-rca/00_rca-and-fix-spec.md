@@ -55,7 +55,7 @@
 
 ## 필수 선행: 라이브 진단 (구현 전 반드시)
 
-정적 코드로는 a/b/c를 구분 불가. gpt-5.5 직원의 **1차 작업은 코드 수정이 아니라 계측+라이브 캡처**다. `OPENCODEX_CURSOR_TEST_TOKEN` 필요(`live-smoke-gate.ts`).
+정적 코드로는 a/b/c를 구분 불가. gpt-5.5 직원의 **1차 작업은 코드 수정이 아니라 계측+라이브 캡처**다. `@mdevs/openprovider_CURSOR_TEST_TOKEN` 필요(`live-smoke-gate.ts`).
 
 진단 항목:
 - D1. 실제 Codex 요청에서 `request.tools.length`를 찍는다 → 상류에서 tool이 비어 오는가?(가설 c 판별, 비용 최저)
@@ -84,7 +84,7 @@
 `src/adapters/cursor/protobuf-request.ts`에 field 4를 **올바르게 감싸** proactively 싣되 기존 reactive 핸들러(`native-exec.ts:63-68`)는 **그대로 유지**(both-ways, idempotent, 둘 다 conformant `toBinary`라 desync 원천 불가):
 ```ts
 // import 블록에 McpToolsSchema 추가, tool-definitions에서 builder도 import
-import { buildCursorToolDefinitions, OCX_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
+import { buildCursorToolDefinitions, opr_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
 // create(AgentRunRequestSchema, { ... }) 안, modelDetails 뒤:
 ...(request.tools?.length
   ? { mcpTools: create(McpToolsSchema, { mcpTools: buildCursorToolDefinitions(request.tools, request.toolChoice) }) }
@@ -107,3 +107,5 @@ import { buildCursorToolDefinitions, OCX_RESPONSES_TOOL_PROVIDER } from "./tool-
 - 프로토콜은 문서 없는 2단계 reverse-engineered 사본(Cursor → jawcode RE → openprovider vendored). `.proto` 원본/재생성 파이프라인 없음.
 - 라이브 진단은 실 Cursor 계정 토큰 필요. 파괴적 실험 금지(read/ls/grep 위주).
 - Boss는 직접 코드 미작성. 구현은 gpt-5.5 직원(`cli-jaw dispatch --virtual --cli codex --model gpt-5.5 --mutable --scope src/adapters/cursor`).
+
+

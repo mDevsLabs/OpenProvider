@@ -74,7 +74,7 @@ Source of truth: codex-rs `core/src/session/mod.rs:2801-2818`.
 The passthrough adapter pipeline (right-to-left execution):
 
 ```
-scrubOcxCompactionItems
+scruboprCompactionItems
   → sanitizeReasoningInputContent
     → stripUnsupportedHostedTools
       → stripInvalidItemIds (type-aware prefix validation)
@@ -110,3 +110,4 @@ scrubOcxCompactionItems
 - **State replay**: 1 HIGH (multi-user, #95 scope), 2 MEDIUM (provenance, miss).
 - **docs-site translations**: 2 HIGH content omissions, broken links, terminology
   drift — documented in 010_docs_translation_audit.md.
+

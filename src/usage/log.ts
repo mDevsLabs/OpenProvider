@@ -2,7 +2,7 @@ import { chmodSync, closeSync, existsSync, fstatSync, mkdirSync, openSync, readF
 import { join } from "node:path";
 import { getConfigDir } from "../config";
 import { usageDisplayTotalTokens } from "./totals";
-import type { OcxUsage } from "../types";
+import type { oprUsage } from "../types";
 
 export type UsageStatus = "reported" | "unreported" | "unsupported" | "estimated";
 
@@ -11,6 +11,7 @@ export type AttemptRecoveryKind =
   | "connection-reset"
   | "oauth-401"
   | "key-429"
+  | "anthropic-oauth-429"
   | "image-413";
 
 export interface PersistedUsageAttempt {
@@ -26,9 +27,14 @@ export interface PersistedUsageAttempt {
   recoveryKinds: AttemptRecoveryKind[];
   usageStatus: UsageStatus;
   inputTokenEstimate?: number;
-  usage?: OcxUsage;
+  usage?: oprUsage;
   totalTokens?: number;
   errorCode?: string;
+  /** Target-specific reasoning intent and exact adapter-normalized wire parameter. */
+  requestedEffort?: string;
+  effectiveEffort?: string;
+  reasoningWireField?: string;
+  reasoningWireValue?: string | number;
 }
 
 export interface PersistedUsageEntry {
@@ -37,10 +43,16 @@ export interface PersistedUsageEntry {
   provider: string;
   model: string;
   surface?: "claude" | "claude-desktop" | "grok";
+  /** Best-effort chat/session correlation for Logs grouping (#330). */
+  conversationId?: string;
   resolvedModel?: string;
   requestedModel?: string;
   /** Reasoning effort / service-tier metadata for GUI Logs after restart. */
   requestedEffort?: string;
+  /** Adapter-normalized tier and exact upstream parameter emitted for this request. */
+  effectiveEffort?: string;
+  reasoningWireField?: string;
+  reasoningWireValue?: string | number;
   requestedServiceTier?: string;
   requestedSpeedLabel?: string;
   configuredServiceTier?: string;
@@ -52,7 +64,7 @@ export interface PersistedUsageEntry {
   /** TTFT relative to the request start (WP4); unset for non-streaming/tool-only. */
   firstOutputMs?: number;
   usageStatus: UsageStatus;
-  usage?: OcxUsage;
+  usage?: oprUsage;
   totalTokens?: number;
   attempts?: PersistedUsageAttempt[];
   // Failure diagnostics (devlog/_plan/260716_claudecode_hardening/030): persisted for
@@ -85,7 +97,7 @@ export function usageLogPath(): string {
   return join(getConfigDir(), "usage.jsonl");
 }
 
-export function usageTotalTokens(usage: OcxUsage | undefined): number | undefined {
+export function usageTotalTokens(usage: oprUsage | undefined): number | undefined {
   return usageDisplayTotalTokens(usage);
 }
 
@@ -99,18 +111,18 @@ function isEstimatedUsageProvider(providerOrAdapter: string): boolean {
     || providerOrAdapter === "cursor" || providerOrAdapter.startsWith("cursor-");
 }
 
-export function usageForFinalLog(provider: string, usage: OcxUsage | undefined): OcxUsage | undefined {
+export function usageForFinalLog(provider: string, usage: oprUsage | undefined): oprUsage | undefined {
   if (!usage) return undefined;
   if (usage.estimated || isEstimatedUsageProvider(provider)) return { ...usage, estimated: true };
   return usage;
 }
 
-export function usageStatusForFinalLog(usage: OcxUsage | undefined): UsageStatus {
+export function usageStatusForFinalLog(usage: oprUsage | undefined): UsageStatus {
   if (!usage) return "unreported";
   return usage.estimated ? "estimated" : "reported";
 }
 
-function normalizeUsageValue(usage: OcxUsage | undefined): OcxUsage | undefined {
+function normalizeUsageValue(usage: oprUsage | undefined): oprUsage | undefined {
   if (!usage) return undefined;
   return {
     inputTokens: usage.inputTokens,
@@ -129,6 +141,7 @@ const ATTEMPT_RECOVERY_KINDS = new Set<AttemptRecoveryKind>([
   "connection-reset",
   "oauth-401",
   "key-429",
+  "anthropic-oauth-429",
   "image-413",
 ]);
 const USAGE_STATUSES = new Set<UsageStatus>([
@@ -142,7 +155,7 @@ function isNonNegativeFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
-function normalizeAttemptUsage(raw: unknown): OcxUsage | null {
+function normalizeAttemptUsage(raw: unknown): oprUsage | null {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   const usage = raw as Record<string, unknown>;
   if (!isNonNegativeFiniteNumber(usage.inputTokens)
@@ -157,7 +170,7 @@ function normalizeAttemptUsage(raw: unknown): OcxUsage | null {
     if (key in usage && !isNonNegativeFiniteNumber(usage[key])) return null;
   }
   if ("estimated" in usage && typeof usage.estimated !== "boolean") return null;
-  return normalizeUsageValue(usage as unknown as OcxUsage) ?? null;
+  return normalizeUsageValue(usage as unknown as oprUsage) ?? null;
 }
 
 function normalizeUsageAttempt(raw: unknown): PersistedUsageAttempt | null {
@@ -213,6 +226,20 @@ function normalizeUsageAttempt(raw: unknown): PersistedUsageAttempt | null {
       ? { totalTokens: attempt.totalTokens }
       : {}),
     ...(typeof attempt.errorCode === "string" ? { errorCode: attempt.errorCode } : {}),
+    ...(typeof attempt.requestedEffort === "string" && attempt.requestedEffort
+      ? { requestedEffort: capMetadataString(attempt.requestedEffort) }
+      : {}),
+    ...(typeof attempt.effectiveEffort === "string" && attempt.effectiveEffort
+      ? { effectiveEffort: capMetadataString(attempt.effectiveEffort) }
+      : {}),
+    ...(typeof attempt.reasoningWireField === "string" && attempt.reasoningWireField
+      ? { reasoningWireField: capMetadataString(attempt.reasoningWireField) }
+      : {}),
+    ...(typeof attempt.reasoningWireValue === "string" && attempt.reasoningWireValue
+      ? { reasoningWireValue: capMetadataString(attempt.reasoningWireValue) }
+      : isNonNegativeFiniteNumber(attempt.reasoningWireValue)
+        ? { reasoningWireValue: attempt.reasoningWireValue }
+        : {}),
   };
 }
 
@@ -235,11 +262,25 @@ function normalizeUsageEntry(entry: PersistedUsageEntry): PersistedUsageEntry {
     provider: entry.provider,
     model: entry.model,
     ...(isKnownUsageSurface(entry.surface) ? { surface: entry.surface } : {}),
+    ...(typeof entry.conversationId === "string" && entry.conversationId.trim()
+      ? { conversationId: entry.conversationId.trim().slice(0, 128) }
+      : {}),
     ...(entry.resolvedModel ? { resolvedModel: entry.resolvedModel } : {}),
     ...(entry.requestedModel ? { requestedModel: entry.requestedModel } : {}),
     ...(typeof entry.requestedEffort === "string" && entry.requestedEffort
       ? { requestedEffort: capMetadataString(entry.requestedEffort) }
       : {}),
+    ...(typeof entry.effectiveEffort === "string" && entry.effectiveEffort
+      ? { effectiveEffort: capMetadataString(entry.effectiveEffort) }
+      : {}),
+    ...(typeof entry.reasoningWireField === "string" && entry.reasoningWireField
+      ? { reasoningWireField: capMetadataString(entry.reasoningWireField) }
+      : {}),
+    ...(typeof entry.reasoningWireValue === "string" && entry.reasoningWireValue
+      ? { reasoningWireValue: capMetadataString(entry.reasoningWireValue) }
+      : isNonNegativeFiniteNumber(entry.reasoningWireValue)
+        ? { reasoningWireValue: entry.reasoningWireValue }
+        : {}),
     ...(typeof entry.requestedServiceTier === "string" && entry.requestedServiceTier
       ? { requestedServiceTier: capMetadataString(entry.requestedServiceTier) }
       : {}),
@@ -507,3 +548,4 @@ export function readRecentUsageEntries(limit: number): PersistedUsageEntry[] {
     }
   }
 }
+

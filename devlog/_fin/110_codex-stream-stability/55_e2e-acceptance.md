@@ -57,8 +57,8 @@ requires_openai_auth = true
 # 2. Leaked upstream sockets after an interrupt (count should return to baseline):
 lsof -p "$(pgrep -f 'opr|openprovider' | head -1)" 2>/dev/null | grep -c ESTABLISHED
 
-# 3. opr-side noise (should be quiet; with OCX_DEBUG_FRAMES=1, inspect any frame drops):
-OCX_DEBUG_FRAMES=1 opr   # run opr with frame-drop visibility during the session
+# 3. opr-side noise (should be quiet; with opr_DEBUG_FRAMES=1, inspect any frame drops):
+opr_DEBUG_FRAMES=1 opr   # run opr with frame-drop visibility during the session
 ```
 
 ## Pass criteria
@@ -101,3 +101,4 @@ Error-path fixes (F1 inline error, F3 overload/transient-429) are covered by uni
 
 - No native `gpt-*` WS path here (phase 120).
 - Not a load/perf benchmark — this gate is correctness/lifecycle only.
+

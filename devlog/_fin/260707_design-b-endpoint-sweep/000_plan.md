@@ -23,7 +23,7 @@ is_openai()-gated endpoint client lands on us:
    - passthrough (native gpt): forward body to {provider.baseUrl}/responses/compact
      with selected forward headers, return upstream response verbatim.
    - routed: internal /v1/responses call with input+[compaction_trigger], stream:false
-     (reuses v2 synthetic-compaction machinery), decode the ocx1 compaction item,
+     (reuses v2 synthetic-compaction machinery), decode the opr1 compaction item,
      return {"output":[{type:"message",role:"user",content:[{type:"input_text",
      text: SUMMARY_PREFIX + summary}]}]} — mirrors codex-rs local build_compacted_history.
 3. tests: /v1 unknown-path 404 JSON; routed compact returns summary output; passthrough
@@ -33,3 +33,4 @@ features; the 404 guard gives them clean failures).
 
 ## Verification
 bun test ./tests/ && bun x tsc --noEmit
+

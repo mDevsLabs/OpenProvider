@@ -60,7 +60,7 @@ This matters on Windows and on any machine where `CODEX_HOME` is custom.
 
 The plist includes:
 
-- `OCX_SERVICE=1`
+- `opr_SERVICE=1`
 - `PATH`
 - `CODEX_HOME` when present at install/start time
 
@@ -70,7 +70,7 @@ This prevents a custom Codex home from being lost when launchd starts the proxy 
 
 The user unit includes:
 
-- `Environment="OCX_SERVICE=1"`
+- `Environment="opr_SERVICE=1"`
 - `Environment="PATH=..."`
 - `Environment="CODEX_HOME=..."` when present
 - append-mode service log paths
@@ -87,7 +87,7 @@ Task Scheduler runs through a generated wrapper script:
 
 The wrapper sets:
 
-- `OCX_SERVICE=1`
+- `opr_SERVICE=1`
 - `PATH`
 - `CODEX_HOME` when present
 
@@ -116,3 +116,4 @@ The release CI updates are related operational hardening:
 - release metadata is better aligned with the npm version workflow.
 
 These are not Windows-specific, but they landed in the same 80 pull window and should be kept with this phase record.
+

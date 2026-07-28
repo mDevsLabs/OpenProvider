@@ -47,16 +47,16 @@ Functions:
 
 ### MODIFY `src/codex-auth-context.ts` Runtime Type
 
-Keep persisted `OcxProviderConfig` free of token-bearing runtime fields. Add a local runtime extension type:
+Keep persisted `oprProviderConfig` free of token-bearing runtime fields. Add a local runtime extension type:
 
 ```ts
-export type OcxRuntimeProviderConfig = OcxProviderConfig & {
+export type oprRuntimeProviderConfig = oprProviderConfig & {
   _codexAccountOverride?: { accessToken: string; chatgptAccountId: string };
   _codexAccountRequired?: boolean;
 };
 ```
 
-Do not add `_codexAccountOverride` or `_codexAccountRequired` to persisted `OcxProviderConfig`.
+Do not add `_codexAccountOverride` or `_codexAccountRequired` to persisted `oprProviderConfig`.
 
 ### MODIFY `src/server.ts`
 
@@ -169,7 +169,7 @@ Required cases:
 - routed non-forward request with active pool and vision sidecar uses pool selected headers even when inbound/main auth is present.
 - sidecar-needed routed request with selected pool token failure returns fail-closed and performs no sidecar fetch with inbound/main headers.
 - WebSocket upgrade stores one immutable auth context; later frames do not re-run account selection or switch to another account.
-- runtime `_codexAccount*` fields cannot be persisted through provider config APIs because they do not live on persisted `OcxProviderConfig`.
+- runtime `_codexAccount*` fields cannot be persisted through provider config APIs because they do not live on persisted `oprProviderConfig`.
 
 ## Verification
 
@@ -279,3 +279,4 @@ Residual coverage note:
 ## Commit Boundary
 
 One implementation commit for Phase 10 after tests pass. Do not mix Phase 20 lifecycle or Phase 30 local API auth changes into this commit.
+

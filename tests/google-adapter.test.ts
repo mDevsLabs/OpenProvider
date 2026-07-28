@@ -1,20 +1,20 @@
 import { describe, expect, test } from "bun:test";
 import { createGoogleAdapter } from "../src/adapters/google";
-import type { OcxParsedRequest } from "../src/types";
+import type { oprParsedRequest } from "../src/types";
 
 const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "key" };
 
-function parsedWith(messages: unknown[], tools?: unknown[]): OcxParsedRequest {
-  return { modelId: "gemini-3-pro", stream: false, options: {}, context: { messages, tools } } as unknown as OcxParsedRequest;
+function parsedWith(messages: unknown[], tools?: unknown[]): oprParsedRequest {
+  return { modelId: "gemini-3-pro", stream: false, options: {}, context: { messages, tools } } as unknown as oprParsedRequest;
 }
 
-async function geminiContents(parsed: OcxParsedRequest): Promise<{ role: string; parts: Record<string, unknown>[] }[]> {
+async function geminiContents(parsed: oprParsedRequest): Promise<{ role: string; parts: Record<string, unknown>[] }[]> {
   // buildRequest is async (google-vertex auth path); await before parsing the body.
   const { body } = await createGoogleAdapter(provider).buildRequest(parsed);
   return JSON.parse(body).contents;
 }
 
-async function geminiBody(parsed: OcxParsedRequest): Promise<Record<string, unknown>> {
+async function geminiBody(parsed: oprParsedRequest): Promise<Record<string, unknown>> {
   const { body } = await createGoogleAdapter(provider).buildRequest(parsed);
   return JSON.parse(body);
 }
@@ -180,7 +180,7 @@ describe("google adapter — tool-call ids on the wire", () => {
           { role: "toolResult", toolCallId: "call_xyz", toolName: "bash", content: "ok", isError: false },
         ],
       },
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
 
     const { body } = await createGoogleAdapter(ccaProvider).buildRequest(parsed);
     const envelope = JSON.parse(body);
@@ -189,3 +189,4 @@ describe("google adapter — tool-call ids on the wire", () => {
     expect(fc).toBe("call_xyz");
   });
 });
+

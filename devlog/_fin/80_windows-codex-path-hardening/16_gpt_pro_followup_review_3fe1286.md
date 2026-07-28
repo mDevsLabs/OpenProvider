@@ -46,10 +46,10 @@ Minimal next patch:
 
 ### P1 - Bun runtime mitigation is only half done
 
-GPT Pro says runtime path diagnostics help, but users still lack a supported `OPENCODEX_BUN_PATH` override to test canary/fixed Bun without editing generated service files.
+GPT Pro says runtime path diagnostics help, but users still lack a supported `OpenProvider_BUN_PATH` override to test canary/fixed Bun without editing generated service files.
 
 Minimal next patch:
-- Add validated `OPENCODEX_BUN_PATH` override shared by CLI launcher and service installation.
+- Add validated `OpenProvider_BUN_PATH` override shared by CLI launcher and service installation.
 - Log `bun --version` and openprovider version in service log/status.
 
 ## P2 findings
@@ -65,3 +65,4 @@ Minimal next patch:
 3. Patch WebSocket lifetime policy.
 4. Patch Bun runtime override/version logging.
 5. Patch docs/dev polish: conditional banner, `dev:proxy`/`dev:gui`, project-specific `gui/README.md`.
+

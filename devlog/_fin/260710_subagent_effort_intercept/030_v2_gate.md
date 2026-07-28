@@ -64,7 +64,7 @@ Snap-down/strip/ultra-conversion tail text unchanged.
 
 ## GUI render grounding (WP3)
 
-Fresh sandboxed server from this worktree (OPENCODEX_HOME + CODEX_HOME pointed at
+Fresh sandboxed server from this worktree (@mdevs/openprovider_HOME + CODEX_HOME pointed at
 temp dirs so `start` cannot inject routing into the real `~/.codex`) on port 10199
 with `effortCap: "high"`, `subagentEffortCap: "medium"`; driven via the in-app
 browser against the built `gui/dist`. Screenshots in `assets/`:
@@ -81,3 +81,4 @@ Caveat noted during capture: `bun run src/cli/index.ts start` WITHOUT a sandboxe
 CODEX_HOME rewrites the real `~/.codex/config.toml` `openai_base_url` to the dev
 port and can leave it stale if the process dies before cleanup (restored to 10100
 by hand this session). Always sandbox both env vars for render checks.
+

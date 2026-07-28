@@ -34,7 +34,7 @@ Add a first-class `sakana` keyed provider for `fugu` and `fugu-ultra`, reusing t
 ```bash
 bun test tests/sakana-provider.test.ts tests/provider-registry-parity.test.ts tests/openai-responses-passthrough.test.ts
 bun run typecheck
-OPENCODEX_HOME=$(mktemp -d) opr provider add sakana --api-key '$SAKANA_API_KEY'
+@mdevs/openprovider_HOME=$(mktemp -d) opr provider add sakana --api-key '$SAKANA_API_KEY'
 ```
 
 An authenticated live smoke is required for `DONE`; without a user-provided key, unit tests may pass but the work-phase ends `NEEDS_HUMAN`, not `DONE`.
@@ -46,3 +46,4 @@ An authenticated live smoke is required for `DONE`; without a user-provided key,
 - `BLOCKED`: official endpoint is withdrawn or unavailable in the user's region.
 - `UNSAFE`: implementation requires logging keys or widening global retry/timeout policy.
 - `NEEDS_HUMAN`: no live Sakana key is available for final smoke.
+

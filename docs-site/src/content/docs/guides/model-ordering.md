@@ -103,9 +103,10 @@ The only supported way to customize leading model order is to reorder `subagentM
 that on the dashboard's **Sub-agents** page or in the OpenProvider configuration. The list accepts at
 most five models, and its order is significant.
 
-There is currently no general `modelOrder`, `providerOrder`, or priority-map setting in `OcxConfig`.
+There is currently no general `modelOrder`, `providerOrder`, or priority-map setting in `oprConfig`.
 The supported ordering field is `subagentModels` (`src/types.ts:238-246`); `disabledModels` and each
 provider's `selectedModels` are visibility fields (`src/types.ts:276-282` and
 `src/types.ts:439-446`). To change the rest of the picker order would require a code-level behavior
 change rather than a configuration edit.
+
 

@@ -1,11 +1,11 @@
 ---
 title: Провайдеры
-description: Все способы, которыми OpenProvider аутентифицируется и общается с LLM-провайдером — OAuth, API-ключ, форвард ChatGPT и локальные серверы.
+description: Все способы, которыми opencodex аутентифицируется и общается с LLM-провайдером — OAuth, API-ключ, форвард ChatGPT и локальные серверы.
 ---
 
 **Провайдер** — это одна вышестоящая конечная точка LLM плюс способ подключения к ней: адаптер,
 базовый URL, режим аутентификации и необязательный список моделей. Провайдеры находятся в
-`~/.OpenProvider/config.json` в секции `providers`.
+`~/.opencodex/config.json` в секции `providers`.
 
 ## Режимы аккаунтов OpenAI
 
@@ -26,9 +26,9 @@ description: Все способы, которыми OpenProvider аутенти
 записи `openai` этот путь восстановления не получают.
 
 Поставляемые v1-конфигурации автоматически мигрируют на маркер 2 и одну строку с поддержкой опций.
-Исходная конфигурация один раз сохраняется в `~/.OpenProvider/config.json.pre-openai-tiers-v2.bak`;
+Исходная конфигурация один раз сохраняется в `~/.opencodex/config.json.pre-openai-tiers-v2.bak`;
 восстановить её можно командой
-`cp ~/.OpenProvider/config.json.pre-openai-tiers-v2.bak ~/.OpenProvider/config.json`.
+`cp ~/.opencodex/config.json.pre-openai-tiers-v2.bak ~/.opencodex/config.json`.
 
 ## Режимы аутентификации
 
@@ -67,20 +67,20 @@ account id, OpenAI beta/originator/session — см. [Адаптеры](/ru/refe
 ## 2. Вход по аккаунту (OAuth)
 
 Шесть пресетов провайдеров используют вход через OAuth — плюс GitHub Copilot через
-экспериментальный неофициальный мост device flow. OpenProvider хранит их учётные данные в
-`~/.OpenProvider/auth.json` и обновляет их автоматически. CLI входа также принимает `chatgpt`: эта
+экспериментальный неофициальный мост device flow. opencodex хранит их учётные данные в
+`~/.opencodex/auth.json` и обновляет их автоматически. CLI входа также принимает `chatgpt`: эта
 команда получает учётные данные ChatGPT и одновременно создаёт запись провайдера в режиме `forward`.
 
 ```bash
-opr login xai          # xAI Grok
-opr login anthropic    # Anthropic Claude (Pro/Max)
-opr login kimi         # Moonshot Kimi
-opr login kiro         # импорт учётных данных kiro-cli (с фолбэком на токен)
-opr login google-antigravity
-opr login cursor       # отдельный PKCE-вход Cursor
-opr login github-copilot  # device flow GitHub → токен Copilot (Copilot Pro/Business)
-opr login chatgpt      # отдельный OAuth-вход ChatGPT
-opr logout <provider>
+ocx login xai          # xAI Grok
+ocx login anthropic    # Anthropic Claude (Pro/Max)
+ocx login kimi         # Moonshot Kimi
+ocx login kiro         # импорт учётных данных kiro-cli (с фолбэком на токен)
+ocx login google-antigravity
+ocx login cursor       # отдельный PKCE-вход Cursor
+ocx login github-copilot  # device flow GitHub → токен Copilot (Copilot Pro/Business)
+ocx login chatgpt      # отдельный OAuth-вход ChatGPT
+ocx logout <provider>
 ```
 
 | Провайдер | Адаптер | Базовый URL | Примечания |
@@ -88,10 +88,17 @@ opr logout <provider>
 | `xai` | `openai-chat` | `https://api.x.ai/v1` | Каталог Grok загружается в реальном времени; фолбэк по умолчанию — `grok-4.5`. |
 | `anthropic` | `anthropic` | `https://api.anthropic.com` | Модели Claude; актуальный список моделей загружается из `/v1/models`. |
 | `kimi` | `openai-chat` | `https://api.kimi.com/coding/v1` | Модели Kimi K2.7/K2.6/K2.5 для кодинга. |
-| `kiro` | `kiro` | `https://runtime.us-east-1.kiro.dev` | Вход сначала импортирует и переиспользует сессию установленного `kiro-cli`. Требуется установленный Kiro CLI (`curl -fsSL https://cli.kiro.dev/install | bash`) и вход через `kiro-cli login`. |
+| `kiro` | `kiro` | `https://runtime.us-east-1.kiro.dev` | Первый вход импортирует существующую сессию после установки Kiro CLI (`curl -fsSL https://cli.kiro.dev/install | bash`) и входа через `kiro-cli login`. **Добавить аккаунт** выполняет выход из `kiro-cli`, запускает новый вход через браузер, переключает аккаунт самого `kiro-cli` и сохраняет метаданные профиля отдельно для каждого аккаунта. Существующие аккаунты OpenCodex сохраняются; при отмене или сбое восстанавливается предыдущая сессия `kiro-cli`. |
 | `google-antigravity` | `google` | `https://daily-cloudcode-pa.googleapis.com` | Google OAuth поверх протокола Cloud Code Assist. |
 | `cursor` | `cursor` | `https://api2.cursor.sh` | Экспериментальный PKCE-вход, живой транспорт HTTP/2 и обнаружение моделей с фильтрацией по аккаунту. |
 | `github-copilot` | `openai-chat` | `https://api.githubcopilot.com` | Экспериментально. Device flow GitHub + обмен `copilot_internal` (OAuth-клиент VS Code). Требуется активная подписка Copilot; это не официальный сторонний API. |
+
+Для канонических пресетов Kimi Coding Plan (вход через аккаунт `kimi` и API-ключ `kimi-code`)
+opencodex передаёт в запрос Chat Completions только стабильный `prompt_cache_key`, предоставленный
+вызывающей стороной, и никогда не создаёт его сам. Документация Kimi требует стабильный ключ
+сессии/задачи для повышения доли попаданий в кэш Code Plan; запрос без ключа остаётся без ключа.
+Если включённый провайдер отклоняет поле, opencodex не удаляет его для повторной попытки и не
+изменяет сохранённую конфигурацию. Для остальных провайдеров действует deny-by-default.
 
 OAuth можно запустить и из [веб-дашборда](/ru/guides/web-dashboard/).
 
@@ -100,13 +107,26 @@ OAuth можно запустить и из [веб-дашборда](/ru/guides
 OAuth-провайдеры, чьи учётные данные содержат стабильный id аккаунта или email, могут хранить
 несколько входов. Страница Providers показывает эти аккаунты в выпадающем списке, позволяет
 добавить ещё один и переключает активный аккаунт, не выполняя выход из остальных. Учётные данные
-Kimi и Kiro без идентификатора заменяют свой активный слот, а `chatgpt` всегда занимает один слот,
-поскольку у пула аккаунтов Codex отдельный реестр. Токены остаются в `~/.OpenProvider/auth.json`;
+Только учётные данные Kimi без идентификатора заменяют активный слот; аккаунты Kiro сохраняются по ARN профиля.
+`chatgpt` всегда занимает один слот, поскольку у пула аккаунтов Codex отдельный реестр. Токены остаются в `~/.opencodex/auth.json`;
 `/api/oauth/accounts` возвращает только маскированные метаданные.
+
+### Импорт учётных данных Kiro
+
+Для входа Kiro требуется Kiro CLI: установите его командой `curl -fsSL https://cli.kiro.dev/install | bash` и сначала выполните `kiro-cli login`. Если сессии `kiro-cli` нет, `ocx login kiro` использует вставленный токен доступа или переменную окружения `KIRO_ACCESS_TOKEN`.
+
+Обычный импорт `ocx login kiro` открывает базу SQLite CLI только для чтения и не изменяет базу, WAL или SHM.
+
+- `KIROCLI_DB_PATH` выбирает нестандартную базу SQLite Kiro CLI; указанная база должна уже существовать.
+- `KIROCLI_TOKEN_KEY` выбирает точный ключ строки `auth_kv`, если найдено несколько неоднозначных строк с токенами. Без выбора вход завершается ошибкой, а не пытается угадать строку.
+
+Импортированные учётные данные сохраняются в `~/.opencodex/auth.json`. Откат **Добавить аккаунт** — отдельная операция: при восстановлении предыдущего снимка она заменяет базу и удаляет текущие sidecar-файлы WAL, SHM и journal.
+
+Поскольку откат возможен только при наличии снимка, **Добавить аккаунт** откажется выходить из `kiro-cli`, если хранилище сессии существует, но его нельзя захватить (файл не читается, несовпадение схемы, неоднозначный выбор токена), если `KIROCLI_DB_PATH` / `KIRO_CLI_DB_FILE` направляют импорт не на активное хранилище CLI, или если в основной базе CLI нет распознаваемой строки токена. Исправьте или удалите повреждённую базу по обычному пути данных `kiro-cli`, снимите селекторы только для импорта и повторите попытку. На машины без существующей сессии `kiro-cli` это не влияет.
 
 ## 3. Каталог API-ключей
 
-OpenProvider поставляется с 53 встроенными пресетами: 42 на основе ключей, семь OAuth, три локальных и
+opencodex поставляется с 53 встроенными пресетами: 42 на основе ключей, семь OAuth, три локальных и
 пресет ChatGPT-форварда по умолчанию. Селектор **Add provider** в дашборде открывает страницу
 выдачи ключей провайдера, проверяет ключ и сохраняет его. Наиболее заметные записи:
 
@@ -129,6 +149,7 @@ OpenProvider поставляется с 53 встроенными пресет�
 | Hugging Face | `https://router.huggingface.co/v1` |
 | NVIDIA NIM | `https://integrate.api.nvidia.com/v1` |
 | Z.AI (GLM Coding) | `https://api.z.ai/api/coding/paas/v4` |
+| Zhipu AI (BigModel) | `https://open.bigmodel.cn/api/paas/v4` |
 | Qwen Cloud | Token plan (по умолчанию): `https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1` · Pay as you go: `https://dashscope.aliyuncs.com/compatible-mode/v1` · или Custom |
 | Tencent Cloud Coding Plan | `https://api.lkeap.cloud.tencent.com/coding/v3` |
 | SiliconFlow | `https://api.siliconflow.cn/v1` |
@@ -146,6 +167,10 @@ OpenProvider поставляется с 53 встроенными пресет�
 > в интерактивных инструментах программирования. Автоматизация общего API, серверы пользовательских
 > приложений и неинтерактивные пакетные вызовы запрещены и могут привести к блокировке ключа плана.
 
+> **Два маршрута GLM:** `zai` — это международная подписка Z.AI на coding-план, а `zhipu-bigmodel` —
+> внутренняя китайская конечная точка BigModel с оплатой по факту использования. Разные хосты,
+> разные ключи, разная тарификация: ключ от одного сервиса не подойдёт к другому.
+
 ### Несколько API-ключей
 
 Провайдеры на основе ключей тоже могут хранить несколько ключей. Ключ, добавленный через страницу
@@ -156,14 +181,14 @@ Providers, сохраняется в `provider.apiKeyPool`, становится
 
 ### Переключение аккаунтов из терминала
 
-Используйте `opr account list`, `opr account current` и `opr account use`, чтобы просматривать и
+Используйте `ocx account list`, `ocx account current` и `ocx account use`, чтобы просматривать и
 переключать те же пулы Codex, OAuth и API-ключей, не открывая дашборд. Команды, JSON-вывод и
 поведение в новых сессиях описаны в разделе
-[Справочник CLI](/ru/reference/cli/#opr-account-subcommand).
+[Справочник CLI](/ru/reference/cli/#ocx-account-subcommand).
 
 ### Превью-маршруты GPT-5.6
 
-GPT-5.6 Sol/Terra/Luna заранее внесены в резервные списки провайдеров, чтобы `opr sync` сохранял
+GPT-5.6 Sol/Terra/Luna заранее внесены в резервные списки провайдеров, чтобы `ocx sync` сохранял
 модели видимыми, даже когда живые каталоги отстают:
 
 | Маршрут Codex | Предзаданные id моделей | Контекст, видимый Codex |
@@ -180,29 +205,29 @@ Luna есть `max`, но нет `ultra`). Маршрутизируемые за
 предзаданный список до моделей, доступных вошедшему аккаунту.
 
 :::note[Шлюзы и прокси по подписке]
-Провайдер попадает в список, когда у OpenProvider есть подходящий wire-адаптер, а **не** в зависимости
+Провайдер попадает в список, когда у opencodex есть подходящий wire-адаптер, а **не** в зависимости
 от того, является ли он «агентским» продуктом. Текущие id адаптеров: `openai-chat`,
 `openai-responses`, `anthropic`, `google` (режимы AI Studio, Vertex и Antigravity/Cloud Code
 Assist), `azure` / `azure-openai`, `kiro` и `cursor`. Проприетарный API без одной из этих
 реализаций — например, нативный Amazon Bedrock — напрямую не поддерживается.
-**GitHub Copilot** — это OAuth-провайдер (`opr login github-copilot`), который обменивает вход
+**GitHub Copilot** — это OAuth-провайдер (`ocx login github-copilot`), который обменивает вход
 через device flow GitHub на короткоживущий API-токен Copilot, а не принимает вставленный API-ключ.
 **GitLab Duo** остаётся шлюзом с ключом/токеном подписки на своей OpenAI-совместимой конечной
 точке. **Cloudflare AI Gateway** требует подставить в URL id аккаунта и шлюза.
 
 Cursor отслеживается отдельно как экспериментальный адаптер. `adapter: "cursor"` появляется в
-`opr init` и в селекторе Add Provider дашборда как экспериментальная запись локальной конфигурации
+`ocx init` и в селекторе Add Provider дашборда как экспериментальная запись локальной конфигурации
 с метаданными статического резервного каталога моделей Cursor. Когда настроен токен доступа Cursor,
-OpenProvider использует живой транспорт HTTP/2 Cursor. Его резервный список версии v2.7.1 включает
+opencodex использует живой транспорт HTTP/2 Cursor. Его резервный список версии v2.7.1 включает
 `gpt-5.6-sol` / `terra` / `luna` (контекст 1M) плюс `grok-4.5` / `grok-4.5-fast` (500K); живое
 обнаружение решает, какие из них останутся видимыми для аккаунта. Управляемое сервером Cursor
 нативное выполнение read/write/delete/ls/grep/shell/fetch по умолчанию отключено, поскольку оно
 обходит путь одобрений и песочницу Codex; устанавливайте `unsafeAllowNativeLocalExec: true` в
-объекте `providers.cursor` файла `~/.OpenProvider/config.json` только для доверенных локальных
+объекте `providers.cursor` файла `~/.opencodex/config.json` только для доверенных локальных
 экспериментов (или через **Providers → Cursor → Edit JSON** в дашборде). Полный пример см. в
 [справочнике по конфигурации](/ru/reference/configuration/#cursor-provider-adapter-cursor).
 MCP, запись экрана и computer-use доступны как хуки исполнителя; без настроенного локального
-исполнителя OpenProvider возвращает типизированные результаты «нет исполнителя», а не блокирует запрос
+исполнителя opencodex возвращает типизированные результаты «нет исполнителя», а не блокирует запрос
 политикой. Для этого экспериментального адаптера включены Cursor OAuth и живое обнаружение моделей;
 при этом Cursor по-прежнему не показывается в списках входа по ключу.
 :::
@@ -211,7 +236,7 @@ MCP, запись экрана и computer-use доступны как хуки 
 
 Ollama Cloud — это размещённая в облаке (не локальная) Ollama, OpenAI-совместимая по адресу
 `https://ollama.com/v1`, с ключом со страницы
-[ollama.com/settings/keys](https://ollama.com/settings/keys). OpenProvider классифицирует её облачную
+[ollama.com/settings/keys](https://ollama.com/settings/keys). opencodex классифицирует её облачную
 линейку по поддержке изображений, чтобы [vision-сайдкар](/ru/guides/sidecars/) включался
 только для текстовых моделей. Текстовые модели (например, `glm-5.2`, `deepseek-v4-pro`, `gpt-oss`,
 `qwen3-coder`, `minimax-m2.x`, `nemotron-3-*`) перечислены в `noVisionModels`; модели с нативной
@@ -221,7 +246,7 @@ Ollama Cloud — это размещённая в облаке (не локал�
 
 ## 4. Локальные провайдеры
 
-Направьте OpenProvider на локальный OpenAI-совместимый сервер — обычно с пустым ключом:
+Направьте opencodex на локальный OpenAI-совместимый сервер — обычно с пустым ключом:
 
 | Провайдер | Базовый URL |
 | --- | --- |
@@ -232,7 +257,6 @@ Ollama Cloud — это размещённая в облаке (не локал�
 ## Любая OpenAI-совместимая конечная точка
 
 Если провайдер поддерживает Chat Completions, с ним справится адаптер `openai-chat` — выберите
-**Custom** в дашборде или `custom` в `opr init` и введите базовый URL. Все поля провайдера
+**Custom** в дашборде или `custom` в `ocx init` и введите базовый URL. Все поля провайдера
 (`headers`, `noReasoningModels`, `noVisionModels`, `models`, …) описаны в
 [справочнике по конфигурации](/ru/reference/configuration/).
-

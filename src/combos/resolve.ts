@@ -1,11 +1,11 @@
-import type { OcxComboTarget, OcxConfig } from "../types";
+import type { oprComboTarget, oprConfig } from "../types";
 import { coolComboTarget, isComboTargetInCooldown } from "./failover";
 import { getCombo, resolveComboId, targetKey } from "./types";
 import type { NormalizedComboConfig } from "./types";
 
 export interface ComboPick {
   comboId: string;
-  target: Required<OcxComboTarget>;
+  target: Required<oprComboTarget>;
   targetIndex: number;
   attempted: string[];
 }
@@ -34,15 +34,15 @@ export class NoAvailableComboTargetsError extends Error {
   }
 }
 
-function targetProviderIsUsable(config: OcxConfig, target: OcxComboTarget): boolean {
+function targetProviderIsUsable(config: oprConfig, target: oprComboTarget): boolean {
   return Object.hasOwn(config.providers, target.provider)
     && config.providers[target.provider]?.disabled !== true;
 }
 
 function smoothWeightedIndex(
-  targets: Required<OcxComboTarget>[],
+  targets: Required<oprComboTarget>[],
   state: SelectionState,
-  eligible: (target: Required<OcxComboTarget>) => boolean,
+  eligible: (target: Required<oprComboTarget>) => boolean,
 ): number {
   let best = -1;
   let bestScore = Number.NEGATIVE_INFINITY;
@@ -67,17 +67,17 @@ function smoothWeightedIndex(
 }
 
 export function pickComboTarget(
-  config: OcxConfig,
+  config: oprConfig,
   comboId: string,
   options: {
     exclude?: Iterable<string>;
-    eligible?: (target: Required<OcxComboTarget>) => boolean;
+    eligible?: (target: Required<oprComboTarget>) => boolean;
   } = {},
 ): ComboPick | null {
   const combo = getCombo(config, comboId);
   if (!combo) throw new UnknownComboError(comboId);
   const excluded = new Set(options.exclude ?? []);
-  const eligible = (target: Required<OcxComboTarget>): boolean =>
+  const eligible = (target: Required<oprComboTarget>): boolean =>
     targetProviderIsUsable(config, target)
     && !excluded.has(targetKey(target))
     && (options.eligible?.(target) ?? true);
@@ -120,7 +120,7 @@ export function pickComboTarget(
 export function noteComboSuccess(
   comboId: string,
   combo: NormalizedComboConfig,
-  target: Required<OcxComboTarget>,
+  target: Required<oprComboTarget>,
 ): void {
   if (combo.strategy !== "round-robin") return;
   const state = selectionState.get(comboId);
@@ -132,7 +132,7 @@ export function noteComboSuccess(
   }
 }
 
-export function noteComboFailure(comboId: string, target: OcxComboTarget): void {
+export function noteComboFailure(comboId: string, target: oprComboTarget): void {
   const state = selectionState.get(comboId);
   if (state?.activeKey === targetKey(target)) {
     delete state.activeKey;
@@ -141,12 +141,12 @@ export function noteComboFailure(comboId: string, target: OcxComboTarget): void 
 }
 
 export function advanceComboAfterFailure(
-  config: OcxConfig,
+  config: oprConfig,
   pick: ComboPick,
   options: {
     retryAfter?: string | null;
     now?: number;
-    eligible?: (target: Required<OcxComboTarget>) => boolean;
+    eligible?: (target: Required<oprComboTarget>) => boolean;
   } = {},
 ): ComboPick | null {
   noteComboFailure(pick.comboId, pick.target);
@@ -166,7 +166,7 @@ export function clearComboSelectionState(comboId?: string): void {
   selectionState.delete(comboId);
 }
 
-export function tryPickComboModel(config: OcxConfig, modelId: string): ComboPick | null {
+export function tryPickComboModel(config: oprConfig, modelId: string): ComboPick | null {
   const comboId = resolveComboId(config, modelId);
   if (!comboId) return null;
   if (!getCombo(config, comboId)) throw new UnknownComboError(comboId);
@@ -174,3 +174,4 @@ export function tryPickComboModel(config: OcxConfig, modelId: string): ComboPick
   if (!picked) throw new NoAvailableComboTargetsError(comboId);
   return picked;
 }
+

@@ -1,11 +1,12 @@
-import type { OcxProviderConfig } from "../types";
+import type { oprProviderConfig } from "../types";
 import { deriveKeyLoginMap, enrichProviderFromRegistry, type DerivedKeyLoginProvider } from "../providers/derive";
 
 /**
  * API-key "login" providers: not OAuth — the flow opens the provider's dashboard so the user can
  * create/copy a key, then validates + stores it as the provider's `apiKey` (authMode "key").
  * Most use the OpenAI-compatible chat API (`openai-chat` adapter, `Authorization: Bearer <key>`); a
- * few expose only an Anthropic-compatible endpoint and set `adapter: "anthropic"` (`x-api-key`).
+ * few expose only an Anthropic-compatible endpoint and set `adapter: "anthropic"` (default
+ * `x-api-key`, optional bearer via `apiKeyTransport`).
  */
 export interface KeyLoginProvider extends DerivedKeyLoginProvider {}
 
@@ -17,7 +18,7 @@ export const KEY_LOGIN_PROVIDERS: Record<string, KeyLoginProvider> = deriveKeyLo
  * caller didn't already supply. Lets the vision/reasoning classification actually reach the saved
  * config (the GUI/API only send adapter/baseUrl/apiKey/defaultModel). No-op for unknown names.
  */
-export function enrichProviderFromCatalog(name: string, prov: OcxProviderConfig): void {
+export function enrichProviderFromCatalog(name: string, prov: oprProviderConfig): void {
   enrichProviderFromRegistry(name, prov);
 }
 
@@ -29,6 +30,20 @@ export function listKeyLoginProviders(): Array<{ id: string } & KeyLoginProvider
   return Object.entries(KEY_LOGIN_PROVIDERS).map(([id, p]) => ({ id, ...p }));
 }
 
+function anthropicKeyValidationHeaders(provider: Pick<KeyLoginProvider, "apiKeyTransport">, key: string): HeadersInit {
+  return provider.apiKeyTransport === "bearer"
+    ? {
+      "Content-Type": "application/json",
+      "anthropic-version": "2023-06-01",
+      "Authorization": `Bearer ${key}`,
+    }
+    : {
+      "Content-Type": "application/json",
+      "anthropic-version": "2023-06-01",
+      "x-api-key": key,
+    };
+}
+
 /** Best-effort key validation. Returns true/false/unknown; never persists the key itself. */
 export async function validateApiKey(provider: KeyLoginProvider, key: string): Promise<boolean | "unknown"> {
   try {
@@ -36,11 +51,7 @@ export async function validateApiKey(provider: KeyLoginProvider, key: string): P
       const base = provider.baseUrl.replace(/\/v1\/?$/, "");
       const res = await fetch(`${base}/v1/messages`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "anthropic-version": "2023-06-01",
-          "x-api-key": key,
-        },
+        headers: anthropicKeyValidationHeaders(provider, key),
         body: JSON.stringify({
           model: provider.defaultModel ?? "claude-haiku-4-5",
           max_tokens: 1,
@@ -76,3 +87,4 @@ export async function validateApiKey(provider: KeyLoginProvider, key: string): P
     return "unknown";
   }
 }
+

@@ -17,8 +17,8 @@ surface; openai/codex#14695 confirms function_call_output array-output shape bre
    - outputToToolResultContent: handles input_text (was silently dropped -> MCP text+image outputs
      lost ALL text), encrypted_content -> "[encrypted content omitted]" marker.
    - custom_tool_call_output arrays normalized via outputToToolResultContent (was leaking raw wire
-     blocks into OcxContentPart[]).
-   - context_compaction: ocx1 payload -> replayed summary user message; empty marker -> silent drop;
+     blocks into oprContentPart[]).
+   - context_compaction: opr1 payload -> replayed summary user message; empty marker -> silent drop;
      never sets _compactionRequest (only compaction_trigger does).
    - local_shell_call replay -> assistant toolCall {name:"shell", arguments:{command}} so the paired
      function_call_output no longer orphans.
@@ -28,7 +28,7 @@ surface; openai/codex#14695 confirms function_call_output array-output shape bre
      and would 400 on "original").
 
 3. src/adapters/openai-responses.ts
-   - scrubOcxCompactionItems also scrubs ocx1 context_compaction items on the passthrough forward path.
+   - scruboprCompactionItems also scrubs opr1 context_compaction items on the passthrough forward path.
 
 ## Verification (C evidence)
 - bun test ./tests/  -> 1543 pass, 0 fail, 159 files (was 1532; +11 new regression tests in
@@ -41,3 +41,4 @@ surface; openai/codex#14695 confirms function_call_output array-output shape bre
 - ToolSearchCall/ToolSearchOutput `execution` field: informational; not needed for pairing.
 
 ## Not live until opr restart (still pending user approval, along with image-guard + compaction v2).
+

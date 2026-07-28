@@ -10,7 +10,7 @@ Safety boundary:
 
 - Allowed exec cases: `requestContextArgs`, `readArgs`, `lsArgs`, `grepArgs`.
 - Denied exec cases: `writeArgs`, `deleteArgs`, `shellArgs`, `shellStreamArgs`, `diagnosticsArgs`, `mcpArgs`, `fetchArgs`, `recordScreenArgs`, `computerUseArgs`, and unknown cases.
-- Verification may use static/type checks and OCX read-only requests only. No destructive Cursor experiments.
+- Verification may use static/type checks and opr read-only requests only. No destructive Cursor experiments.
 
 ## Existing source of truth reused
 
@@ -55,7 +55,7 @@ export interface IncomingMeta {
 export interface ProviderAdapter {
   name: string;
 
-  buildRequest(parsed: OcxParsedRequest, incoming?: IncomingMeta): {
+  buildRequest(parsed: oprParsedRequest, incoming?: IncomingMeta): {
     url: string;
     method: string;
     headers: Record<string, string>;
@@ -79,7 +79,7 @@ export interface IncomingMeta {
 export interface ProviderAdapter {
   name: string;
 
-  buildRequest(parsed: OcxParsedRequest, incoming?: IncomingMeta): {
+  buildRequest(parsed: oprParsedRequest, incoming?: IncomingMeta): {
     url: string;
     method: string;
     headers: Record<string, string>;
@@ -89,7 +89,7 @@ export interface ProviderAdapter {
   parseStream(response: Response): AsyncGenerator<AdapterEvent>;
   parseResponse?(response: Response): Promise<AdapterEvent[]>;
   runTurn?(
-    parsed: OcxParsedRequest,
+    parsed: oprParsedRequest,
     incoming: IncomingMeta,
     emit: (event: AdapterEvent) => void,
   ): Promise<void>;
@@ -125,10 +125,10 @@ Behavior:
 
 ### MODIFY `src/types.ts`
 
-Add Cursor-specific local safety config to `OcxProviderConfig`.
+Add Cursor-specific local safety config to `oprProviderConfig`.
 
 ```ts
-export interface OcxProviderConfig {
+export interface oprProviderConfig {
   // ...
   cursorWorkspaceRoot?: string;
   cursorReadOnlyExec?: boolean;
@@ -235,7 +235,7 @@ Responsibilities:
 
 ### NEW `src/adapters/cursor/request-builder.ts`
 
-Purpose: build a minimal Cursor `AgentRunRequest` from `OcxParsedRequest`.
+Purpose: build a minimal Cursor `AgentRunRequest` from `oprParsedRequest`.
 
 Scope:
 
@@ -331,7 +331,7 @@ Add or update focused tests only for safe/read-only behavior:
 
 Live verification:
 
-- Use OCX read-only request only after static checks pass and credentials are available.
+- Use opr read-only request only after static checks pass and credentials are available.
 - Do not test `write`, `delete`, `shell`, `shellStream`, `diagnostics`, `mcp`, `fetch`, `recordScreen`, `computerUse`, or unknown denied cases by sending live Cursor requests.
 - Safe tests may instantiate policy/handler functions locally with fixtures to prove denial without contacting Cursor.
 - Live smoke can prove denied requests are not executed; it cannot prove Cursor never attempted one. Logs/policy counters should distinguish attempted-vs-executed.
@@ -362,11 +362,11 @@ Live verification:
 - Wire adapter `runTurn`.
 - Commit after typecheck and safe mocked tests.
 
-### Phase 5: OCX read-only smoke
+### Phase 5: opr read-only smoke
 
 - Start openprovider locally.
 - Configure Cursor provider only if credential exists or OAuth login can be completed safely.
-- Send read-only prompt/request through OCX.
+- Send read-only prompt/request through opr.
 - Verify no write/delete/shell/MCP request is sent or executed.
 
 ## Explicitly out of scope
@@ -380,3 +380,4 @@ Live verification:
 - Screen recording.
 
 Those require separate approval and a dedicated security review.
+

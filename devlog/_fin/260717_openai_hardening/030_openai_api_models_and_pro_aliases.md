@@ -3,7 +3,7 @@
 ## Objective
 
 Add eight OpenAI API choices total: existing `gpt-5.5` plus seven GPT-5.6 ids,
-of which exactly three are API-only virtual Pro choices. Keep virtual identity on OCX
+of which exactly three are API-only virtual Pro choices. Keep virtual identity on opr
 catalog, selection, request-log, and usage surfaces. Upstream HTTP JSON/SSE and real
 WebSocket response payloads retain the base model unchanged so the Windows native-relay
 safety invariant is preserved; record that base separately as resolved identity.
@@ -12,7 +12,7 @@ safety invariant is preserved; record that base separately as resolved identity.
 
 ### MODIFY `src/types.ts`, `src/config.ts`, and `src/server/auth-cors.ts`
 
-Add `modelMaxInputTokens?: Record<string, number>` to `OcxProviderConfig`. Disk-load
+Add `modelMaxInputTokens?: Record<string, number>` to `oprProviderConfig`. Disk-load
 schema and management admission both require a plain own-property record of positive
 finite integers. Zero, negative, fractional, string, array, null, inherited, or
 non-finite values fail with 400 and do not overwrite prior config. Do not add virtual
@@ -65,7 +65,7 @@ resolveOpenAiVirtualModel(
   selectedModelId: string,
 ): OpenAiVirtualModelResolution | undefined;
 applyOpenAiVirtualModel(
-  parsed: OcxParsedRequest,
+  parsed: oprParsedRequest,
   route: RouteResult,
   logCtx: RequestLogContext,
 ): OpenAiVirtualModelResolution | undefined;
@@ -109,7 +109,7 @@ turn reapplies Pro mode.
 - Routed `auto_compact_token_limit` becomes
   `min(floor(effectiveContextWindow*0.9), maxInputTokens)`; a 350K user cap stays 315K.
 - Add exact
-  `augmentRoutedModelsWithRegistryOpenAiApiRows(models: CatalogModel[], config: OcxConfig): CatalogModel[]`
+  `augmentRoutedModelsWithRegistryOpenAiApiRows(models: CatalogModel[], config: oprConfig): CatalogModel[]`
   after live/static gathering and before visibility/sort. When API tier is enabled it
   filters that provider to the exact eight-id trusted allowlist, removes unrelated live
   OpenAI rows, and deterministically rebuilds `gpt-5.5` plus all seven registry-owned
@@ -148,7 +148,7 @@ Change the compact signature to:
 ```ts
 export async function handleResponsesCompact(
   req: Request,
-  config: OcxConfig,
+  config: oprConfig,
   logCtx: RequestLogContext,
 ): Promise<Response>;
 ```
@@ -275,3 +275,4 @@ transformed.
 gaps in `df740d84`. Final transport/runtime proof and terminal criteria are indexed in
 [`050_integration_verification.md`](./050_integration_verification.md),
 [`190_consolidated_finish_plan.md`](./190_consolidated_finish_plan.md), and the `051` audit.
+

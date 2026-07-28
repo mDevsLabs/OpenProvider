@@ -14,7 +14,7 @@ API provider; other providers use normal fill semantics.
 - Disk config schema rejects inherited, null, array, zero, negative, fractional, string, Infinity
 - Management API rejects same + returns 400 with field path
 - `src/router.ts` `mergePositiveNumberCaps` for API tier; `mergeRecordFill` for others
-- `modelMaxInputTokens` on `OcxProviderConfig` in `src/types.ts`
+- `modelMaxInputTokens` on `oprProviderConfig` in `src/types.ts`
 - Management admission accepts validated max-input maps, disk persists them, and
   routing consumes them, but `safeConfigDTO` and `/api/config` omit them
 - `src/server/auth-cors.ts` FORBIDDEN_PROVIDER_RUNTIME_FIELDS excludes max-input
@@ -44,3 +44,4 @@ API provider; other providers use normal fill semantics.
 - The Cycle A matrix, including `tests/config.test.ts` and `tests/server-auth.test.ts`,
   passed 266 tests with 0 failures and 1,492 assertions, covering disk/management
   rejection, valid persistence, and DTO redaction.
+

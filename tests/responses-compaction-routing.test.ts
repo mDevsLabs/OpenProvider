@@ -7,7 +7,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { handleResponses } from "../src/server/responses";
 import { supportsNativeResponsesCompactEndpoint } from "../src/providers/openai-tiers";
-import type { OcxConfig, OcxProviderConfig } from "../src/types";
+import type { oprConfig, oprProviderConfig } from "../src/types";
 
 const originalFetch = globalThis.fetch;
 
@@ -15,7 +15,7 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
 });
 
-function keyProviderConfig(overrides: Partial<OcxProviderConfig> = {}): OcxConfig {
+function keyProviderConfig(overrides: Partial<oprProviderConfig> = {}): oprConfig {
   return {
     defaultProvider: "gw",
     providers: {
@@ -27,7 +27,7 @@ function keyProviderConfig(overrides: Partial<OcxProviderConfig> = {}): OcxConfi
         ...overrides,
       },
     },
-  } as unknown as OcxConfig;
+  } as unknown as oprConfig;
 }
 
 function compactionRequest(body: Record<string, unknown>): Request {
@@ -82,12 +82,12 @@ describe("supportsNativeResponsesCompactEndpoint (#422)", () => {
     adapter: "openai-responses",
     baseUrl: "https://chatgpt.com/backend-api/codex",
     authMode: "forward",
-  } as OcxProviderConfig;
+  } as oprProviderConfig;
   const officialApi = {
     adapter: "openai-responses",
     baseUrl: "https://api.openai.com/v1",
     authMode: "key",
-  } as OcxProviderConfig;
+  } as oprProviderConfig;
 
   test("accepts the canonical ChatGPT backend and the official OpenAI API", () => {
     expect(supportsNativeResponsesCompactEndpoint("openai", canonicalForward)).toBe(true);
@@ -103,7 +103,7 @@ describe("supportsNativeResponsesCompactEndpoint (#422)", () => {
       adapter: "openai-responses",
       baseUrl: "https://gateway.example/v1",
       authMode: "key",
-    } as OcxProviderConfig)).toBe(false);
+    } as oprProviderConfig)).toBe(false);
     // Right provider id, wrong destination.
     expect(supportsNativeResponsesCompactEndpoint("openai-apikey", {
       ...officialApi,
@@ -276,3 +276,4 @@ describe("compaction terminal handling (#422)", () => {
     expect(await res.text()).toContain("\"type\":\"compaction\"");
   });
 });
+

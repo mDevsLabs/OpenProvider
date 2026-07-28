@@ -51,7 +51,7 @@
   `process.execPath [process.argv[1], "stop"]` (inherit stdio) — graceful drain via
   `/api/stop` (loop 1), service stop, native Codex restore. Print that the proxy was
   stopped and must be restarted (`opr start` / `opr service install`).
-- `bin/ocx.mjs` `runNpmSelfUpdate()`: same pre-step — `spawnSync(process.execPath,
+- `bin/opr.mjs` `runNpmSelfUpdate()`: same pre-step — `spawnSync(process.execPath,
   [launcher, "stop"], { stdio: "inherit" })` before `npm install -g` (idempotent; prints
   "No running proxy found" when nothing runs).
 
@@ -69,9 +69,9 @@
   without runtime state.
 - `tests/service.test.ts` (extend): source-scan `stopTrackedProxyIfRunning` also calls
   `removeRuntimePort(pid);`; install-state records bunPath/cliPath; status flags missing
-  baked paths (unit via written state file + temp OPENCODEX_HOME).
+  baked paths (unit via written state file + temp @mdevs/openprovider_HOME).
 - `tests/update-stop-first.test.ts` (new): source-scan `src/update.ts` +
-  `bin/ocx.mjs` for the stop-before-update invocation ordering.
+  `bin/opr.mjs` for the stop-before-update invocation ordering.
 
 ## Verification gate (C)
 `bun x tsc --noEmit` + full `bun test ./tests/` (baseline 1269 pass / 0 fail).
@@ -80,14 +80,14 @@
 
 1. Liveness helpers shipped in new `src/proxy-liveness.ts` (cli.ts dispatches argv at
    module top — confirmed unimportable by tests).
-2. Stale line refs noted (healthz at server.ts:2011; npm short-circuit at ocx.mjs:166-168).
+2. Stale line refs noted (healthz at server.ts:2011; npm short-circuit at opr.mjs:166-168).
 3. `handleEnsure` now always syncs the live-probed port (`config.port ?? port` removed).
 4. Identity-aware liveness extended to `cli-status.ts` (foreign 200 → "not an openprovider
    proxy") and `oauth/login-cli.ts` (`notifyRunningProxy` uses findLiveProxy + 127.0.0.1
    instead of localhost + config.port). `opr gui` left as-is (already runtime-port based).
-5. ocx.mjs stop-before-update resolves its own launcher path via `fileURLToPath(import.meta.url)`
+5. opr.mjs stop-before-update resolves its own launcher path via `fileURLToPath(import.meta.url)`
    (runs before Bun is resolved).
-- Compat guard added beyond the plan: `isOpencodexHealthz` accepts the legacy
+- Compat guard added beyond the plan: `is@mdevs/openproviderHealthz` accepts the legacy
   `{status, version, uptime}` body so a still-running pre-identity proxy isn't mistaken
   for a foreign server right after an update.
 
@@ -105,3 +105,5 @@
    launcher handles npm installs itself, so update.ts only runs under bun/source).
 5. Does `waitForProxy`'s current caller rely on it returning `config.port` specifically
    (post-spawn port persistence interplay with `shouldPersistSelectedPort`)?
+
+

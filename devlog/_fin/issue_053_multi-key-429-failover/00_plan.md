@@ -11,7 +11,7 @@ The Codex provider (OpenAI) has sophisticated multi-account failover via
 `src/codex/routing.ts`: on 429 it puts the account in cooldown, clears thread
 affinity, and rotates to the next lowest-usage account. Non-OpenAI providers
 already have an `apiKeyPool` mechanism (`src/providers/api-keys.ts`,
-`OcxProviderConfig.apiKeyPool`) for storing multiple API keys, but the pool was
+`oprProviderConfig.apiKeyPool`) for storing multiple API keys, but the pool was
 management-only (add/remove/switch active key via `/api/providers/keys`). When a
 non-OpenAI upstream returned 429, the error was forwarded directly to the client
 with no retry.
@@ -76,3 +76,4 @@ automatically.
 
 - `bun x tsc --noEmit` — exit 0
 - `bun test ./tests/` — 1580 pass / 0 fail
+

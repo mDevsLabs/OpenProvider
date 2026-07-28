@@ -15,7 +15,7 @@
    pid/runtime-port 덮어쓰기(cli/index.ts:136-139)에 **더해 Codex 설정 인젝션 등
    공유 상태 부작용**이 있으므로 스모크에 사용하지 않는다. 대신 e2e 테스트와 동일한
    `startServer()` 직접 부팅:
-   - `OPENCODEX_HOME=$(mktemp -d)` **+ `CODEX_HOME=$(mktemp -d)`(선-생성 필수 —
+   - `@mdevs/openprovider_HOME=$(mktemp -d)` **+ `CODEX_HOME=$(mktemp -d)`(선-생성 필수 —
      paths.ts:26이 모듈 로드 시 1회 해석하고 부재 시 throw)** 격리: startServer()는
      index.ts:185에서 `invalidateCodexModelsCache()`를 불러 `$CODEX_HOME/models_cache.json`
      을 재작성하므로(재감사 blocker) CODEX_HOME 미격리 시 라이브 `~/.codex` 오염.
@@ -39,3 +39,4 @@
 - goalplan cr1~cr3의 capturedEvidence가 모두 채워져 있음을 교차 확인.
 - D 클로즈에 LOOP-PESSIMIST-01: 안 된 것(미검증 잔여 — Claude Code의 mid-stream
   overloaded 재시도 여부, 라이브 미반영)을 명시.
+

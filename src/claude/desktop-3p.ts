@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { atomicWriteFile } from "../config";
 import type { OcxClaudeDesktopProfile } from "../types";
+import { claudeDesktopConfigLibraryDir, resolveConfigLibraryDir } from "./desktop-3p-paths";
 import {
   reconcileDesktopProfile,
   renderDesktopProfile,
@@ -49,7 +50,34 @@ export interface Desktop3pRoutedModel {
  */
 export const DESKTOP_SUPPORTS_1M_THRESHOLD = 1_000_000;
 
-/** CLI arg parsing for `opr claude desktop` mode flags (mutually exclusive). */
+export interface Desktop3pConfigLibraryOptions {
+  env?: NodeJS.ProcessEnv;
+  platform?: NodeJS.Platform;
+  homeDir?: string;
+}
+
+/**
+ * Resolve the config library from the same user-data root Claude Desktop uses. Keeping this in one
+ * helper prevents the writer and dashboard status probe from agreeing on a path Desktop never reads.
+ *
+ * The resolution itself lives in `./desktop-3p-paths`, which ports Claude Desktop's own `GE()`
+ * branch for branch — including the `-3p` suffix the app appends to its userData root. Dropping
+ * that suffix points us at a directory Desktop never reads (GitHub #539).
+ */
+export function resolveDesktop3pConfigLibraryPath(
+  options: Desktop3pConfigLibraryOptions = {},
+): string {
+  if (options.env === undefined && options.platform === undefined && options.homeDir === undefined) {
+    return claudeDesktopConfigLibraryDir();
+  }
+  return resolveConfigLibraryDir({
+    env: options.env ?? process.env,
+    platform: options.platform ?? process.platform,
+    home: options.homeDir ?? homedir(),
+  });
+}
+
+/** CLI arg parsing for `ocx claude desktop` mode flags (mutually exclusive). */
 export function parseDesktop3pModeArgs(flags: string[]): { mode: Desktop3pConfigMode } | { error: string } {
   const known = new Map<string, Desktop3pConfigMode>([
     ["--static", "static"],
@@ -168,7 +196,7 @@ function collectDesktop3pModels(
       const legacy = legacyDesktop3pAlias(provider, id);
       const existing = registry.get(legacy);
       if (existing && existing !== model.route) {
-        console.warn(`[openprovider] Claude Desktop legacy alias collision: ${legacy} stays bound to ${existing}; ignoring ${model.route}`);
+        console.warn(`[opencodex] Claude Desktop legacy alias collision: ${legacy} stays bound to ${existing}; ignoring ${model.route}`);
         continue;
       }
       registry.set(legacy, model.route);
@@ -198,7 +226,7 @@ function collectDesktop3pModels(
     }
     const existingRoute = registry.get(alias);
     if (existingRoute !== undefined) {
-      console.warn(`[openprovider] Claude Desktop 3P alias collision: ${alias} maps to both ${existingRoute} and ${route}; skipping ${route}`);
+      console.warn(`[opencodex] Claude Desktop 3P alias collision: ${alias} maps to both ${existingRoute} and ${route}; skipping ${route}`);
       continue;
     }
 
@@ -264,7 +292,7 @@ export function generateDesktop3pConfig(
   port: number,
   nativeSlugs: string[],
   routedModels: Array<Desktop3pRoutedModel>,
-  apiKey = "opr",
+  apiKey = "ocx",
   mode: Desktop3pConfigMode = "static",
   profile?: OcxClaudeDesktopProfile,
 ): object {
@@ -299,7 +327,7 @@ function parseMetadata(path: string): Desktop3pMetadata {
   return { ...parsed, entries: parsed.entries };
 }
 
-/** Write and apply the openprovider config in Claude Desktop 3P's config library. */
+/** Write and apply the opencodex config in Claude Desktop 3P's config library. */
 export function writeDesktop3pConfig(
   port: number,
   nativeSlugs: string[],
@@ -308,18 +336,17 @@ export function writeDesktop3pConfig(
   mode: Desktop3pConfigMode = "static",
   profile?: OcxClaudeDesktopProfile,
 ): { written: boolean; path: string; reason?: string; fingerprint?: string } {
-  const libraryPath = process.env.OPENPROVIDER_CLAUDE_DESKTOP_CONFIG_DIR?.trim()
-    || join(homedir(), "Library", "Application Support", "Claude-3p", "configLibrary");
+  const libraryPath = resolveDesktop3pConfigLibraryPath();
   const metadataPath = join(libraryPath, "_meta.json");
   let configPath = libraryPath;
 
   try {
     mkdirSync(libraryPath, { recursive: true, mode: 0o700 });
     const metadata = parseMetadata(metadataPath);
-    const existing = metadata.entries.find(entry => entry?.name === "openprovider" && typeof entry.id === "string");
+    const existing = metadata.entries.find(entry => entry?.name === "opencodex" && typeof entry.id === "string");
     const id = existing?.id ?? randomUUID();
     configPath = join(libraryPath, `${id}.json`);
-    const entry: Desktop3pMetadataEntry = existing ? { ...existing, id, name: "openprovider" } : { id, name: "openprovider" };
+    const entry: Desktop3pMetadataEntry = existing ? { ...existing, id, name: "opencodex" } : { id, name: "opencodex" };
     const entries = existing
       ? metadata.entries.map(current => current === existing ? entry : current)
       : [...metadata.entries, entry];

@@ -15,7 +15,7 @@ Windows에서 `opr service install`로 서비스를 설치하면 Task Scheduler 
 2. Task action이 콘솔 프로그램인 `.cmd` 배치를 직접 실행합니다 (같은 파일 375행 부근, `<Command>`가 래퍼 `.cmd`). 대화형 세션 + 콘솔 서브시스템 조합이라 창이 보입니다.
 3. 창을 숨기는 hidden-launch 메커니즘이 없습니다. `<Hidden>`은 Task Scheduler UI 목록 숨김 설정일 뿐 콘솔 창과 무관하고(MS Learn TaskSettings.Hidden), `windowsHide: true`는 openprovider가 `schtasks.exe`를 호출할 때만 적용되어 등록된 태스크의 실행 창에는 영향이 없습니다. 래퍼 스크립트의 "runs in its own hidden console" 주석(`src/service.ts` 298행 부근)은 실제 동작과 모순됩니다.
 
-창을 닫으면 Windows가 해당 콘솔의 모든 프로세스에 `CTRL_CLOSE_EVENT`를 보내고 기본 핸들러가 프로세스를 종료합니다(MS Learn HandlerRoutine). 래퍼가 Bun을 동기 실행하므로(`"%OCX_BUN%" "%OCX_CLI%" start`) 래퍼와 프록시가 같은 콘솔 수명에 묶여 함께 죽고, 배치 내부의 5초 재시작 루프도 배치 자체가 죽어 무력화됩니다.
+창을 닫으면 Windows가 해당 콘솔의 모든 프로세스에 `CTRL_CLOSE_EVENT`를 보내고 기본 핸들러가 프로세스를 종료합니다(MS Learn HandlerRoutine). 래퍼가 Bun을 동기 실행하므로(`"%opr_BUN%" "%opr_CLI%" start`) 래퍼와 프록시가 같은 콘솔 수명에 묶여 함께 죽고, 배치 내부의 5초 재시작 루프도 배치 자체가 죽어 무력화됩니다.
 
 `opr stop`으로 정상 종료하면 서비스 매니저 중지 → graceful drain → 네이티브 Codex 복원까지 완결되므로 문제가 없습니다. 문제는 콘솔 창 닫기류(창 X 버튼이 대표 재현이며 세션 logoff, 작업 관리자 강제 종료도 같은 계열)의 강제 종료 경로에만 있습니다.
 
@@ -74,3 +74,4 @@ Microsoft Windows 11 (커뮤니티 제보 기준; InteractiveToken 등록은 모
 - https://learn.microsoft.com/en-us/windows/win32/taskschd/tasksettings-hidden
 - https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-logontype-simpletype
 - https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-restartonfailure-settingstype-element
+

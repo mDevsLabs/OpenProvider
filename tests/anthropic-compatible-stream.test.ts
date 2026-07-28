@@ -2,14 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { createAnthropicAdapter } from "../src/adapters/anthropic";
 import { bridgeToResponsesSSE } from "../src/bridge";
 import { responsesSseToAnthropicSse } from "../src/claude/outbound";
-import type { AdapterEvent, OcxProviderConfig } from "../src/types";
+import type { AdapterEvent, oprProviderConfig } from "../src/types";
 
 const provider = {
   adapter: "anthropic",
   baseUrl: "https://api.kimi.com/coding",
   apiKey: "test-key",
   authMode: "key",
-} as OcxProviderConfig;
+} as oprProviderConfig;
 
 const kimiCompatibleSse = [
   'event: message_start\ndata: {"type":"message_start","message":{}}',
@@ -215,3 +215,4 @@ describe("Anthropic-compatible reasoning stream termination (#312)", () => {
     ]);
   });
 });
+

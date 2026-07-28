@@ -420,14 +420,14 @@ function spawnTray(state: WindowsTrayEntry): void {
     windowsHide: true,
     env: {
       ...process.env,
-      OCX_TRAY_ENTRY_B64: Buffer.from(JSON.stringify(state), "utf8").toString("base64"),
+      opr_TRAY_ENTRY_B64: Buffer.from(JSON.stringify(state), "utf8").toString("base64"),
     },
   });
   child.unref();
 }
 
 function parseTrayHostEntry(): WindowsTrayEntry {
-  const encoded = process.env.OCX_TRAY_ENTRY_B64;
+  const encoded = process.env.opr_TRAY_ENTRY_B64;
   if (!encoded) throw new Error("Missing tray host entry.");
   const value = JSON.parse(Buffer.from(encoded, "base64").toString("utf8")) as Partial<WindowsTrayEntry>;
   for (const key of ["bun", "cli", "script", "codexHome", "openproviderHome"] as const) {
@@ -441,7 +441,7 @@ function parseTrayHostEntry(): WindowsTrayEntry {
 export async function runWindowsTrayHost(): Promise<void> {
   assertWindows();
   const entry = parseTrayHostEntry();
-  delete process.env.OCX_TRAY_ENTRY_B64;
+  delete process.env.opr_TRAY_ENTRY_B64;
   const child = spawn(windowsPowerShellPath(), windowsTrayProcessArgs(entry, "Run", process.pid), {
     stdio: "ignore",
     windowsHide: true,
@@ -626,4 +626,5 @@ export async function windowsTrayCommand(args: string[]): Promise<void> {
     process.exitCode = 1;
   }
 }
+
 

@@ -1,4 +1,4 @@
-import type { OcxConfig } from "../../types";
+import type { oprConfig } from "../../types";
 import { probeHostname } from "../proxy-liveness";
 
 export interface ApiAccessEndpoints {
@@ -66,7 +66,7 @@ function originBaseUrl(raw: string): string | null {
  * Falls back to loopback only when no usable request context is available.
  */
 export function resolveApiAccessBaseUrl(
-  config: Pick<OcxConfig, "hostname" | "port">,
+  config: Pick<oprConfig, "hostname" | "port">,
   opts: BuildApiAccessEndpointsOptions = {},
 ): string {
   const port = config.port ?? 10100;
@@ -124,7 +124,7 @@ export function resolveApiAccessDisplayHost(
 }
 
 export function buildApiAccessEndpoints(
-  config: OcxConfig,
+  config: oprConfig,
   opts: BuildApiAccessEndpointsOptions = {},
 ): ApiAccessEndpoints {
   const baseUrl = resolveApiAccessBaseUrl(config, opts);
@@ -139,3 +139,4 @@ export function buildApiAccessEndpoints(
     endpoint: responsesEndpoint,
   };
 }
+

@@ -44,7 +44,7 @@ afterEach(() => {
 const EXISTING_KEY = {
   id: "key-1",
   name: "existing-key",
-  prefix: "ocx_exist",
+  prefix: "opr_exist",
   createdAt: "2026-01-15T12:00:00.000Z",
 };
 
@@ -83,7 +83,7 @@ test("successful key create keeps last-good keys visible when follow-up refresh 
       return new Response("upstream unavailable", { status: 503 });
     }
     if (url.endsWith("/api/keys") && method === "POST") {
-      return Response.json({ key: "ocx_new_secret_value_only_shown_once" });
+      return Response.json({ key: "opr_new_secret_value_only_shown_once" });
     }
     return new Response(null, { status: 404 });
   }) as typeof fetch;
@@ -104,7 +104,7 @@ test("successful key create keeps last-good keys visible when follow-up refresh 
     });
 
     expect(container.textContent).toContain("existing-key");
-    expect(container.textContent).toContain("ocx_exist");
+    expect(container.textContent).toContain("opr_exist");
     expect(container.textContent).toContain("http://127.0.0.1:10100/v1");
     expect(container.textContent).not.toContain("Could not load API keys.");
 
@@ -124,7 +124,7 @@ test("successful key create keeps last-good keys visible when follow-up refresh 
 
     expect(keysGets).toBeGreaterThanOrEqual(2);
     expect(container.textContent).toContain("existing-key");
-    expect(container.textContent).toContain("ocx_exist");
+    expect(container.textContent).toContain("opr_exist");
     expect(container.textContent).toContain("http://127.0.0.1:10100/v1");
     expect(container.textContent).toContain("Could not load API keys.");
     expect(container.textContent).not.toContain("No API keys yet.");
@@ -203,10 +203,11 @@ test("successful key delete keeps last-good keys visible when follow-up refresh 
 
     expect(keysGets).toBeGreaterThanOrEqual(2);
     expect(container.textContent).toContain("existing-key");
-    expect(container.textContent).toContain("ocx_exist");
+    expect(container.textContent).toContain("opr_exist");
     expect(container.textContent).toContain("Could not load API keys.");
   } finally {
     await act(async () => root.unmount());
     testWindow.close();
   }
 });
+

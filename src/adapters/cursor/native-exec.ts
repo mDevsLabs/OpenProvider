@@ -50,7 +50,7 @@ import {
 } from "./native-exec-tools";
 import { clientBytes, execBytes } from "./native-exec-common";
 import type { McpToolDefinition } from "./gen/agent_pb";
-import { OCX_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
+import { opr_RESPONSES_TOOL_PROVIDER } from "./tool-definitions";
 
 export type CursorNativeExecDeps = CursorNativeNetworkDeps & CursorNativeToolDeps;
 
@@ -166,7 +166,7 @@ export async function handleCursorNativeExec(execMsg: ExecServerMessage, deps: C
   if (execCase === "backgroundShellSpawnArgs") return [backgroundShellSpawnExec(execMsg)];
   if (execCase === "writeShellStdinArgs") return [writeShellStdinExec(execMsg)];
   if (execCase === "fetchArgs") return [await fetchExec(execMsg, deps)];
-  if (execCase === "mcpArgs" && execMsg.message.value.providerIdentifier === OCX_RESPONSES_TOOL_PROVIDER) {
+  if (execCase === "mcpArgs" && execMsg.message.value.providerIdentifier === opr_RESPONSES_TOOL_PROVIDER) {
     return [execBytes(execMsg, "mcpResult", create(McpResultSchema, {
       result: {
         case: "error",
@@ -226,3 +226,4 @@ export function handleCursorNativeKv(kvMsg: KvServerMessage): Uint8Array {
   }
   return clientBytes({ message: { case: "kvClientMessage", value: create(KvClientMessageSchema, { id: kvMsg.id }) } });
 }
+

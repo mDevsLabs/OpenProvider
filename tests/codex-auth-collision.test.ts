@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { saveCodexAccountCredential } from "../src/codex/account-store";
 import { checkAccountIdCollision } from "../src/codex/auth-api";
 import { saveConfig } from "../src/config";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-auth-collision-test");
 const TEST_CODEX_HOME = join(TEST_DIR, "codex");
@@ -28,8 +28,8 @@ afterEach(() => {
   if (existsSync(TEST_DIR)) rmSync(TEST_DIR, { recursive: true });
 });
 
-function seedAccount(id: string, email: string, chatgptAccountId: string, plan?: string): OcxConfig {
-  const config: OcxConfig = {
+function seedAccount(id: string, email: string, chatgptAccountId: string, plan?: string): oprConfig {
+  const config: oprConfig = {
     port: 10100,
     providers: {},
     defaultProvider: "openai",
@@ -94,7 +94,7 @@ describe("codex auth account collision", () => {
       providers: {},
       defaultProvider: "openai",
       codexAccounts: [],
-    } as OcxConfig);
+    } as oprConfig);
 
     const result = checkAccountIdCollision("main-chatgpt-account", "main@example.test", "business");
     expect(result).toEqual({ collision: false });
@@ -117,3 +117,4 @@ describe("codex auth account collision", () => {
     )).toEqual({ collision: false });
   });
 });
+

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { handleManagementAPI } from "../src/server/management-api";
 import { saveConfig } from "../src/config";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const TEST_DIR = join(tmpdir(), "opr-conn-test");
 const previousHome = process.env.OPENPROVIDER_HOME;
@@ -23,18 +23,18 @@ afterEach(() => {
   rmSync(TEST_DIR, { recursive: true, force: true });
 });
 
-function baseConfig(providers: OcxConfig["providers"]): OcxConfig {
+function baseConfig(providers: oprConfig["providers"]): oprConfig {
   const config = {
     port: 0,
     hostname: "127.0.0.1",
     defaultProvider: Object.keys(providers)[0]!,
     providers,
-  } as OcxConfig;
+  } as oprConfig;
   saveConfig(config);
   return config;
 }
 
-async function probe(config: OcxConfig, name: string): Promise<{ status: number; body: Record<string, unknown> }> {
+async function probe(config: oprConfig, name: string): Promise<{ status: number; body: Record<string, unknown> }> {
   const req = new Request(`http://127.0.0.1/api/providers/test?name=${name}`, { method: "POST" });
   const res = await handleManagementAPI(req, new URL(req.url), config, {});
   if (!res) throw new Error("handler returned no response");
@@ -187,3 +187,4 @@ describe("POST /api/oauth/login/cancel (WP040)", () => {
     expect(ok.body).toEqual({ ok: true, cancelled: false });
   });
 });
+

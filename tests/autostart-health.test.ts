@@ -3,7 +3,7 @@ import { deriveStartupHealth, startupHealthSummary } from "../src/codex/autostar
 import { classifyCodexRouting, hasInjectedCodexRouting } from "../src/codex/inject";
 import { handleManagementAPI } from "../src/server/management-api";
 import { invalidateStartupHealthCache, markStartupHealthDiagnosticStale } from "../src/server/startup-health-cache";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 const base = {
   routingKind: "openprovider-local" as const,
@@ -157,7 +157,7 @@ describe("Codex startup health", () => {
     const responsePromise = handleManagementAPI(
       new Request(url),
       url,
-      { port: 10100, providers: {}, defaultProvider: "openai", codexAutoStart: true } as OcxConfig,
+      { port: 10100, providers: {}, defaultProvider: "openai", codexAutoStart: true } as oprConfig,
     );
     await Bun.sleep(75);
     expect(timerFired).toBe(true); // service-manager probes run in a child, not the proxy event loop
@@ -181,3 +181,4 @@ describe("Codex startup health", () => {
     }
   });
 });
+

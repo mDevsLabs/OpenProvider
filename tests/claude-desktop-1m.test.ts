@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildClaudeDesktopState } from "../src/server/management/shared";
 import { DESKTOP_SUPPORTS_1M_THRESHOLD } from "../src/claude/desktop-3p";
-import type { OcxConfig } from "../src/types";
+import type { oprConfig } from "../src/types";
 
 /**
  * D1c: the dashboard surfaces the same 1M eligibility the writer emits, from one
@@ -16,7 +16,7 @@ const config = {
   port: 10100,
   defaultProvider: "openai",
   providers: {},
-} as unknown as OcxConfig;
+} as unknown as oprConfig;
 
 test("the DTO and the writer share one threshold constant", () => {
   // If someone changes one side, this fails — that is the point.
@@ -49,3 +49,4 @@ test("supports1m is true at and above the threshold, false below it", async () =
     rmSync(home, { recursive: true, force: true });
   }
 });
+

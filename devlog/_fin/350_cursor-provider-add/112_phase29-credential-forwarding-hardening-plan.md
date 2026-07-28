@@ -23,14 +23,14 @@ key, then the test-token env var, then fail with the existing clear "no token" e
 
 ### Current openprovider — implicit forward
 ```30:40:src/adapters/cursor/live-transport.ts
-export function resolveCursorToken(provider: OcxProviderConfig, headers?: Headers): string {
+export function resolveCursorToken(provider: oprProviderConfig, headers?: Headers): string {
   const providerKey = provider.apiKey?.trim();
   if (providerKey) return providerKey;
 
   const forwarded = headers?.get("authorization") ?? headers?.get("Authorization");
   if (forwarded?.toLowerCase().startsWith("bearer ")) return forwarded.slice("bearer ".length).trim();
 
-  const envToken = process.env.OPENCODEX_CURSOR_TEST_TOKEN?.trim();
+  const envToken = process.env.OpenProvider_CURSOR_TEST_TOKEN?.trim();
   if (envToken) return envToken;
   throw new CursorMissingCredentialError();
 }
@@ -48,14 +48,14 @@ export function resolveCursorToken(provider: OcxProviderConfig, headers?: Header
 ## 3. Decision
 
 Forwarding becomes **opt-in**. New optional provider field `forwardAuthToCursor?: boolean`
-(default `false`). Precedence: `provider.apiKey` → (opt-in) forwarded bearer → `OPENCODEX_CURSOR_TEST_TOKEN`
+(default `false`). Precedence: `provider.apiKey` → (opt-in) forwarded bearer → `OpenProvider_CURSOR_TEST_TOKEN`
 → throw `CursorMissingCredentialError`. The forwarded bearer is no longer first.
 
 ## 4. Diff-level plan
 
 ### MODIFY `src/adapters/cursor/live-transport.ts`
 ```ts
-export function resolveCursorToken(provider: OcxProviderConfig, headers?: Headers): string {
+export function resolveCursorToken(provider: oprProviderConfig, headers?: Headers): string {
   const providerKey = provider.apiKey?.trim();
   if (providerKey) return providerKey;
 
@@ -66,16 +66,16 @@ export function resolveCursorToken(provider: OcxProviderConfig, headers?: Header
     if (forwarded?.toLowerCase().startsWith("bearer ")) return forwarded.slice("bearer ".length).trim();
   }
 
-  const envToken = process.env.OPENCODEX_CURSOR_TEST_TOKEN?.trim();
+  const envToken = process.env.OpenProvider_CURSOR_TEST_TOKEN?.trim();
   if (envToken) return envToken;
   throw new CursorMissingCredentialError();
 }
 ```
 - Also update `CursorMissingCredentialError` message to stop advertising `Authorization` as a default
-  source: `"requires a Cursor access token in provider.apiKey or OPENCODEX_CURSOR_TEST_TOKEN
+  source: `"requires a Cursor access token in provider.apiKey or OpenProvider_CURSOR_TEST_TOKEN
   (set forwardAuthToCursor:true to forward a client bearer)."`
 
-### MODIFY `src/types.ts` (`OcxProviderConfig`)
+### MODIFY `src/types.ts` (`oprProviderConfig`)
 - Add `forwardAuthToCursor?: boolean;` with a doc comment describing the trust boundary.
 
 ### Config docs
@@ -99,3 +99,4 @@ export function resolveCursorToken(provider: OcxProviderConfig, headers?: Header
 ## 7. Cross-references
 - GPT Pro review 260627 — finding **#2 (Critical)**.
 - `111` (native exec gate, the other Critical) · `117` (false-safety error) · `118` (index).
+

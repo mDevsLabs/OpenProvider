@@ -6,16 +6,16 @@ import { CODEX_GPT5_IDENTITY_LINE, NEUTRAL_IDENTITY_LINE, neutralizeIdentity } f
 import { createGoogleAdapter } from "../src/adapters/google";
 import { createKiroAdapter } from "../src/adapters/kiro";
 import { createOpenAIChatAdapter } from "../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../src/types";
+import type { oprParsedRequest, oprProviderConfig } from "../src/types";
 
 const SYS = CODEX_GPT5_IDENTITY_LINE;
 
-function parsed(modelId: string, adapter: string, extra?: Partial<OcxParsedRequest>): OcxParsedRequest {
+function parsed(modelId: string, adapter: string, extra?: Partial<oprParsedRequest>): oprParsedRequest {
   return {
     modelId, stream: false, options: {},
     context: { systemPrompt: [SYS], messages: [{ role: "user", content: "hi" }] },
     ...extra,
-  } as unknown as OcxParsedRequest;
+  } as unknown as oprParsedRequest;
 }
 
 describe("identity neutralization — central helper", () => {
@@ -42,7 +42,7 @@ describe("identity neutralization — central helper", () => {
 
 describe("identity neutralization — adapters never leak proxy identity", () => {
   test("openai-chat: system message is neutralized, no proxy mention", async () => {
-    const provider = { adapter: "openai-chat", baseUrl: "https://api.example.invalid", apiKey: "key" } as unknown as OcxProviderConfig;
+    const provider = { adapter: "openai-chat", baseUrl: "https://api.example.invalid", apiKey: "key" } as unknown as oprProviderConfig;
     const { body } = await createOpenAIChatAdapter(provider).buildRequest(parsed("some/routed-model", "openai-chat"));
     const messages = JSON.parse(body).messages as { role: string; content: string }[];
     const sys = messages.find(m => m.role === "system")!;
@@ -76,7 +76,7 @@ describe("identity neutralization — adapters never leak proxy identity", () =>
     });
 
     test("system prefix is neutralized, no proxy mention", async () => {
-      const provider = { adapter: "kiro", baseUrl: "https://runtime.us-east-1.kiro.dev", authMode: "oauth", apiKey: "tok-123" } as unknown as OcxProviderConfig;
+      const provider = { adapter: "kiro", baseUrl: "https://runtime.us-east-1.kiro.dev", authMode: "oauth", apiKey: "tok-123" } as unknown as oprProviderConfig;
       const { body } = await createKiroAdapter(provider).buildRequest(parsed("claude-sonnet-4.5", "kiro"));
       const serialized = typeof body === "string" ? body : JSON.stringify(body);
       expect(serialized).not.toMatch(/openprovider proxy/i);
@@ -84,3 +84,4 @@ describe("identity neutralization — adapters never leak proxy identity", () =>
     });
   });
 });
+

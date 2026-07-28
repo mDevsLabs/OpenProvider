@@ -28,8 +28,8 @@ PR #55 attempts this but is unmergeable:
 models/subagents pages hang: every provider `/models` fetch runs the full
 `AbortSignal.timeout(8000)` (src/codex-catalog.ts:711) before failing. Nothing in src/
 applies HTTP_PROXY/HTTPS_PROXY (only src/doctor.ts:76 *reports* them). Key runtime fact:
-**opr always runs on Bun** — the npm `bin/ocx.mjs` is a Node shim that execs a bundled Bun
-(see bin/ocx.mjs header comment). So any proxy fix must work with *Bun's* fetch;
+**opr always runs on Bun** — the npm `bin/opr.mjs` is a Node shim that execs a bundled Bun
+(see bin/opr.mjs header comment). So any proxy fix must work with *Bun's* fetch;
 undici `setGlobalDispatcher`/`EnvHttpProxyAgent` does not apply.
 
 ## Research dispatched (3 parallel spark agents, read-only)
@@ -95,3 +95,4 @@ One logical commit per fix on top of `cursor-fixes`:
 - `bun x tsc --noEmit` + `bun test ./tests/` green.
 - Manual: `opr start` with a real Gemini API key → google models visible in catalog;
   with `HTTPS_PROXY` set to a local mitm/dummy → provider fetches route through it.
+

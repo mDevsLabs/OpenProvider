@@ -11,12 +11,12 @@ import { resetDebugSettingsForTests } from "../src/lib/debug-settings";
 import { setDraining } from "../src/server/lifecycle";
 import { startServer } from "../src/server";
 import { formatPassthroughUpstreamError } from "../src/server/responses/passthrough-error";
-import type { OcxConfig, OcxParsedRequest } from "../src/types";
+import type { oprConfig, oprParsedRequest } from "../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "./helpers/isolated-codex-home";
 
 const previousApiToken = process.env.OPENPROVIDER_API_AUTH_TOKEN;
 const previousOpenproviderHome = process.env.OPENPROVIDER_HOME;
-const previousOcxDebug = process.env.OCX_DEBUG;
+const previousoprDebug = process.env.opr_DEBUG;
 const originalGlobalFetch = globalThis.fetch;
 const TEST_DIR = join(import.meta.dir, ".tmp-issue-452-empty-503");
 let isolatedCodexHome: IsolatedCodexHome | null = null;
@@ -48,8 +48,8 @@ afterEach(() => {
   else process.env.OPENPROVIDER_API_AUTH_TOKEN = previousApiToken;
   if (previousOpenproviderHome === undefined) delete process.env.OPENPROVIDER_HOME;
   else process.env.OPENPROVIDER_HOME = previousOpenproviderHome;
-  if (previousOcxDebug === undefined) delete process.env.OCX_DEBUG;
-  else process.env.OCX_DEBUG = previousOcxDebug;
+  if (previousoprDebug === undefined) delete process.env.opr_DEBUG;
+  else process.env.opr_DEBUG = previousoprDebug;
   resetDebugSettingsForTests();
   resetDebugLogBufferForTests();
   isolatedCodexHome?.restore();
@@ -82,11 +82,19 @@ describe("formatPassthroughUpstreamError (#452)", () => {
   });
 
   test("empty body drops invalid Retry-After values", async () => {
-    for (const bad of ["", "nope", "-1", "0", "1e6", "not-a-delay"]) {
+    // "0" is intentionally preserved as an instant-retry client directive
+    // (see resolveClientRetryAfter / #507 review hardening).
+    for (const bad of ["", "nope", "-1", "1e6", "not-a-delay"]) {
       const headers = new Headers({ "retry-after": bad });
       const response = formatPassthroughUpstreamError(503, "", { headers, now: Date.now() });
       expect(response.headers.get("retry-after")).toBeNull();
     }
+  });
+
+  test("empty body preserves Retry-After: 0", async () => {
+    const headers = new Headers({ "retry-after": "0" });
+    const response = formatPassthroughUpstreamError(503, "", { headers, now: Date.now() });
+    expect(response.headers.get("retry-after")).toBe("0");
   });
 
   test("JSON with error.message is preserved for Codex", async () => {
@@ -145,7 +153,7 @@ async function withPoolPassthrough(
       { id: "pool-a", email: "pool-a@example.test", isMain: false, chatgptAccountId: "acct-pool-a" },
     ],
     activeCodexAccountId: "pool-a",
-  } as OcxConfig);
+  } as oprConfig);
   saveCodexAccountCredential("pool-a", {
     accessToken: "pool-a-token",
     refreshToken: "pool-a-refresh",
@@ -255,7 +263,7 @@ describe("drain 503 JSON (#452)", () => {
           defaultModel: "mimo-v2.5-pro",
         },
       },
-    } as OcxConfig);
+    } as oprConfig);
 
     const server = startServer(0);
     try {
@@ -278,8 +286,8 @@ describe("drain 503 JSON (#452)", () => {
 });
 
 describe("openai-chat provider debug (#452)", () => {
-  test("buildRequest emits debugProviderDiagnostic when OCX_DEBUG=1", () => {
-    process.env.OCX_DEBUG = "1";
+  test("buildRequest emits debugProviderDiagnostic when opr_DEBUG=1", () => {
+    process.env.opr_DEBUG = "1";
     resetDebugLogBufferForTests();
     const adapter = createOpenAIChatAdapter({
       adapter: "openai-chat",
@@ -294,7 +302,7 @@ describe("openai-chat provider debug (#452)", () => {
         tools: [{ type: "function", name: "shell_command", description: "run", parameters: { type: "object" } }],
       },
       options: {},
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
     adapter.buildRequest(parsed);
     const lines = getDebugLogEntries().map(e => e.line);
     expect(lines.some(line => line.includes("[opr:openai-chat:request]"))).toBe(true);
@@ -304,7 +312,7 @@ describe("openai-chat provider debug (#452)", () => {
   });
 
   test("tenant-scoped baseUrl logs host only — account id never appears", () => {
-    process.env.OCX_DEBUG = "1";
+    process.env.opr_DEBUG = "1";
     resetDebugLogBufferForTests();
     const accountId = "cf-account-abc123secret";
     const adapter = createOpenAIChatAdapter({
@@ -319,7 +327,7 @@ describe("openai-chat provider debug (#452)", () => {
         messages: [{ role: "user", content: [{ type: "text", text: "hi" }] }],
       },
       options: {},
-    } as unknown as OcxParsedRequest;
+    } as unknown as oprParsedRequest;
     adapter.buildRequest(parsed);
     const joined = getDebugLogEntries().map(e => e.line).join("\n");
     expect(joined).toContain("[opr:openai-chat:request]");
@@ -330,3 +338,4 @@ describe("openai-chat provider debug (#452)", () => {
     expect(joined).not.toContain("/ai/v1");
   });
 });
+

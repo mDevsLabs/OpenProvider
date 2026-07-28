@@ -22,7 +22,7 @@ openprovider 프록시에서 가로채 사용자 지정 모델로 리라이트. 
 
 | File | Action | Description |
 |------|--------|-------------|
-| src/types.ts | MODIFY | Add OcxShadowCallInterceptConfig + shadowCallIntercept field to OcxConfig |
+| src/types.ts | MODIFY | Add oprShadowCallInterceptConfig + shadowCallIntercept field to oprConfig |
 | src/server/responses.ts | MODIFY | Intercept gpt-5.4-mini before routeModel, rewrite model + force effort=low |
 | src/server/management-api.ts | MODIFY | Add GET/PUT /api/shadow-call-settings endpoint |
 | gui/src/pages/Dashboard.tsx | MODIFY | Shadow call intercept panel below sidecar panels |
@@ -36,12 +36,12 @@ openprovider 프록시에서 가로채 사용자 지정 모델로 리라이트. 
 ### Config shape (types.ts line ~381, after disabledModels)
 
 ```ts
-interface OcxShadowCallInterceptConfig {
+interface oprShadowCallInterceptConfig {
   enabled?: boolean;  // default false (opt-in)
   model?: string;     // replacement model from active routed models
 }
-// In OcxConfig:
-shadowCallIntercept?: OcxShadowCallInterceptConfig;
+// In oprConfig:
+shadowCallIntercept?: oprShadowCallInterceptConfig;
 ```
 
 ### Intercept point (responses.ts line ~462-469)
@@ -75,3 +75,4 @@ Follow sidecar panel pattern in Dashboard.tsx (lines 753-815):
 5. Warning banner on activation
 6. Request log shows shadowCallRewrittenFrom
 7. Docs page created
+
